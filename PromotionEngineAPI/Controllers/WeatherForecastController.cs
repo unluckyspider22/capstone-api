@@ -13,7 +13,7 @@ namespace PromotionEngineAPI.Controllers
     {
         private static readonly string[] Summaries = new[]
         {
-            "1", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
+            "1", "Bracing_1", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
 
         private readonly ILogger<WeatherForecastController> _logger;
