@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ApplicationCore.Repository.Role;
 using ApplicationCore.Service;
+using ApplicationCore.Services.PromotionStoreMappings;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -59,7 +60,7 @@ namespace PromotionEngineAPI
             //Promotion
 
             //PromotionStoreMapping
-
+            services.AddScoped<IPromotionStoreMappingService, PromotionStoreMappingService>();
             //PromotionTier
 
             //RoleEntity
