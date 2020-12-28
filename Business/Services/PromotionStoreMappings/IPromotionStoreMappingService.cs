@@ -8,9 +8,9 @@ namespace ApplicationCore.Services.PromotionStoreMappings
 {
     public interface IPromotionStoreMappingService
     {
-        public List<Infrastructure.Models.PromotionStoreMapping> GetPromotionStoreMappings();
+        public List<PromotionStoreMapping> GetPromotionStoreMappings();
 
-        public Infrastructure.Models.PromotionStoreMapping GetPromotionStoreMapping(Guid id);
+        public PromotionStoreMapping GetPromotionStoreMapping(Guid id);
 
         public int PostPromotionStoreMapping(PromotionStoreMapping promotionStoreMapping);
 

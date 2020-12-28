@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using ApplicationCore.Repository.Role;
 using ApplicationCore.Service;
 using ApplicationCore.Services.PromotionStoreMappings;
+using ApplicationCore.Services.Stores;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -66,7 +67,7 @@ namespace PromotionEngineAPI
             //RoleEntity
             services.AddScoped<IRoleService, RoleService>();
             //Store
-
+            services.AddScoped<IStoreService, StoreService>();
             //Voucher
 
             //VoucherChannel
