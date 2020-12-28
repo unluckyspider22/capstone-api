@@ -6,6 +6,7 @@ using ApplicationCore.Repository.Role;
 using ApplicationCore.Service;
 using ApplicationCore.Services.PromotionStoreMappings;
 using ApplicationCore.Services.Stores;
+using ApplicationCore.Services.VoucherGroups;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -73,7 +74,7 @@ namespace PromotionEngineAPI
             //VoucherChannel
 
             //VoucherGroup
-
+            services.AddScoped<IVoucherGroupService, VoucherGroupService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
