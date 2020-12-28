@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ApplicationCore.Repository.Role;
 using ApplicationCore.Service;
+using ApplicationCore.Services.Accounts;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -35,7 +36,7 @@ namespace PromotionEngineAPI
             });
             services.AddTransient<PromotionEngineContext, PromotionEngineContext>();
             //Account
-
+            services.AddScoped<IAccountService, AccountService>();
             //Action
 
             //Brand
@@ -72,6 +73,7 @@ namespace PromotionEngineAPI
 
             //VoucherGroup
 
+            services.AddControllers().AddNewtonsoftJson();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
