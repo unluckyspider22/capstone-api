@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ApplicationCore.Repository.Role;
+using ApplicationCore.Service;
+using Infrastructure.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -30,6 +33,45 @@ namespace PromotionEngineAPI
             services.AddSwaggerGen(c => {
                 c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "My API", Version = "1" });
             });
+            services.AddTransient<PromotionEngineContext, PromotionEngineContext>();
+            //Account
+
+            //Action
+
+            //Brand
+
+            //Channel
+
+            //ConditionRule
+
+            //Holiday
+
+            //Membership
+
+            //MembershipCondition
+
+            //OrderCondition
+
+            //ProductCondition
+
+            //MembershipAction
+
+            //Promotion
+
+            //PromotionStoreMapping
+
+            //PromotionTier
+
+            //RoleEntity
+            services.AddScoped<IRoleService, RoleService>();
+            //Store
+
+            //Voucher
+
+            //VoucherChannel
+
+            //VoucherGroup
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

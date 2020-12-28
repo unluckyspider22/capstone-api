@@ -1,0 +1,27 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace Infrastructure.Models
+{
+    public partial class MembershipAction
+    {
+        public MembershipAction()
+        {
+            PromotionTier = new HashSet<PromotionTier>();
+        }
+
+        public Guid MembershipActionId { get; set; }
+        public Guid? PromotionTierId { get; set; }
+        public string GroupNo { get; set; }
+        public string ActionType { get; set; }
+        public string GiftProductCode { get; set; }
+        public string GiftName { get; set; }
+        public string GiftVoucherCode { get; set; }
+        public decimal? BonusPoint { get; set; }
+        public string DelFlg { get; set; }
+        public DateTime? InsDate { get; set; }
+        public DateTime? UpdDate { get; set; }
+
+        public virtual ICollection<PromotionTier> PromotionTier { get; set; }
+    }
+}
