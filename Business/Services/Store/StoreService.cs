@@ -25,13 +25,22 @@ namespace ApplicationCore.Services
         public int DeleteStore(Guid id)
         {
             var store = _context.Store.Find(id);
+
             if (store == null)
             {
                 return GlobalVariables.NOT_FOUND;
             }
+            try
+            {
+                _context.Store.Remove(store);
+                _context.SaveChanges();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
 
-            _context.Store.Remove(store);
-            _context.SaveChangesAsync();
+
             return GlobalVariables.SUCCESS;
         }
 
@@ -43,12 +52,12 @@ namespace ApplicationCore.Services
             result.StoreCode = store.StoreCode;
             result.StoreName = store.StoreName;
             result.BrandId = store.BrandId;
-            if (store.DelFlg != GlobalVariables.DELETED)
+            if (store.DelFlg.Equals(GlobalVariables.DELETED))
             {
                 // vẫn trả ra obj, FE check delflag để hiển thị ????
                 return null;
             }
-            return result != null ? result : null;
+            return result;
         }
 
         public List<Store> GetStores()
@@ -59,6 +68,7 @@ namespace ApplicationCore.Services
         public int PostStore(Store store)
         {
             store.StoreId = Guid.NewGuid();
+            store.InsDate = DateTime.Now;
             _context.Store.Add(store);
             try
             {
@@ -102,6 +112,30 @@ namespace ApplicationCore.Services
 
             return GlobalVariables.SUCCESS;
         }
+
+        public int UpdateDelFlag(Guid id, string delflg)
+        {
+            var store = _context.Store.Find(id);
+            if(store == null)
+            {
+                return GlobalVariables.NOT_FOUND;
+            }
+            store.UpdDate = DateTime.Now;
+            store.DelFlg = delflg;
+
+            try
+            {              
+                _context.SaveChanges();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+               
+                    throw;
+                
+            }
+            return GlobalVariables.SUCCESS;
+        }
+
         private bool StoreExists(Guid id)
         {
             return _context.Store.Any(e => e.StoreId == id);

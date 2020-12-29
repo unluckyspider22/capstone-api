@@ -21,5 +21,7 @@ namespace ApplicationCore.Services
         public int DeleteStore(Guid id);
 
         public int CountStore();
+
+        public int UpdateDelFlag(Guid id,string delflag);
     }
 }

@@ -32,11 +32,12 @@ namespace PromotionEngineAPI.Controllers
 
         // GET: api/Stores/5
         [HttpGet("{id}")]
-        public ActionResult<StoreParam> GetStore(string id)
+        public ActionResult<StoreParam> GetStore(Guid id)
         {
-            System.Guid param = new System.Guid(id);
-            StoreParam result = _service.GetStore(param);
-            if (result == null) return NotFound();
+
+            StoreParam result = _service.GetStore(id);
+            if (result == null)
+                return NotFound();
             return Ok(result);
         }
 
@@ -50,7 +51,15 @@ namespace PromotionEngineAPI.Controllers
             if (result == GlobalVariables.NOT_FOUND) return NotFound();
             return Ok(store);
         }
-
+        //PATCH:  api/Stores
+        [HttpPatch("{id}")]
+        public ActionResult UpdateDelFlg(Guid id, string delflg)
+        {
+            var result = _service.UpdateDelFlag(id, delflg);
+            if (result == GlobalVariables.NOT_FOUND)
+                return NotFound();
+            return Ok();
+        }
         // POST: api/Stores
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
@@ -64,16 +73,15 @@ namespace PromotionEngineAPI.Controllers
 
         // DELETE: api/Stores/5
         [HttpDelete("{id}")]
-        public ActionResult DeleteStore(string id)
-        {
-            System.Guid param = new System.Guid(id);
-            var result = _service.DeleteStore(param);
+        public ActionResult DeleteStore(Guid id)
+        {       
+            var result = _service.DeleteStore(id);
             if (result == GlobalVariables.NOT_FOUND) {
-                return Ok();
+                return NotFound();
             }
             return Ok();
         }
-
+        // GETCOUNT: api/Stores/count
         [HttpGet]
         [Route("count")]
         public ActionResult GetStoreCount()
