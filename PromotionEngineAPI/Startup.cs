@@ -39,7 +39,7 @@ namespace PromotionEngineAPI
             //Holiday
 
             //Membership
-
+            services.AddScoped<IMembershipService, MembershipService>();
             //MembershipCondition
 
             //OrderCondition

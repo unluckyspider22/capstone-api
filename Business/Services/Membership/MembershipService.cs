@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ApplicationCore.Models;
 using ApplicationCore.Utils;
 using Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
@@ -10,9 +11,6 @@ namespace ApplicationCore.Services
 {
     public class MembershipService : IMembershipService
     {
-        private static int DUPLICATE = 0;
-        private static int OK = 1;
-        private static int FAIL = 2;
         private readonly PromotionEngineContext _context;
 
         public MembershipService(PromotionEngineContext context)
@@ -22,7 +20,7 @@ namespace ApplicationCore.Services
 
         public List<Membership> FindMembership()
         {
-            return _context.Membership.Where(c => c.DelFlg.Equals("0")).ToList();
+            return _context.Membership.Where(c => !c.DelFlg.Equals(GlobalVariables.DELETED)).ToList();
         }
 
         public Membership FindMembership(Guid id)
@@ -35,42 +33,45 @@ namespace ApplicationCore.Services
             return membership != null ? membership : null;
         }
 
-        public Membership UpdateMembership(Guid id, Membership membership)
+        public int UpdateMembership(Guid id, MembershipParam param)
         {
+            var member = _context.Membership.Find(id);
+            if (member != null)
+            {
+                member.Fullname = param.Fullname;
+                member.Email = param.Email;
+                member.MembershipCode = param.MembershipCode;
+                member.UpdDate = DateTime.Now;
+                try
+                {
+                    int result = _context.SaveChanges();
+                    if(result > 0)
+                    {
+                        return GlobalVariables.SUCCESS;
+                    }
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    return GlobalVariables.DUPLICATE;
+                }
+            }
 
-            if (id != membership.MembershipId)
-            {
-                return null;
-            }
-            else
-                _context.Entry(membership).State = EntityState.Modified;
-
-            try
-            {
-                _context.SaveChanges();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                throw;
-            }
-            return null;
+            return GlobalVariables.NOT_FOUND;
         }
 
         public int AddMembership(Membership membership)
         {
+            membership.MembershipId = Guid.NewGuid();
             _context.Membership.Add(membership);
             try
             {
-                if (_context.SaveChanges() > 1)
-                {
-                    return OK;
-                }
+                _context.SaveChanges();
             }
             catch (DbUpdateException)
             {
-                return DUPLICATE;
+                return GlobalVariables.DUPLICATE;
             }
-            return FAIL;
+            return GlobalVariables.SUCCESS;
         }
 
         public int DeleteMembership(Guid id)
@@ -80,9 +81,9 @@ namespace ApplicationCore.Services
             {
                 _context.Membership.Remove(membership);
                 return _context.SaveChanges();
-                
+
             }
-            return FAIL;
+            return GlobalVariables.FAIL;
         }
 
 
