@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.Models;
 using ApplicationCore.Services;
+using ApplicationCore.Utils;
 
 namespace PromotionEngineAPI.Controllers
 {
@@ -51,7 +52,7 @@ namespace PromotionEngineAPI.Controllers
                 return BadRequest();
             }
 
-            if (_service.UpdateAccount(username, account) == 0)
+            if (_service.UpdateAccount(username, account) == GlobalVariables.NOT_FOUND)
             {
                 return NotFound();
             }
@@ -63,10 +64,11 @@ namespace PromotionEngineAPI.Controllers
         [HttpPost]
         public ActionResult<Account> PostAccount(Account account)
         {
-            if (_service.CreateAccount(account) == 0)
+            if (_service.CreateAccount(account) == GlobalVariables.DUPLICATE)
             {
                 return Conflict();
             }
+
             return Ok(account);
         }
 
@@ -74,10 +76,11 @@ namespace PromotionEngineAPI.Controllers
         [HttpDelete("{username}")]
         public ActionResult<Account> DeleteAccount(string username)
         {
-            if (_service.DeleteAccount(username) == 0)
+            if (_service.DeleteAccount(username) == GlobalVariables.NOT_FOUND)
             {
                 return NotFound();
             }   
+
             return Ok();
         }
 

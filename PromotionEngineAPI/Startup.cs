@@ -31,13 +31,13 @@ namespace PromotionEngineAPI
             //Action
             services.AddScoped<IActionService, ActionService>();
             //Brand
-            /*services.AddScoped<IBrandService, BrandService>();*/
+            services.AddScoped<IBrandService, BrandService>();
             //Channel
-
+            services.AddScoped<IChannelService, ChannelService>();
             //ConditionRule
-
+            services.AddScoped<IConditionRuleService, ConditionRuleService>();
             //Holiday
-
+            services.AddScoped<IHolidayService, HolidayService>();
             //Membership
 
             //MembershipCondition
