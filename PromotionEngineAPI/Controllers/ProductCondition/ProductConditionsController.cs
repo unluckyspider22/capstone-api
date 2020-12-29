@@ -1,38 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.Models;
 using ApplicationCore.Services;
-using ApplicationCore.Utils;
 using ApplicationCore.Models;
+using ApplicationCore.Utils;
 
 namespace PromotionEngineAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class OrderConditionsController : ControllerBase
+    public class ProductConditionsController : ControllerBase
     {
-        private readonly IOrderConditionService _service;
+        private readonly IProductConditionService _service;
 
-        public OrderConditionsController(IOrderConditionService service)
+        public ProductConditionsController(IProductConditionService service)
         {
             _service = service;
         }
 
-        // GET: api/OrderConditions
+        // GET: api/ProductConditions
         [HttpGet]
-        public List<OrderCondition> GetOrderCondition()
+        public List<ProductCondition> GetProductCondition()
         {
-            return _service.GetOrderConditions();
+            return _service.GetProductConditions();
         }
 
-        // GET: api/OrderConditions/5
+        // GET: api/ProductConditions/5
         [HttpGet("{id}")]
-        public ActionResult<OrderCondition> GetOrderCondition(Guid id)
+        public ActionResult<ProductCondition> GetProductCondition(Guid id)
         {
-            var condition = _service.FindOrderCondition(id);
+            var condition = _service.FindProductCondition(id);
 
             if (condition == null)
             {
@@ -42,20 +41,20 @@ namespace PromotionEngineAPI.Controllers
             return Ok(condition);
         }
 
-        // PUT: api/OrderConditions/5
+        // PUT: api/ProductConditions/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public ActionResult PutOrderCondition(Guid id, OrderConditionParam param)
+        public ActionResult PutProductCondition(Guid id, ProductConditionParam param)
         {
-            if (id != param.OrderConditionId)
+            if (id != param.ProductConditionId)
             {
                 return BadRequest();
             }
 
             try
             {
-                int result = _service.UpdateOrderCondition(id, param);
+                int result = _service.UpdateProductCondition(id, param);
                 if (result == GlobalVariables.SUCCESS)
                 {
                     return Ok(param);
@@ -73,16 +72,16 @@ namespace PromotionEngineAPI.Controllers
             return NoContent();
         }
 
-        // POST: api/OrderConditions
+        // POST: api/ProductConditions
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public ActionResult<OrderCondition> PostOrderCondition(OrderCondition orderCondition)
+        public ActionResult<ProductCondition> PostProductCondition(ProductCondition ProductCondition)
         {
-            int result = _service.AddOrderCondition(orderCondition);
+            int result = _service.AddProductCondition(ProductCondition);
             if (result == GlobalVariables.SUCCESS)
             {
-                return Ok(orderCondition);
+                return Ok(ProductCondition);
             }
             else if (result == GlobalVariables.DUPLICATE)
             {
@@ -91,11 +90,11 @@ namespace PromotionEngineAPI.Controllers
             return NoContent();
         }
 
-        // DELETE: api/OrderConditions/5
+        // DELETE: api/ProductConditions/5
         [HttpDelete("{id}")]
-        public ActionResult<OrderCondition> DeleteOrderCondition(Guid id)
+        public ActionResult<ProductCondition> DeleteProductCondition(Guid id)
         {
-            var condition = _service.DeleteOrderCondition(id);
+            var condition = _service.DeleteProductCondition(id);
 
             if (condition > 0)
             {
