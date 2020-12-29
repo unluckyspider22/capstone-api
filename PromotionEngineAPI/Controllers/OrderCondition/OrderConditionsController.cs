@@ -1,40 +1,38 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.Models;
 using ApplicationCore.Services;
-using ApplicationCore.Models;
 using ApplicationCore.Utils;
+using ApplicationCore.Models;
 
 namespace PromotionEngineAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class MembershipConditionsController : ControllerBase
+    public class OrderConditionsController : ControllerBase
     {
-        private readonly IMembershipConditionService _service;
+        private readonly IOrderConditionService _service;
 
-        public MembershipConditionsController(IMembershipConditionService service)
+        public OrderConditionsController(IOrderConditionService service)
         {
             _service = service;
         }
 
-        // GET: api/MembershipConditions
+        // GET: api/OrderConditions
         [HttpGet]
-        public ActionResult<List<MembershipCondition>> GetMembershipCondition()
+        public List<OrderCondition> GetOrderCondition()
         {
-            return _service.GetMembershipConditions();
+            return _service.GetOrderConditions();
         }
 
-        // GET: api/MembershipConditions/5
+        // GET: api/OrderConditions/5
         [HttpGet("{id}")]
-        public ActionResult<MembershipCondition> GetMembershipCondition(Guid id)
+        public ActionResult<OrderCondition> GetOrderCondition(Guid id)
         {
-            var condition = _service.FindMembershipCondition(id);
+            var condition = _service.FindOrderCondition(id);
 
             if (condition == null)
             {
@@ -44,20 +42,20 @@ namespace PromotionEngineAPI.Controllers
             return Ok(condition);
         }
 
-        // PUT: api/MembershipConditions/5
+        // PUT: api/OrderConditions/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public ActionResult<MembershipCondition> PutMembershipCondition(Guid id, MembershipConditionParam param)
+        public async Task<IActionResult> PutOrderCondition(Guid id, OrderConditionParam param)
         {
-            if (id != param.MembershipConditionId)
+            if (id != param.OrderConditionId)
             {
                 return BadRequest();
             }
 
             try
             {
-                int result = _service.UpdateMembershipCondition(id, param);
+                int result = _service.UpdateOrderCondition(id, param);
                 if (result == GlobalVariables.SUCCESS)
                 {
                     return Ok(param);
@@ -69,24 +67,22 @@ namespace PromotionEngineAPI.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-
                 return Conflict();
-
             }
 
             return NoContent();
         }
 
-        // POST: api/MembershipConditions
+        // POST: api/OrderConditions
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public ActionResult<MembershipCondition> PostMembershipCondition(MembershipCondition membershipCondition)
+        public ActionResult<OrderCondition> PostOrderCondition(OrderCondition orderCondition)
         {
-            int result = _service.AddMembershipCondition(membershipCondition);
+            int result = _service.AddOrderCondition(orderCondition);
             if (result == GlobalVariables.SUCCESS)
             {
-                return Ok(membershipCondition);
+                return Ok(orderCondition);
             }
             else if (result == GlobalVariables.DUPLICATE)
             {
@@ -95,11 +91,11 @@ namespace PromotionEngineAPI.Controllers
             return NoContent();
         }
 
-        // DELETE: api/MembershipConditions/5
+        // DELETE: api/OrderConditions/5
         [HttpDelete("{id}")]
-        public ActionResult DeleteMembershipCondition(Guid id)
+        public ActionResult<OrderCondition> DeleteOrderCondition(Guid id)
         {
-            var condition = _service.DeleteMembershipCondition(id);
+            var condition = _service.DeleteOrderCondition(id);
 
             if (condition > 0)
             {

@@ -43,7 +43,7 @@ namespace PromotionEngineAPI
             //MembershipCondition
             services.AddScoped<IMembershipConditionService, MembershipConditionService>();
             //OrderCondition
-
+            services.AddScoped<IOrderConditionService, OrderConditionService>();
             //ProductCondition
 
             //MembershipAction
