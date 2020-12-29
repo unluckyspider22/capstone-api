@@ -1,5 +1,6 @@
 ﻿
 using ApplicationCore.Models;
+using ApplicationCore.Utils;
 using Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -24,6 +25,8 @@ namespace ApplicationCore.Services
 
         public int CreateAction(ActionParam actionParam)
         {
+            actionParam.ActionId = System.Guid.NewGuid();
+
             Infrastructure.Models.Action action = new Infrastructure.Models.Action
             {
                 ActionId = actionParam.ActionId,
@@ -49,10 +52,10 @@ namespace ApplicationCore.Services
             }
             catch (DbUpdateException)
             {
-                return 0;
+                throw;
             }
 
-            return 1;
+            return GlobalVariables.SUCCESS;
         }
 
         public int DeleteAction(System.Guid id)
@@ -60,13 +63,22 @@ namespace ApplicationCore.Services
             var action = _context.Action.Find(id);
             if (action == null)
             {
-                return 0;
+                return GlobalVariables.NOT_FOUND;
             }
-            action.DelFlg = "1";
-            _context.Entry(action).Property("DelFlg").IsModified = true;
-            _context.SaveChanges();
 
-            return 1;
+            action.DelFlg = "1";
+            try
+            {
+                _context.Entry(action).Property("DelFlg").IsModified = true;
+                _context.SaveChanges();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+           
+
+            return GlobalVariables.SUCCESS;
         }
 
         public List<Infrastructure.Models.Action> GetActions()
@@ -86,10 +98,12 @@ namespace ApplicationCore.Services
         public int UpdateAction(System.Guid id, ActionParam actionParam)
         {
             var action = _context.Action.Find(id);
+
             if (action == null)
             {
-                return 0;
+                return GlobalVariables.NOT_FOUND;
             }
+
             action.GroupNo = actionParam.GroupNo;
             action.ActionType = actionParam.ActionType;
             action.IsLimitAmount = actionParam.IsLimitAmount;
@@ -109,10 +123,10 @@ namespace ApplicationCore.Services
             }
             catch (DbUpdateConcurrencyException)
             {
-                return 0;
+                throw;
             }
 
-            return 1;
+            return GlobalVariables.SUCCESS;
         }
     }
 }

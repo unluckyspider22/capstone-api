@@ -18,8 +18,7 @@ namespace ApplicationCore.Services
         }
         public int CountBrand()
         {
-            int count = _context.Brand.Where(c => c.DelFlg.Equals("0")).Count();
-            return count;
+            return _context.Brand.Where(c => !c.DelFlg.Equals(GlobalVariables.DELETED)).Count();
         }
 
         public int CreateBrand(BrandParam brandParam)
@@ -44,47 +43,60 @@ namespace ApplicationCore.Services
             {
                 _context.SaveChanges();
             }
-            catch (DbUpdateException e)
+            catch (DbUpdateException)
             {
-
-                Console.WriteLine("Error: " + e.ToString());
-                return 0;
+                throw;
             }
 
-            return 1;
+            return GlobalVariables.SUCCESS;
         }
 
         public int DeleteBrand(Guid id)
         {
             var brand = _context.Brand.Find(id);
+
             if (brand == null)
             {
-                return 0;
+                return GlobalVariables.NOT_FOUND;
             }
-            brand.DelFlg = "1";
-            _context.Entry(brand).Property("DelFlg").IsModified = true;
-            _context.SaveChanges();
 
-            return 1;
+            brand.DelFlg = GlobalVariables.DELETED;
+            try
+            {
+                _context.Entry(brand).Property("DelFlg").IsModified = true;
+                _context.SaveChanges();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+
+            return GlobalVariables.SUCCESS;
         }
 
         public List<Brand> GetBrands()
         {
-            return _context.Brand.Where(c => c.DelFlg.Equals("0")).ToList();
+            return _context.Brand.Where(c => !c.DelFlg.Equals(GlobalVariables.DELETED)).ToList();
         }
 
         public Brand GetBrands(Guid id)
         {
-            return _context.Brand.Where(c => c.DelFlg.Equals("0")).Where(c => c.BrandId.Equals(id)).First();
+            return _context.Brand
+                .Where(c => !c.DelFlg.Equals(GlobalVariables.DELETED))
+                .Where(c => c.BrandId.Equals(id))
+                .First();
         }
 
         public int UpdateBrand(Guid id, BrandParam brandParam)
         {
             var brand = _context.Brand.Find(id);
+
             if (brand == null)
             {
-                return 0;
+                return GlobalVariables.NOT_FOUND;
             }
+
             brand.BrandId = brandParam.BrandId;
             brand.Username = brandParam.Username;
             brand.BrandCode = brandParam.BrandCode;
@@ -94,16 +106,18 @@ namespace ApplicationCore.Services
             brand.CompanyName = brandParam.CompanyName;
             brand.Description = brandParam.Description;
             brand.Address = brandParam.Address;
+            brand.UpdDate = DateTime.Now;
+
             try
             {
                 _context.SaveChanges();
             }
             catch (DbUpdateConcurrencyException)
             {
-                return 0;
+                throw;
             }
 
-            return 1;
+            return GlobalVariables.SUCCESS;
 
         }
     }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ApplicationCore.Models;
 using ApplicationCore.Services;
+using ApplicationCore.Utils;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -45,7 +46,7 @@ namespace PromotionEngineAPI.Controllers
 
         // PUT: api/brands/5
         [HttpPut("{id}")]
-        public ActionResult<Brand> PutBrand(Guid id, BrandParam brandParam)
+        public ActionResult<BrandParam> PutBrand(Guid id, BrandParam brandParam)
         {
 
             if (!id.Equals(brandParam.BrandId))
@@ -53,7 +54,9 @@ namespace PromotionEngineAPI.Controllers
                 return BadRequest();
             }
 
-            if (_service.UpdateBrand(id, brandParam) == 0)
+            var result = _service.UpdateBrand(id, brandParam);
+
+            if (result == GlobalVariables.NOT_FOUND)
             {
                 return NotFound();
             }
@@ -63,23 +66,21 @@ namespace PromotionEngineAPI.Controllers
 
         // POST: api/Brands
         [HttpPost]
-        public ActionResult<Brand> PostBrand(BrandParam brandParam)
+        public ActionResult<BrandParam> PostBrand(BrandParam brandParam)
         {
             brandParam.BrandId = Guid.NewGuid();
 
-            if (_service.CreateBrand(brandParam) == 0)
-            {
-                return Conflict();
-            }
+            _service.CreateBrand(brandParam);
+
             return Ok(brandParam);
         }
 
         // DELETE: api/Brands/5
         [HttpDelete("{id}")]
-        public ActionResult<Brand> DeleteBrand(Guid id)
+        public ActionResult DeleteBrand(Guid id)
         {
-
-            if (_service.DeleteBrand(id) == 0)
+            var result = _service.DeleteBrand(id);
+            if (result == GlobalVariables.NOT_FOUND)
             {
                 return NotFound();
             }

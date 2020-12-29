@@ -18,7 +18,7 @@ namespace ApplicationCore.Services
             _context = context;
         }
 
-        public List<Membership> FindMembership()
+        public List<Membership> GetMembership()
         {
             return _context.Membership.Where(c => !c.DelFlg.Equals(GlobalVariables.DELETED)).ToList();
         }
@@ -26,11 +26,11 @@ namespace ApplicationCore.Services
         public Membership FindMembership(Guid id)
         {
             var membership = _context.Membership.Find(id);
-            if (membership.DelFlg != GlobalVariables.DELETED)
+            if (membership == null || membership.DelFlg == GlobalVariables.DELETED)
             {
                 return null;
             }
-            return membership != null ? membership : null;
+            return membership;
         }
 
         public int UpdateMembership(Guid id, MembershipParam param)
@@ -45,7 +45,7 @@ namespace ApplicationCore.Services
                 try
                 {
                     int result = _context.SaveChanges();
-                    if(result > 0)
+                    if (result > 0)
                     {
                         return GlobalVariables.SUCCESS;
                     }
@@ -85,10 +85,5 @@ namespace ApplicationCore.Services
             }
             return GlobalVariables.FAIL;
         }
-
-
-
-
-
     }
 }

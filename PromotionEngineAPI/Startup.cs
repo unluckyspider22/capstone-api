@@ -31,19 +31,19 @@ namespace PromotionEngineAPI
             //Action
             services.AddScoped<IActionService, ActionService>();
             //Brand
-            /*services.AddScoped<IBrandService, BrandService>();*/
+            services.AddScoped<IBrandService, BrandService>();
             //Channel
-
+            services.AddScoped<IChannelService, ChannelService>();
             //ConditionRule
-
+            services.AddScoped<IConditionRuleService, ConditionRuleService>();
             //Holiday
-
+            services.AddScoped<IHolidayService, HolidayService>();
             //Membership
             services.AddScoped<IMembershipService, MembershipService>();
             //MembershipCondition
-
+            services.AddScoped<IMembershipConditionService, MembershipConditionService>();
             //OrderCondition
-
+            services.AddScoped<IOrderConditionService, OrderConditionService>();
             //ProductCondition
 
             //MembershipAction

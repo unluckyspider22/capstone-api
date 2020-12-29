@@ -1,60 +1,61 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.Models;
 using ApplicationCore.Services;
-using ApplicationCore.Models;
 using ApplicationCore.Utils;
+using ApplicationCore.Models;
 
 namespace PromotionEngineAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class MembershipsController : ControllerBase
+    public class OrderConditionsController : ControllerBase
     {
-        private readonly IMembershipService _service;
+        private readonly IOrderConditionService _service;
 
-        public MembershipsController(IMembershipService service)
+        public OrderConditionsController(IOrderConditionService service)
         {
             _service = service;
         }
 
-        // GET: api/Memberships
+        // GET: api/OrderConditions
         [HttpGet]
-        public List<Membership> GetMembership()
+        public List<OrderCondition> GetOrderCondition()
         {
-            return _service.GetMembership();
+            return _service.GetOrderConditions();
         }
 
-        // GET: api/Memberships/5
+        // GET: api/OrderConditions/5
         [HttpGet("{id}")]
-        public ActionResult<Membership> GetMembership(Guid id)
+        public ActionResult<OrderCondition> GetOrderCondition(Guid id)
         {
-            var membership = _service.FindMembership(id);
+            var condition = _service.FindOrderCondition(id);
 
-            if (membership == null)
+            if (condition == null)
             {
                 return NotFound();
             }
 
-            return Ok(membership);
+            return Ok(condition);
         }
 
-        // PUT: api/Memberships/5
+        // PUT: api/OrderConditions/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public ActionResult<Membership> PutMembership(Guid id, MembershipParam param)
+        public async Task<IActionResult> PutOrderCondition(Guid id, OrderConditionParam param)
         {
-            if (id != param.MembershipId)
+            if (id != param.OrderConditionId)
             {
                 return BadRequest();
             }
 
             try
             {
-                int result = _service.UpdateMembership(id, param);
+                int result = _service.UpdateOrderCondition(id, param);
                 if (result == GlobalVariables.SUCCESS)
                 {
                     return Ok(param);
@@ -66,46 +67,41 @@ namespace PromotionEngineAPI.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-
                 return Conflict();
-
             }
 
             return NoContent();
         }
 
-        // POST: api/Memberships
+        // POST: api/OrderConditions
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public ActionResult<Membership> PostMembership(Membership membership)
+        public ActionResult<OrderCondition> PostOrderCondition(OrderCondition orderCondition)
         {
-
-            int result = _service.AddMembership(membership);
+            int result = _service.AddOrderCondition(orderCondition);
             if (result == GlobalVariables.SUCCESS)
             {
-                return Ok();
+                return Ok(orderCondition);
             }
             else if (result == GlobalVariables.DUPLICATE)
             {
                 return Conflict();
             }
             return NoContent();
-
         }
 
-        // DELETE: api/Memberships/5
+        // DELETE: api/OrderConditions/5
         [HttpDelete("{id}")]
-        public ActionResult DeleteMembership(Guid id)
+        public ActionResult<OrderCondition> DeleteOrderCondition(Guid id)
         {
-            var membership = _service.DeleteMembership(id);
+            var condition = _service.DeleteOrderCondition(id);
 
-            if (membership > 0)
+            if (condition > 0)
             {
                 return Ok();
             }
             return NotFound();
         }
-
     }
 }

@@ -28,7 +28,7 @@ namespace ApplicationCore.Services
             _context.Account.Add(account);
             try
             {
-                 _context.SaveChanges();
+                _context.SaveChanges();
             }
             catch (DbUpdateException)
             {
@@ -38,7 +38,7 @@ namespace ApplicationCore.Services
                 }
                 else
                 {
-                    return GlobalVariables.FAIL;
+                    throw;
                 }
             }
 
@@ -47,21 +47,31 @@ namespace ApplicationCore.Services
 
         public int DeleteAccount(string username)
         {
-            var account =  _context.Account.Find(username);
+            var account = _context.Account.Find(username);
             if (account == null)
             {
                 return GlobalVariables.NOT_FOUND;
             }
-            account.DelFlg = "1";
-            _context.Entry(account).Property("DelFlg").IsModified = true;
-            _context.SaveChanges();
 
-            return 1;
+            account.DelFlg = GlobalVariables.DELETED;
+
+            try
+            {
+                _context.Entry(account).Property("DelFlg").IsModified = true;
+                _context.SaveChanges();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+
+            return GlobalVariables.SUCCESS;
         }
 
         public Account GetAccount(string username)
         {
-            var account = _context.Account.Where(c => c.DelFlg.Equals("0")).Where(c => c.Username.Equals(username)).FirstOrDefault() ;
+            var account = _context.Account.Where(c => c.DelFlg.Equals("0")).Where(c => c.Username.Equals(username)).First();
 
             return account;
         }
@@ -85,11 +95,14 @@ namespace ApplicationCore.Services
             {
                 if (!AccountExists(username))
                 {
-                    return 0;
+                    return GlobalVariables.NOT_FOUND;
+                } else
+                {
+                    throw;
                 }
             }
 
-            return 1;
+            return GlobalVariables.SUCCESS;
         }
 
         private bool AccountExists(string id)
