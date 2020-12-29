@@ -66,11 +66,10 @@ namespace ApplicationCore.Services
                 return GlobalVariables.NOT_FOUND;
             }
 
-            action.DelFlg = "1";
+            
             try
             {
-                _context.Entry(action).Property("DelFlg").IsModified = true;
-                _context.SaveChanges();
+                _context.Action.Remove(action);
             }
             catch (Exception)
             {
@@ -93,6 +92,31 @@ namespace ApplicationCore.Services
             var action = _context.Action.Where(c => c.DelFlg.Equals("0")).Where(c => c.ActionId.Equals(id)).FirstOrDefault();
 
             return action;
+        }
+
+        public int HideAction(Guid id)
+        {
+            var action = _context.Action.Find(id);
+            if (action == null)
+            {
+                return GlobalVariables.NOT_FOUND;
+            }
+
+            action.DelFlg = "1";
+            action.UpdDate = DateTime.Now;
+            try
+            {
+                _context.Entry(action).Property("DelFlg").IsModified = true;
+                _context.Entry(action).Property("UpdDate").IsModified = true;
+                _context.SaveChanges();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+
+            return GlobalVariables.SUCCESS;
         }
 
         public int UpdateAction(System.Guid id, ActionParam actionParam)

@@ -86,5 +86,17 @@ namespace PromotionEngineAPI.Controllers
             }
             return Ok();
         }
+
+        // PATCH: api/ConditionRules/5
+        [HttpPatch("{id}")]
+        public ActionResult HideConditionRule(Guid id)
+        {
+            var result = _service.HideConditionRule(id);
+            if (result == GlobalVariables.NOT_FOUND)
+            {
+                return NotFound();
+            }
+            return Ok();
+        }
     }
 }

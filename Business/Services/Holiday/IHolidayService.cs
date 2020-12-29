@@ -13,6 +13,7 @@ namespace ApplicationCore.Services
         public int CreateHoliday(Holiday holiday);
         public int UpdateHoliday(Guid id, Holiday holiday);
         public int DeleteHoliday(Guid id);
+        public int HideHoliday(Guid id);
         public int CountHoliday();
     }
 }

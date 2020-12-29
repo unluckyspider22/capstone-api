@@ -14,6 +14,7 @@ namespace ApplicationCore.Services
         public int CreateConditionRule(ConditionRuleParam conditionRuleParam);
         public int UpdateConditionRule(Guid id, ConditionRuleParam conditionRuleParam);
         public int DeleteConditionRule(Guid id);
+        public int HideConditionRule(Guid id);
         public int CountConditionRule();
     }
 }

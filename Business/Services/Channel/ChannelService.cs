@@ -56,11 +56,10 @@ namespace ApplicationCore.Services
                 return GlobalVariables.NOT_FOUND;
             }
 
-            channel.DelFlg = GlobalVariables.DELETED;
+            
             try
             {
-                _context.Entry(channel).Property("DelFlg").IsModified = true;
-                _context.SaveChanges();
+                _context.Channel.Remove(channel);
             }
             catch (Exception)
             {
@@ -84,6 +83,32 @@ namespace ApplicationCore.Services
                .First();
         }
 
+        public int HideChannel(Guid id)
+        {
+            var channel = _context.Channel.Find(id);
+
+            if (channel == null)
+            {
+                return GlobalVariables.NOT_FOUND;
+            }
+
+            channel.DelFlg = GlobalVariables.DELETED;
+            channel.UpdDate = DateTime.Now;
+            try
+            {
+                _context.Entry(channel).Property("DelFlg").IsModified = true;
+                _context.Entry(channel).Property("UpdDate").IsModified = true;
+                _context.SaveChanges();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+
+            return GlobalVariables.SUCCESS;
+        }
+
         public int UpdateChannel(Guid id, ChannelParam channelParam)
         {
             var channel = _context.Channel.Find(id);
@@ -97,6 +122,7 @@ namespace ApplicationCore.Services
             channel.BrandId = channelParam.BrandId;
             channel.ChannelName = channelParam.ChannelName;
             channel.ChannelCode = channelParam.ChannelCode;
+            channel.UpdDate = DateTime.Now;
 
             try
             {

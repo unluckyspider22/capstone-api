@@ -77,5 +77,16 @@ namespace PromotionEngineAPI.Controllers
             }
             return Ok();
         }
+
+        // Patch: api/Actions/5
+        [HttpPatch("{id}")]
+        public ActionResult<Action> HideAction(System.Guid id)
+        {
+            if (_service.HideAction(id) == GlobalVariables.NOT_FOUND)
+            {
+                return NotFound();
+            }
+            return Ok();
+        }
     }
 }
