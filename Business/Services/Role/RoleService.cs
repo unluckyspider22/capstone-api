@@ -1,4 +1,4 @@
-﻿using ApplicationCore.Service;
+﻿using ApplicationCore.Services;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 
-namespace ApplicationCore.Repository.Role
+namespace ApplicationCore.Services
 {
     public class RoleService : IRoleService
     {

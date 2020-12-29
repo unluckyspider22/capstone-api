@@ -1,4 +1,4 @@
-﻿using ApplicationCore.Services.Stores;
+﻿using ApplicationCore.Services;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;

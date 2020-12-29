@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 
 
-namespace ApplicationCore.Service
+namespace ApplicationCore.Services
 {
     public interface IRoleService
     {

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ApplicationCore.Services.Stores
+namespace ApplicationCore.Services
 {
     public class StoreService : IStoreService
     {
