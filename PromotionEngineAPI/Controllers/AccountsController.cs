@@ -15,7 +15,6 @@ namespace PromotionEngineAPI.Controllers
     public class AccountsController : ControllerBase
     {
         private readonly IAccountService _service;
-
         public AccountsController(IAccountService service)
         {
             _service = service;

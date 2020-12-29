@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ApplicationCore.Utils;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -33,15 +34,15 @@ namespace ApplicationCore.Services.Accounts
             {
                 if (AccountExists(account.Username))
                 {
-                    return 0;
+                    return GlobalVariables.DUPLICATE;
                 }
                 else
                 {
-                    throw;
+                    return GlobalVariables.FAIL;
                 }
             }
 
-            return 1;
+            return GlobalVariables.SUCCESS;
         }
 
         public int DeleteAccount(string username)
