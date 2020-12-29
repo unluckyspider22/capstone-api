@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 
 
-namespace ApplicationCore.Services.Accounts
+namespace ApplicationCore.Services
 {
     public interface IAccountService
     {

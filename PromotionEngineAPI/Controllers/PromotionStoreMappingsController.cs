@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.Models;
-using ApplicationCore.Services.PromotionStoreMappings;
+using ApplicationCore.Services;
 
 namespace PromotionEngineAPI.Controllers
 {

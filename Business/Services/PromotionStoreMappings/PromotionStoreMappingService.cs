@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ApplicationCore.Services.PromotionStoreMappings
+namespace ApplicationCore.Services
 {
     public class PromotionStoreMappingService : IPromotionStoreMappingService
     {

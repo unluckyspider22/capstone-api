@@ -6,7 +6,7 @@ using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace ApplicationCore.Services.Accounts
+namespace ApplicationCore.Services
 {
     public class AccountService : IAccountService
     {

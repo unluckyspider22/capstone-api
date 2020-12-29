@@ -3,7 +3,7 @@ using ApplicationCore.Models;
 using Infrastructure.Models;
 
 
-namespace ApplicationCore.Services.Actions
+namespace ApplicationCore.Services
 {
 
 

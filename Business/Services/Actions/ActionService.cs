@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 
-namespace ApplicationCore.Services.Actions
+namespace ApplicationCore.Services
 {
     public class ActionService : IActionService
     {
