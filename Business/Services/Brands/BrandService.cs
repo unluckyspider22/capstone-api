@@ -7,7 +7,7 @@ using ApplicationCore.Utils;
 using Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace ApplicationCore.Services.Brands
+namespace ApplicationCore.Services
 {
     public class BrandService : IBrandService
     {
