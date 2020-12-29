@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
+using ApplicationCore.Utils;
 namespace ApplicationCore.Services
 {
     public class PromotionStoreMappingService : IPromotionStoreMappingService
@@ -20,17 +20,17 @@ namespace ApplicationCore.Services
             var promotionStoreMapping =  _context.PromotionStoreMapping.Find(id);
             if (promotionStoreMapping == null)
             {
-                return 0;
+                return GlobalVariables.NOT_FOUND;
             }
 
             _context.PromotionStoreMapping.Remove(promotionStoreMapping);
              _context.SaveChangesAsync();
-            return 1;
+            return GlobalVariables.SUCCESS;
         }
 
         public PromotionStoreMapping GetPromotionStoreMapping(Guid id)
         {
-            throw new NotImplementedException();
+            return _context.PromotionStoreMapping.Find(id);
         }
 
         public List<PromotionStoreMapping> GetPromotionStoreMappings()
@@ -49,7 +49,7 @@ namespace ApplicationCore.Services
             {
                 if (PromotionStoreMappingExists(promotionStoreMapping.Id))
                 {
-                    return 0;
+                    return GlobalVariables.DUPLICATE;
                 }
                 else
                 {
@@ -57,7 +57,7 @@ namespace ApplicationCore.Services
                 }
             }
 
-            return 1;
+            return GlobalVariables.SUCCESS;
         }
 
         public int PutPromotionStoreMapping(PromotionStoreMapping promotionStoreMapping)
@@ -73,7 +73,7 @@ namespace ApplicationCore.Services
             {
                 if (!PromotionStoreMappingExists(promotionStoreMapping.Id))
                 {
-                    return 0;
+                    return GlobalVariables.NOT_FOUND;
                 }
                 else
                 {
@@ -81,7 +81,7 @@ namespace ApplicationCore.Services
                 }
             }
 
-            return 1;
+            return GlobalVariables.SUCCESS;
         }
         private bool PromotionStoreMappingExists(Guid id)
         {

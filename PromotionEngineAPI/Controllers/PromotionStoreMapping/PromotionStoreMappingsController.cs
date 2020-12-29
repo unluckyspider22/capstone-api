@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.Models;
 using ApplicationCore.Services;
-
+using ApplicationCore.Utils;
 namespace PromotionEngineAPI.Controllers
 {
     [Route("api/[controller]")]
@@ -41,7 +41,9 @@ namespace PromotionEngineAPI.Controllers
         [HttpPut]
         public ActionResult PutPromotionStoreMapping( PromotionStoreMapping promotionStoreMapping)
         {
-            if (_service.PutPromotionStoreMapping(promotionStoreMapping) == 0) return Conflict();
+            promotionStoreMapping.Id = new Guid();
+            if (_service.PutPromotionStoreMapping(promotionStoreMapping) == GlobalVariables.DUPLICATE) 
+                return Conflict();
             else return Ok();
         }
 
@@ -51,7 +53,8 @@ namespace PromotionEngineAPI.Controllers
         [HttpPost]
         public ActionResult PostPromotionStoreMapping(PromotionStoreMapping promotionStoreMapping)
         {
-            if (_service.PostPromotionStoreMapping(promotionStoreMapping) == 0) return Conflict();
+            if (_service.PostPromotionStoreMapping(promotionStoreMapping) == GlobalVariables.DUPLICATE)
+                return Conflict();
             else return Ok();
         }
 
@@ -59,7 +62,8 @@ namespace PromotionEngineAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<PromotionStoreMapping>> DeletePromotionStoreMapping(Guid id)
         {
-            if (_service.DeletePromotionStoreMapping(id) == 0) return NotFound();
+            if (_service.DeletePromotionStoreMapping(id) == GlobalVariables.NOT_FOUND) 
+                return NotFound();
             else return Ok();
         }
 
