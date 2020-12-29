@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.Models;
@@ -11,50 +14,50 @@ namespace PromotionEngineAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class MembershipsController : ControllerBase
+    public class MembershipConditionsController : ControllerBase
     {
-        private readonly IMembershipService _service;
+        private readonly IMembershipConditionService _service;
 
-        public MembershipsController(IMembershipService service)
+        public MembershipConditionsController(IMembershipConditionService service)
         {
             _service = service;
         }
 
-        // GET: api/Memberships
+        // GET: api/MembershipConditions
         [HttpGet]
-        public List<Membership> GetMembership()
+        public ActionResult<List<MembershipCondition>> GetMembershipCondition()
         {
-            return _service.GetMembership();
+            return _service.GetMembershipConditions();
         }
 
-        // GET: api/Memberships/5
+        // GET: api/MembershipConditions/5
         [HttpGet("{id}")]
-        public ActionResult<Membership> GetMembership(Guid id)
+        public ActionResult<MembershipCondition> GetMembershipCondition(Guid id)
         {
-            var membership = _service.FindMembership(id);
+            var condition = _service.FindMembershipCondition(id);
 
-            if (membership == null)
+            if (condition == null)
             {
                 return NotFound();
             }
 
-            return Ok(membership);
+            return Ok(condition);
         }
 
-        // PUT: api/Memberships/5
+        // PUT: api/MembershipConditions/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public ActionResult<Membership> PutMembership(Guid id, MembershipParam param)
+        public ActionResult<MembershipCondition> PutMembershipCondition(Guid id, MembershipConditionParam param)
         {
-            if (id != param.MembershipId)
+            if (id != param.MembershipConditionId)
             {
                 return BadRequest();
             }
 
             try
             {
-                int result = _service.UpdateMembership(id, param);
+                int result = _service.UpdateMembershipCondition(id, param);
                 if (result == GlobalVariables.SUCCESS)
                 {
                     return Ok(param);
@@ -74,31 +77,29 @@ namespace PromotionEngineAPI.Controllers
             return NoContent();
         }
 
-        // POST: api/Memberships
+        // POST: api/MembershipConditions
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public ActionResult<Membership> PostMembership(Membership membership)
+        public ActionResult<MembershipCondition> PostMembershipCondition(MembershipCondition membershipCondition)
         {
-
-            int result = _service.AddMembership(membership);
+            int result = _service.AddMembershipCondition(membershipCondition);
             if (result == GlobalVariables.SUCCESS)
             {
-                return Ok();
+                return Ok(membershipCondition);
             }
             else if (result == GlobalVariables.DUPLICATE)
             {
                 return Conflict();
             }
             return NoContent();
-
         }
 
-        // DELETE: api/Memberships/5
+        // DELETE: api/MembershipConditions/5
         [HttpDelete("{id}")]
-        public ActionResult DeleteMembership(Guid id)
+        public ActionResult DeleteMembershipCondition(Guid id)
         {
-            var membership = _service.DeleteMembership(id);
+            var membership = _service.DeleteMembershipCondition(id);
 
             if (membership > 0)
             {
@@ -106,6 +107,5 @@ namespace PromotionEngineAPI.Controllers
             }
             return NotFound();
         }
-
     }
 }

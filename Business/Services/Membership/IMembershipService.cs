@@ -10,7 +10,7 @@ namespace ApplicationCore.Services
 {
     public interface IMembershipService
     {
-        public List<Membership> FindMembership();
+        public List<Membership> GetMembership();
 
 
         public Membership FindMembership(Guid id);
