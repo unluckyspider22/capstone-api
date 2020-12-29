@@ -11,6 +11,6 @@ namespace ApplicationCore.Utils
         public const int FAIL = 0;
         public const int NOT_FOUND = -1;
         public const int DUPLICATE = 2;
-        public const int DELETED = 1;
+        public const string DELETED = "1";
     }
 }
