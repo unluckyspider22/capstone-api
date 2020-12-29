@@ -1,4 +1,5 @@
-﻿using Infrastructure.Models;
+﻿using ApplicationCore.Models.Store;
+using Infrastructure.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,12 +12,14 @@ namespace ApplicationCore.Services
     {
         public List<Store> GetStores();
 
-        public Store GetStore(Guid id);
+        public StoreParam GetStore(Guid id);
 
-        public int PostStore(Store promotionStoreMapping);
+        public int PostStore(Store store);
 
-        public int PutStore(Store promotionStoreMapping);
+        public int PutStore(Store store);
 
         public int DeleteStore(Guid id);
+
+        public int CountStore();
     }
 }

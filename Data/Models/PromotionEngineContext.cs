@@ -596,13 +596,13 @@ namespace Infrastructure.Models
 
                 entity.HasOne(d => d.Promotion)
                     .WithMany(p => p.PromotionStoreMapping)
-                    .HasForeignKey(d => d.PromotionId)
+                  .HasForeignKey(d => d.PromotionId)
                     .HasConstraintName("FK_PromotionStoreMapping_Promotion");
 
                 entity.HasOne(d => d.Store)
-                    .WithMany(p => p.PromotionStoreMapping)
+                   .WithMany(p => p.PromotionStoreMapping)
                     .HasForeignKey(d => d.StoreId)
-                    .HasConstraintName("FK_PromotionStoreMapping_Store");
+                   .HasConstraintName("FK_PromotionStoreMapping_Store");
             });
 
             modelBuilder.Entity<PromotionTier>(entity =>
