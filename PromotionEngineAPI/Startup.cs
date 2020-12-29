@@ -45,11 +45,11 @@ namespace PromotionEngineAPI
             //OrderCondition
             services.AddScoped<IOrderConditionService, OrderConditionService>();
             //ProductCondition
-
+            services.AddScoped<IProductConditionService, ProductConditionService>();
             //MembershipAction
 
             //Promotion
-
+            services.AddScoped<IPromotionService, PromotionService>();
             //PromotionStoreMapping
             services.AddScoped<IPromotionStoreMappingService, PromotionStoreMappingService>();
             //PromotionTier
