@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.Models;
 using ApplicationCore.Services;
+using ApplicationCore.Models;
+using ApplicationCore.Utils;
 
 namespace PromotionEngineAPI.Controllers
 {
@@ -30,7 +32,7 @@ namespace PromotionEngineAPI.Controllers
 
         // GET: api/Memberships/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Membership>> GetMembership(Guid id)
+        public ActionResult<Membership> GetMembership(Guid id)
         {
             var membership = _service.FindMembership(id);
 
@@ -46,22 +48,33 @@ namespace PromotionEngineAPI.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public ActionResult<Membership> PutMembership(Guid id, Membership membership)
+        public ActionResult<Membership> PutMembership(Guid id, MembershipParam param)
         {
-
+            if (id != param.MembershipId)
+            {
+                return BadRequest();
+            }
 
             try
             {
-                PutMembership(id, membership);
+                int result = _service.UpdateMembership(id, param);
+                if (result == GlobalVariables.SUCCESS)
+                {
+                    return Ok(param);
+                }
+                else if (result == GlobalVariables.NOT_FOUND)
+                {
+                    return NotFound();
+                }
             }
             catch (DbUpdateConcurrencyException)
             {
 
-                return NotFound();
+                return Conflict();
 
             }
 
-            return Ok();
+            return NoContent();
         }
 
         // POST: api/Memberships
@@ -70,22 +83,18 @@ namespace PromotionEngineAPI.Controllers
         [HttpPost]
         public ActionResult<Membership> PostMembership(Membership membership)
         {
-            try
+
+            int result = _service.AddMembership(membership);
+            if (result == GlobalVariables.SUCCESS)
             {
-                var member = _service.AddMembership(membership);
-                if (member != 0)
-                {
-                    return Ok();
-                }
+                return Ok();
             }
-            catch (DbUpdateException)
+            else if (result == GlobalVariables.DUPLICATE)
             {
-
                 return Conflict();
-
             }
             return NoContent();
-            
+
         }
 
         // DELETE: api/Memberships/5
@@ -98,7 +107,7 @@ namespace PromotionEngineAPI.Controllers
             {
                 return Ok();
             }
-            return NoContent();
+            return NotFound();
         }
 
     }

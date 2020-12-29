@@ -1,4 +1,5 @@
-﻿using Infrastructure.Models;
+﻿using ApplicationCore.Models;
+using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ namespace ApplicationCore.Services
 
         public Membership FindMembership(Guid id);
 
-        public Membership UpdateMembership(Guid id, Membership membership);
+        public int UpdateMembership(Guid id, MembershipParam param);
 
         public int AddMembership(Membership membership);
 
