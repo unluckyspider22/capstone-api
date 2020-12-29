@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ApplicationCore.Utils;
 using Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,7 +28,7 @@ namespace ApplicationCore.Services
         public Membership FindMembership(Guid id)
         {
             var membership = _context.Membership.Find(id);
-            if (membership.DelFlg != "0")
+            if (membership.DelFlg != GlobalVariables.DELETED)
             {
                 return null;
             }

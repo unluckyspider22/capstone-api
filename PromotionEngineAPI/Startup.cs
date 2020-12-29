@@ -1,14 +1,10 @@
-using ApplicationCore.Service;
 using ApplicationCore.Services;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace PromotionEngineAPI
 {
@@ -31,11 +27,11 @@ namespace PromotionEngineAPI
             });
             services.AddTransient<PromotionEngineContext, PromotionEngineContext>();
             //Account
-
+            services.AddScoped<IAccountService, AccountService>();
             //Action
-
+            services.AddScoped<IActionService, ActionService>();
             //Brand
-
+            /*services.AddScoped<IBrandService, BrandService>();*/
             //Channel
 
             //ConditionRule
@@ -43,7 +39,7 @@ namespace PromotionEngineAPI
             //Holiday
 
             //Membership
-            services.AddScoped<IMembershipService, MembershipService>();
+
             //MembershipCondition
 
             //OrderCondition
@@ -55,7 +51,7 @@ namespace PromotionEngineAPI
             //Promotion
 
             //PromotionStoreMapping
-
+            services.AddScoped<IPromotionStoreMappingService, PromotionStoreMappingService>();
             //PromotionTier
 
             //RoleEntity
@@ -68,6 +64,7 @@ namespace PromotionEngineAPI
 
             //VoucherGroup
 
+            services.AddControllers().AddNewtonsoftJson();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
