@@ -50,7 +50,7 @@ namespace ApplicationCore.Services
             var account =  _context.Account.Find(username);
             if (account == null)
             {
-                return 0;
+                return GlobalVariables.NOT_FOUND;
             }
             account.DelFlg = "1";
             _context.Entry(account).Property("DelFlg").IsModified = true;
