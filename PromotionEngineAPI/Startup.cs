@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using ApplicationCore.Repository.Role;
 using ApplicationCore.Service;
+using ApplicationCore.Services;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -47,7 +43,7 @@ namespace PromotionEngineAPI
             //Holiday
 
             //Membership
-
+            services.AddScoped<IMembershipService, MembershipService>();
             //MembershipCondition
 
             //OrderCondition

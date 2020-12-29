@@ -1,12 +1,11 @@
 ﻿using ApplicationCore.Service;
 using Infrastructure.Models;
-using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 
-namespace ApplicationCore.Repository.Role
+namespace ApplicationCore.Service
 {
     public class RoleService : IRoleService
     {
@@ -24,6 +23,7 @@ namespace ApplicationCore.Repository.Role
 
         public List<RoleEntity> GetRoles()
         {
+            
             return _context.Role.ToList();
         }
     }
