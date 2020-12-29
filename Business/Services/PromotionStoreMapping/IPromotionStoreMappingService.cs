@@ -1,4 +1,5 @@
-﻿using Infrastructure.Models;
+﻿using ApplicationCore.Models.PromotionStoreMapping;
+using Infrastructure.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,12 +11,14 @@ namespace ApplicationCore.Services
     {
         public List<PromotionStoreMapping> GetPromotionStoreMappings();
 
-        public PromotionStoreMapping GetPromotionStoreMapping(Guid id);
+        public PromotionStoreMappingParam GetPromotionStoreMapping(Guid id);
 
         public int PostPromotionStoreMapping(PromotionStoreMapping promotionStoreMapping);
 
         public int PutPromotionStoreMapping(PromotionStoreMapping promotionStoreMapping);
 
         public int DeletePromotionStoreMapping(Guid id);
+
+        public int UpdateDelFlag(Guid id, string delflg);
     }
 }

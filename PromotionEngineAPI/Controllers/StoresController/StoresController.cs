@@ -51,7 +51,7 @@ namespace PromotionEngineAPI.Controllers
             if (result == GlobalVariables.NOT_FOUND) return NotFound();
             return Ok(store);
         }
-        //PATCH:  api/Stores
+        //PATCH:  api/Stores/2?delflg=?
         [HttpPatch("{id}")]
         public ActionResult UpdateDelFlg(Guid id, string delflg)
         {

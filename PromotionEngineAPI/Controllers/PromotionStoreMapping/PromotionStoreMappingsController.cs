@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Infrastructure.Models;
 using ApplicationCore.Services;
 using ApplicationCore.Utils;
+using ApplicationCore.Models.PromotionStoreMapping;
+
 namespace PromotionEngineAPI.Controllers
 {
     [Route("api/[controller]")]
@@ -30,9 +32,12 @@ namespace PromotionEngineAPI.Controllers
 
         // GET: api/PromotionStoreMappings/5
         [HttpGet("{id}")]
-        public PromotionStoreMapping GetPromotionStoreMapping(Guid id)
+        public ActionResult<PromotionStoreMappingParam>  GetPromotionStoreMapping(Guid id)
         {
-            return _service.GetPromotionStoreMapping(id);
+            PromotionStoreMappingParam result = _service.GetPromotionStoreMapping(id);
+            if (result == null)
+                return NotFound();
+            return Ok(result);
         }
 
         // PUT: api/PromotionStoreMappings/5
@@ -41,10 +46,18 @@ namespace PromotionEngineAPI.Controllers
         [HttpPut]
         public ActionResult PutPromotionStoreMapping( PromotionStoreMapping promotionStoreMapping)
         {
-            promotionStoreMapping.Id = new Guid();
-            if (_service.PutPromotionStoreMapping(promotionStoreMapping) == GlobalVariables.DUPLICATE) 
-                return Conflict();
-            else return Ok();
+            var result = _service.PutPromotionStoreMapping(promotionStoreMapping);
+            if (result == GlobalVariables.NOT_FOUND) return NotFound();
+            return Ok(promotionStoreMapping);
+        }
+        //PATCH:  api/PromotionStoreMapping/2?delflg=?
+        [HttpPatch("{id}")]
+        public ActionResult UpdateDelFlg(Guid id, string delflg)
+        {
+            var result = _service.UpdateDelFlag(id, delflg);
+            if (result == GlobalVariables.NOT_FOUND)
+                return NotFound();
+            return Ok();
         }
 
         // POST: api/PromotionStoreMappings
@@ -53,18 +66,21 @@ namespace PromotionEngineAPI.Controllers
         [HttpPost]
         public ActionResult PostPromotionStoreMapping(PromotionStoreMapping promotionStoreMapping)
         {
-            if (_service.PostPromotionStoreMapping(promotionStoreMapping) == GlobalVariables.DUPLICATE)
-                return Conflict();
-            else return Ok();
+            var result = _service.PostPromotionStoreMapping(promotionStoreMapping);
+            if (result == GlobalVariables.DUPLICATE) return Conflict();
+            return Ok(promotionStoreMapping);
         }
 
         // DELETE: api/PromotionStoreMappings/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<PromotionStoreMapping>> DeletePromotionStoreMapping(Guid id)
+        public ActionResult DeletePromotionStoreMapping(Guid id)
         {
-            if (_service.DeletePromotionStoreMapping(id) == GlobalVariables.NOT_FOUND) 
+            var result = _service.DeletePromotionStoreMapping(id);
+            if (result == GlobalVariables.NOT_FOUND)
+            {
                 return NotFound();
-            else return Ok();
+            }
+            return Ok();
         }
 
         
