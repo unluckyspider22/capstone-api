@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using ApplicationCore.Repository.Role;
 using ApplicationCore.Service;
 using ApplicationCore.Services.Accounts;
+using ApplicationCore.Services.Actions;
+using ApplicationCore.Services.Brands;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -38,9 +40,9 @@ namespace PromotionEngineAPI
             //Account
             services.AddScoped<IAccountService, AccountService>();
             //Action
-
+            services.AddScoped<IActionService, ActionService>();
             //Brand
-
+            services.AddScoped<IBrandService, BrandService>();
             //Channel
 
             //ConditionRule
