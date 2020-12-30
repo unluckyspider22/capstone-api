@@ -47,11 +47,10 @@ namespace ApplicationCore.Services
                 return GlobalVariables.NOT_FOUND;
             }
 
-            holiday.DelFlg = GlobalVariables.DELETED;
+            
             try
             {
-                _context.Entry(holiday).Property("DelFlg").IsModified = true;
-                _context.SaveChanges();
+                _context.Holiday.Remove(holiday);
             }
             catch (Exception)
             {
@@ -73,6 +72,32 @@ namespace ApplicationCore.Services
               .Where(c => !c.DelFlg.Equals(GlobalVariables.DELETED))
               .Where(c => c.HolidayId.Equals(id))
               .First();
+        }
+
+        public int HideHoliday(Guid id)
+        {
+            var holiday = _context.Holiday.Find(id);
+
+            if (holiday == null)
+            {
+                return GlobalVariables.NOT_FOUND;
+            }
+
+            holiday.DelFlg = GlobalVariables.DELETED;
+            holiday.UpdDate = DateTime.Now;
+            try
+            {
+                _context.Entry(holiday).Property("DelFlg").IsModified = true;
+                _context.Entry(holiday).Property("UpdDate").IsModified = true;
+                _context.SaveChanges();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+
+            return GlobalVariables.SUCCESS;
         }
 
         public int UpdateHoliday(Guid id, Holiday holiday)

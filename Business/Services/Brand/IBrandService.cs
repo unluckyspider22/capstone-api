@@ -14,6 +14,7 @@ namespace ApplicationCore.Services
         public int CreateBrand(BrandParam brandParam);
         public int UpdateBrand(System.Guid id, BrandParam brandParam);
         public int DeleteBrand(System.Guid id);
+        public int HideBrand(System.Guid id);
         public int CountBrand();
     }
 }

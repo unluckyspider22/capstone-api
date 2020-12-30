@@ -85,5 +85,18 @@ namespace PromotionEngineAPI.Controllers
             }
             return Ok();
         }
+
+
+        // PATCH: api/Holidays/5
+        [HttpPatch("{id}")]
+        public ActionResult HideHoliday(Guid id)
+        {
+            var result = _service.HideHoliday(id);
+            if (result == GlobalVariables.NOT_FOUND)
+            {
+                return NotFound();
+            }
+            return Ok();
+        }
     }
 }

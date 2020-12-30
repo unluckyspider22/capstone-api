@@ -13,6 +13,7 @@ namespace ApplicationCore.Services
         public int CreateAccount(Account account);
         public int UpdateAccount(string username, Account account);
         public int DeleteAccount(string username);
+        public int HideAccount(string username);
         public int CountAccount();
     }
 }

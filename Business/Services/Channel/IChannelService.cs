@@ -14,6 +14,7 @@ namespace ApplicationCore.Services
         public int CreateChannel(ChannelParam channelParam);
         public int UpdateChannel(Guid id, ChannelParam channelParam);
         public int DeleteChannel(Guid id);
+        public int HideChannel(Guid id);
         public int CountChannel();
     }
 }

@@ -60,11 +60,10 @@ namespace ApplicationCore.Services
                 return GlobalVariables.NOT_FOUND;
             }
 
-            brand.DelFlg = GlobalVariables.DELETED;
+            
             try
             {
-                _context.Entry(brand).Property("DelFlg").IsModified = true;
-                _context.SaveChanges();
+                _context.Brand.Remove(brand);
             }
             catch (Exception)
             {
@@ -86,6 +85,32 @@ namespace ApplicationCore.Services
                 .Where(c => !c.DelFlg.Equals(GlobalVariables.DELETED))
                 .Where(c => c.BrandId.Equals(id))
                 .First();
+        }
+
+        public int HideBrand(Guid id)
+        {
+            var brand = _context.Brand.Find(id);
+
+            if (brand == null)
+            {
+                return GlobalVariables.NOT_FOUND;
+            }
+
+            brand.DelFlg = GlobalVariables.DELETED;
+            brand.UpdDate = DateTime.Now;
+            try
+            {
+                _context.Entry(brand).Property("DelFlg").IsModified = true;
+                _context.Entry(brand).Property("UpdDate").IsModified = true;
+                _context.SaveChanges();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+
+            return GlobalVariables.SUCCESS;
         }
 
         public int UpdateBrand(Guid id, BrandParam brandParam)

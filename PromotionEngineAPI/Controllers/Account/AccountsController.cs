@@ -84,6 +84,18 @@ namespace PromotionEngineAPI.Controllers
             return Ok();
         }
 
+        // PATCH: api/accounts/dev
+        [HttpPatch("{username}")]
+        public ActionResult<Account> HideAccount(string username)
+        {
+            if (_service.HideAccount(username) == GlobalVariables.NOT_FOUND)
+            {
+                return NotFound();
+            }
+
+            return Ok();
+        }
+
 
     }
 }

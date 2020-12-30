@@ -86,5 +86,17 @@ namespace PromotionEngineAPI.Controllers
             }
             return Ok();
         }
+
+        // PATCH: api/Channels/5
+        [HttpPatch("{id}")]
+        public ActionResult HideChannel(Guid id)
+        {
+            var result = _service.HideChannel(id);
+            if (result == GlobalVariables.NOT_FOUND)
+            {
+                return NotFound();
+            }
+            return Ok();
+        }
     }
 }
