@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Infrastructure.Models;
 using ApplicationCore.Services;
-using ApplicationCore.Models;
-using ApplicationCore.Utils;
+using System.Threading.Tasks;
+using Infrastructure.DTOs;
+using Infrastructure.Helper;
 
 namespace PromotionEngineAPI.Controllers
 {
@@ -22,89 +20,111 @@ namespace PromotionEngineAPI.Controllers
 
         // GET: api/Memberships
         [HttpGet]
-        public List<Membership> GetMembership()
+        // api/Memberships?pageIndex=...&pageSize=...
+        public async Task<IActionResult> GetMembership([FromQuery] PagingRequestParam param)
         {
-            return _service.GetMembership();
+            var result = await _service.GetAsync(pageIndex: param.PageIndex, pageSize: param.PageSize, filter: el => el.DelFlg.Equals("0"));
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
+        }
+
+        // GET: api/Memberships/count
+        [HttpGet]
+        [Route("count")]
+        public async Task<IActionResult> CountMembership()
+        {
+            return Ok(await _service.CountAsync());
         }
 
         // GET: api/Memberships/5
         [HttpGet("{id}")]
-        public ActionResult<Membership> GetMembership(Guid id)
+        public async Task<IActionResult> GetMembership([FromRoute]Guid id)
         {
-            var membership = _service.FindMembership(id);
-
-            if (membership == null)
+            var result = await _service.GetByIdAsync(id);
+            if (result == null)
             {
                 return NotFound();
             }
-
-            return Ok(membership);
+            return Ok(result);
         }
 
         // PUT: api/Memberships/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public ActionResult<Membership> PutMembership(Guid id, MembershipParam param)
+        public async Task<IActionResult> PutMembership([FromRoute]Guid id, [FromBody] MembershipDto dto)
         {
-            if (id != param.MembershipId)
+            if (id != dto.MembershipId)
             {
                 return BadRequest();
             }
 
-            try
-            {
-                int result = _service.UpdateMembership(id, param);
-                if (result == GlobalVariables.SUCCESS)
-                {
-                    return Ok(param);
-                }
-                else if (result == GlobalVariables.NOT_FOUND)
-                {
-                    return NotFound();
-                }
-            }
-            catch (DbUpdateConcurrencyException)
-            {
+            dto.UpdDate = DateTime.Now;
 
-                return Conflict();
+            var result = await _service.UpdateAsync(dto);
 
+            if (result == null)
+            {
+                return NotFound();
             }
 
-            return NoContent();
+            return Ok(result);
+
         }
 
         // POST: api/Memberships
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public ActionResult<Membership> PostMembership(Membership membership)
+        public async Task<IActionResult> PostMembership([FromBody] MembershipDto dto)
         {
+            dto.MembershipId = Guid.NewGuid();
 
-            int result = _service.AddMembership(membership);
-            if (result == GlobalVariables.SUCCESS)
-            {
-                return Ok();
-            }
-            else if (result == GlobalVariables.DUPLICATE)
-            {
-                return Conflict();
-            }
-            return NoContent();
+            var result = await _service.CreateAsync(dto);
 
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            //var result = dto;
+
+            return Ok(result);
         }
 
         // DELETE: api/Memberships/5
-        [HttpDelete("{id}")]
-        public ActionResult DeleteMembership(Guid id)
+        [HttpDelete]
+        public async Task<IActionResult> DeleteMembership([FromQuery]Guid id)
         {
-            var membership = _service.DeleteMembership(id);
-
-            if (membership > 0)
+            if (id == null)
             {
-                return Ok();
+                return BadRequest();
             }
-            return NotFound();
+            var result = await _service.DeleteAsync(id);
+            if (result == false)
+            {
+                return NotFound();
+            }
+            return Ok();
+        }
+
+        // Put: api/Memberships/5
+        [HttpPatch]
+        public async Task<IActionResult> HideMembership([FromQuery]Guid id, [FromQuery]string value)
+        {
+            if (id == null)
+            {
+                return BadRequest();
+            }
+            if (!value.Equals(AppConstant.DelFlg.HIDE) && !value.Equals(AppConstant.DelFlg.UNHIDE))
+            {
+                return BadRequest();
+            }
+            var result = await _service.HideAsync(id, value);
+            if (result == false)
+            {
+                return NotFound();
+            }
+            return Ok();
         }
 
     }

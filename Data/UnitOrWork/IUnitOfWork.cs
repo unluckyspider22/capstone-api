@@ -1,10 +1,6 @@
 ﻿using Infrastructure.Models;
 using Infrastructure.Repository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Infrastructure.Models;
 
 namespace Infrastructure.UnitOrWork
 {
@@ -23,17 +19,17 @@ namespace Infrastructure.UnitOrWork
         //Holiday
 
         //Membership
-
+        IGenericRepository<Membership> MembershipRepository { get; }
         //MembershipAction
-
+        IGenericRepository<MembershipAction> MembershipActionRepository { get; }
         //MembershipCondition
-
-        //OrderAction
-
-        //ProductAction
-
+        IGenericRepository<MembershipCondition> MembershipConditionRepository { get; }
+        //OrderCondition
+        IGenericRepository<OrderCondition> OrderConditionRepository { get; }
+        //ProductCondition
+        IGenericRepository<ProductCondition> ProductConditionRepository { get; }
         //Promotion
-
+        IGenericRepository<Promotion> PromotionRepository { get; }
         //PromotionStoreMapping
 
         //PromotionTier
@@ -47,7 +43,7 @@ namespace Infrastructure.UnitOrWork
         //VoucherChannel
 
         //VoucherGroup
-        
+
 
         Task<int> SaveAsync();
     }

@@ -27,17 +27,23 @@ namespace Infrastructure.AutoMapper
             //Holiday
 
             //Membership
-
+            CreateMap<Membership, MembershipDto>();
+            CreateMap<MembershipDto, Membership>();
             //MembershipAction
-
+            CreateMap<MembershipAction, MembershipActionDto>();
+            CreateMap<MembershipActionDto, MembershipAction>();
             //MembershipCondition
-
-            //OrderAction
-
-            //ProductAction
-
+            CreateMap<MembershipCondition, MembershipConditionDto>();
+            CreateMap<MembershipConditionDto, MembershipCondition>();
+            //OrderCondition
+            CreateMap<OrderCondition, OrderConditionDto>();
+            CreateMap<OrderConditionDto, OrderCondition>();
+            //ProductCondition
+            CreateMap<ProductCondition, ProductConditionDto>();
+            CreateMap<ProductConditionDto, ProductCondition>();
             //Promotion
-
+            CreateMap<Promotion, PromotionDto>();
+            CreateMap<PromotionDto, Promotion>();
             //PromotionStoreMapping
 
             //PromotionTier

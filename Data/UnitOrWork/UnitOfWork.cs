@@ -30,17 +30,17 @@ namespace Infrastructure.UnitOrWork
         //Holiday
 
         //Membership
-
+        public IGenericRepository<Membership> MembershipRepository { get; set; }
         //MembershipAction
-
+        public IGenericRepository<MembershipAction> MembershipActionRepository { get; set; }
         //MembershipCondition
-
-        //OrderAction
-
-        //ProductAction
-
+        public IGenericRepository<MembershipCondition> MembershipConditionRepository { get; set; }
+        //OrderCondition
+        public IGenericRepository<OrderCondition> OrderConditionRepository { get; set; }
+        //ProductCondition
+        public IGenericRepository<ProductCondition> ProductConditionRepository { get; set; }
         //Promotion
-
+        public IGenericRepository<Promotion> PromotionRepository { get; set; }
         //PromotionStoreMapping
 
         //PromotionTier
@@ -71,17 +71,17 @@ namespace Infrastructure.UnitOrWork
             //Holiday
 
             //Membership
-
+            MembershipRepository = new GenericRepository<Membership>(_context);
             //MembershipAction
-
+            MembershipActionRepository = new GenericRepository<MembershipAction>(_context);
             //MembershipCondition
-
-            //OrderAction
-
-            //ProductAction
-
+            MembershipConditionRepository = new GenericRepository<MembershipCondition>(_context);
+            //OrderCondition
+            OrderConditionRepository = new GenericRepository<OrderCondition>(_context);
+            //ProductCondition
+            ProductConditionRepository = new GenericRepository<ProductCondition>(_context);
             //Promotion
-
+            PromotionRepository = new GenericRepository<Promotion>(_context);
             //PromotionStoreMapping
 
             //PromotionTier

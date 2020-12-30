@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace ApplicationCore.Models
+namespace Infrastructure.DTOs
 {
-    public class MembershipActionParam
+    public class MembershipActionDto : BaseDto
     {
         public Guid MembershipActionId { get; set; }
         public Guid? PromotionTierId { get; set; }

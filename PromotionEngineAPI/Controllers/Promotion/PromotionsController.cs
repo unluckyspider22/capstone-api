@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Infrastructure.Models;
 using ApplicationCore.Services;
-using ApplicationCore.Utils;
+using Infrastructure.DTOs;
+using Infrastructure.Helper;
 
 namespace PromotionEngineAPI.Controllers
 {
@@ -24,85 +20,111 @@ namespace PromotionEngineAPI.Controllers
 
         // GET: api/Promotions
         [HttpGet]
-        public List<Promotion> GetPromotion()
+        // api/Promotions?pageIndex=...&pageSize=...
+        public async Task<IActionResult> GetPromotion([FromQuery] PagingRequestParam param)
         {
-            return _service.GetPromotions();
+            var result = await _service.GetAsync(pageIndex: param.PageIndex, pageSize: param.PageSize, filter: el => el.DelFlg.Equals("0"));
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
+        }
+
+        // GET: api/Promotions/count
+        [HttpGet]
+        [Route("count")]
+        public async Task<IActionResult> CountPromotion()
+        {
+            return Ok(await _service.CountAsync());
         }
 
         // GET: api/Promotions/5
         [HttpGet("{id}")]
-        public ActionResult<Promotion> GetPromotion(Guid id)
+        public async Task<IActionResult> GetPromotion([FromRoute]Guid id)
         {
-            var condition = _service.FindPromotion(id);
-
-            if (condition == null)
+            var result = await _service.GetByIdAsync(id);
+            if (result == null)
             {
                 return NotFound();
             }
-
-            return Ok(condition);
+            return Ok(result);
         }
 
         // PUT: api/Promotions/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public ActionResult<Promotion> PutPromotion(Guid id, Promotion param)
+        public async Task<IActionResult> PutPromotion([FromRoute]Guid id, [FromBody] PromotionDto dto)
         {
-            if (id != param.PromotionId)
+            if (id != dto.PromotionId)
             {
                 return BadRequest();
             }
 
-            try
+            dto.UpdDate = DateTime.Now;
+
+            var result = await _service.UpdateAsync(dto);
+
+            if (result == null)
             {
-                int result = _service.UpdatePromotion(id, param);
-                if (result == GlobalVariables.SUCCESS)
-                {
-                    return Ok(param);
-                }
-                else if (result == GlobalVariables.NOT_FOUND)
-                {
-                    return NotFound();
-                }
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                return Conflict();
+                return NotFound();
             }
 
-            return NoContent();
+            return Ok(result);
+
         }
 
         // POST: api/Promotions
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public ActionResult<Promotion> PostPromotion(Promotion Promotion)
+        public async Task<IActionResult> PostPromotion([FromBody] PromotionDto dto)
         {
-            int result = _service.AddPromotion(Promotion);
-            if (result == GlobalVariables.SUCCESS)
+            dto.PromotionId = Guid.NewGuid();
+
+            var result = await _service.CreateAsync(dto);
+
+            if (result == null)
             {
-                return Ok(Promotion);
+                return NotFound();
             }
-            else if (result == GlobalVariables.DUPLICATE)
-            {
-                return Conflict();
-            }
-            return NoContent();
+
+            //var result = dto;
+
+            return Ok(result);
         }
 
         // DELETE: api/Promotions/5
-        [HttpDelete("{id}")]
-        public ActionResult<Promotion> DeletePromotion(Guid id)
+        [HttpDelete]
+        public async Task<IActionResult> DeletePromotion([FromQuery]Guid id)
         {
-            var condition = _service.DeletePromotion(id);
-
-            if (condition > 0)
+            if (id == null)
             {
-                return Ok();
+                return BadRequest();
             }
-            return NotFound();
+            var result = await _service.DeleteAsync(id);
+            if (result == false)
+            {
+                return NotFound();
+            }
+            return Ok();
+        }
+
+        // Put: api/Promotions/5
+        [HttpPatch]
+        public async Task<IActionResult> HidePromotion([FromQuery]Guid id, [FromQuery]string value)
+        {
+            if (id == null)
+            {
+                return BadRequest();
+            }
+            if (!value.Equals(AppConstant.DelFlg.HIDE) && !value.Equals(AppConstant.DelFlg.UNHIDE))
+            {
+                return BadRequest();
+            }
+            var result = await _service.HideAsync(id, value);
+            if (result == false)
+            {
+                return NotFound();
+            }
+            return Ok();
         }
     }
 }

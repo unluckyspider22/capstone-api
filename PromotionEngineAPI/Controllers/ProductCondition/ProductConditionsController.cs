@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Infrastructure.Models;
 using ApplicationCore.Services;
-using ApplicationCore.Models;
-using ApplicationCore.Utils;
+using System.Threading.Tasks;
+using Infrastructure.DTOs;
+using Infrastructure.Helper;
 
 namespace PromotionEngineAPI.Controllers
 {
@@ -22,85 +20,111 @@ namespace PromotionEngineAPI.Controllers
 
         // GET: api/ProductConditions
         [HttpGet]
-        public List<ProductCondition> GetProductCondition()
+        // api/ProductConditions?pageIndex=...&pageSize=...
+        public async Task<IActionResult> GetProductCondition([FromQuery] PagingRequestParam param)
         {
-            return _service.GetProductConditions();
+            var result = await _service.GetAsync(pageIndex: param.PageIndex, pageSize: param.PageSize, filter: el => el.DelFlg.Equals("0"));
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
+        }
+
+        // GET: api/ProductConditions/count
+        [HttpGet]
+        [Route("count")]
+        public async Task<IActionResult> CountProductCondition()
+        {
+            return Ok(await _service.CountAsync());
         }
 
         // GET: api/ProductConditions/5
         [HttpGet("{id}")]
-        public ActionResult<ProductCondition> GetProductCondition(Guid id)
+        public async Task<IActionResult> GetProductCondition([FromRoute]Guid id)
         {
-            var condition = _service.FindProductCondition(id);
-
-            if (condition == null)
+            var result = await _service.GetByIdAsync(id);
+            if (result == null)
             {
                 return NotFound();
             }
-
-            return Ok(condition);
+            return Ok(result);
         }
 
         // PUT: api/ProductConditions/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public ActionResult PutProductCondition(Guid id, ProductConditionParam param)
+        public async Task<IActionResult> PutProductCondition([FromRoute]Guid id, [FromBody] ProductConditionDto dto)
         {
-            if (id != param.ProductConditionId)
+            if (id != dto.ProductConditionId)
             {
                 return BadRequest();
             }
 
-            try
+            dto.UpdDate = DateTime.Now;
+
+            var result = await _service.UpdateAsync(dto);
+
+            if (result == null)
             {
-                int result = _service.UpdateProductCondition(id, param);
-                if (result == GlobalVariables.SUCCESS)
-                {
-                    return Ok(param);
-                }
-                else if (result == GlobalVariables.NOT_FOUND)
-                {
-                    return NotFound();
-                }
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                return Conflict();
+                return NotFound();
             }
 
-            return NoContent();
+            return Ok(result);
+
         }
 
         // POST: api/ProductConditions
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public ActionResult<ProductCondition> PostProductCondition(ProductCondition ProductCondition)
+        public async Task<IActionResult> PostProductCondition([FromBody] ProductConditionDto dto)
         {
-            int result = _service.AddProductCondition(ProductCondition);
-            if (result == GlobalVariables.SUCCESS)
+            dto.ProductConditionId = Guid.NewGuid();
+
+            var result = await _service.CreateAsync(dto);
+
+            if (result == null)
             {
-                return Ok(ProductCondition);
+                return NotFound();
             }
-            else if (result == GlobalVariables.DUPLICATE)
-            {
-                return Conflict();
-            }
-            return NoContent();
+
+            //var result = dto;
+
+            return Ok(result);
         }
 
         // DELETE: api/ProductConditions/5
-        [HttpDelete("{id}")]
-        public ActionResult<ProductCondition> DeleteProductCondition(Guid id)
+        [HttpDelete]
+        public async Task<IActionResult> DeleteProductCondition([FromQuery]Guid id)
         {
-            var condition = _service.DeleteProductCondition(id);
-
-            if (condition > 0)
+            if (id == null)
             {
-                return Ok();
+                return BadRequest();
             }
-            return NotFound();
+            var result = await _service.DeleteAsync(id);
+            if (result == false)
+            {
+                return NotFound();
+            }
+            return Ok();
+        }
+
+        // Put: api/ProductConditions/5
+        [HttpPatch]
+        public async Task<IActionResult> HideProductCondition([FromQuery]Guid id, [FromQuery]string value)
+        {
+            if (id == null)
+            {
+                return BadRequest();
+            }
+            if (!value.Equals(AppConstant.DelFlg.HIDE) && !value.Equals(AppConstant.DelFlg.UNHIDE))
+            {
+                return BadRequest();
+            }
+            var result = await _service.HideAsync(id, value);
+            if (result == false)
+            {
+                return NotFound();
+            }
+            return Ok();
         }
     }
 }

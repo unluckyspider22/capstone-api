@@ -1,4 +1,5 @@
 ﻿using ApplicationCore.Models;
+using Infrastructure.DTOs;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -8,17 +9,8 @@ using System.Threading.Tasks;
 
 namespace ApplicationCore.Services
 {
-    public interface IMembershipService
+    public interface IMembershipService : IBaseService<Membership, MembershipDto>
     {
-        public List<Membership> GetMembership();
-
-
-        public Membership FindMembership(Guid id);
-
-        public int UpdateMembership(Guid id, MembershipParam param);
-
-        public int AddMembership(Membership membership);
-
-        public int DeleteMembership(Guid id);
+        
     }
 }
