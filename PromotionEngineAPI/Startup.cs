@@ -47,7 +47,7 @@ namespace PromotionEngineAPI
             //ProductCondition
             services.AddScoped<IProductConditionService, ProductConditionService>();
             //MembershipAction
-
+            services.AddScoped<IMembershipActionService, MembershipActionService>();
             //Promotion
             services.AddScoped<IPromotionService, PromotionService>();
             //PromotionStoreMapping
