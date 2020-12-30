@@ -55,11 +55,9 @@ namespace ApplicationCore.Services
                 return GlobalVariables.NOT_FOUND;
             }
 
-            conditionRule.DelFlg = GlobalVariables.DELETED;
             try
             {
-                _context.Entry(conditionRule).Property("DelFlg").IsModified = true;
-                _context.SaveChanges();
+                _context.ConditionRule.Remove(conditionRule);
             }
             catch (Exception)
             {
@@ -81,6 +79,33 @@ namespace ApplicationCore.Services
                .Where(c => !c.DelFlg.Equals(GlobalVariables.DELETED))
                .Where(c => c.ConditionRuleId.Equals(id))
                .First();
+        }
+
+        public int HideConditionRule(Guid id)
+        {
+            var conditionRule = _context.ConditionRule.Find(id);
+
+            if (conditionRule == null)
+            {
+                return GlobalVariables.NOT_FOUND;
+            }
+
+            conditionRule.DelFlg = GlobalVariables.DELETED;
+            conditionRule.UpdDate = DateTime.Now;
+
+            try
+            {
+                _context.Entry(conditionRule).Property("DelFlg").IsModified = true;
+                _context.Entry(conditionRule).Property("UpdDate").IsModified = true;
+                _context.SaveChanges();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+
+            return GlobalVariables.SUCCESS;
         }
 
         public int UpdateConditionRule(Guid id, ConditionRuleParam conditionRuleParam)

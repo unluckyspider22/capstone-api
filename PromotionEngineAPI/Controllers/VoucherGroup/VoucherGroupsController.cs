@@ -1,5 +1,5 @@
 ﻿using ApplicationCore.Models.VoucherGroup;
-using ApplicationCore.Services.VoucherGroups;
+using ApplicationCore.Services;
 using ApplicationCore.Utils;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;

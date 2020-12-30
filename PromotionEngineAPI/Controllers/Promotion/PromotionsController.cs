@@ -1,38 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.Models;
 using ApplicationCore.Services;
 using ApplicationCore.Utils;
-using ApplicationCore.Models;
 
 namespace PromotionEngineAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class OrderConditionsController : ControllerBase
+    public class PromotionsController : ControllerBase
     {
-        private readonly IOrderConditionService _service;
+        private readonly IPromotionService _service;
 
-        public OrderConditionsController(IOrderConditionService service)
+        public PromotionsController(IPromotionService service)
         {
             _service = service;
         }
 
-        // GET: api/OrderConditions
+        // GET: api/Promotions
         [HttpGet]
-        public List<OrderCondition> GetOrderCondition()
+        public List<Promotion> GetPromotion()
         {
-            return _service.GetOrderConditions();
+            return _service.GetPromotions();
         }
 
-        // GET: api/OrderConditions/5
+        // GET: api/Promotions/5
         [HttpGet("{id}")]
-        public ActionResult<OrderCondition> GetOrderCondition(Guid id)
+        public ActionResult<Promotion> GetPromotion(Guid id)
         {
-            var condition = _service.FindOrderCondition(id);
+            var condition = _service.FindPromotion(id);
 
             if (condition == null)
             {
@@ -42,20 +43,20 @@ namespace PromotionEngineAPI.Controllers
             return Ok(condition);
         }
 
-        // PUT: api/OrderConditions/5
+        // PUT: api/Promotions/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public ActionResult PutOrderCondition(Guid id, OrderConditionParam param)
+        public ActionResult<Promotion> PutPromotion(Guid id, Promotion param)
         {
-            if (id != param.OrderConditionId)
+            if (id != param.PromotionId)
             {
                 return BadRequest();
             }
 
             try
             {
-                int result = _service.UpdateOrderCondition(id, param);
+                int result = _service.UpdatePromotion(id, param);
                 if (result == GlobalVariables.SUCCESS)
                 {
                     return Ok(param);
@@ -73,16 +74,16 @@ namespace PromotionEngineAPI.Controllers
             return NoContent();
         }
 
-        // POST: api/OrderConditions
+        // POST: api/Promotions
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public ActionResult<OrderCondition> PostOrderCondition(OrderCondition orderCondition)
+        public ActionResult<Promotion> PostPromotion(Promotion Promotion)
         {
-            int result = _service.AddOrderCondition(orderCondition);
+            int result = _service.AddPromotion(Promotion);
             if (result == GlobalVariables.SUCCESS)
             {
-                return Ok(orderCondition);
+                return Ok(Promotion);
             }
             else if (result == GlobalVariables.DUPLICATE)
             {
@@ -91,11 +92,11 @@ namespace PromotionEngineAPI.Controllers
             return NoContent();
         }
 
-        // DELETE: api/OrderConditions/5
+        // DELETE: api/Promotions/5
         [HttpDelete("{id}")]
-        public ActionResult<OrderCondition> DeleteOrderCondition(Guid id)
+        public ActionResult<Promotion> DeletePromotion(Guid id)
         {
-            var condition = _service.DeleteOrderCondition(id);
+            var condition = _service.DeletePromotion(id);
 
             if (condition > 0)
             {

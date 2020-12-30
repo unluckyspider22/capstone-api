@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ApplicationCore.Services
 {
-    public class VoucherService
+    public class VoucherService : IVoucherService
     {
         private readonly PromotionEngineContext _context;
         public VoucherService(PromotionEngineContext context)

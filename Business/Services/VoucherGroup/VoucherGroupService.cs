@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ApplicationCore.Services.VoucherGroups
+namespace ApplicationCore.Services
 {
     public class VoucherGroupService  : IVoucherGroupService
     {

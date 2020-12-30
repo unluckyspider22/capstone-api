@@ -86,5 +86,17 @@ namespace PromotionEngineAPI.Controllers
             }
             return Ok();
         }
+
+        // PATCH: api/Brands/5
+        [HttpPatch("{id}")]
+        public ActionResult HideBrand(Guid id)
+        {
+            var result = _service.HideBrand(id);
+            if (result == GlobalVariables.NOT_FOUND)
+            {
+                return NotFound();
+            }
+            return Ok();
+        }
     }
 }

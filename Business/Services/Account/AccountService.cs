@@ -53,12 +53,9 @@ namespace ApplicationCore.Services
                 return GlobalVariables.NOT_FOUND;
             }
 
-            account.DelFlg = GlobalVariables.DELETED;
-
             try
             {
-                _context.Entry(account).Property("DelFlg").IsModified = true;
-                _context.SaveChanges();
+                _context.Account.Remove(account);
             }
             catch (Exception)
             {
@@ -82,8 +79,35 @@ namespace ApplicationCore.Services
             return result;
         }
 
+        public int HideAccount(string username)
+        {
+            var account = _context.Account.Find(username);
+            if (account == null)
+            {
+                return GlobalVariables.NOT_FOUND;
+            }
+
+            account.DelFlg = GlobalVariables.DELETED;
+            account.UpdDate = DateTime.Now;
+
+            try
+            {
+                _context.Entry(account).Property("DelFlg").IsModified = true;
+                _context.Entry(account).Property("UpdDate").IsModified = true;
+                _context.SaveChanges();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+
+            return GlobalVariables.SUCCESS;
+        }
+
         public int UpdateAccount(string username, Account account)
         {
+            account.UpdDate = DateTime.Now;
 
             _context.Entry(account).State = EntityState.Modified;
 
@@ -96,7 +120,8 @@ namespace ApplicationCore.Services
                 if (!AccountExists(username))
                 {
                     return GlobalVariables.NOT_FOUND;
-                } else
+                }
+                else
                 {
                     throw;
                 }

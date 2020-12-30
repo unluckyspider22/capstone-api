@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ApplicationCore.Services
 {
-    public class PromotionTierService
+    public class PromotionTierService : IPromotionTierService
     {
 
         private readonly PromotionEngineContext _context;

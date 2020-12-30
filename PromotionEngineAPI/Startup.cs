@@ -1,5 +1,4 @@
 using ApplicationCore.Services;
-using ApplicationCore.Services.VoucherGroups;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -46,23 +45,23 @@ namespace PromotionEngineAPI
             //OrderCondition
             services.AddScoped<IOrderConditionService, OrderConditionService>();
             //ProductCondition
-
+            services.AddScoped<IProductConditionService, ProductConditionService>();
             //MembershipAction
-
+            services.AddScoped<IMembershipActionService, MembershipActionService>();
             //Promotion
-
+            services.AddScoped<IPromotionService, PromotionService>();
             //PromotionStoreMapping
             services.AddScoped<IPromotionStoreMappingService, PromotionStoreMappingService>();
             //PromotionTier
-
+            services.AddScoped<IPromotionTierService, PromotionTierService>();
             //RoleEntity
             services.AddScoped<IRoleService, RoleService>();
             //Store
             services.AddScoped<IStoreService, StoreService>();
             //Voucher
-
+            services.AddScoped<IVoucherService, VoucherService>();
             //VoucherChannel
-
+            services.AddScoped<IVoucherChannelService, VoucherChannelService>();
             //VoucherGroup
             services.AddScoped<IVoucherGroupService, VoucherGroupService>();
 
