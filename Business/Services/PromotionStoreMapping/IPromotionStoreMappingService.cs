@@ -11,11 +11,11 @@ namespace ApplicationCore.Services
     {
         public List<PromotionStoreMapping> GetPromotionStoreMappings();
 
-        public PromotionStoreMappingParam GetPromotionStoreMapping(Guid id);
+        public PromotionStoreMapping GetPromotionStoreMapping(Guid id);
 
         public int PostPromotionStoreMapping(PromotionStoreMapping promotionStoreMapping);
 
-        public int PutPromotionStoreMapping(PromotionStoreMapping promotionStoreMapping);
+        public int PutPromotionStoreMapping(Guid id,PromotionStoreMapping promotionStoreMapping);
 
         public int DeletePromotionStoreMapping(Guid id);
 

@@ -44,24 +44,24 @@ namespace ApplicationCore.Services
             return GlobalVariables.SUCCESS;
         }
 
-        public StoreParam GetStore(Guid id)
+        public Store GetStore(Guid id)
         {
             var store = _context.Store.Find(id);
-            StoreParam result = new StoreParam();
+           /* StoreParam result = new StoreParam();
             result.StoreId = id;
             result.StoreCode = store.StoreCode;
             result.StoreName = store.StoreName;
-            result.BrandId = store.BrandId;
+            result.BrandId = store.BrandId;*/
             if (store.DelFlg.Equals(GlobalVariables.DELETED))
             {
                 // vẫn trả ra obj, FE check delflag để hiển thị ????
                 return null;
             }
-            return result;
+            return store;
         }
 
         public List<Store> GetStores()
-        {        
+        {
             return _context.Store.Where(c => !c.DelFlg.Equals(GlobalVariables.DELETED)).ToList();
         }
 
@@ -72,7 +72,7 @@ namespace ApplicationCore.Services
             _context.Store.Add(store);
             try
             {
-                _context.SaveChangesAsync();
+                _context.SaveChanges();
             }
             catch (DbUpdateException)
             {
@@ -89,18 +89,27 @@ namespace ApplicationCore.Services
             return GlobalVariables.SUCCESS;
         }
 
-        public int PutStore(Store store)
+        public int PutStore(Guid id, StoreParam storeParam)
         {
-            store.UpdDate = DateTime.Now;
-            _context.Entry(store).State = EntityState.Modified;
+            var result = _context.Store.Find(id);
+
+            if (result == null)
+            {
+                return GlobalVariables.NOT_FOUND;
+            }
+            result.StoreId = storeParam.StoreId;
+            result.StoreCode = storeParam.StoreCode;
+            result.StoreName = storeParam.StoreName;
+            result.UpdDate = DateTime.Now;
+            result.BrandId = storeParam.BrandId;
 
             try
             {
-                _context.SaveChangesAsync();
+                _context.SaveChanges();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!StoreExists(store.StoreId))
+                if (!StoreExists(id))
                 {
                     return GlobalVariables.NOT_FOUND;
                 }
@@ -111,35 +120,37 @@ namespace ApplicationCore.Services
             }
 
             return GlobalVariables.SUCCESS;
-        }
-
-        public int UpdateDelFlag(Guid id, string delflg)
-        {
-            var store = _context.Store.Find(id);
-            if(store == null)
+        } 
+            public int UpdateDelFlag(Guid id, string delflg)
             {
-                return GlobalVariables.NOT_FOUND;
-            }
-            store.UpdDate = DateTime.Now;
-            store.DelFlg = delflg;
+                var store = _context.Store.Find(id);
+                if (store == null)
+                {
+                    return GlobalVariables.NOT_FOUND;
+                }
+                store.UpdDate = DateTime.Now;
+                store.DelFlg = delflg;
 
-            try
-            {              
-                _context.SaveChanges();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-               
+                try
+                {
+                    _context.SaveChanges();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+
                     throw;
-                
+
+                }
+                return GlobalVariables.SUCCESS;
             }
-            return GlobalVariables.SUCCESS;
+
+            private bool StoreExists(Guid id)
+            {
+                return _context.Store.Any(e => e.StoreId == id);
+            }
         }
 
-        private bool StoreExists(Guid id)
-        {
-            return _context.Store.Any(e => e.StoreId == id);
-        }
+
     }
-}
+
 

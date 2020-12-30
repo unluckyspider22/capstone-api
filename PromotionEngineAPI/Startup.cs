@@ -1,4 +1,5 @@
 using ApplicationCore.Services;
+using ApplicationCore.Services.VoucherGroups;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -63,6 +64,7 @@ namespace PromotionEngineAPI
             //VoucherChannel
 
             //VoucherGroup
+            services.AddScoped<IVoucherGroupService, VoucherGroupService>();
 
             services.AddControllers().AddNewtonsoftJson();
         }

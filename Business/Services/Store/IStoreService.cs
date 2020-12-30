@@ -12,11 +12,11 @@ namespace ApplicationCore.Services
     {
         public List<Store> GetStores();
 
-        public StoreParam GetStore(Guid id);
+        public Store GetStore(Guid id);
 
         public int PostStore(Store store);
 
-        public int PutStore(Store store);
+        public int PutStore(Guid id, StoreParam storeParam);
 
         public int DeleteStore(Guid id);
 

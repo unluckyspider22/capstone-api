@@ -34,7 +34,7 @@ namespace PromotionEngineAPI.Controllers
         [HttpGet("{id}")]
         public ActionResult<PromotionStoreMappingParam>  GetPromotionStoreMapping(Guid id)
         {
-            PromotionStoreMappingParam result = _service.GetPromotionStoreMapping(id);
+            PromotionStoreMapping result = _service.GetPromotionStoreMapping(id);
             if (result == null)
                 return NotFound();
             return Ok(result);
@@ -43,10 +43,10 @@ namespace PromotionEngineAPI.Controllers
         // PUT: api/PromotionStoreMappings/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
-        [HttpPut]
-        public ActionResult PutPromotionStoreMapping( PromotionStoreMapping promotionStoreMapping)
+        [HttpPut("{id}")]
+        public ActionResult PutPromotionStoreMapping(Guid id, PromotionStoreMapping promotionStoreMapping)
         {
-            var result = _service.PutPromotionStoreMapping(promotionStoreMapping);
+            var result = _service.PutPromotionStoreMapping(id, promotionStoreMapping);
             if (result == GlobalVariables.NOT_FOUND) return NotFound();
             return Ok(promotionStoreMapping);
         }

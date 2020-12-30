@@ -37,15 +37,15 @@ namespace ApplicationCore.Services
             return GlobalVariables.SUCCESS;
         }
 
-        public PromotionStoreMappingParam GetPromotionStoreMapping(Guid id)
+        public PromotionStoreMapping GetPromotionStoreMapping(Guid id)
         {
-            var promotionStoreMapping = _context.PromotionStoreMapping.Find(id);
-            PromotionStoreMappingParam result = new PromotionStoreMappingParam();
+            var result = _context.PromotionStoreMapping.Find(id);
+            /*PromotionStoreMapping result = new PromotionStoreMapping();
             result.Id = id;
             result.PromotionId = promotionStoreMapping.PromotionId;
-            result.StoreId = promotionStoreMapping.StoreId;
+            result.StoreId = promotionStoreMapping.StoreId;*/
             
-            if (promotionStoreMapping.DelFlg.Equals(GlobalVariables.DELETED))
+            if (result.DelFlg.Equals(GlobalVariables.DELETED))
             {
                 // vẫn trả ra obj, FE check delflag để hiển thị ????
                 return null;
@@ -65,7 +65,7 @@ namespace ApplicationCore.Services
             _context.PromotionStoreMapping.Add(promotionStoreMapping);
             try
             {
-                _context.SaveChangesAsync();
+                _context.SaveChanges();
             }
             catch (DbUpdateException)
             {
@@ -82,20 +82,26 @@ namespace ApplicationCore.Services
             return GlobalVariables.SUCCESS;
         }
 
-        public int PutPromotionStoreMapping(PromotionStoreMapping promotionStoreMapping)
+        public int PutPromotionStoreMapping(Guid id, PromotionStoreMapping promotionStoreMapping)
         {
-            /*var insDate = _context.PromotionStoreMapping.Find(promotionStoreMapping.Id).InsDate;
-            promotionStoreMapping.InsDate = DateTime.Now;*/
-            promotionStoreMapping.UpdDate = DateTime.Now;
-            _context.Entry(promotionStoreMapping).State = EntityState.Modified;
+            var result = _context.PromotionStoreMapping.Find(id);
+
+            if (result == null)
+            {
+                return GlobalVariables.NOT_FOUND;
+            }
+            result.StoreId = promotionStoreMapping.StoreId;
+            result.PromotionId = promotionStoreMapping.PromotionId;
+            result.Id = promotionStoreMapping.Id;
+            result.UpdDate = DateTime.Now;
 
             try
             {
-                _context.SaveChangesAsync();
+                _context.SaveChanges();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!PromotionStoreMappingExists(promotionStoreMapping.Id))
+                if (!PromotionStoreMappingExists(id))
                 {
                     return GlobalVariables.NOT_FOUND;
                 }

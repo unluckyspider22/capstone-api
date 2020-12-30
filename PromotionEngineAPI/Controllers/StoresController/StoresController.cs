@@ -35,7 +35,7 @@ namespace PromotionEngineAPI.Controllers
         public ActionResult<StoreParam> GetStore(Guid id)
         {
 
-            StoreParam result = _service.GetStore(id);
+            Store result = _service.GetStore(id);
             if (result == null)
                 return NotFound();
             return Ok(result);
@@ -44,12 +44,12 @@ namespace PromotionEngineAPI.Controllers
         // PUT: api/Stores/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
-        [HttpPut]
-        public ActionResult<Store> PutStore(Store store)
+        [HttpPut("{id}")]
+        public ActionResult<Store> PutStore(Guid id,StoreParam storeParam)
         {
-            var result = _service.PutStore(store);
+            var result = _service.PutStore(id, storeParam);
             if (result == GlobalVariables.NOT_FOUND) return NotFound();
-            return Ok(store);
+            return Ok(storeParam);
         }
         //PATCH:  api/Stores/2?delflg=?
         [HttpPatch("{id}")]
