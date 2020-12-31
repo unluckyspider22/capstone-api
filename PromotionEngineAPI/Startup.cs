@@ -20,6 +20,17 @@ namespace PromotionEngineAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("VueCorsPolicy", builder =>
+                {
+                    builder
+                      .AllowAnyHeader()
+                      .AllowAnyMethod()
+                      .AllowCredentials()
+                      .WithOrigins("http://localhost:8080");
+                });
+            });
             services.AddControllers();
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c => {
@@ -65,7 +76,7 @@ namespace PromotionEngineAPI
             //VoucherGroup
             services.AddScoped<IVoucherGroupService, VoucherGroupService>();
 
-            services.AddControllers().AddNewtonsoftJson();
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -92,10 +103,14 @@ namespace PromotionEngineAPI
 
             app.UseAuthorization();
 
+            app.UseCors("VueCorsPolicy");
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
+
+            
         }
     }
 }
