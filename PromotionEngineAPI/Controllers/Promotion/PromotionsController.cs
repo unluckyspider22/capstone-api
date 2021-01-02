@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using Infrastructure.Models;
 using ApplicationCore.Services;
 using ApplicationCore.Utils;
-using Microsoft.AspNetCore.Cors;
 
 namespace PromotionEngineAPI.Controllers
 {
