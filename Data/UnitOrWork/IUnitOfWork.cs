@@ -31,19 +31,19 @@ namespace Infrastructure.UnitOrWork
         //Promotion
         IGenericRepository<Promotion> PromotionRepository { get; }
         //PromotionStoreMapping
-
+        IGenericRepository<PromotionStoreMapping> PromotionStoreMappingRepository { get; }
         //PromotionTier
-
+        IGenericRepository<PromotionTier> PromotionTierRepository { get; }
         //RoleEntity
-
+        IGenericRepository<RoleEntity> RoleEntityRepository { get; }
         //Store
-
+        IGenericRepository<Store> StoreRepository { get; }
         //Voucher
-
+        IGenericRepository<Voucher> VoucherRepository { get; }
         //VoucherChannel
-
+        IGenericRepository<VoucherChannel> VoucherChannelRepository { get; }
         //VoucherGroup
-
+        IGenericRepository<VoucherGroup> VoucherGroupRepository { get; }
 
         Task<int> SaveAsync();
     }
