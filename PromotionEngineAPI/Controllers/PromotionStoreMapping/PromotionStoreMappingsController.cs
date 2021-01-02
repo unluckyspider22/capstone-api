@@ -9,6 +9,9 @@ using Infrastructure.Models;
 using ApplicationCore.Services;
 using ApplicationCore.Utils;
 using ApplicationCore.Models.PromotionStoreMapping;
+using Infrastructure.Helper;
+using Infrastructure.DTOs;
+using Infrastructure.DTOs.PromotionStoreMapping;
 
 namespace PromotionEngineAPI.Controllers
 {
@@ -25,64 +28,113 @@ namespace PromotionEngineAPI.Controllers
 
         // GET: api/PromotionStoreMappings
         [HttpGet]
-        public  List<PromotionStoreMapping> GetPromotionStoreMapping()
+        // api/PromotionStoreMappings?pageIndex=...&pageSize=...
+        public async Task<IActionResult> GetPromotionStoreMapping([FromQuery] PagingRequestParam param)
         {
-            return  _service.GetPromotionStoreMappings();
+            var result = await _service.GetAsync(pageIndex: param.PageIndex, pageSize: param.PageSize, filter: el => el.DelFlg.Equals("0"));
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
+        }
+
+        // GET: api/PromotionStoreMappings/count
+        [HttpGet]
+        [Route("count")]
+        public async Task<IActionResult> CountPromotionStoreMapping()
+        {
+            return Ok(await _service.CountAsync());
         }
 
         // GET: api/PromotionStoreMappings/5
         [HttpGet("{id}")]
-        public ActionResult<PromotionStoreMappingParam>  GetPromotionStoreMapping(Guid id)
+        public async Task<IActionResult> GetPromotionStoreMapping([FromRoute] Guid id)
         {
-            PromotionStoreMapping result = _service.GetPromotionStoreMapping(id);
+            var result = await _service.GetByIdAsync(id);
             if (result == null)
+            {
                 return NotFound();
+            }
             return Ok(result);
         }
 
         // PUT: api/PromotionStoreMappings/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public ActionResult PutPromotionStoreMapping(Guid id, PromotionStoreMapping promotionStoreMapping)
+        public async Task<IActionResult> PutPromotionStoreMapping([FromRoute] Guid id, [FromBody] PromotionStoreMappingDto dto)
         {
-            var result = _service.PutPromotionStoreMapping(id, promotionStoreMapping);
-            if (result == GlobalVariables.NOT_FOUND) return NotFound();
-            return Ok(promotionStoreMapping);
-        }
-        //PATCH:  api/PromotionStoreMapping/2?delflg=?
-        [HttpPatch("{id}")]
-        public ActionResult UpdateDelFlg(Guid id, string delflg)
-        {
-            var result = _service.UpdateDelFlag(id, delflg);
-            if (result == GlobalVariables.NOT_FOUND)
+            if (id != dto.Id)
+            {
+                return BadRequest();
+            }
+
+            dto.UpdDate = DateTime.Now;
+
+            var result = await _service.UpdateAsync(dto);
+
+            if (result == null)
+            {
                 return NotFound();
-            return Ok();
+            }
+
+            return Ok(result);
+
         }
 
         // POST: api/PromotionStoreMappings
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public ActionResult PostPromotionStoreMapping(PromotionStoreMapping promotionStoreMapping)
+        public async Task<IActionResult> PostPromotionStoreMapping([FromBody] PromotionStoreMappingDto dto)
         {
-            var result = _service.PostPromotionStoreMapping(promotionStoreMapping);
-            if (result == GlobalVariables.DUPLICATE) return Conflict();
-            return Ok(promotionStoreMapping);
+            dto.Id = Guid.NewGuid();
+
+            var result = await _service.CreateAsync(dto);
+
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            //var result = dto;
+
+            return Ok(result);
         }
 
         // DELETE: api/PromotionStoreMappings/5
-        [HttpDelete("{id}")]
-        public ActionResult DeletePromotionStoreMapping(Guid id)
+        [HttpDelete]
+        public async Task<IActionResult> DeletePromotionStoreMapping([FromQuery] Guid id)
         {
-            var result = _service.DeletePromotionStoreMapping(id);
-            if (result == GlobalVariables.NOT_FOUND)
+            if (id == null)
+            {
+                return BadRequest();
+            }
+            var result = await _service.DeleteAsync(id);
+            if (result == false)
             {
                 return NotFound();
             }
             return Ok();
         }
 
-        
+        // Put: api/PromotionStoreMappings/5
+        [HttpPatch]
+        public async Task<IActionResult> HidePromotionStoreMapping([FromQuery] Guid id, [FromQuery] string value)
+        {
+            if (id == null)
+            {
+                return BadRequest();
+            }
+            if (!value.Equals(AppConstant.DelFlg.HIDE) && !value.Equals(AppConstant.DelFlg.UNHIDE))
+            {
+                return BadRequest();
+            }
+            var result = await _service.HideAsync(id, value);
+            if (result == false)
+            {
+                return NotFound();
+            }
+            return Ok();
+        }
+
+
     }
 }

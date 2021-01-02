@@ -1,4 +1,5 @@
 ﻿using ApplicationCore.Models.VoucherChannel;
+using Infrastructure.DTOs.VoucherChannel;
 using Infrastructure.Models;
 using System;
 using System.Collections.Generic;
@@ -7,20 +8,7 @@ using System.Threading.Tasks;
 
 namespace ApplicationCore.Services
 {
-   public interface IVoucherChannelService
+   public interface IVoucherChannelService : IBaseService<VoucherChannel, VoucherChannelDto>
     {
-        public List<VoucherChannel> GetVoucherChannels();
-
-        public VoucherChannel GetVoucherChannel(Guid id);
-
-        public int PostVoucherChannel(VoucherChannel VoucherChannel);
-
-        public int PutVoucherChannel(Guid id, VoucherChannelParam VoucherChannelParam);
-
-        public int DeleteVoucherChannel(Guid id);
-
-        public int CountVoucherChannel();
-
-        public int UpdateDelFlag(Guid id, string delflg);
     }
 }
