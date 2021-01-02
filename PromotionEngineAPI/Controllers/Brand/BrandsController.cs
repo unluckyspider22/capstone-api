@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using ApplicationCore.Models;
 using ApplicationCore.Services;
 using ApplicationCore.Utils;
+using Infrastructure.DTOs;
+using Infrastructure.Helper;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -24,75 +26,107 @@ namespace PromotionEngineAPI.Controllers
 
         // GET: api/brands
         [HttpGet]
-        public List<Brand> GetBrand()
+        // api/brands?pageIndex=...&pageSize=...
+        public async Task<IActionResult> GetBrand([FromQuery] PagingRequestParam param)
         {
-            return _service.GetBrands();
+            var result = await _service.GetAsync(pageIndex: param.PageIndex, pageSize: param.PageSize, filter: el => el.DelFlg.Equals("0"));
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
         }
 
         // GET: api/brands/count
         [HttpGet]
         [Route("count")]
-        public int CountBrand()
+        public async Task<IActionResult> CountBrand()
         {
-            return _service.CountBrand();
+            return Ok(await _service.CountAsync());
         }
 
         // GET: api/brands/5
         [HttpGet("{id}")]
-        public Brand GetBrand(Guid id)
+        public async Task<IActionResult> GetBrand([FromRoute]Guid id)
         {
-            return _service.GetBrands(id);
+            var result = await _service.GetByIdAsync(id);
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
         }
 
         // PUT: api/brands/5
         [HttpPut("{id}")]
-        public ActionResult<BrandParam> PutBrand(Guid id, BrandParam brandParam)
+        public async Task<IActionResult> PutBrand([FromRoute]Guid id, [FromBody] BrandDto dto)
         {
-
-            if (!id.Equals(brandParam.BrandId))
+            if (id != dto.BrandId)
             {
                 return BadRequest();
             }
 
-            var result = _service.UpdateBrand(id, brandParam);
+            dto.UpdDate = DateTime.Now;
 
-            if (result == GlobalVariables.NOT_FOUND)
+            var result = await _service.UpdateAsync(dto);
+
+            if (result == null)
             {
                 return NotFound();
             }
 
-            return Ok(brandParam);
+            return Ok(result);
+
         }
 
         // POST: api/Brands
         [HttpPost]
-        public ActionResult<BrandParam> PostBrand(BrandParam brandParam)
+        public async Task<IActionResult> PostBrand([FromBody] BrandDto dto)
         {
-            brandParam.BrandId = Guid.NewGuid();
+            dto.BrandId = Guid.NewGuid();
 
-            _service.CreateBrand(brandParam);
+            var result = await _service.CreateAsync(dto);
 
-            return Ok(brandParam);
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            //var result = dto;
+
+            return Ok(result);
         }
 
         // DELETE: api/Brands/5
-        [HttpDelete("{id}")]
-        public ActionResult DeleteBrand(Guid id)
+        [HttpDelete]
+        public async Task<IActionResult> DeleteBrand([FromQuery]Guid id)
         {
-            var result = _service.DeleteBrand(id);
-            if (result == GlobalVariables.NOT_FOUND)
+            if (id == null)
+            {
+                return BadRequest();
+            }
+            var result = await _service.DeleteAsync(id);
+            if (result == false)
             {
                 return NotFound();
             }
             return Ok();
         }
 
-        // PATCH: api/Brands/5
-        [HttpPatch("{id}")]
-        public ActionResult HideBrand(Guid id)
+        // Put: api/Brands/5
+        [HttpPatch]
+        public async Task<IActionResult> HideBrand([FromQuery]Guid id, [FromQuery]string value)
         {
-            var result = _service.HideBrand(id);
-            if (result == GlobalVariables.NOT_FOUND)
+            if (id == null)
+            {
+                return BadRequest();
+            }
+            if (!value.Equals(AppConstant.DelFlg.HIDE) && !value.Equals(AppConstant.DelFlg.UNHIDE))
+            {
+                return BadRequest();
+            }
+            var result = await _service.HideAsync(id, value);
+            if (result == false)
             {
                 return NotFound();
             }
