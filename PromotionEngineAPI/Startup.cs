@@ -1,10 +1,14 @@
 using ApplicationCore.Services;
+using AutoMapper;
 using Infrastructure.Models;
+using Infrastructure.UnitOrWork;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 
 namespace PromotionEngineAPI
 {
@@ -20,12 +24,38 @@ namespace PromotionEngineAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("VueCorsPolicy", builder =>
+                {
+                    builder
+                      .AllowAnyHeader()
+                      .AllowAnyMethod()
+                      .AllowCredentials();
+                });
+            });
             services.AddControllers();
-            // Register the Swagger generator, defining 1 or more Swagger documents
-            services.AddSwaggerGen(c => {
+            // add config swagger
+            services.AddSwaggerGen(c =>
+            {
                 c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "My API", Version = "1" });
             });
             services.AddTransient<PromotionEngineContext, PromotionEngineContext>();
+
+            // add config auto mapper
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            // connect unit of work
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            //DI for all service
+            ServiceAddScoped(services);
+            // configure controller
+            services.AddControllers().AddNewtonsoftJson(option => option.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+
+
+        }
+
+        private void ServiceAddScoped(IServiceCollection services)
+        {
             //Account
             services.AddScoped<IAccountService, AccountService>();
             //Action
@@ -64,8 +94,6 @@ namespace PromotionEngineAPI
             services.AddScoped<IVoucherChannelService, VoucherChannelService>();
             //VoucherGroup
             services.AddScoped<IVoucherGroupService, VoucherGroupService>();
-
-            services.AddControllers().AddNewtonsoftJson();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -92,10 +120,14 @@ namespace PromotionEngineAPI
 
             app.UseAuthorization();
 
+            app.UseCors("VueCorsPolicy");
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
+
+
         }
     }
 }

@@ -9,6 +9,8 @@ using Infrastructure.Models;
 using ApplicationCore.Services;
 using ApplicationCore.Models;
 using ApplicationCore.Utils;
+using Infrastructure.DTOs;
+using Infrastructure.Helper;
 
 namespace PromotionEngineAPI.Controllers
 {
@@ -25,87 +27,111 @@ namespace PromotionEngineAPI.Controllers
 
         // GET: api/MembershipConditions
         [HttpGet]
-        public ActionResult<List<MembershipCondition>> GetMembershipCondition()
+        // api/MembershipConditions?pageIndex=...&pageSize=...
+        public async Task<IActionResult> GetMembershipCondition([FromQuery] PagingRequestParam param)
         {
-            return _service.GetMembershipConditions();
+            var result = await _service.GetAsync(pageIndex: param.PageIndex, pageSize: param.PageSize, filter: el => el.DelFlg.Equals("0"));
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
+        }
+
+        // GET: api/MembershipConditions/count
+        [HttpGet]
+        [Route("count")]
+        public async Task<IActionResult> CountMembershipCondition()
+        {
+            return Ok(await _service.CountAsync());
         }
 
         // GET: api/MembershipConditions/5
         [HttpGet("{id}")]
-        public ActionResult<MembershipCondition> GetMembershipCondition(Guid id)
+        public async Task<IActionResult> GetMembershipCondition([FromRoute]Guid id)
         {
-            var condition = _service.FindMembershipCondition(id);
-
-            if (condition == null)
+            var result = await _service.GetByIdAsync(id);
+            if (result == null)
             {
                 return NotFound();
             }
-
-            return Ok(condition);
+            return Ok(result);
         }
 
         // PUT: api/MembershipConditions/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public ActionResult<MembershipCondition> PutMembershipCondition(Guid id, MembershipConditionParam param)
+        public async Task<IActionResult> PutMembershipCondition([FromRoute]Guid id, [FromBody] MembershipConditionDto dto)
         {
-            if (id != param.MembershipConditionId)
+            if (id != dto.MembershipConditionId)
             {
                 return BadRequest();
             }
 
-            try
-            {
-                int result = _service.UpdateMembershipCondition(id, param);
-                if (result == GlobalVariables.SUCCESS)
-                {
-                    return Ok(param);
-                }
-                else if (result == GlobalVariables.NOT_FOUND)
-                {
-                    return NotFound();
-                }
-            }
-            catch (DbUpdateConcurrencyException)
-            {
+            dto.UpdDate = DateTime.Now;
 
-                return Conflict();
+            var result = await _service.UpdateAsync(dto);
 
+            if (result == null)
+            {
+                return NotFound();
             }
 
-            return NoContent();
+            return Ok(result);
+
         }
 
         // POST: api/MembershipConditions
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public ActionResult<MembershipCondition> PostMembershipCondition(MembershipCondition membershipCondition)
+        public async Task<IActionResult> PostMembershipCondition([FromBody] MembershipConditionDto dto)
         {
-            int result = _service.AddMembershipCondition(membershipCondition);
-            if (result == GlobalVariables.SUCCESS)
+            dto.MembershipConditionId = Guid.NewGuid();
+
+            var result = await _service.CreateAsync(dto);
+
+            if (result == null)
             {
-                return Ok(membershipCondition);
+                return NotFound();
             }
-            else if (result == GlobalVariables.DUPLICATE)
-            {
-                return Conflict();
-            }
-            return NoContent();
+
+            //var result = dto;
+
+            return Ok(result);
         }
 
         // DELETE: api/MembershipConditions/5
-        [HttpDelete("{id}")]
-        public ActionResult DeleteMembershipCondition(Guid id)
+        [HttpDelete]
+        public async Task<IActionResult> DeleteMembershipCondition([FromQuery]Guid id)
         {
-            var condition = _service.DeleteMembershipCondition(id);
-
-            if (condition > 0)
+            if (id == null)
             {
-                return Ok();
+                return BadRequest();
             }
-            return NotFound();
+            var result = await _service.DeleteAsync(id);
+            if (result == false)
+            {
+                return NotFound();
+            }
+            return Ok();
+        }
+
+        // Put: api/MembershipConditions/5
+        [HttpPatch]
+        public async Task<IActionResult> HideMembershipCondition([FromQuery]Guid id, [FromQuery]string value)
+        {
+            if (id == null)
+            {
+                return BadRequest();
+            }
+            if (!value.Equals(AppConstant.DelFlg.HIDE) && !value.Equals(AppConstant.DelFlg.UNHIDE))
+            {
+                return BadRequest();
+            }
+            var result = await _service.HideAsync(id, value);
+            if (result == false)
+            {
+                return NotFound();
+            }
+            return Ok();
         }
     }
 }

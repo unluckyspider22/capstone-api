@@ -1,81 +1,22 @@
-﻿using ApplicationCore.Models;
-using ApplicationCore.Utils;
+﻿using ApplicationCore.Utils;
+using AutoMapper;
+using Infrastructure.DTOs;
 using Infrastructure.Models;
+using Infrastructure.Repository;
+using Infrastructure.UnitOrWork;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace ApplicationCore.Services
 {
-    public class PromotionService : IPromotionService
+    public class PromotionService : BaseService<Promotion, PromotionDto>, IPromotionService
     {
-        private readonly PromotionEngineContext _context;
-
-        public PromotionService(PromotionEngineContext context)
+        public PromotionService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
         {
-            _context = context;
-        }
-        public List<Promotion> GetPromotions()
-        {
-            return _context.Promotion.Where(c => !c.DelFlg.Equals(GlobalVariables.DELETED)).ToList();
         }
 
-        public Promotion FindPromotion(Guid id)
-        {
-            var Promotion = _context.Promotion.Find(id);
-            if (Promotion == null || Promotion.DelFlg == GlobalVariables.DELETED)
-            {
-                return null;
-            }
-            return Promotion;
-        }
-
-        public int AddPromotion(Promotion param)
-        {
-            param.PromotionId = Guid.NewGuid();
-            _context.Promotion.Add(param);
-            try
-            {
-                _context.SaveChanges();
-            }
-            catch (DbUpdateException)
-            {
-                throw;
-            }
-            return GlobalVariables.SUCCESS;
-        }
-        public int UpdatePromotion(Guid id, Promotion param)
-        {
-
-            _context.Entry(param).State = EntityState.Modified;
-            try
-            {
-                int result =_context.SaveChanges();
-                if(result > 0)
-                {
-                    return GlobalVariables.SUCCESS;
-                }
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                return GlobalVariables.DUPLICATE;
-
-            }
-            return GlobalVariables.NOT_FOUND;
-        }
-
-        public int DeletePromotion(Guid id)
-        {
-            var condition = _context.Promotion.Find(id);
-            if (condition != null)
-            {
-                _context.Promotion.Remove(condition);
-                return _context.SaveChanges();
-
-            }
-            return GlobalVariables.FAIL;
-        }
+        protected override IGenericRepository<Promotion> _repository => _unitOfWork.PromotionRepository;
     }
 }

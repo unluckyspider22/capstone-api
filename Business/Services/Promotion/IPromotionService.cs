@@ -1,19 +1,13 @@
 ﻿using ApplicationCore.Models;
+using Infrastructure.DTOs;
 using Infrastructure.Models;
 using System;
 using System.Collections.Generic;
 
 namespace ApplicationCore.Services
 {
-    public interface IPromotionService
+    public interface IPromotionService : IBaseService<Promotion,PromotionDto>
     {
-        public List<Promotion> GetPromotions();
-
-        public Promotion FindPromotion(Guid id);
-
-        public int AddPromotion(Promotion param);
-        public int UpdatePromotion(Guid id, Promotion param);
-
-        public int DeletePromotion(Guid id);
+       
     }
 }

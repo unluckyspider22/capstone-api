@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using ApplicationCore.Models;
+using Infrastructure.DTOs;
 using Infrastructure.Models;
 
 
@@ -7,14 +8,8 @@ namespace ApplicationCore.Services
 {
 
 
-    public interface IActionService
+    public interface IActionService : IBaseService<Action, ActionDto>
     {
-        public List<Action> GetActions();
-        public Action GetActions(System.Guid id);
-        public int CreateAction(ActionParam actionParam);
-        public int UpdateAction(System.Guid id, ActionParam actionParam);
-        public int DeleteAction(System.Guid id);
-        public int HideAction(System.Guid id);
-        public int CountAction();
+
     }
 }

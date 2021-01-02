@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Infrastructure.Models;
 using ApplicationCore.Services;
-using ApplicationCore.Utils;
-using ApplicationCore.Models;
+using Infrastructure.DTOs;
+using Infrastructure.Helper;
 
 namespace PromotionEngineAPI.Controllers
 {
@@ -23,85 +20,111 @@ namespace PromotionEngineAPI.Controllers
 
         // GET: api/OrderConditions
         [HttpGet]
-        public List<OrderCondition> GetOrderCondition()
+        // api/OrderConditions?pageIndex=...&pageSize=...
+        public async Task<IActionResult> GetOrderCondition([FromQuery] PagingRequestParam param)
         {
-            return _service.GetOrderConditions();
+            var result = await _service.GetAsync(pageIndex: param.PageIndex, pageSize: param.PageSize, filter: el => el.DelFlg.Equals("0"));
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
+        }
+
+        // GET: api/OrderConditions/count
+        [HttpGet]
+        [Route("count")]
+        public async Task<IActionResult> CountOrderCondition()
+        {
+            return Ok(await _service.CountAsync());
         }
 
         // GET: api/OrderConditions/5
         [HttpGet("{id}")]
-        public ActionResult<OrderCondition> GetOrderCondition(Guid id)
+        public async Task<IActionResult> GetOrderCondition([FromRoute]Guid id)
         {
-            var condition = _service.FindOrderCondition(id);
-
-            if (condition == null)
+            var result = await _service.GetByIdAsync(id);
+            if (result == null)
             {
                 return NotFound();
             }
-
-            return Ok(condition);
+            return Ok(result);
         }
 
         // PUT: api/OrderConditions/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public ActionResult PutOrderCondition(Guid id, OrderConditionParam param)
+        public async Task<IActionResult> PutOrderCondition([FromRoute]Guid id, [FromBody] OrderConditionDto dto)
         {
-            if (id != param.OrderConditionId)
+            if (id != dto.OrderConditionId)
             {
                 return BadRequest();
             }
 
-            try
+            dto.UpdDate = DateTime.Now;
+
+            var result = await _service.UpdateAsync(dto);
+
+            if (result == null)
             {
-                int result = _service.UpdateOrderCondition(id, param);
-                if (result == GlobalVariables.SUCCESS)
-                {
-                    return Ok(param);
-                }
-                else if (result == GlobalVariables.NOT_FOUND)
-                {
-                    return NotFound();
-                }
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                return Conflict();
+                return NotFound();
             }
 
-            return NoContent();
+            return Ok(result);
+
         }
 
         // POST: api/OrderConditions
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public ActionResult<OrderCondition> PostOrderCondition(OrderCondition orderCondition)
+        public async Task<IActionResult> PostOrderCondition([FromBody] OrderConditionDto dto)
         {
-            int result = _service.AddOrderCondition(orderCondition);
-            if (result == GlobalVariables.SUCCESS)
+            dto.OrderConditionId = Guid.NewGuid();
+
+            var result = await _service.CreateAsync(dto);
+
+            if (result == null)
             {
-                return Ok(orderCondition);
+                return NotFound();
             }
-            else if (result == GlobalVariables.DUPLICATE)
-            {
-                return Conflict();
-            }
-            return NoContent();
+
+            //var result = dto;
+
+            return Ok(result);
         }
 
         // DELETE: api/OrderConditions/5
-        [HttpDelete("{id}")]
-        public ActionResult<OrderCondition> DeleteOrderCondition(Guid id)
+        [HttpDelete]
+        public async Task<IActionResult> DeleteOrderCondition([FromQuery]Guid id)
         {
-            var condition = _service.DeleteOrderCondition(id);
-
-            if (condition > 0)
+            if (id == null)
             {
-                return Ok();
+                return BadRequest();
             }
-            return NotFound();
+            var result = await _service.DeleteAsync(id);
+            if (result == false)
+            {
+                return NotFound();
+            }
+            return Ok();
+        }
+
+        // Put: api/OrderConditions/5
+        [HttpPatch]
+        public async Task<IActionResult> HideOrderCondition([FromQuery]Guid id, [FromQuery]string value)
+        {
+            if (id == null)
+            {
+                return BadRequest();
+            }
+            if (!value.Equals(AppConstant.DelFlg.HIDE) && !value.Equals(AppConstant.DelFlg.UNHIDE))
+            {
+                return BadRequest();
+            }
+            var result = await _service.HideAsync(id, value);
+            if (result == false)
+            {
+                return NotFound();
+            }
+            return Ok();
         }
     }
 }
