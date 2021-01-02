@@ -9,12 +9,12 @@ using Infrastructure.UnitOrWork;
 
 namespace ApplicationCore.Services
 {
-    public class ActionService : BaseService<Infrastructure.Models.Action, ActionDto>, IActionService
+    public class ActionService : BaseService<Action, ActionDto>, IActionService
     {
         public ActionService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
         {
         }
 
-        protected override IGenericRepository<Action> _repository => throw new System.NotImplementedException();
+        protected override IGenericRepository<Action> _repository => _unitOfWork.ActionRepository;
     }
 }

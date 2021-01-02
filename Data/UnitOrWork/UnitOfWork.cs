@@ -17,9 +17,44 @@ namespace Infrastructure.UnitOrWork
             _context = context;
             initRepository();
         }
+        //Account
 
-        public IGenericRepository<Brand> BrandRepository { get; set; }
+        //Action
         public IGenericRepository<Models.Action> ActionRepository { get; set; }
+        //Brand
+        public IGenericRepository<Brand> BrandRepository { get; set; }
+        //Channel
+
+        //ConditionRule
+
+        //Holiday
+
+        //Membership
+
+        //MembershipAction
+
+        //MembershipCondition
+
+        //OrderAction
+
+        //ProductAction
+
+        //Promotion
+
+        //PromotionStoreMapping
+
+        //PromotionTier
+
+        //RoleEntity
+
+        //Store
+
+        //Voucher
+
+        //VoucherChannel
+
+        //VoucherGroup
+
 
         private void initRepository()
         {
