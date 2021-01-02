@@ -58,7 +58,44 @@ namespace Infrastructure.UnitOrWork
 
         private void initRepository()
         {
+            //Account
+
+            //Action
+            ActionRepository = new GenericRepository<Models.Action>(_context);
+            //Brand
             BrandRepository = new GenericRepository<Brand>(_context);
+            //Channel
+
+            //ConditionRule
+
+            //Holiday
+
+            //Membership
+
+            //MembershipAction
+
+            //MembershipCondition
+
+            //OrderAction
+
+            //ProductAction
+
+            //Promotion
+
+            //PromotionStoreMapping
+
+            //PromotionTier
+
+            //RoleEntity
+
+            //Store
+
+            //Voucher
+
+            //VoucherChannel
+
+            //VoucherGroup
+
         }
         public void Dispose()
         {
