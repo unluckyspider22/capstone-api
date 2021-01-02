@@ -12,13 +12,46 @@ namespace Infrastructure.AutoMapper
     {
         public AutoMapper()
         {
+            //Acount
+
+            //Action
+            CreateMap<Models.Action, ActionDto>();
+            CreateMap<ActionDto, Models.Action>();
             //Brand
-            CreateMap<Brand, BrandDto>()
-                .ForAllMembers(opt => opt.Condition(
-                    (source, destination, sourceMember, destMember) => (sourceMember != null)
-                    )
-                );
+            CreateMap<Brand, BrandDto>();
             CreateMap<BrandDto, Brand>();
+            //Channel
+
+            //ConditionRule
+
+            //Holiday
+
+            //Membership
+
+            //MembershipAction
+
+            //MembershipCondition
+
+            //OrderAction
+
+            //ProductAction
+
+            //Promotion
+
+            //PromotionStoreMapping
+
+            //PromotionTier
+
+            //RoleEntity
+
+            //Store
+
+            //Voucher
+
+            //VoucherChannel
+
+            //VoucherGroup
+
         }
     }
 }
