@@ -47,7 +47,7 @@ namespace PromotionEngineAPI.Controllers
         [Route("count")]
         public async Task<IActionResult> CountChannel()
         {
-            return Ok(await _service.CountAsync());
+            return Ok(await _service.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE)));
         }
 
         // GET: api/Channels/5

@@ -18,7 +18,7 @@ namespace Infrastructure.UnitOrWork
             initRepository();
         }
         //Account
-        public IGenericRepository<Account> AccountRepositoryImp { get; set; }
+        public IGenericRepository<Account> AccountRepository { get; set; }
         //Action
         public IGenericRepository<Models.Action> ActionRepository { get; set; }
         //Brand
@@ -29,7 +29,6 @@ namespace Infrastructure.UnitOrWork
         public IGenericRepository<ConditionRule> ConditionRuleRepository { get; set; }
         //Holiday
         public IGenericRepository<Holiday> HolidayRepository { get; set; }
-
         //Membership
         public IGenericRepository<Membership> MembershipRepository { get; set; }
         //MembershipAction
@@ -60,7 +59,7 @@ namespace Infrastructure.UnitOrWork
         private void initRepository()
         {
             //Account
-            AccountRepositoryImp = new AccountRepository(_context);
+            AccountRepository = new GenericRepository<Account>(_context);
             //Action
             ActionRepository = new GenericRepository<Models.Action>(_context);
             //Brand

@@ -45,9 +45,9 @@ namespace ApplicationCore.Services
              
         }
 
-        public Task<IEnumerable<TEntity>> GetAsync(int pageIndex = 0, int pageSize = 0, Expression<Func<TEntity, bool>> filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, string includeProperties = "")
+        public async Task<IEnumerable<TEntity>> GetAsync(int pageIndex = 0, int pageSize = 0, Expression<Func<TEntity, bool>> filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, string includeProperties = "")
         {
-            return _repository.Get(pageIndex, pageSize, filter, orderBy, includeProperties);
+            return await _repository.Get(pageIndex, pageSize, filter, orderBy, includeProperties);
         }
 
         public virtual async Task<TDto> GetByIdAsync(Guid id)
@@ -76,9 +76,9 @@ namespace ApplicationCore.Services
             return await _unitOfWork.SaveAsync() > 0;
         }
 
-        public Task<int> CountAsync()
+        public Task<int> CountAsync(Expression<Func<TEntity, bool>> filter = null)
         {
-            return _repository.CountAsync();
+            return _repository.CountAsync(filter);
         }
     }
 }

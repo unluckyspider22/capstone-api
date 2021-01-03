@@ -33,15 +33,14 @@ namespace PromotionEngineAPI.Controllers
                 pageIndex: param.PageIndex,
                 pageSize: param.PageSize,
                 filter: el => el.DelFlg.Equals("0"),
-                orderBy: el => el.OrderByDescending(b => b.InsDate),
-                includeProperties: "Account"
+                orderBy: el => el.OrderByDescending(b => b.InsDate)
                 );
 
             if (result == null)
             {
                 return NotFound();
             }
-            return Ok(result);
+            return Ok(dictionary);
         }
 
         // GET: api/brands/count
@@ -49,7 +48,7 @@ namespace PromotionEngineAPI.Controllers
         [Route("count")]
         public async Task<IActionResult> CountBrand()
         {
-            return Ok(await _service.CountAsync());
+            return Ok(await _service.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE)));
         }
 
         // GET: api/brands/5

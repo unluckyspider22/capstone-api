@@ -18,7 +18,7 @@ namespace ApplicationCore.Services
         Task<bool> DeleteAsync(Guid id);
         Task<bool> HideAsync(Guid id, string value);
         Task<TDto> GetByIdAsync(Guid id);
-        Task<int> CountAsync();
+        Task<int> CountAsync(Expression<Func<TEntity, bool>> filter = null);
 
     }
 }

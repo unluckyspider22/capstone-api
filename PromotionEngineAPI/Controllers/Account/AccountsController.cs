@@ -46,7 +46,7 @@ namespace PromotionEngineAPI.Controllers
         [Route("count")]
         public async Task<IActionResult> CountAccount()
         {
-            return Ok(await _service.CountAsync());
+            return Ok(await _service.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE)));
         }
 
         //GET: api/Accounts/5
@@ -63,7 +63,7 @@ namespace PromotionEngineAPI.Controllers
 
         // PUT: api/Accounts/5
         [HttpPut("{username}")]
-        public async Task<IActionResult> PutAccount([FromRoute]System.Guid username, [FromBody] AccountDto dto)
+        public async Task<IActionResult> PutAccount([FromRoute]string username, [FromBody] AccountDto dto)
         {
             if (!username.Equals(dto.Username))
             {
@@ -99,13 +99,13 @@ namespace PromotionEngineAPI.Controllers
 
         // DELETE: api/Accounts/5
         [HttpDelete]
-        public async Task<IActionResult> DeleteAccount([FromQuery]Guid id)
+        public async Task<IActionResult> DeleteAccount([FromQuery]string username)
         {
-            if (id == null)
+            if (username == null)
             {
                 return BadRequest();
             }
-            var result = await _service.DeleteAsync(id);
+            var result = await _service.DeleteUsernameAsync(username);
             if (result == false)
             {
                 return NotFound();
@@ -115,17 +115,19 @@ namespace PromotionEngineAPI.Controllers
 
         // Put: api/Accounts/5
         [HttpPatch]
-        public async Task<IActionResult> HideAccount([FromQuery]Guid id, [FromQuery]string value)
+        public async Task<IActionResult> HideAccount([FromQuery]string username, [FromQuery]string value)
         {
-            if (id == null)
+            if (username == null)
             {
                 return BadRequest();
             }
+
             if (!value.Equals(AppConstant.DelFlg.HIDE) && !value.Equals(AppConstant.DelFlg.UNHIDE))
             {
                 return BadRequest();
             }
-            var result = await _service.HideAsync(id, value);
+
+            var result = await _service.HideUsernameAsync(username, value);
             if (result == false)
             {
                 return NotFound();
