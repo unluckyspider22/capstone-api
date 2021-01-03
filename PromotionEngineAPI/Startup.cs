@@ -30,7 +30,8 @@ namespace PromotionEngineAPI
                     builder
                       .AllowAnyHeader()
                       .AllowAnyMethod()
-                      .AllowCredentials();
+                      .AllowCredentials()
+                      .WithOrigins("http://localhost:8080");
                 });
             });
             services.AddControllers();
