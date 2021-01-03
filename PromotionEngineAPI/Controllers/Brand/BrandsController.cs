@@ -40,7 +40,7 @@ namespace PromotionEngineAPI.Controllers
             {
                 return NotFound();
             }
-            return Ok(dictionary);
+            return Ok(result);
         }
 
         // GET: api/brands/count
