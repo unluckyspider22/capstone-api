@@ -1,6 +1,9 @@
 ﻿using ApplicationCore.Models.VoucherChannel;
 using ApplicationCore.Services;
 using ApplicationCore.Utils;
+using Infrastructure.DTOs;
+using Infrastructure.DTOs.VoucherChannel;
+using Infrastructure.Helper;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -57,7 +60,7 @@ namespace PromotionEngineAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutVoucherChannel([FromRoute] Guid id, [FromBody] VoucherChannelDto dto)
         {
-            if (id != dto.Id)
+            if (id != dto.VoucherChannelId)
             {
                 return BadRequest();
             }
@@ -79,7 +82,7 @@ namespace PromotionEngineAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> PostVoucherChannel([FromBody] VoucherChannelDto dto)
         {
-            dto.Id = Guid.NewGuid();
+            dto.VoucherChannelId = Guid.NewGuid();
 
             var result = await _service.CreateAsync(dto);
 

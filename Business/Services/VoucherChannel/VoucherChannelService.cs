@@ -23,4 +23,4 @@ namespace ApplicationCore.Services
         protected override IGenericRepository<VoucherChannel> _repository => _unitOfWork.VoucherChannelRepository;
     }
 }
-}
+

@@ -8,6 +8,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ApplicationCore.Utils;
+using Infrastructure.DTOs;
+using Infrastructure.DTOs.Store;
+using Infrastructure.Helper;
 
 namespace PromotionEngineAPI.Controllers
 {
@@ -59,7 +62,7 @@ namespace PromotionEngineAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutStore([FromRoute] Guid id, [FromBody] StoreDto dto)
         {
-            if (id != dto.Id)
+            if (id != dto.StoreId)
             {
                 return BadRequest();
             }
@@ -81,7 +84,7 @@ namespace PromotionEngineAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> PostStore([FromBody] StoreDto dto)
         {
-            dto.Id = Guid.NewGuid();
+            dto.StoreId = Guid.NewGuid();
 
             var result = await _service.CreateAsync(dto);
 

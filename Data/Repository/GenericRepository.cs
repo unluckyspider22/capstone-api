@@ -14,6 +14,7 @@ namespace Infrastructure.Repository
     {
         internal PromotionEngineContext _context;
         internal DbSet<TEntity> _dbSet;
+        internal Expression<Func<TEntity, bool>> delflgCond;
         public GenericRepository(PromotionEngineContext context)
         {
             _context = context;
@@ -28,6 +29,7 @@ namespace Infrastructure.Repository
 
         public async Task<int> CountAsync()
         {
+          //  var result = _dbSet.FromSql($"SELECT * FROM '{TEntity}' WHERE DelFlg = '0'").CountAsync();
             return await _dbSet.CountAsync();
         }
 

@@ -22,5 +22,5 @@ namespace ApplicationCore.Services
 
         protected override IGenericRepository<VoucherGroup> _repository => _unitOfWork.VoucherGroupRepository;
     }
-}
+
 }

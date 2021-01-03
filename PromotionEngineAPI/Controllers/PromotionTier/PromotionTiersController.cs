@@ -1,6 +1,9 @@
 ﻿using ApplicationCore.Models.PromotionTier;
 using ApplicationCore.Services;
 using ApplicationCore.Utils;
+using Infrastructure.DTOs;
+using Infrastructure.DTOs.PromotionTier;
+using Infrastructure.Helper;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -58,7 +61,7 @@ namespace PromotionEngineAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutPromotionTier([FromRoute] Guid id, [FromBody] PromotionTierDto dto)
         {
-            if (id != dto.Id)
+            if (id != dto.PromotionTierId)
             {
                 return BadRequest();
             }
@@ -80,7 +83,7 @@ namespace PromotionEngineAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> PostPromotionTier([FromBody] PromotionTierDto dto)
         {
-            dto.Id = Guid.NewGuid();
+            dto.PromotionTierId = Guid.NewGuid();
 
             var result = await _service.CreateAsync(dto);
 

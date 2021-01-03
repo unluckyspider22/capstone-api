@@ -1,6 +1,9 @@
 ﻿using ApplicationCore.Models.Voucher;
 using ApplicationCore.Services;
 using ApplicationCore.Utils;
+using Infrastructure.DTOs;
+using Infrastructure.DTOs.Voucher;
+using Infrastructure.Helper;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -58,7 +61,7 @@ namespace PromotionEngineAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutVoucher([FromRoute] Guid id, [FromBody] VoucherDto dto)
         {
-            if (id != dto.Id)
+            if (id != dto.VoucherId)
             {
                 return BadRequest();
             }
@@ -80,7 +83,7 @@ namespace PromotionEngineAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> PostVoucher([FromBody] VoucherDto dto)
         {
-            dto.Id = Guid.NewGuid();
+            dto.VoucherId = Guid.NewGuid();
 
             var result = await _service.CreateAsync(dto);
 
