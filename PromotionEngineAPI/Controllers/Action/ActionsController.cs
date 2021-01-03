@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using ApplicationCore.Models;
 using ApplicationCore.Services;
 using ApplicationCore.Utils;
 using Infrastructure.DTOs;
+using Infrastructure.Helper;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,11 +23,17 @@ namespace PromotionEngineAPI.Controllers
             _service = service;
         }
 
-        // GET: api/actions
+        // GET: api/Actions
         [HttpGet]
         public async Task<IActionResult> GetAction([FromQuery] PagingRequestParam param)
         {
-            var result = await _service.GetAsync(pageIndex: param.PageIndex, pageSize: param.PageSize);
+            var result = await _service.GetAsync(
+                pageIndex: param.PageIndex,
+                pageSize: param.PageSize,
+                filter: el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE),
+                orderBy: el => el.OrderByDescending(b => b.InsDate)
+                );
+
             if (result == null)
             {
                 return NotFound();
@@ -32,68 +41,100 @@ namespace PromotionEngineAPI.Controllers
             return Ok(result);
         }
 
-        //// GET: api/Actions/count
-        //[HttpGet]
-        //[Route("count")]
-        //public int CountAction()
-        //{
-        //    return _service.CountAction();
-        //}
+        // GET: api/Actions/count
+        [HttpGet]
+        [Route("count")]
+        public async Task<IActionResult> CountAction()
+        {
+            return Ok(await _service.CountAsync());
+        }
 
-        //// GET: api/Actions/5
-        //[HttpGet("{id}")]
-        //public Action GetAction(System.Guid id)
-        //{
-        //    return _service.GetActions(id);
-        //}
+        // GET: api/Actions/5
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetAction([FromRoute]System.Guid id)
+        {
+            var result = await _service.GetByIdAsync(id);
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
+        }
 
-        //// PUT: api/Actions/5
-        //[HttpPut("{id}")]
-        //public ActionResult<Action> PutAction(System.Guid id, ActionParam actionParam)
-        //{
+        // PUT: api/Actions/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutAction([FromRoute]System.Guid id, [FromBody] ActionDto dto)
+        {
+            if (id != dto.ActionId)
+            {
+                return BadRequest();
+            }
 
-        //    if (!id.Equals(actionParam.ActionId))
-        //    {
-        //        return BadRequest();
-        //    }
+            dto.UpdDate = DateTime.Now;
 
-        //    if (_service.UpdateAction(id, actionParam) == GlobalVariables.NOT_FOUND)
-        //    {
-        //        return NotFound();
-        //    }
+            var result = await _service.UpdateAsync(dto);
 
-        //    return Ok(actionParam);
-        //}
+            if (result == null)
+            {
+                return NotFound();
+            }
 
-        //// POST: api/Actions
-        //[HttpPost]
-        //public ActionResult<Action> PostAction(ActionParam actionParam)
-        //{
-        //    _service.CreateAction(actionParam);
+            return Ok(result);
 
-        //    return Ok(actionParam);
-        //}
+        }
 
-        //// DELETE: api/Actions/5
-        //[HttpDelete("{id}")]
-        //public ActionResult<Action> DeleteAction(System.Guid id)
-        //{
-        //    if (_service.DeleteAction(id) == GlobalVariables.NOT_FOUND)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return Ok();
-        //}
+        // POST: api/Actions
+        [HttpPost]
+        public async Task<IActionResult> PostAction([FromBody] ActionDto dto)
+        {
+            dto.ActionId = Guid.NewGuid();
 
-        //// Patch: api/Actions/5
-        //[HttpPatch("{id}")]
-        //public ActionResult<Action> HideAction(System.Guid id)
-        //{
-        //    if (_service.HideAction(id) == GlobalVariables.NOT_FOUND)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return Ok();
-        //}
+            var result = await _service.CreateAsync(dto);
+
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            //var result = dto;
+
+            return Ok(result);
+        }
+
+        // DELETE: api/Actions/5
+        [HttpDelete]
+        public async Task<IActionResult> DeleteAction([FromQuery]Guid id)
+        {
+            if (id == null)
+            {
+                return BadRequest();
+            }
+            var result = await _service.DeleteAsync(id);
+            if (result == false)
+            {
+                return NotFound();
+            }
+            return Ok();
+        }
+
+        // Put: api/Actions/5
+        [HttpPatch]
+        public async Task<IActionResult> HideAction([FromQuery]Guid id, [FromQuery]string value)
+        {
+            if (id == null)
+            {
+                return BadRequest();
+            }
+            if (!value.Equals(AppConstant.DelFlg.HIDE) && !value.Equals(AppConstant.DelFlg.UNHIDE))
+            {
+                return BadRequest();
+            }
+            var result = await _service.HideAsync(id, value);
+            if (result == false)
+            {
+                return NotFound();
+            }
+            return Ok();
+        }
     }
 }

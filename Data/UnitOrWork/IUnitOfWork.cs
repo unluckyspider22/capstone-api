@@ -7,17 +7,17 @@ namespace Infrastructure.UnitOrWork
     public interface IUnitOfWork
     {
         //Account
-
+        IGenericRepository<Account> AccountRepositoryImp { get; }
         //Action
         IGenericRepository<Models.Action> ActionRepository { get; }
         //Brand
         IGenericRepository<Brand> BrandRepository { get; }
         //Channel
-
+        IGenericRepository<Channel> ChannelRepository { get; }
         //ConditionRule
-
+        IGenericRepository<ConditionRule> ConditionRuleRepository { get; }
         //Holiday
-
+        IGenericRepository<Holiday> HolidayRepository { get; }
         //Membership
         IGenericRepository<Membership> MembershipRepository { get; }
         //MembershipAction
