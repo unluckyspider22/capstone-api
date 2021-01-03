@@ -26,9 +26,16 @@ namespace Infrastructure.Repository
             _dbSet.Add(entity);
         }
 
-        public async Task<int> CountAsync()
+        public async Task<int> CountAsync(Expression<Func<TEntity, bool>> filter = null)
         {
-            return await _dbSet.CountAsync();
+            IQueryable<TEntity> query = _dbSet;
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            return await query.CountAsync();
         }
 
         public void Delete(Guid id)
@@ -42,6 +49,17 @@ namespace Infrastructure.Repository
                 _dbSet.Remove(entity);
             }
 
+        }
+
+        public void DeleteUsername(string username)
+        {
+            TEntity entity = _dbSet.Find(username);
+
+            if (entity != null)
+            {
+                _dbSet.Attach(entity);
+                _dbSet.Remove(entity);
+            }
         }
 
         public virtual async Task<IEnumerable<TEntity>> Get(int pageIndex = 0, int pageSize = 0, Expression<Func<TEntity, bool>> filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, string includeProperties = "")
@@ -99,6 +117,17 @@ namespace Infrastructure.Repository
                 _context.Entry(entity).Property("UpdDate").CurrentValue = DateTime.Now;
             }
 
+        }
+
+        public void HideUsername(string username, string value)
+        {
+            TEntity entity = _dbSet.Find(username);
+            if (entity != null)
+            {
+                _dbSet.Attach(entity);
+                _context.Entry(entity).Property("DelFlg").CurrentValue = value;
+                _context.Entry(entity).Property("UpdDate").CurrentValue = DateTime.Now;
+            }
         }
 
         public void Update(TEntity entity)

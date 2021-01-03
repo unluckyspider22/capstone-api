@@ -3,136 +3,45 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ApplicationCore.Utils;
+using AutoMapper;
+using Infrastructure.DTOs;
+using Infrastructure.Helper;
 using Infrastructure.Models;
+using Infrastructure.Repository;
+using Infrastructure.UnitOrWork;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace ApplicationCore.Services
 {
-    public class AccountService : IAccountService
+    public class AccountService : BaseService<Account, AccountDto>, IAccountService
     {
-        private readonly PromotionEngineContext _context;
-        public AccountService(PromotionEngineContext context)
+        public AccountService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
         {
-            _context = context;
+
+        }
+        protected override IGenericRepository<Account> _repository => _unitOfWork.AccountRepository;
+
+        public async Task<bool> DeleteUsernameAsync(string username)
+        {
+            _repository.DeleteUsername(username);
+            return await _unitOfWork.SaveAsync() > 0;
         }
 
-        public int CountAccount()
+        public async Task<AccountDto> GetByUsernameAsync(string username)
         {
-            int count = _context.Account.Where(c => c.DelFlg.Equals("0")).Count();
-            return count;
+            var result = await _repository.GetFirst(
+                el => el.Username.Equals(username)
+                && el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE)
+                );
+
+            return _mapper.Map<AccountDto>(result);
         }
 
-        public int CreateAccount(Account account)
+        public async Task<bool> HideUsernameAsync(string username, string value)
         {
-            _context.Account.Add(account);
-            try
-            {
-                _context.SaveChanges();
-            }
-            catch (DbUpdateException)
-            {
-                if (AccountExists(account.Username))
-                {
-                    return GlobalVariables.DUPLICATE;
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return GlobalVariables.SUCCESS;
-        }
-
-        public int DeleteAccount(string username)
-        {
-            var account = _context.Account.Find(username);
-            if (account == null)
-            {
-                return GlobalVariables.NOT_FOUND;
-            }
-
-            try
-            {
-                _context.Account.Remove(account);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-
-
-            return GlobalVariables.SUCCESS;
-        }
-
-        public Account GetAccount(string username)
-        {
-            var account = _context.Account.Where(c => c.DelFlg.Equals("0")).Where(c => c.Username.Equals(username)).First();
-
-            return account;
-        }
-
-        public List<Account> GetAccounts()
-        {
-            var result = _context.Account.Where(c => c.DelFlg.Equals("0")).ToList();
-            return result;
-        }
-
-        public int HideAccount(string username)
-        {
-            var account = _context.Account.Find(username);
-            if (account == null)
-            {
-                return GlobalVariables.NOT_FOUND;
-            }
-
-            account.DelFlg = GlobalVariables.DELETED;
-            account.UpdDate = DateTime.Now;
-
-            try
-            {
-                _context.Entry(account).Property("DelFlg").IsModified = true;
-                _context.Entry(account).Property("UpdDate").IsModified = true;
-                _context.SaveChanges();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-
-
-            return GlobalVariables.SUCCESS;
-        }
-
-        public int UpdateAccount(string username, Account account)
-        {
-            account.UpdDate = DateTime.Now;
-
-            _context.Entry(account).State = EntityState.Modified;
-
-            try
-            {
-                _context.SaveChanges();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!AccountExists(username))
-                {
-                    return GlobalVariables.NOT_FOUND;
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return GlobalVariables.SUCCESS;
-        }
-
-        private bool AccountExists(string id)
-        {
-            return _context.Account.Any(e => e.Username == id);
+            _repository.HideUsername(username, value);
+            return await _unitOfWork.SaveAsync() > 0;
         }
     }
 }

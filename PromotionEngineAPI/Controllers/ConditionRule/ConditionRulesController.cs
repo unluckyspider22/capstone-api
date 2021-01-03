@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using ApplicationCore.Models;
 using ApplicationCore.Services;
 using ApplicationCore.Utils;
+using Infrastructure.DTOs;
+using Infrastructure.Helper;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -24,75 +26,112 @@ namespace PromotionEngineAPI.Controllers
 
         // GET: api/ConditionRules
         [HttpGet]
-        public List<ConditionRule> GetConditionRule()
+        public async Task<IActionResult> GetConditionRule([FromQuery] PagingRequestParam param)
         {
-            return _service.GetConditionRules();
+            var result = await _service.GetAsync(
+                pageIndex: param.PageIndex,
+                pageSize: param.PageSize,
+                filter: el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE),
+                orderBy: el => el.OrderByDescending(b => b.InsDate)
+                );
+
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
         }
 
         // GET: api/ConditionRules/count
         [HttpGet]
         [Route("count")]
-        public int CountConditionRule()
+        public async Task<IActionResult> CountConditionRule()
         {
-            return _service.CountConditionRule();
+            return Ok(await _service.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE)));
         }
 
         // GET: api/ConditionRules/5
         [HttpGet("{id}")]
-        public ConditionRule GetConditionRule(Guid id)
+        public async Task<IActionResult> GetConditionRule([FromRoute]Guid id)
         {
-            return _service.GetConditionRules(id);
+            var result = await _service.GetByIdAsync(id);
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
         }
 
         // PUT: api/ConditionRules/5
         [HttpPut("{id}")]
-        public ActionResult<ConditionRuleParam> PutConditionRule(Guid id, ConditionRuleParam ConditionRuleParam)
+        public async Task<IActionResult> PutConditionRule([FromRoute]Guid id, [FromBody] ConditionRuleDto dto)
         {
-
-            if (!id.Equals(ConditionRuleParam.ConditionRuleId))
+            if (id != dto.ConditionRuleId)
             {
                 return BadRequest();
             }
 
-            var result = _service.UpdateConditionRule(id, ConditionRuleParam);
+            dto.UpdDate = DateTime.Now;
 
-            if (result == GlobalVariables.NOT_FOUND)
+            var result = await _service.UpdateAsync(dto);
+
+            if (result == null)
             {
                 return NotFound();
             }
 
-            return Ok(ConditionRuleParam);
+            return Ok(result);
+
         }
 
         // POST: api/ConditionRules
         [HttpPost]
-        public ActionResult<ConditionRuleParam> PostConditionRule(ConditionRuleParam ConditionRuleParam)
+        public async Task<IActionResult> PostConditionRule([FromBody] ConditionRuleDto dto)
         {
-            ConditionRuleParam.ConditionRuleId = Guid.NewGuid();
+            dto.ConditionRuleId = Guid.NewGuid();
 
-            _service.CreateConditionRule(ConditionRuleParam);
+            var result = await _service.CreateAsync(dto);
 
-            return Ok(ConditionRuleParam);
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            //var result = dto;
+
+            return Ok(result);
         }
 
         // DELETE: api/ConditionRules/5
-        [HttpDelete("{id}")]
-        public ActionResult DeleteConditionRule(Guid id)
+        [HttpDelete]
+        public async Task<IActionResult> DeleteConditionRule([FromQuery]Guid id)
         {
-            var result = _service.DeleteConditionRule(id);
-            if (result == GlobalVariables.NOT_FOUND)
+            if (id == null)
+            {
+                return BadRequest();
+            }
+            var result = await _service.DeleteAsync(id);
+            if (result == false)
             {
                 return NotFound();
             }
             return Ok();
         }
 
-        // PATCH: api/ConditionRules/5
-        [HttpPatch("{id}")]
-        public ActionResult HideConditionRule(Guid id)
+        // Put: api/ConditionRules/5
+        [HttpPatch]
+        public async Task<IActionResult> HideConditionRule([FromQuery]Guid id, [FromQuery]string value)
         {
-            var result = _service.HideConditionRule(id);
-            if (result == GlobalVariables.NOT_FOUND)
+            if (id == null)
+            {
+                return BadRequest();
+            }
+            if (!value.Equals(AppConstant.DelFlg.HIDE) && !value.Equals(AppConstant.DelFlg.UNHIDE))
+            {
+                return BadRequest();
+            }
+            var result = await _service.HideAsync(id, value);
+            if (result == false)
             {
                 return NotFound();
             }

@@ -18,17 +18,17 @@ namespace Infrastructure.UnitOrWork
             initRepository();
         }
         //Account
-
+        public IGenericRepository<Account> AccountRepository { get; set; }
         //Action
         public IGenericRepository<Models.Action> ActionRepository { get; set; }
         //Brand
         public IGenericRepository<Brand> BrandRepository { get; set; }
         //Channel
-
+        public IGenericRepository<Channel> ChannelRepository { get; set; }
         //ConditionRule
-
+        public IGenericRepository<ConditionRule> ConditionRuleRepository { get; set; }
         //Holiday
-
+        public IGenericRepository<Holiday> HolidayRepository { get; set; }
         //Membership
         public IGenericRepository<Membership> MembershipRepository { get; set; }
         //MembershipAction
@@ -59,17 +59,17 @@ namespace Infrastructure.UnitOrWork
         private void initRepository()
         {
             //Account
-
+            AccountRepository = new GenericRepository<Account>(_context);
             //Action
             ActionRepository = new GenericRepository<Models.Action>(_context);
             //Brand
             BrandRepository = new GenericRepository<Brand>(_context);
             //Channel
-
+            ChannelRepository = new GenericRepository<Channel>(_context);
             //ConditionRule
-
+            ConditionRuleRepository = new GenericRepository<ConditionRule>(_context);
             //Holiday
-
+            HolidayRepository = new GenericRepository<Holiday>(_context);
             //Membership
             MembershipRepository = new GenericRepository<Membership>(_context);
             //MembershipAction

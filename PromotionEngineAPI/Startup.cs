@@ -4,7 +4,6 @@ using Infrastructure.Models;
 using Infrastructure.UnitOrWork;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -39,10 +38,9 @@ namespace PromotionEngineAPI
             // add config swagger
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "My API", Version = "1" });
+                c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Promotion Engine API", Version = "1" });
             });
             services.AddTransient<PromotionEngineContext, PromotionEngineContext>();
-
             // add config auto mapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             // connect unit of work
@@ -57,6 +55,7 @@ namespace PromotionEngineAPI
 
         private void ServiceAddScoped(IServiceCollection services)
         {
+
             //Account
             services.AddScoped<IAccountService, AccountService>();
             //Action
@@ -95,6 +94,8 @@ namespace PromotionEngineAPI
             services.AddScoped<IVoucherChannelService, VoucherChannelService>();
             //VoucherGroup
             services.AddScoped<IVoucherGroupService, VoucherGroupService>();
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -114,7 +115,7 @@ namespace PromotionEngineAPI
             // specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Promotion Engine API V1");
             });
 
             app.UseRouting();

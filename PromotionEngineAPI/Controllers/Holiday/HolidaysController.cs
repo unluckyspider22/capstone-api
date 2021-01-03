@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using ApplicationCore.Services;
 using ApplicationCore.Utils;
+using Infrastructure.DTOs;
+using Infrastructure.Helper;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -23,76 +25,112 @@ namespace PromotionEngineAPI.Controllers
 
         // GET: api/Holidays
         [HttpGet]
-        public List<Holiday> GetHoliday()
+        public async Task<IActionResult> GetHoliday([FromQuery] PagingRequestParam param)
         {
-            return _service.GetHoliday();
+            var result = await _service.GetAsync(
+                pageIndex: param.PageIndex,
+                pageSize: param.PageSize,
+                filter: el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE),
+                orderBy: el => el.OrderByDescending(b => b.InsDate)
+                );
+
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
         }
 
         // GET: api/Holidays/count
         [HttpGet]
         [Route("count")]
-        public int CountHoliday()
+        public async Task<IActionResult> CountHoliday()
         {
-            return _service.CountHoliday();
+            return Ok(await _service.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE)));
         }
 
         // GET: api/Holidays/5
         [HttpGet("{id}")]
-        public Holiday GetHoliday(Guid id)
+        public async Task<IActionResult> GetHoliday([FromRoute]Guid id)
         {
-            return _service.GetHolidays(id);
+            var result = await _service.GetByIdAsync(id);
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
         }
 
         // PUT: api/Holidays/5
         [HttpPut("{id}")]
-        public ActionResult<Holiday> PutHoliday(Guid id, Holiday holiday)
+        public async Task<IActionResult> PutHoliday([FromRoute]Guid id, [FromBody] HolidayDto dto)
         {
-
-            if (!id.Equals(holiday.HolidayId))
+            if (id != dto.HolidayId)
             {
                 return BadRequest();
             }
 
-            var result = _service.UpdateHoliday(id, holiday);
+            dto.UpdDate = DateTime.Now;
 
-            if (result == GlobalVariables.NOT_FOUND)
+            var result = await _service.UpdateAsync(dto);
+
+            if (result == null)
             {
                 return NotFound();
             }
 
-            return Ok(holiday);
+            return Ok(result);
+
         }
 
         // POST: api/Holidays
         [HttpPost]
-        public ActionResult<Holiday> PostHoliday(Holiday holiday)
+        public async Task<IActionResult> PostHoliday([FromBody] HolidayDto dto)
         {
-            holiday.HolidayId = Guid.NewGuid();
+            dto.HolidayId = Guid.NewGuid();
 
-            _service.CreateHoliday(holiday);
+            var result = await _service.CreateAsync(dto);
 
-            return Ok(holiday);
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            //var result = dto;
+
+            return Ok(result);
         }
 
         // DELETE: api/Holidays/5
-        [HttpDelete("{id}")]
-        public ActionResult DeleteHoliday(Guid id)
+        [HttpDelete]
+        public async Task<IActionResult> DeleteHoliday([FromQuery]Guid id)
         {
-            var result = _service.DeleteHoliday(id);
-            if (result == GlobalVariables.NOT_FOUND)
+            if (id == null)
+            {
+                return BadRequest();
+            }
+            var result = await _service.DeleteAsync(id);
+            if (result == false)
             {
                 return NotFound();
             }
             return Ok();
         }
 
-
-        // PATCH: api/Holidays/5
-        [HttpPatch("{id}")]
-        public ActionResult HideHoliday(Guid id)
+        // Put: api/Holidays/5
+        [HttpPatch]
+        public async Task<IActionResult> HideHoliday([FromQuery]Guid id, [FromQuery]string value)
         {
-            var result = _service.HideHoliday(id);
-            if (result == GlobalVariables.NOT_FOUND)
+            if (id == null)
+            {
+                return BadRequest();
+            }
+            if (!value.Equals(AppConstant.DelFlg.HIDE) && !value.Equals(AppConstant.DelFlg.UNHIDE))
+            {
+                return BadRequest();
+            }
+            var result = await _service.HideAsync(id, value);
+            if (result == false)
             {
                 return NotFound();
             }
