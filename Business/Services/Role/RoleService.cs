@@ -1,5 +1,9 @@
 ﻿using ApplicationCore.Services;
+using AutoMapper;
+using Infrastructure.DTOs.Role;
 using Infrastructure.Models;
+using Infrastructure.Repository;
+using Infrastructure.UnitOrWork;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -8,23 +12,13 @@ using System.Linq;
 
 namespace ApplicationCore.Services
 {
-    public class RoleService : IRoleService
+    public class RoleService : BaseService<RoleEntity, RoleDto>, IRoleService
     {
-        private readonly PromotionEngineContext _context;
-
-        public RoleService(PromotionEngineContext context)
+        public RoleService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
         {
-            _context = context;
+
         }
 
-        public RoleEntity GetRole(string id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public List<RoleEntity> GetRoles()
-        {
-            return _context.Role.ToList();
-        }
+        protected override IGenericRepository<RoleEntity> _repository => _unitOfWork.RoleEntityRepository;
     }
 }

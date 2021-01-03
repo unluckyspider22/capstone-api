@@ -41,19 +41,33 @@ namespace Infrastructure.UnitOrWork
         public IGenericRepository<ProductCondition> ProductConditionRepository { get; set; }
         //Promotion
         public IGenericRepository<Promotion> PromotionRepository { get; set; }
+
         //PromotionStoreMapping
+        public IGenericRepository<PromotionStoreMapping> PromotionStoreMappingRepository { get; set; }
 
         //PromotionTier
+        public IGenericRepository<PromotionTier> PromotionTierRepository { get; set; }
+
 
         //RoleEntity
+        public IGenericRepository<RoleEntity> RoleEntityRepository { get; set; }
+
 
         //Store
+        public IGenericRepository<Store> StoreRepository { get; set; }
+
 
         //Voucher
+        public IGenericRepository<Voucher> VoucherRepository { get; set; }
+
 
         //VoucherChannel
+        public IGenericRepository<VoucherChannel> VoucherChannelRepository { get; set; }
+
 
         //VoucherGroup
+        public IGenericRepository<VoucherGroup> VoucherGroupRepository { get; set; }
+
 
 
         private void initRepository()
@@ -83,19 +97,19 @@ namespace Infrastructure.UnitOrWork
             //Promotion
             PromotionRepository = new GenericRepository<Promotion>(_context);
             //PromotionStoreMapping
-
+            PromotionStoreMappingRepository = new GenericRepository<PromotionStoreMapping>(_context);
             //PromotionTier
-
+            PromotionTierRepository = new GenericRepository<PromotionTier>(_context);
             //RoleEntity
-
+            RoleEntityRepository = new GenericRepository<RoleEntity>(_context);
             //Store
-
+            StoreRepository = new GenericRepository<Store>(_context);
             //Voucher
-
+            VoucherRepository = new GenericRepository<Voucher>(_context);
             //VoucherChannel
-
+            VoucherChannelRepository = new GenericRepository<VoucherChannel>(_context);
             //VoucherGroup
-
+            VoucherGroupRepository = new GenericRepository<VoucherGroup>(_context);
         }
         public void Dispose()
         {

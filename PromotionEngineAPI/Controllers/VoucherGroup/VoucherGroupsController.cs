@@ -1,6 +1,9 @@
 ﻿using ApplicationCore.Models.VoucherGroup;
 using ApplicationCore.Services;
 using ApplicationCore.Utils;
+using Infrastructure.DTOs;
+using Infrastructure.DTOs.VoucherGroup;
+using Infrastructure.Helper;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -23,71 +26,111 @@ namespace PromotionEngineAPI.Controllers
 
         // GET: api/VoucherGroups
         [HttpGet]
-        public List<VoucherGroup> GetVoucherGroup()
+        // api/VoucherGroups?pageIndex=...&pageSize=...
+        public async Task<IActionResult> GetVoucherGroup([FromQuery] PagingRequestParam param)
         {
-            return _service.GetVoucherGroups();
+            var result = await _service.GetAsync(pageIndex: param.PageIndex, pageSize: param.PageSize, filter: el => el.DelFlg.Equals("0"));
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
+        }
+
+        // GET: api/VoucherGroups/count
+        [HttpGet]
+        [Route("count")]
+        public async Task<IActionResult> CountVoucherGroup()
+        {
+            return Ok(await _service.CountAsync());
         }
 
         // GET: api/VoucherGroups/5
         [HttpGet("{id}")]
-        public ActionResult<VoucherGroupParam> GetVoucherGroup(Guid id)
+        public async Task<IActionResult> GetVoucherGroup([FromRoute] Guid id)
         {
-            VoucherGroupParam result = _service.GetVoucherGroup(id);
+            var result = await _service.GetByIdAsync(id);
             if (result == null)
+            {
                 return NotFound();
+            }
             return Ok(result);
         }
 
         // PUT: api/VoucherGroups/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public ActionResult PutVoucherGroup(Guid id, VoucherGroupParam VoucherGroupParam)
+        public async Task<IActionResult> PutVoucherGroup([FromRoute] Guid id, [FromBody] VoucherGroupDto dto)
         {
-            var result = _service.PutVoucherGroup(id, VoucherGroupParam);
-            if (result == GlobalVariables.NOT_FOUND) return NotFound();
-            return Ok(VoucherGroupParam);
-        }
+            if (id != dto.VoucherGroupId)
+            {
+                return BadRequest();
+            }
 
-        //PATCH:  api/VoucherGroups/2?delflg=?
-        [HttpPatch("{id}")]
-        public ActionResult UpdateDelFlg(Guid id, string delflg)
-        {
-            var result = _service.UpdateDelFlag(id, delflg);
-            if (result == GlobalVariables.NOT_FOUND)
+            dto.UpdDate = DateTime.Now;
+
+            var result = await _service.UpdateAsync(dto);
+
+            if (result == null)
+            {
                 return NotFound();
-            return Ok();
+            }
+
+            return Ok(result);
+
         }
 
         // POST: api/VoucherGroups
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public ActionResult PostVoucherGroup(VoucherGroup VoucherGroup)
+        public async Task<IActionResult> PostVoucherGroup([FromBody] VoucherGroupDto dto)
         {
-            var result = _service.PostVoucherGroup(VoucherGroup);
-            if (result == GlobalVariables.DUPLICATE) return Conflict();
-            return Ok(VoucherGroup);
+            dto.VoucherGroupId = Guid.NewGuid();
+
+            var result = await _service.CreateAsync(dto);
+
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            //var result = dto;
+
+            return Ok(result);
         }
 
         // DELETE: api/VoucherGroups/5
-        [HttpDelete("{id}")]
-        public ActionResult DeleteVoucherGroup(Guid id)
+        [HttpDelete]
+        public async Task<IActionResult> DeleteVoucherGroup([FromQuery] Guid id)
         {
-            var result = _service.DeleteVoucherGroup(id);
-            if (result == GlobalVariables.NOT_FOUND)
+            if (id == null)
+            {
+                return BadRequest();
+            }
+            var result = await _service.DeleteAsync(id);
+            if (result == false)
             {
                 return NotFound();
             }
             return Ok();
         }
-        // GETCOUNT: api/VoucherGroups/count
-        [HttpGet]
-        [Route("count")]
-        public ActionResult GetStoreCount()
+
+        // Put: api/VoucherGroups/5
+        [HttpPatch]
+        public async Task<IActionResult> HideVoucherGroup([FromQuery] Guid id, [FromQuery] string value)
         {
-            var result = _service.CountVoucherGroup();
-            return Ok(result);
+            if (id == null)
+            {
+                return BadRequest();
+            }
+            if (!value.Equals(AppConstant.DelFlg.HIDE) && !value.Equals(AppConstant.DelFlg.UNHIDE))
+            {
+                return BadRequest();
+            }
+            var result = await _service.HideAsync(id, value);
+            if (result == false)
+            {
+                return NotFound();
+            }
+            return Ok();
         }
     }
 }

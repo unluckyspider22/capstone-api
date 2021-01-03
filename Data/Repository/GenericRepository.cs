@@ -14,6 +14,7 @@ namespace Infrastructure.Repository
     {
         internal PromotionEngineContext _context;
         internal DbSet<TEntity> _dbSet;
+        internal Expression<Func<TEntity, bool>> delflgCond;
         public GenericRepository(PromotionEngineContext context)
         {
             _context = context;

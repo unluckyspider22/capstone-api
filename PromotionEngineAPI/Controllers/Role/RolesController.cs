@@ -1,7 +1,12 @@
 ﻿using ApplicationCore.Services;
+using Infrastructure.DTOs;
+using Infrastructure.DTOs.Role;
+using Infrastructure.Helper;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers
 {
@@ -18,12 +23,27 @@ namespace PromotionEngineAPI.Controllers
 
         // GET: api/Roles
         [HttpGet]
-        public List<RoleEntity> GetRole()
+        // api/Roles?pageIndex=...&pageSize=...
+        public async Task<IActionResult> GetRole([FromQuery] PagingRequestParam param)
         {
-            return _service.GetRoles();
-            
+            var result = await _service.GetAsync(pageIndex: param.PageIndex, pageSize: param.PageSize, filter: el => el.DelFlg.Equals("0"));
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
         }
 
-      
+        // GET: api/Roles/count
+        [HttpGet]
+        [Route("count")]
+        public async Task<IActionResult> CountRole()
+        {
+            return Ok(await _service.CountAsync());
+        }
+
+       
+
+
     }
 }

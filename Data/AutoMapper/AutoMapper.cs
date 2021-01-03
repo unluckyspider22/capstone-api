@@ -1,5 +1,12 @@
 ﻿using AutoMapper;
 using Infrastructure.DTOs;
+using Infrastructure.DTOs.PromotionStoreMapping;
+using Infrastructure.DTOs.PromotionTier;
+using Infrastructure.DTOs.Role;
+using Infrastructure.DTOs.Store;
+using Infrastructure.DTOs.Voucher;
+using Infrastructure.DTOs.VoucherChannel;
+using Infrastructure.DTOs.VoucherGroup;
 using Infrastructure.Models;
 
 namespace Infrastructure.AutoMapper
@@ -45,19 +52,26 @@ namespace Infrastructure.AutoMapper
             CreateMap<Promotion, PromotionDto>();
             CreateMap<PromotionDto, Promotion>();
             //PromotionStoreMapping
-
+            CreateMap<PromotionStoreMapping, PromotionStoreMappingDto>();
+            CreateMap<PromotionStoreMappingDto, PromotionStoreMapping>();
             //PromotionTier
-
+            CreateMap<PromotionTier, PromotionTierDto>();
+            CreateMap<PromotionTierDto, PromotionTier>();
             //RoleEntity
-
+            CreateMap<RoleEntity, RoleDto>();
+            CreateMap<RoleDto, RoleEntity>();
             //Store
-
+            CreateMap<Store, StoreDto>();
+            CreateMap<StoreDto, Store>();
             //Voucher
-
+            CreateMap<Voucher, VoucherDto>();
+            CreateMap<VoucherDto, Voucher>();
             //VoucherChannel
-
+            CreateMap<VoucherChannel, VoucherChannelDto>();
+            CreateMap<VoucherChannelDto, VoucherChannel>();
             //VoucherGroup
-
+            CreateMap<VoucherGroup, VoucherGroupDto>();
+            CreateMap<VoucherGroupDto, VoucherGroup>();
         }
     }
 }

@@ -8,6 +8,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ApplicationCore.Utils;
+using Infrastructure.DTOs;
+using Infrastructure.DTOs.Store;
+using Infrastructure.Helper;
 
 namespace PromotionEngineAPI.Controllers
 {
@@ -24,70 +27,111 @@ namespace PromotionEngineAPI.Controllers
 
         // GET: api/Stores
         [HttpGet]
-        public List<Store> GetStore()
+        // api/Stores?pageIndex=...&pageSize=...
+        public async Task<IActionResult> GetStore([FromQuery] PagingRequestParam param)
         {
-            var result = _service.GetStores();
-            return result;
+            var result = await _service.GetAsync(pageIndex: param.PageIndex, pageSize: param.PageSize, filter: el => el.DelFlg.Equals("0"));
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
+        }
+
+        // GET: api/Stores/count
+        [HttpGet]
+        [Route("count")]
+        public async Task<IActionResult> CountStore()
+        {
+            return Ok(await _service.CountAsync());
         }
 
         // GET: api/Stores/5
         [HttpGet("{id}")]
-        public ActionResult<StoreParam> GetStore(Guid id)
+        public async Task<IActionResult> GetStore([FromRoute] Guid id)
         {
-
-            Store result = _service.GetStore(id);
+            var result = await _service.GetByIdAsync(id);
             if (result == null)
+            {
                 return NotFound();
+            }
             return Ok(result);
         }
 
         // PUT: api/Stores/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public ActionResult<Store> PutStore(Guid id,StoreParam storeParam)
+        public async Task<IActionResult> PutStore([FromRoute] Guid id, [FromBody] StoreDto dto)
         {
-            var result = _service.PutStore(id, storeParam);
-            if (result == GlobalVariables.NOT_FOUND) return NotFound();
-            return Ok(storeParam);
-        }
-        //PATCH:  api/Stores/2?delflg=?
-        [HttpPatch("{id}")]
-        public ActionResult UpdateDelFlg(Guid id, string delflg)
-        {
-            var result = _service.UpdateDelFlag(id, delflg);
-            if (result == GlobalVariables.NOT_FOUND)
+            if (id != dto.StoreId)
+            {
+                return BadRequest();
+            }
+
+            dto.UpdDate = DateTime.Now;
+
+            var result = await _service.UpdateAsync(dto);
+
+            if (result == null)
+            {
                 return NotFound();
-            return Ok();
+            }
+
+            return Ok(result);
+
         }
+
         // POST: api/Stores
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public ActionResult<Store> PostStore(Store store)
+        public async Task<IActionResult> PostStore([FromBody] StoreDto dto)
         {
-            var result = _service.PostStore(store);
-            if (result == GlobalVariables.DUPLICATE) return Conflict();
-            return Ok(store);
+            dto.StoreId = Guid.NewGuid();
+
+            var result = await _service.CreateAsync(dto);
+
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            //var result = dto;
+
+            return Ok(result);
         }
 
         // DELETE: api/Stores/5
-        [HttpDelete("{id}")]
-        public ActionResult DeleteStore(Guid id)
-        {       
-            var result = _service.DeleteStore(id);
-            if (result == GlobalVariables.NOT_FOUND) {
+        [HttpDelete]
+        public async Task<IActionResult> DeleteStore([FromQuery] Guid id)
+        {
+            if (id == null)
+            {
+                return BadRequest();
+            }
+            var result = await _service.DeleteAsync(id);
+            if (result == false)
+            {
                 return NotFound();
             }
             return Ok();
         }
-        // GETCOUNT: api/Stores/count
-        [HttpGet]
-        [Route("count")]
-        public ActionResult GetStoreCount()
+
+        // Put: api/Stores/5
+        [HttpPatch]
+        public async Task<IActionResult> HideStore([FromQuery] Guid id, [FromQuery] string value)
         {
-            var result = _service.CountStore();
-            return Ok(result);
+            if (id == null)
+            {
+                return BadRequest();
+            }
+            if (!value.Equals(AppConstant.DelFlg.HIDE) && !value.Equals(AppConstant.DelFlg.UNHIDE))
+            {
+                return BadRequest();
+            }
+            var result = await _service.HideAsync(id, value);
+            if (result == false)
+            {
+                return NotFound();
+            }
+            return Ok();
         }
     }
 }

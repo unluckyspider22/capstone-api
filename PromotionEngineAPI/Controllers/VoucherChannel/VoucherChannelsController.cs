@@ -1,6 +1,9 @@
 ﻿using ApplicationCore.Models.VoucherChannel;
 using ApplicationCore.Services;
 using ApplicationCore.Utils;
+using Infrastructure.DTOs;
+using Infrastructure.DTOs.VoucherChannel;
+using Infrastructure.Helper;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -20,74 +23,113 @@ namespace PromotionEngineAPI.Controllers
         {
             _service = service;
         }
-
         // GET: api/VoucherChannels
         [HttpGet]
-        public List<VoucherChannel> GetVoucherChannel()
+        // api/VoucherChannels?pageIndex=...&pageSize=...
+        public async Task<IActionResult> GetVoucherChannel([FromQuery] PagingRequestParam param)
         {
-            var result = _service.GetVoucherChannels();
-            return result;
+            var result = await _service.GetAsync(pageIndex: param.PageIndex, pageSize: param.PageSize, filter: el => el.DelFlg.Equals("0"));
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
+        }
+
+        // GET: api/VoucherChannels/count
+        [HttpGet]
+        [Route("count")]
+        public async Task<IActionResult> CountVoucherChannel()
+        {
+            return Ok(await _service.CountAsync());
         }
 
         // GET: api/VoucherChannels/5
         [HttpGet("{id}")]
-        public ActionResult<VoucherChannelParam> GetVoucherChannel(Guid id)
+        public async Task<IActionResult> GetVoucherChannel([FromRoute] Guid id)
         {
-
-            VoucherChannel result = _service.GetVoucherChannel(id);
+            var result = await _service.GetByIdAsync(id);
             if (result == null)
+            {
                 return NotFound();
+            }
             return Ok(result);
         }
 
         // PUT: api/VoucherChannels/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public ActionResult<VoucherChannel> PutVoucherChannel(Guid id, VoucherChannelParam VoucherChannelParam)
+        public async Task<IActionResult> PutVoucherChannel([FromRoute] Guid id, [FromBody] VoucherChannelDto dto)
         {
-            var result = _service.PutVoucherChannel(id, VoucherChannelParam);
-            if (result == GlobalVariables.NOT_FOUND) return NotFound();
-            return Ok(VoucherChannelParam);
-        }
-        //PATCH:  api/VoucherChannels/2?delflg=?
-        [HttpPatch("{id}")]
-        public ActionResult UpdateDelFlg(Guid id, string delflg)
-        {
-            var result = _service.UpdateDelFlag(id, delflg);
-            if (result == GlobalVariables.NOT_FOUND)
+            if (id != dto.VoucherChannelId)
+            {
+                return BadRequest();
+            }
+
+            dto.UpdDate = DateTime.Now;
+
+            var result = await _service.UpdateAsync(dto);
+
+            if (result == null)
+            {
                 return NotFound();
-            return Ok();
+            }
+
+            return Ok(result);
+
         }
+
         // POST: api/VoucherChannels
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public ActionResult<VoucherChannel> PostVoucherChannel(VoucherChannel VoucherChannel)
+        public async Task<IActionResult> PostVoucherChannel([FromBody] VoucherChannelDto dto)
         {
-            var result = _service.PostVoucherChannel(VoucherChannel);
-            if (result == GlobalVariables.DUPLICATE) return Conflict();
-            return Ok(VoucherChannel);
+            dto.VoucherChannelId = Guid.NewGuid();
+
+            var result = await _service.CreateAsync(dto);
+
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            //var result = dto;
+
+            return Ok(result);
         }
 
         // DELETE: api/VoucherChannels/5
-        [HttpDelete("{id}")]
-        public ActionResult DeleteVoucherChannel(Guid id)
+        [HttpDelete]
+        public async Task<IActionResult> DeleteVoucherChannel([FromQuery] Guid id)
         {
-            var result = _service.DeleteVoucherChannel(id);
-            if (result == GlobalVariables.NOT_FOUND)
+            if (id == null)
+            {
+                return BadRequest();
+            }
+            var result = await _service.DeleteAsync(id);
+            if (result == false)
             {
                 return NotFound();
             }
             return Ok();
         }
-        // GETCOUNT: api/VoucherChannels/count
-        [HttpGet]
-        [Route("count")]
-        public ActionResult GetVoucherChannelCount()
+
+        // Put: api/VoucherChannels/5
+        [HttpPatch]
+        public async Task<IActionResult> HideVoucherChannel([FromQuery] Guid id, [FromQuery] string value)
         {
-            var result = _service.CountVoucherChannel();
-            return Ok(result);
+            if (id == null)
+            {
+                return BadRequest();
+            }
+            if (!value.Equals(AppConstant.DelFlg.HIDE) && !value.Equals(AppConstant.DelFlg.UNHIDE))
+            {
+                return BadRequest();
+            }
+            var result = await _service.HideAsync(id, value);
+            if (result == false)
+            {
+                return NotFound();
+            }
+            return Ok();
         }
     }
 }

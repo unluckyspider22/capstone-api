@@ -1,6 +1,9 @@
 ﻿using ApplicationCore.Models.PromotionTier;
 using ApplicationCore.Services;
 using ApplicationCore.Utils;
+using Infrastructure.DTOs;
+using Infrastructure.DTOs.PromotionTier;
+using Infrastructure.Helper;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -23,71 +26,111 @@ namespace PromotionEngineAPI.Controllers
 
         // GET: api/PromotionTiers
         [HttpGet]
-        public List<PromotionTier> GetPromotionTier()
+        // api/PromotionTiers?pageIndex=...&pageSize=...
+        public async Task<IActionResult> GetPromotionTier([FromQuery] PagingRequestParam param)
         {
-            var result = _service.GetPromotionTiers();
-            return result;
+            var result = await _service.GetAsync(pageIndex: param.PageIndex, pageSize: param.PageSize, filter: el => el.DelFlg.Equals("0"));
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
+        }
+
+        // GET: api/PromotionTiers/count
+        [HttpGet]
+        [Route("count")]
+        public async Task<IActionResult> CountPromotionTier()
+        {
+            return Ok(await _service.CountAsync());
         }
 
         // GET: api/PromotionTiers/5
         [HttpGet("{id}")]
-        public ActionResult<PromotionTierParam> GetPromotionTier(Guid id)
+        public async Task<IActionResult> GetPromotionTier([FromRoute] Guid id)
         {
-
-            PromotionTier result = _service.GetPromotionTier(id);
+            var result = await _service.GetByIdAsync(id);
             if (result == null)
+            {
                 return NotFound();
+            }
             return Ok(result);
         }
 
         // PUT: api/PromotionTiers/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public ActionResult<PromotionTier> PutPromotionTier(Guid id, PromotionTierParam PromotionTierParam)
+        public async Task<IActionResult> PutPromotionTier([FromRoute] Guid id, [FromBody] PromotionTierDto dto)
         {
-            var result = _service.PutPromotionTier(id, PromotionTierParam);
-            if (result == GlobalVariables.NOT_FOUND) return NotFound();
-            return Ok(PromotionTierParam);
-        }
-        //PATCH:  api/PromotionTiers/2?delflg=?
-        [HttpPatch("{id}")]
-        public ActionResult UpdateDelFlg(Guid id, string delflg)
-        {
-            var result = _service.UpdateDelFlag(id, delflg);
-            if (result == GlobalVariables.NOT_FOUND)
+            if (id != dto.PromotionTierId)
+            {
+                return BadRequest();
+            }
+
+            dto.UpdDate = DateTime.Now;
+
+            var result = await _service.UpdateAsync(dto);
+
+            if (result == null)
+            {
                 return NotFound();
-            return Ok();
+            }
+
+            return Ok(result);
+
         }
+
         // POST: api/PromotionTiers
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public ActionResult<PromotionTier> PostPromotionTier(PromotionTier PromotionTier)
+        public async Task<IActionResult> PostPromotionTier([FromBody] PromotionTierDto dto)
         {
-            var result = _service.PostPromotionTier(PromotionTier);
-            if (result == GlobalVariables.DUPLICATE) return Conflict();
-            return Ok(PromotionTier);
+            dto.PromotionTierId = Guid.NewGuid();
+
+            var result = await _service.CreateAsync(dto);
+
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            //var result = dto;
+
+            return Ok(result);
         }
 
         // DELETE: api/PromotionTiers/5
-        [HttpDelete("{id}")]
-        public ActionResult DeletePromotionTier(Guid id)
+        [HttpDelete]
+        public async Task<IActionResult> DeletePromotionTier([FromQuery] Guid id)
         {
-            var result = _service.DeletePromotionTier(id);
-            if (result == GlobalVariables.NOT_FOUND)
+            if (id == null)
+            {
+                return BadRequest();
+            }
+            var result = await _service.DeleteAsync(id);
+            if (result == false)
             {
                 return NotFound();
             }
             return Ok();
         }
-        // GETCOUNT: api/PromotionTiers/count
-        [HttpGet]
-        [Route("count")]
-        public ActionResult GetPromotionTierCount()
+
+        // Put: api/PromotionTiers/5
+        [HttpPatch]
+        public async Task<IActionResult> HidePromotionTier([FromQuery] Guid id, [FromQuery] string value)
         {
-            var result = _service.CountPromotionTier();
-            return Ok(result);
+            if (id == null)
+            {
+                return BadRequest();
+            }
+            if (!value.Equals(AppConstant.DelFlg.HIDE) && !value.Equals(AppConstant.DelFlg.UNHIDE))
+            {
+                return BadRequest();
+            }
+            var result = await _service.HideAsync(id, value);
+            if (result == false)
+            {
+                return NotFound();
+            }
+            return Ok();
         }
     }
 }

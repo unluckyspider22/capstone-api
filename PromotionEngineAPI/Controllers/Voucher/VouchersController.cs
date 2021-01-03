@@ -1,6 +1,9 @@
 ﻿using ApplicationCore.Models.Voucher;
 using ApplicationCore.Services;
 using ApplicationCore.Utils;
+using Infrastructure.DTOs;
+using Infrastructure.DTOs.Voucher;
+using Infrastructure.Helper;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -23,71 +26,111 @@ namespace PromotionEngineAPI.Controllers
 
         // GET: api/Vouchers
         [HttpGet]
-        public List<Voucher> GetVoucher()
+        // api/Vouchers?pageIndex=...&pageSize=...
+        public async Task<IActionResult> GetVoucher([FromQuery] PagingRequestParam param)
         {
-            var result = _service.GetVouchers();
-            return result;
+            var result = await _service.GetAsync(pageIndex: param.PageIndex, pageSize: param.PageSize, filter: el => el.DelFlg.Equals("0"));
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
+        }
+
+        // GET: api/Vouchers/count
+        [HttpGet]
+        [Route("count")]
+        public async Task<IActionResult> CountVoucher()
+        {
+            return Ok(await _service.CountAsync());
         }
 
         // GET: api/Vouchers/5
         [HttpGet("{id}")]
-        public ActionResult<VoucherParam> GetVoucher(Guid id)
+        public async Task<IActionResult> GetVoucher([FromRoute] Guid id)
         {
-
-            Voucher result = _service.GetVoucher(id);
+            var result = await _service.GetByIdAsync(id);
             if (result == null)
+            {
                 return NotFound();
+            }
             return Ok(result);
         }
 
         // PUT: api/Vouchers/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public ActionResult<Voucher> PutVoucher(Guid id, VoucherParam VoucherParam)
+        public async Task<IActionResult> PutVoucher([FromRoute] Guid id, [FromBody] VoucherDto dto)
         {
-            var result = _service.PutVoucher(id, VoucherParam);
-            if (result == GlobalVariables.NOT_FOUND) return NotFound();
-            return Ok(VoucherParam);
-        }
-        //PATCH:  api/Vouchers/2?delflg=?
-        [HttpPatch("{id}")]
-        public ActionResult UpdateDelFlg(Guid id, string delflg)
-        {
-            var result = _service.UpdateDelFlag(id, delflg);
-            if (result == GlobalVariables.NOT_FOUND)
+            if (id != dto.VoucherId)
+            {
+                return BadRequest();
+            }
+
+            dto.UpdDate = DateTime.Now;
+
+            var result = await _service.UpdateAsync(dto);
+
+            if (result == null)
+            {
                 return NotFound();
-            return Ok();
+            }
+
+            return Ok(result);
+
         }
+
         // POST: api/Vouchers
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public ActionResult<Voucher> PostVoucher(Voucher Voucher)
+        public async Task<IActionResult> PostVoucher([FromBody] VoucherDto dto)
         {
-            var result = _service.PostVoucher(Voucher);
-            if (result == GlobalVariables.DUPLICATE) return Conflict();
-            return Ok(Voucher);
+            dto.VoucherId = Guid.NewGuid();
+
+            var result = await _service.CreateAsync(dto);
+
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            //var result = dto;
+
+            return Ok(result);
         }
 
         // DELETE: api/Vouchers/5
-        [HttpDelete("{id}")]
-        public ActionResult DeleteVoucher(Guid id)
+        [HttpDelete]
+        public async Task<IActionResult> DeleteVoucher([FromQuery] Guid id)
         {
-            var result = _service.DeleteVoucher(id);
-            if (result == GlobalVariables.NOT_FOUND)
+            if (id == null)
+            {
+                return BadRequest();
+            }
+            var result = await _service.DeleteAsync(id);
+            if (result == false)
             {
                 return NotFound();
             }
             return Ok();
         }
-        // GETCOUNT: api/Vouchers/count
-        [HttpGet]
-        [Route("count")]
-        public ActionResult GetVoucherCount()
+
+        // Put: api/Vouchers/5
+        [HttpPatch]
+        public async Task<IActionResult> HideVoucher([FromQuery] Guid id, [FromQuery] string value)
         {
-            var result = _service.CountVoucher();
-            return Ok(result);
+            if (id == null)
+            {
+                return BadRequest();
+            }
+            if (!value.Equals(AppConstant.DelFlg.HIDE) && !value.Equals(AppConstant.DelFlg.UNHIDE))
+            {
+                return BadRequest();
+            }
+            var result = await _service.HideAsync(id, value);
+            if (result == false)
+            {
+                return NotFound();
+            }
+            return Ok();
         }
     }
 }
