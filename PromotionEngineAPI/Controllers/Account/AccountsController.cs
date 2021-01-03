@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Infrastructure.Models;
 using ApplicationCore.Services;
 using ApplicationCore.Utils;
+using Infrastructure.DTOs;
+using Infrastructure.Helper;
 
 namespace PromotionEngineAPI.Controllers
 {
@@ -21,78 +23,113 @@ namespace PromotionEngineAPI.Controllers
             _service = service;
         }
 
-        // GET: api/accounts
+        // GET: api/Accounts
         [HttpGet]
-        public List<Account> GetAccount()
+        public async Task<IActionResult> GetAccount([FromQuery] PagingRequestParam param)
         {
-            return _service.GetAccounts();
+            var result = await _service.GetAsync(
+                pageIndex: param.PageIndex,
+                pageSize: param.PageSize,
+                filter: el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE),
+                orderBy: el => el.OrderByDescending(b => b.InsDate)
+                );
+
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
         }
 
-        // GET: api/accounts/count
+        // GET: api/Accounts/count
         [HttpGet]
         [Route("count")]
-        public int CountAccount()
+        public async Task<IActionResult> CountAccount()
         {
-            return _service.CountAccount();
+            return Ok(await _service.CountAsync());
         }
 
-        // GET: api/accounts/5
+        //GET: api/Accounts/5
         [HttpGet("{username}")]
-        public Account GetAccount(string username)
+        public async Task<IActionResult> GetAccount([FromRoute]string username)
         {
-            return _service.GetAccount(username);
+            var result = await _service.GetByUsernameAsync(username);
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
         }
 
-        // PUT: api/accounts/5
+        // PUT: api/Accounts/5
         [HttpPut("{username}")]
-        public ActionResult<Account> PutAccount(string username, Account account)
+        public async Task<IActionResult> PutAccount([FromRoute]System.Guid username, [FromBody] AccountDto dto)
         {
-            if (username != account.Username)
+            if (!username.Equals(dto.Username))
             {
                 return BadRequest();
             }
 
-            if (_service.UpdateAccount(username, account) == GlobalVariables.NOT_FOUND)
+            dto.UpdDate = DateTime.Now;
+
+            var result = await _service.UpdateAsync(dto);
+
+            if (result == null)
             {
                 return NotFound();
             }
 
-            return Ok(account);
+            return Ok(result);
+
         }
 
-        // POST: api/accounts
+        // POST: api/Accounts
         [HttpPost]
-        public ActionResult<Account> PostAccount(Account account)
+        public async Task<IActionResult> PostAccount([FromBody] AccountDto dto)
         {
-            if (_service.CreateAccount(account) == GlobalVariables.DUPLICATE)
-            {
-                return Conflict();
-            }
+            var result = await _service.CreateAsync(dto);
 
-            return Ok(account);
-        }
-
-        // DELETE: api/accounts/5
-        [HttpDelete("{username}")]
-        public ActionResult<Account> DeleteAccount(string username)
-        {
-            if (_service.DeleteAccount(username) == GlobalVariables.NOT_FOUND)
+            if (result == null)
             {
                 return NotFound();
-            }   
+            }
 
+            return Ok(result);
+        }
+
+        // DELETE: api/Accounts/5
+        [HttpDelete]
+        public async Task<IActionResult> DeleteAccount([FromQuery]Guid id)
+        {
+            if (id == null)
+            {
+                return BadRequest();
+            }
+            var result = await _service.DeleteAsync(id);
+            if (result == false)
+            {
+                return NotFound();
+            }
             return Ok();
         }
 
-        // PATCH: api/accounts/dev
-        [HttpPatch("{username}")]
-        public ActionResult<Account> HideAccount(string username)
+        // Put: api/Accounts/5
+        [HttpPatch]
+        public async Task<IActionResult> HideAccount([FromQuery]Guid id, [FromQuery]string value)
         {
-            if (_service.HideAccount(username) == GlobalVariables.NOT_FOUND)
+            if (id == null)
+            {
+                return BadRequest();
+            }
+            if (!value.Equals(AppConstant.DelFlg.HIDE) && !value.Equals(AppConstant.DelFlg.UNHIDE))
+            {
+                return BadRequest();
+            }
+            var result = await _service.HideAsync(id, value);
+            if (result == false)
             {
                 return NotFound();
             }
-
             return Ok();
         }
 

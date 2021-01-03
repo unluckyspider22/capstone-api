@@ -4,24 +4,23 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Infrastructure.Models;
 
 namespace Infrastructure.UnitOrWork
 {
     public interface IUnitOfWork
     {
         //Account
-
+        IGenericRepository<Account> AccountRepositoryImp { get; }
         //Action
         IGenericRepository<Models.Action> ActionRepository { get; }
         //Brand
         IGenericRepository<Brand> BrandRepository { get; }
         //Channel
-
+        IGenericRepository<Channel> ChannelRepository { get; }
         //ConditionRule
-
+        IGenericRepository<ConditionRule> ConditionRuleRepository { get; }
         //Holiday
-
+        IGenericRepository<Holiday> HolidayRepository { get; }
         //Membership
 
         //MembershipAction
@@ -47,7 +46,7 @@ namespace Infrastructure.UnitOrWork
         //VoucherChannel
 
         //VoucherGroup
-        
+
 
         Task<int> SaveAsync();
     }

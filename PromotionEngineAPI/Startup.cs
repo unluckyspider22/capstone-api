@@ -1,6 +1,7 @@
 using ApplicationCore.Services;
 using AutoMapper;
 using Infrastructure.Models;
+using Infrastructure.Repository;
 using Infrastructure.UnitOrWork;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -41,7 +42,7 @@ namespace PromotionEngineAPI
                 c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "My API", Version = "1" });
             });
             services.AddTransient<PromotionEngineContext, PromotionEngineContext>();
-
+            services.AddScoped<IAccountRepository, AccountRepository>();
             // add config auto mapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             // connect unit of work
@@ -56,6 +57,7 @@ namespace PromotionEngineAPI
 
         private void ServiceAddScoped(IServiceCollection services)
         {
+
             //Account
             services.AddScoped<IAccountService, AccountService>();
             //Action
@@ -94,6 +96,8 @@ namespace PromotionEngineAPI
             services.AddScoped<IVoucherChannelService, VoucherChannelService>();
             //VoucherGroup
             services.AddScoped<IVoucherGroupService, VoucherGroupService>();
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

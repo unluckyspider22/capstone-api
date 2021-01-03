@@ -29,7 +29,14 @@ namespace PromotionEngineAPI.Controllers
         // api/brands?pageIndex=...&pageSize=...
         public async Task<IActionResult> GetBrand([FromQuery] PagingRequestParam param)
         {
-            var result = await _service.GetAsync(pageIndex: param.PageIndex, pageSize: param.PageSize, filter: el => el.DelFlg.Equals("0"));
+            var result = await _service.GetAsync(
+                pageIndex: param.PageIndex,
+                pageSize: param.PageSize,
+                filter: el => el.DelFlg.Equals("0"),
+                orderBy: el => el.OrderByDescending(b => b.InsDate),
+                includeProperties: "Account"
+                );
+
             if (result == null)
             {
                 return NotFound();

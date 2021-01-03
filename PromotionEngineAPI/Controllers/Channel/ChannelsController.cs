@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using ApplicationCore.Models;
 using ApplicationCore.Services;
 using ApplicationCore.Utils;
+using Infrastructure.DTOs;
+using Infrastructure.Helper;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -24,75 +26,112 @@ namespace PromotionEngineAPI.Controllers
 
         // GET: api/Channels
         [HttpGet]
-        public List<Channel> GetChannel()
+        public async Task<IActionResult> GetChannel([FromQuery] PagingRequestParam param)
         {
-            return _service.GetChannels();
+            var result = await _service.GetAsync(
+                pageIndex: param.PageIndex,
+                pageSize: param.PageSize,
+                filter: el => el.DelFlg.Equals("0"),
+                orderBy: el => el.OrderByDescending(b => b.InsDate)
+                );
+
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
         }
 
         // GET: api/Channels/count
         [HttpGet]
         [Route("count")]
-        public int CountChannel()
+        public async Task<IActionResult> CountChannel()
         {
-            return _service.CountChannel();
+            return Ok(await _service.CountAsync());
         }
 
         // GET: api/Channels/5
         [HttpGet("{id}")]
-        public Channel GetChannel(Guid id)
+        public async Task<IActionResult> GetChannel([FromRoute]Guid id)
         {
-            return _service.GetChannels(id);
+            var result = await _service.GetByIdAsync(id);
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
         }
 
         // PUT: api/Channels/5
         [HttpPut("{id}")]
-        public ActionResult<ChannelParam> PutChannel(Guid id, ChannelParam channelParam)
+        public async Task<IActionResult> PutChannel([FromRoute]Guid id, [FromBody] ChannelDto dto)
         {
-
-            if (!id.Equals(channelParam.ChannelId))
+            if (id != dto.ChannelId)
             {
                 return BadRequest();
             }
 
-            var result = _service.UpdateChannel(id, channelParam);
+            dto.UpdDate = DateTime.Now;
 
-            if (result == GlobalVariables.NOT_FOUND)
+            var result = await _service.UpdateAsync(dto);
+
+            if (result == null)
             {
                 return NotFound();
             }
 
-            return Ok(channelParam);
+            return Ok(result);
+
         }
 
         // POST: api/Channels
         [HttpPost]
-        public ActionResult<ChannelParam> PostChannel(ChannelParam ChannelParam)
+        public async Task<IActionResult> PostChannel([FromBody] ChannelDto dto)
         {
-            ChannelParam.ChannelId = Guid.NewGuid();
+            dto.ChannelId = Guid.NewGuid();
 
-            _service.CreateChannel(ChannelParam);
+            var result = await _service.CreateAsync(dto);
 
-            return Ok(ChannelParam);
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            //var result = dto;
+
+            return Ok(result);
         }
 
         // DELETE: api/Channels/5
-        [HttpDelete("{id}")]
-        public ActionResult DeleteChannel(Guid id)
+        [HttpDelete]
+        public async Task<IActionResult> DeleteChannel([FromQuery]Guid id)
         {
-            var result = _service.DeleteChannel(id);
-            if (result == GlobalVariables.NOT_FOUND)
+            if (id == null)
+            {
+                return BadRequest();
+            }
+            var result = await _service.DeleteAsync(id);
+            if (result == false)
             {
                 return NotFound();
             }
             return Ok();
         }
 
-        // PATCH: api/Channels/5
-        [HttpPatch("{id}")]
-        public ActionResult HideChannel(Guid id)
+        // Put: api/Channels/5
+        [HttpPatch]
+        public async Task<IActionResult> HideChannel([FromQuery]Guid id, [FromQuery]string value)
         {
-            var result = _service.HideChannel(id);
-            if (result == GlobalVariables.NOT_FOUND)
+            if (id == null)
+            {
+                return BadRequest();
+            }
+            if (!value.Equals(AppConstant.DelFlg.HIDE) && !value.Equals(AppConstant.DelFlg.UNHIDE))
+            {
+                return BadRequest();
+            }
+            var result = await _service.HideAsync(id, value);
+            if (result == false)
             {
                 return NotFound();
             }
