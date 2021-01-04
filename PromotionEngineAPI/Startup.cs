@@ -31,7 +31,8 @@ namespace PromotionEngineAPI
                       .AllowAnyHeader()
                       .AllowAnyMethod()
                       .AllowCredentials()
-                      .WithOrigins("http://localhost:8080");
+                      .WithOrigins("http://localhost:8080")
+                      .WithOrigins("https://promotionengine.netlify.app");
                 });
             });
             services.AddControllers();
