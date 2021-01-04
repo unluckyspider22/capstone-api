@@ -30,14 +30,40 @@ namespace PromotionEngineAPI.Controllers
             }
             return Ok(result);
         }
+        // GET: api/Promotions/count
+        [HttpGet]
+        [Route("countSearch")]
+        public async Task<IActionResult> CountPromotion([FromQuery] SearchPagingRequestParam param)
+        {
+            return Ok(await _service.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE) && el.PromotionName.ToLower().Contains(param.SearchContent.ToLower())));
+        }
+
+        // GET: api/Promotions
+        [HttpGet]
+        [Route("search")]
+        // api/Promotions/SearchContent=...?pageIndex=...&pageSize=...
+        public async Task<IActionResult> SearchPromotion([FromQuery] SearchPagingRequestParam param)
+        {
+            var result = await _service.GetAsync(
+                pageIndex: param.PageIndex, 
+                pageSize: param.PageSize, 
+                filter: el => el.DelFlg.Equals("0") && el.PromotionName.ToLower().Contains(param.SearchContent.ToLower()));
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
+        }
 
         // GET: api/Promotions/count
         [HttpGet]
         [Route("count")]
-        public async Task<IActionResult> CountPromotion()
+        public async Task<IActionResult> CountSearchResultPromotion()
         {
             return Ok(await _service.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE)));
         }
+
+      
 
         // GET: api/Promotions/5
         [HttpGet("{id}")]
