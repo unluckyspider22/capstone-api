@@ -32,7 +32,8 @@ namespace PromotionEngineAPI
                       .AllowAnyMethod()
                       .AllowCredentials()
                       .WithOrigins("http://localhost:8080")
-                      .WithOrigins("https://promotionengine.netlify.app");
+                      .WithOrigins("https://promotionengine.netlify.app")
+                      .WithOrigins("https://blue-forest-070876000.azurestaticapps.net");
                 });
             });
             services.AddControllers();
