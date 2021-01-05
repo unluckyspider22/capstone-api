@@ -28,9 +28,14 @@ namespace PromotionEngineAPI.Controllers
         // GET: api/Stores
         [HttpGet]
         // api/Stores?pageIndex=...&pageSize=...
-        public async Task<IActionResult> GetStore([FromQuery] PagingRequestParam param)
+        public async Task<IActionResult> GetStore([FromQuery] PagingRequestParam param, [FromQuery] Guid BrandId)
         {
-            var result = await _service.GetAsync(pageIndex: param.PageIndex, pageSize: param.PageSize, filter: el => el.DelFlg.Equals("0"));
+            var result = await _service.GetAsync(
+                pageIndex: param.PageIndex,
+                pageSize: param.PageSize,
+                filter: el => el.DelFlg.Equals("0") && el.BrandId.Equals(BrandId),
+                orderBy: el => el.OrderByDescending(obj => obj.InsDate)
+                );
             if (result == null)
             {
                 return NotFound();
@@ -38,12 +43,14 @@ namespace PromotionEngineAPI.Controllers
             return Ok(result);
         }
 
+   
+
         // GET: api/Stores/count
         [HttpGet]
         [Route("count")]
-        public async Task<IActionResult> CountStore()
+        public async Task<IActionResult> CountStore([FromQuery] Guid BrandId)
         {
-            return Ok(await _service.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE)));
+            return Ok(await _service.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE) && el.BrandId.Equals(BrandId)));
         }
 
         // GET: api/Stores/5
