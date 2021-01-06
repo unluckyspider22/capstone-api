@@ -11,6 +11,12 @@ namespace Infrastructure.Helper
         {
             public const string HIDE = "1";
             public const string UNHIDE = "0";
+            
+
+        }
+        public struct Status
+        {
+            public const string ALL = "0";
         }
     }
 }
