@@ -113,28 +113,5 @@ namespace PromotionEngineAPI.Controllers
             return Ok();
         }
 
-        // Put: api/Accounts/5
-        [HttpPatch]
-        public async Task<IActionResult> HideAccount([FromQuery]string username, [FromQuery]string value)
-        {
-            if (username == null)
-            {
-                return BadRequest();
-            }
-
-            if (!value.Equals(AppConstant.DelFlg.HIDE) && !value.Equals(AppConstant.DelFlg.UNHIDE))
-            {
-                return BadRequest();
-            }
-
-            var result = await _service.HideUsernameAsync(username, value);
-            if (result == false)
-            {
-                return NotFound();
-            }
-            return Ok();
-        }
-
-
     }
 }

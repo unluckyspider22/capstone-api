@@ -117,24 +117,6 @@ namespace PromotionEngineAPI.Controllers
             return Ok();
         }
 
-        // Put: api/Holidays/5
-        [HttpPatch]
-        public async Task<IActionResult> HideHoliday([FromQuery]Guid id, [FromQuery]string value)
-        {
-            if (id == null)
-            {
-                return BadRequest();
-            }
-            if (!value.Equals(AppConstant.DelFlg.HIDE) && !value.Equals(AppConstant.DelFlg.UNHIDE))
-            {
-                return BadRequest();
-            }
-            var result = await _service.HideAsync(id, value);
-            if (result == false)
-            {
-                return NotFound();
-            }
-            return Ok();
-        }
+        
     }
 }
