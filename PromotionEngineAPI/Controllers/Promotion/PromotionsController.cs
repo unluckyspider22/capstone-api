@@ -21,33 +21,44 @@ namespace PromotionEngineAPI.Controllers
         // GET: api/Promotions
         [HttpGet]
         // api/Promotions?pageIndex=...&pageSize=...
-        public async Task<IActionResult> GetPromotion([FromQuery] PagingRequestParam param)
+        public async Task<IActionResult> GetPromotion([FromQuery] PagingRequestParam param, [FromQuery] Guid BrandId, [FromQuery] string status)
         {
-            var result = await _service.GetAsync(pageIndex: param.PageIndex, pageSize: param.PageSize, filter: el => el.DelFlg.Equals("0"));
-            if (result == null)
+
+            if (status.Equals(AppConstant.Status.ALL))
             {
-                return NotFound();
+                return Ok(await _service.GetAsync(
+                pageIndex: param.PageIndex,
+                pageSize: param.PageSize,
+                filter: el => el.DelFlg.Equals("0") && el.BrandId.Equals(BrandId)));
             }
-            return Ok(result);
+            else return Ok(await _service.GetAsync(
+              pageIndex: param.PageIndex,
+              pageSize: param.PageSize,
+              filter: el => el.DelFlg.Equals("0") && el.BrandId.Equals(BrandId)
+              && el.Status.Equals(status)));
         }
         // GET: api/Promotions/count
         [HttpGet]
         [Route("countSearch")]
-        public async Task<IActionResult> CountPromotion([FromQuery] SearchPagingRequestParam param)
+        public async Task<IActionResult> CountPromotion([FromQuery] SearchPagingRequestParam param, [FromQuery] Guid BrandId)
         {
-            return Ok(await _service.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE) && el.PromotionName.ToLower().Contains(param.SearchContent.ToLower())));
+            return Ok(await _service.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE)
+            && el.BrandId.Equals(BrandId)
+            && el.PromotionName.ToLower().Contains(param.SearchContent.ToLower())));
         }
 
         // GET: api/Promotions
         [HttpGet]
         [Route("search")]
-        // api/Promotions/SearchContent=...?pageIndex=...&pageSize=...
-        public async Task<IActionResult> SearchPromotion([FromQuery] SearchPagingRequestParam param)
+        // api/Promotions?SearchContent=...?pageIndex=...&pageSize=...
+        public async Task<IActionResult> SearchPromotion([FromQuery] SearchPagingRequestParam param, [FromQuery] Guid BrandId)
         {
             var result = await _service.GetAsync(
-                pageIndex: param.PageIndex, 
-                pageSize: param.PageSize, 
-                filter: el => el.DelFlg.Equals("0") && el.PromotionName.ToLower().Contains(param.SearchContent.ToLower()));
+                pageIndex: param.PageIndex,
+                pageSize: param.PageSize,
+                filter: el => el.DelFlg.Equals("0")
+                && el.PromotionName.ToLower().Contains(param.SearchContent.ToLower())
+                && el.BrandId.Equals(BrandId));
             if (result == null)
             {
                 return NotFound();
@@ -58,12 +69,17 @@ namespace PromotionEngineAPI.Controllers
         // GET: api/Promotions/count
         [HttpGet]
         [Route("count")]
-        public async Task<IActionResult> CountSearchResultPromotion()
+        public async Task<IActionResult> CountSearchResultPromotion([FromQuery] string status, [FromQuery] Guid brandId)
         {
-            return Ok(await _service.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE)));
+            if (status != null && !status.Equals(AppConstant.Status.ALL))
+            {
+                return Ok(await _service.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE)
+                && el.BrandId.Equals(brandId)
+                && el.Status.Equals(status)));
+            }
+            return Ok(await _service.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE)
+            && el.BrandId.Equals(brandId)));
         }
-
-      
 
         // GET: api/Promotions/5
         [HttpGet("{id}")]
