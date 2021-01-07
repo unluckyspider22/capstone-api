@@ -28,14 +28,15 @@ namespace ApplicationCore.Services
             return await _unitOfWork.SaveAsync() > 0;
         }
 
-        public async Task<AccountDto> GetByUsernameAsync(string username)
+        public async Task<Account> GetByUsernameAsync(string username)
         {
             var result = await _repository.GetFirst(
                 el => el.Username.Equals(username)
-                && el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE)
+                && el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE), 
+                includeProperties: "Brand"
                 );
 
-            return _mapper.Map<AccountDto>(result);
+            return result;
         }
 
         public async Task<bool> HideUsernameAsync(string username, string value)

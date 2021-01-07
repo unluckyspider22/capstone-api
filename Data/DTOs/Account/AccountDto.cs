@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Infrastructure.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,5 +15,6 @@ namespace Infrastructure.DTOs
         public string Fullname { get; set; }
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
+        public virtual Brand Brand { get; set; }
     }
 }

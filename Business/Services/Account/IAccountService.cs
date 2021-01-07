@@ -9,7 +9,7 @@ namespace ApplicationCore.Services
 {
     public interface IAccountService : IBaseService<Account, AccountDto>
     {
-        Task<AccountDto> GetByUsernameAsync(string username);
+        Task<Account> GetByUsernameAsync(string username);
         Task<bool> DeleteUsernameAsync(string username);
         Task<bool> HideUsernameAsync(string username, string value);
     }
