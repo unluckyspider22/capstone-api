@@ -27,14 +27,14 @@ namespace PromotionEngineAPI.Controllers
 
         // GET: api/Stores
         [HttpGet]
-        // api/Stores?pageIndex=...&pageSize=...
         public async Task<IActionResult> GetStore([FromQuery] PagingRequestParam param, [FromQuery] Guid BrandId)
         {
             var result = await _service.GetAsync(
                 pageIndex: param.PageIndex,
                 pageSize: param.PageSize,
                 filter: el => el.DelFlg.Equals("0") && el.BrandId.Equals(BrandId),
-                orderBy: el => el.OrderByDescending(obj => obj.InsDate)
+                orderBy: el => el.OrderByDescending(obj => obj.InsDate),
+                includeProperties: "VoucherChannel"
                 );
             if (result == null)
             {

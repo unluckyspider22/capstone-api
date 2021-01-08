@@ -26,13 +26,14 @@ namespace PromotionEngineAPI.Controllers
 
         // GET: api/Channels
         [HttpGet]
-        public async Task<IActionResult> GetChannel([FromQuery] PagingRequestParam param)
+        public async Task<IActionResult> GetChannel([FromQuery] PagingRequestParam param, [FromQuery] Guid BrandId)
         {
             var result = await _service.GetAsync(
                 pageIndex: param.PageIndex,
                 pageSize: param.PageSize,
-                filter: el => el.DelFlg.Equals("0"),
-                orderBy: el => el.OrderByDescending(b => b.InsDate)
+                filter: el => el.DelFlg.Equals("0") && el.BrandId.Equals(BrandId),
+                orderBy: el => el.OrderByDescending(b => b.InsDate),
+                includeProperties: "voucherChannel"
                 );
 
             if (result == null)
@@ -45,9 +46,9 @@ namespace PromotionEngineAPI.Controllers
         // GET: api/Channels/count
         [HttpGet]
         [Route("count")]
-        public async Task<IActionResult> CountChannel()
+        public async Task<IActionResult> CountChannel([FromQuery] Guid BrandId)
         {
-            return Ok(await _service.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE)));
+            return Ok(await _service.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE) && el.BrandId.Equals(BrandId)));
         }
 
         // GET: api/Channels/5
