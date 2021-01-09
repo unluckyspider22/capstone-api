@@ -12,9 +12,6 @@ namespace Infrastructure.Models
         public decimal? MaxQuantity { get; set; }
         public decimal? MinAmount { get; set; }
         public decimal? MaxAmount { get; set; }
-        public bool? IsContainProduct { get; set; }
-        public string ProductType { get; set; }
-        public string ProductCode { get; set; }
         public string DelFlg { get; set; }
         public DateTime? InsDate { get; set; }
         public DateTime? UpdDate { get; set; }

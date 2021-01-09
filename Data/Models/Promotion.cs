@@ -15,10 +15,8 @@ namespace Infrastructure.Models
         public Guid PromotionId { get; set; }
         public Guid? BrandId { get; set; }
         public string PromotionName { get; set; }
-        public string PromotionCode { get; set; }
         public string PromotionType { get; set; }
         public string PromotionLevel { get; set; }
-        public string ConditionLevel { get; set; }
         public string ImgUrl { get; set; }
         public string Description { get; set; }
         public DateTime? StartDate { get; set; }

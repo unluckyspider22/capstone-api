@@ -395,15 +395,6 @@ namespace Infrastructure.Models
 
                 entity.Property(e => e.MinQuantity).HasColumnType("decimal(10, 0)");
 
-                entity.Property(e => e.ProductCode)
-                    .HasMaxLength(20)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.ProductType)
-                    .HasMaxLength(1)
-                    .IsUnicode(false)
-                    .IsFixedLength();
-
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
@@ -471,11 +462,6 @@ namespace Infrastructure.Models
                     .IsUnicode(false)
                     .IsFixedLength();
 
-                entity.Property(e => e.ConditionLevel)
-                    .HasMaxLength(1)
-                    .IsUnicode(false)
-                    .IsFixedLength();
-
                 entity.Property(e => e.DayFilter)
                     .HasMaxLength(3)
                     .IsUnicode(false);
@@ -531,10 +517,6 @@ namespace Infrastructure.Models
 
                 entity.Property(e => e.PaymentMethod)
                     .HasMaxLength(10)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.PromotionCode)
-                    .HasMaxLength(20)
                     .IsUnicode(false);
 
                 entity.Property(e => e.PromotionLevel)
