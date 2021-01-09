@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/roles")]
     [ApiController]
     public class RolesController : Controller
     {

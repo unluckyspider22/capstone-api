@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace PromotionEngineAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/membership-actions")]
     [ApiController]
     public class MembershipActionsController : ControllerBase
     {

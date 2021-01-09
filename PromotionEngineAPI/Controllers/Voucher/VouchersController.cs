@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/vouchers")]
     [ApiController]
     public class VouchersController : ControllerBase
     {

@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Infrastructure.Models
 {
@@ -27,7 +29,7 @@ namespace Infrastructure.Models
         public virtual DbSet<Promotion> Promotion { get; set; }
         public virtual DbSet<PromotionStoreMapping> PromotionStoreMapping { get; set; }
         public virtual DbSet<PromotionTier> PromotionTier { get; set; }
-        public virtual DbSet<RoleEntity> Role { get; set; }
+        public virtual DbSet<Role> Role { get; set; }
         public virtual DbSet<Store> Store { get; set; }
         public virtual DbSet<Voucher> Voucher { get; set; }
         public virtual DbSet<VoucherChannel> VoucherChannel { get; set; }
@@ -38,12 +40,10 @@ namespace Infrastructure.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                //optionsBuilder.UseSqlServer("Server=.,1432;Initial Catalog=PromotionEngine;Persist Security Info=False;User ID=sa;Password=tyhuynh99; MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;");
                 optionsBuilder.UseSqlServer("Server=tcp:promotionengine.database.windows.net,1433;Initial Catalog=PromotionEngine;Persist Security Info=False;User ID=adm;Password=Abcd1234;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
             }
         }
-        
-          
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Account>(entity =>
@@ -65,11 +65,17 @@ namespace Infrastructure.Models
                     .HasMaxLength(62)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Fullname).HasMaxLength(50);
+                entity.Property(e => e.FirstName).HasMaxLength(50);
+
+                entity.Property(e => e.ImgUrl)
+                    .HasMaxLength(2048)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.LastName).HasMaxLength(50);
 
                 entity.Property(e => e.Password)
                     .HasMaxLength(60)
@@ -83,11 +89,6 @@ namespace Infrastructure.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.HasOne(d => d.Brand)
-                    .WithMany(p => p.Account)
-                    .HasForeignKey(d => d.BrandId)
-                    .HasConstraintName("FK_Account_Brand");
-
                 entity.HasOne(d => d.Role)
                     .WithMany(p => p.Account)
                     .HasForeignKey(d => d.RoleId)
@@ -96,7 +97,7 @@ namespace Infrastructure.Models
 
             modelBuilder.Entity<Action>(entity =>
             {
-                entity.Property(e => e.ActionId).ValueGeneratedNever();
+                entity.Property(e => e.ActionId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.ActionType)
                     .HasMaxLength(1)
@@ -138,7 +139,11 @@ namespace Infrastructure.Models
 
             modelBuilder.Entity<Brand>(entity =>
             {
-                entity.Property(e => e.BrandId).ValueGeneratedNever();
+                entity.HasIndex(e => e.Username)
+                    .HasName("UNIQUE_Brand")
+                    .IsUnique();
+
+                entity.Property(e => e.BrandId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.Address).HasMaxLength(100);
 
@@ -159,7 +164,7 @@ namespace Infrastructure.Models
                 entity.Property(e => e.Description).HasMaxLength(100);
 
                 entity.Property(e => e.ImgUrl)
-                    .HasMaxLength(100)
+                    .HasMaxLength(2048)
                     .IsUnicode(false);
 
                 entity.Property(e => e.InsDate)
@@ -175,18 +180,20 @@ namespace Infrastructure.Models
                     .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.Username)
+                    .IsRequired()
                     .HasMaxLength(25)
                     .IsUnicode(false);
 
                 entity.HasOne(d => d.UsernameNavigation)
-                    .WithMany(p => p.BrandNavigation)
-                    .HasForeignKey(d => d.Username)
+                    .WithOne(p => p.Brand)
+                    .HasForeignKey<Brand>(d => d.Username)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Brand_Account");
             });
 
             modelBuilder.Entity<Channel>(entity =>
             {
-                entity.Property(e => e.ChannelId).ValueGeneratedNever();
+                entity.Property(e => e.ChannelId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.ChannelCode)
                     .HasMaxLength(20)
@@ -207,16 +214,11 @@ namespace Infrastructure.Models
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
-
-                entity.HasOne(d => d.Brand)
-                    .WithMany(p => p.Channel)
-                    .HasForeignKey(d => d.BrandId)
-                    .HasConstraintName("FK_Channel_Brand");
             });
 
             modelBuilder.Entity<ConditionRule>(entity =>
             {
-                entity.Property(e => e.ConditionRuleId).ValueGeneratedNever();
+                entity.Property(e => e.ConditionRuleId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.DelFlg)
                     .HasMaxLength(1)
@@ -235,16 +237,11 @@ namespace Infrastructure.Models
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
-
-                entity.HasOne(d => d.Brand)
-                    .WithMany(p => p.ConditionRule)
-                    .HasForeignKey(d => d.BrandId)
-                    .HasConstraintName("FK_ConditionRule_Brand");
             });
 
             modelBuilder.Entity<Holiday>(entity =>
             {
-                entity.Property(e => e.HolidayId).ValueGeneratedNever();
+                entity.Property(e => e.HolidayId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.Date).HasColumnType("date");
 
@@ -271,7 +268,7 @@ namespace Infrastructure.Models
 
             modelBuilder.Entity<Membership>(entity =>
             {
-                entity.Property(e => e.MembershipId).ValueGeneratedNever();
+                entity.Property(e => e.MembershipId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.DelFlg)
                     .HasMaxLength(1)
@@ -294,7 +291,7 @@ namespace Infrastructure.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.PhoneNumber)
-                    .HasMaxLength(50)
+                    .HasMaxLength(11)
                     .IsUnicode(false);
 
                 entity.Property(e => e.UpdDate)
@@ -304,7 +301,7 @@ namespace Infrastructure.Models
 
             modelBuilder.Entity<MembershipAction>(entity =>
             {
-                entity.Property(e => e.MembershipActionId).ValueGeneratedNever();
+                entity.Property(e => e.MembershipActionId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.ActionType)
                     .HasMaxLength(1)
@@ -344,7 +341,7 @@ namespace Infrastructure.Models
 
             modelBuilder.Entity<MembershipCondition>(entity =>
             {
-                entity.Property(e => e.MembershipConditionId).ValueGeneratedNever();
+                entity.Property(e => e.MembershipConditionId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.DelFlg)
                     .HasMaxLength(1)
@@ -374,7 +371,7 @@ namespace Infrastructure.Models
 
             modelBuilder.Entity<OrderCondition>(entity =>
             {
-                entity.Property(e => e.OrderConditionId).ValueGeneratedNever();
+                entity.Property(e => e.OrderConditionId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.DelFlg)
                     .HasMaxLength(1)
@@ -383,7 +380,7 @@ namespace Infrastructure.Models
                     .HasDefaultValueSql("((0))");
 
                 entity.Property(e => e.GroupNo)
-                    .HasMaxLength(10)
+                    .HasMaxLength(2)
                     .IsUnicode(false);
 
                 entity.Property(e => e.InsDate)
@@ -392,11 +389,11 @@ namespace Infrastructure.Models
 
                 entity.Property(e => e.MaxAmount).HasColumnType("decimal(10, 2)");
 
-                entity.Property(e => e.MaxQuantity).HasColumnType("decimal(10, 2)");
+                entity.Property(e => e.MaxQuantity).HasColumnType("decimal(10, 0)");
 
                 entity.Property(e => e.MinAmount).HasColumnType("decimal(10, 2)");
 
-                entity.Property(e => e.MinQuantity).HasColumnType("decimal(10, 2)");
+                entity.Property(e => e.MinQuantity).HasColumnType("decimal(10, 0)");
 
                 entity.Property(e => e.ProductCode)
                     .HasMaxLength(20)
@@ -419,7 +416,7 @@ namespace Infrastructure.Models
 
             modelBuilder.Entity<ProductCondition>(entity =>
             {
-                entity.Property(e => e.ProductConditionId).ValueGeneratedNever();
+                entity.Property(e => e.ProductConditionId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.DelFlg)
                     .HasMaxLength(1)
@@ -436,7 +433,7 @@ namespace Infrastructure.Models
                     .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.ProductCode)
-                    .HasMaxLength(20)
+                    .HasMaxLength(30)
                     .IsUnicode(false);
 
                 entity.Property(e => e.ProductConditionType)
@@ -446,7 +443,7 @@ namespace Infrastructure.Models
 
                 entity.Property(e => e.ProductName).HasMaxLength(100);
 
-                entity.Property(e => e.ProductQuantity).HasColumnType("decimal(10, 2)");
+                entity.Property(e => e.ProductQuantity).HasColumnType("decimal(10, 0)");
 
                 entity.Property(e => e.ProductTag).HasMaxLength(20);
 
@@ -467,7 +464,7 @@ namespace Infrastructure.Models
 
             modelBuilder.Entity<Promotion>(entity =>
             {
-                entity.Property(e => e.PromotionId).ValueGeneratedNever();
+                entity.Property(e => e.PromotionId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.ApplyBy)
                     .HasMaxLength(1)
@@ -571,16 +568,11 @@ namespace Infrastructure.Models
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
-
-                entity.HasOne(d => d.Brand)
-                    .WithMany(p => p.Promotion)
-                    .HasForeignKey(d => d.BrandId)
-                    .HasConstraintName("FK_Promotion_Brand");
             });
 
             modelBuilder.Entity<PromotionStoreMapping>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.DelFlg)
                     .HasMaxLength(1)
@@ -598,18 +590,18 @@ namespace Infrastructure.Models
 
                 entity.HasOne(d => d.Promotion)
                     .WithMany(p => p.PromotionStoreMapping)
-                  .HasForeignKey(d => d.PromotionId)
+                    .HasForeignKey(d => d.PromotionId)
                     .HasConstraintName("FK_PromotionStoreMapping_Promotion");
 
                 entity.HasOne(d => d.Store)
-                   .WithMany(p => p.PromotionStoreMapping)
+                    .WithMany(p => p.PromotionStoreMapping)
                     .HasForeignKey(d => d.StoreId)
-                   .HasConstraintName("FK_PromotionStoreMapping_Store");
+                    .HasConstraintName("FK_PromotionStoreMapping_Store");
             });
 
             modelBuilder.Entity<PromotionTier>(entity =>
             {
-                entity.Property(e => e.PromotionTierId).ValueGeneratedNever();
+                entity.Property(e => e.PromotionTierId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.DelFlg)
                     .HasMaxLength(1)
@@ -646,7 +638,7 @@ namespace Infrastructure.Models
                     .HasConstraintName("FK_PromotionTier_Promotion");
             });
 
-            modelBuilder.Entity<RoleEntity>(entity =>
+            modelBuilder.Entity<Role>(entity =>
             {
                 entity.Property(e => e.DelFlg)
                     .HasMaxLength(1)
@@ -669,7 +661,7 @@ namespace Infrastructure.Models
 
             modelBuilder.Entity<Store>(entity =>
             {
-                entity.Property(e => e.StoreId).ValueGeneratedNever();
+                entity.Property(e => e.StoreId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.DelFlg)
                     .HasMaxLength(1)
@@ -690,16 +682,11 @@ namespace Infrastructure.Models
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
-
-                entity.HasOne(d => d.Brand)
-                    .WithMany(p => p.Store)
-                    .HasForeignKey(d => d.BrandId)
-                    .HasConstraintName("FK_Store_Brand");
             });
 
             modelBuilder.Entity<Voucher>(entity =>
             {
-                entity.Property(e => e.VoucherId).ValueGeneratedNever();
+                entity.Property(e => e.VoucherId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.DelFlg)
                     .HasMaxLength(1)
@@ -710,6 +697,11 @@ namespace Infrastructure.Models
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.IsLimited)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .IsFixedLength();
 
                 entity.Property(e => e.RedempedDate).HasColumnType("datetime");
 
@@ -732,11 +724,16 @@ namespace Infrastructure.Models
                     .WithMany(p => p.Voucher)
                     .HasForeignKey(d => d.VoucherChannelId)
                     .HasConstraintName("FK_Voucher_VoucherChannel");
+
+                entity.HasOne(d => d.VoucherGroup)
+                    .WithMany(p => p.Voucher)
+                    .HasForeignKey(d => d.VoucherGroupId)
+                    .HasConstraintName("FK_Voucher_VoucherGroup");
             });
 
             modelBuilder.Entity<VoucherChannel>(entity =>
             {
-                entity.Property(e => e.VoucherChannelId).ValueGeneratedNever();
+                entity.Property(e => e.VoucherChannelId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.DelFlg)
                     .HasMaxLength(1)
@@ -770,7 +767,7 @@ namespace Infrastructure.Models
 
             modelBuilder.Entity<VoucherGroup>(entity =>
             {
-                entity.Property(e => e.VoucherGroupId).ValueGeneratedNever();
+                entity.Property(e => e.VoucherGroupId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.DelFlg)
                     .HasMaxLength(1)
@@ -799,10 +796,7 @@ namespace Infrastructure.Models
 
                 entity.Property(e => e.UsedQuantity).HasColumnType("decimal(10, 0)");
 
-                entity.HasOne(d => d.Brand)
-                    .WithMany(p => p.VoucherGroup)
-                    .HasForeignKey(d => d.BrandId)
-                    .HasConstraintName("FK_VoucherGroup_Brand");
+                entity.Property(e => e.VoucherName).HasMaxLength(50);
             });
 
             OnModelCreatingPartial(modelBuilder);

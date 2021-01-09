@@ -14,7 +14,7 @@ using Infrastructure.Helper;
 
 namespace PromotionEngineAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/membership-conditions")]
     [ApiController]
     public class MembershipConditionsController : ControllerBase
     {

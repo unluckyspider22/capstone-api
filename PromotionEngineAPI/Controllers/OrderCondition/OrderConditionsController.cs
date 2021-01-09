@@ -7,7 +7,7 @@ using Infrastructure.Helper;
 
 namespace PromotionEngineAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/order-conditions")]
     [ApiController]
     public class OrderConditionsController : ControllerBase
     {

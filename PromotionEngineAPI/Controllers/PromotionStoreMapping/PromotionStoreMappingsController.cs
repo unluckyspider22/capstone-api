@@ -15,7 +15,7 @@ using Infrastructure.DTOs.PromotionStoreMapping;
 
 namespace PromotionEngineAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/promotion-store-mapping")]
     [ApiController]
     public class PromotionStoreMappingsController : ControllerBase
     {

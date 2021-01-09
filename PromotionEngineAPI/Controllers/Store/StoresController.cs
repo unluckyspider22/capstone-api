@@ -14,7 +14,7 @@ using Infrastructure.Helper;
 
 namespace PromotionEngineAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/stores")]
     [ApiController]
     public class StoresController : ControllerBase
     {

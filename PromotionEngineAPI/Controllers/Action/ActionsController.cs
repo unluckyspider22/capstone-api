@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace PromotionEngineAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/actions")]
     [ApiController]
     public class ActionsController : ControllerBase
     {

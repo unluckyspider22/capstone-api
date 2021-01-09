@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace PromotionEngineAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/condition-rules")]
     [ApiController]
     public class ConditionRulesController : ControllerBase
     {

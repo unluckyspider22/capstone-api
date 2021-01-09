@@ -21,7 +21,6 @@ namespace Infrastructure.Models
         public DateTime? InsDate { get; set; }
         public DateTime? UpdDate { get; set; }
 
-        public virtual Brand Brand { get; set; }
         public virtual ICollection<MembershipCondition> MembershipCondition { get; set; }
         public virtual ICollection<OrderCondition> OrderCondition { get; set; }
         public virtual ICollection<ProductCondition> ProductCondition { get; set; }
