@@ -9,6 +9,7 @@ namespace Infrastructure.DTOs.VoucherGroup
     {
         public Guid VoucherGroupId { get; set; }
         public Guid? BrandId { get; set; }
+        public string VoucherName { get; set; }
         public decimal? Quantity { get; set; }
         public decimal? UsedQuantity { get; set; }
         public decimal? RedempedQuantity { get; set; }

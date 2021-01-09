@@ -14,8 +14,5 @@ namespace Infrastructure.DTOs
         public decimal? MaxQuantity { get; set; }
         public decimal? MinAmount { get; set; }
         public decimal? MaxAmount { get; set; }
-        public bool? IsContainProduct { get; set; }
-        public string ProductType { get; set; }
-        public string ProductCode { get; set; }
     }
 }
