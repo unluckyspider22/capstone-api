@@ -32,8 +32,7 @@ namespace PromotionEngineAPI.Controllers
                 pageIndex: param.PageIndex,
                 pageSize: param.PageSize,
                 filter: el => el.DelFlg.Equals("0") && el.BrandId.Equals(BrandId),
-                orderBy: el => el.OrderByDescending(b => b.InsDate),
-                includeProperties: "voucherChannel"
+                orderBy: el => el.OrderByDescending(b => b.InsDate)
                 );
 
             if (result == null)
