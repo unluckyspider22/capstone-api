@@ -5,6 +5,14 @@ namespace Infrastructure.Models
 {
     public partial class Brand
     {
+        public Brand()
+        {
+            Channel = new HashSet<Channel>();
+            ConditionRule = new HashSet<ConditionRule>();
+            Promotion = new HashSet<Promotion>();
+            VoucherGroup = new HashSet<VoucherGroup>();
+        }
+
         public Guid BrandId { get; set; }
         public string Username { get; set; }
         public string BrandCode { get; set; }
@@ -19,5 +27,9 @@ namespace Infrastructure.Models
         public DateTime? UpdDate { get; set; }
 
         public virtual Account UsernameNavigation { get; set; }
+        public virtual ICollection<Channel> Channel { get; set; }
+        public virtual ICollection<ConditionRule> ConditionRule { get; set; }
+        public virtual ICollection<Promotion> Promotion { get; set; }
+        public virtual ICollection<VoucherGroup> VoucherGroup { get; set; }
     }
 }

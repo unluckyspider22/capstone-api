@@ -14,8 +14,10 @@ namespace Infrastructure.Models
 
         public Guid PromotionId { get; set; }
         public Guid? BrandId { get; set; }
+        public Guid? VoucherGroupId { get; set; }
         public string PromotionName { get; set; }
         public string PromotionType { get; set; }
+        public string ActionType { get; set; }
         public string PromotionLevel { get; set; }
         public string ImgUrl { get; set; }
         public string Description { get; set; }
@@ -40,6 +42,7 @@ namespace Infrastructure.Models
         public DateTime? InsDate { get; set; }
         public DateTime? UpdDate { get; set; }
 
+        public virtual Brand Brand { get; set; }
         public virtual ICollection<PromotionStoreMapping> PromotionStoreMapping { get; set; }
         public virtual ICollection<PromotionTier> PromotionTier { get; set; }
         public virtual ICollection<VoucherChannel> VoucherChannel { get; set; }

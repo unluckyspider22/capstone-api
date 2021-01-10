@@ -25,6 +25,7 @@ namespace Infrastructure.Models
         public DateTime? InsDate { get; set; }
         public DateTime? UpdDate { get; set; }
 
+        public virtual Brand Brand { get; set; }
         public virtual ICollection<Voucher> Voucher { get; set; }
         public virtual ICollection<VoucherChannel> VoucherChannel { get; set; }
     }

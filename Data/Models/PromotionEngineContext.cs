@@ -214,6 +214,11 @@ namespace Infrastructure.Models
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
+
+                entity.HasOne(d => d.Brand)
+                    .WithMany(p => p.Channel)
+                    .HasForeignKey(d => d.BrandId)
+                    .HasConstraintName("FK_Channel_Brand");
             });
 
             modelBuilder.Entity<ConditionRule>(entity =>
@@ -237,6 +242,11 @@ namespace Infrastructure.Models
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
+
+                entity.HasOne(d => d.Brand)
+                    .WithMany(p => p.ConditionRule)
+                    .HasForeignKey(d => d.BrandId)
+                    .HasConstraintName("FK_ConditionRule_Brand");
             });
 
             modelBuilder.Entity<Holiday>(entity =>
@@ -457,6 +467,11 @@ namespace Infrastructure.Models
             {
                 entity.Property(e => e.PromotionId).HasDefaultValueSql("(newid())");
 
+                entity.Property(e => e.ActionType)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .IsFixedLength();
+
                 entity.Property(e => e.ApplyBy)
                     .HasMaxLength(1)
                     .IsUnicode(false)
@@ -550,6 +565,11 @@ namespace Infrastructure.Models
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
+
+                entity.HasOne(d => d.Brand)
+                    .WithMany(p => p.Promotion)
+                    .HasForeignKey(d => d.BrandId)
+                    .HasConstraintName("FK_Promotion_Brand");
             });
 
             modelBuilder.Entity<PromotionStoreMapping>(entity =>
@@ -705,7 +725,7 @@ namespace Infrastructure.Models
                 entity.HasOne(d => d.VoucherChannel)
                     .WithMany(p => p.Voucher)
                     .HasForeignKey(d => d.VoucherChannelId)
-                    .HasConstraintName("FK_Voucher_VoucherChannel");
+                    .HasConstraintName("FK_Voucher_VoucherChannel1");
 
                 entity.HasOne(d => d.VoucherGroup)
                     .WithMany(p => p.Voucher)
@@ -779,6 +799,11 @@ namespace Infrastructure.Models
                 entity.Property(e => e.UsedQuantity).HasColumnType("decimal(10, 0)");
 
                 entity.Property(e => e.VoucherName).HasMaxLength(50);
+
+                entity.HasOne(d => d.Brand)
+                    .WithMany(p => p.VoucherGroup)
+                    .HasForeignKey(d => d.BrandId)
+                    .HasConstraintName("FK_VoucherGroup_Brand");
             });
 
             OnModelCreatingPartial(modelBuilder);

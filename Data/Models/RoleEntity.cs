@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Models
 {
-    public class RoleEntity
+    public partial class RoleEntity
     {
         public RoleEntity()
         {
