@@ -684,6 +684,11 @@ namespace Infrastructure.Models
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
+
+                entity.HasOne(d => d.Brand)
+                    .WithMany(p => p.Store)
+                    .HasForeignKey(d => d.BrandId)
+                    .HasConstraintName("FK_Store_Brand");
             });
 
             modelBuilder.Entity<Voucher>(entity =>
@@ -726,11 +731,6 @@ namespace Infrastructure.Models
                     .WithMany(p => p.Voucher)
                     .HasForeignKey(d => d.VoucherChannelId)
                     .HasConstraintName("FK_Voucher_VoucherChannel1");
-
-                entity.HasOne(d => d.VoucherGroup)
-                    .WithMany(p => p.Voucher)
-                    .HasForeignKey(d => d.VoucherGroupId)
-                    .HasConstraintName("FK_Voucher_VoucherGroup");
             });
 
             modelBuilder.Entity<VoucherChannel>(entity =>
@@ -804,6 +804,11 @@ namespace Infrastructure.Models
                     .WithMany(p => p.VoucherGroup)
                     .HasForeignKey(d => d.BrandId)
                     .HasConstraintName("FK_VoucherGroup_Brand");
+
+                entity.HasOne(d => d.Promotion)
+                    .WithMany(p => p.VoucherGroup)
+                    .HasForeignKey(d => d.PromotionId)
+                    .HasConstraintName("FK_VoucherGroup_Promotion");
             });
 
             OnModelCreatingPartial(modelBuilder);

@@ -22,6 +22,5 @@ namespace Infrastructure.Models
 
         public virtual Membership Membership { get; set; }
         public virtual VoucherChannel VoucherChannel { get; set; }
-        public virtual VoucherGroup VoucherGroup { get; set; }
     }
 }

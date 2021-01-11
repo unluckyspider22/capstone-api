@@ -10,11 +10,12 @@ namespace Infrastructure.Models
             PromotionStoreMapping = new HashSet<PromotionStoreMapping>();
             PromotionTier = new HashSet<PromotionTier>();
             VoucherChannel = new HashSet<VoucherChannel>();
+            VoucherGroup = new HashSet<VoucherGroup>();
         }
 
         public Guid PromotionId { get; set; }
-        public Guid? BrandId { get; set; }
         public Guid? VoucherGroupId { get; set; }
+        public Guid? BrandId { get; set; }
         public string PromotionName { get; set; }
         public string PromotionType { get; set; }
         public string ActionType { get; set; }
@@ -46,5 +47,6 @@ namespace Infrastructure.Models
         public virtual ICollection<PromotionStoreMapping> PromotionStoreMapping { get; set; }
         public virtual ICollection<PromotionTier> PromotionTier { get; set; }
         public virtual ICollection<VoucherChannel> VoucherChannel { get; set; }
+        public virtual ICollection<VoucherGroup> VoucherGroup { get; set; }
     }
 }
