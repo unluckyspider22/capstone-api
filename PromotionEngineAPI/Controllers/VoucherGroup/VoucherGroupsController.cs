@@ -2,7 +2,6 @@
 using ApplicationCore.Services;
 using ApplicationCore.Utils;
 using Infrastructure.DTOs;
-using Infrastructure.DTOs.VoucherGroup;
 using Infrastructure.Helper;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;

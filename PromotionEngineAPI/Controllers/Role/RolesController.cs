@@ -1,6 +1,5 @@
 ﻿using ApplicationCore.Services;
 using Infrastructure.DTOs;
-using Infrastructure.DTOs.Role;
 using Infrastructure.Helper;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;

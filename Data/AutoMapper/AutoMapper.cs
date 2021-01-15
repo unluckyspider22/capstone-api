@@ -1,12 +1,5 @@
 ﻿using AutoMapper;
 using Infrastructure.DTOs;
-using Infrastructure.DTOs.PromotionStoreMapping;
-using Infrastructure.DTOs.PromotionTier;
-using Infrastructure.DTOs.Role;
-using Infrastructure.DTOs.Store;
-using Infrastructure.DTOs.Voucher;
-using Infrastructure.DTOs.VoucherChannel;
-using Infrastructure.DTOs.VoucherGroup;
 using Infrastructure.Models;
 
 namespace Infrastructure.AutoMapper

@@ -35,21 +35,29 @@ namespace Infrastructure.Repository
             {
                 query = query.Where(filter);
             }
-
             return await query.CountAsync();
         }
 
-        public void Delete(Guid id)
+        public void Delete(Guid id, Expression<Func<TEntity, bool>> filter = null)
         {
+            IQueryable<TEntity> query = _dbSet;
 
-            TEntity entity = _dbSet.Find(id);
 
-            if (entity != null)
+            if (filter == null)
             {
-                _dbSet.Attach(entity);
-                _dbSet.Remove(entity);
-            }
+                TEntity entity = _dbSet.Find(id);
+                if (entity != null)
+                {
 
+                    _dbSet.Attach(entity);
+                    _dbSet.Remove(entity);
+                }
+            }
+            else
+            {
+                query = query.Where(filter);
+                _dbSet.RemoveRange(query);
+            }
         }
 
         public void DeleteUsername(string username)

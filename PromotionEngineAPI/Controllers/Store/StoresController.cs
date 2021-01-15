@@ -9,7 +9,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using ApplicationCore.Utils;
 using Infrastructure.DTOs;
-using Infrastructure.DTOs.Store;
 using Infrastructure.Helper;
 
 namespace PromotionEngineAPI.Controllers

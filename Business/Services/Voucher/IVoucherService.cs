@@ -1,5 +1,5 @@
 ﻿using ApplicationCore.Models.Voucher;
-using Infrastructure.DTOs.Voucher;
+using Infrastructure.DTOs;
 using Infrastructure.Models;
 using System;
 using System.Collections.Generic;

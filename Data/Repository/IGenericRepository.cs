@@ -15,7 +15,7 @@ namespace Infrastructure.Repository
 
         Task<TEntity> GetById(Guid id);
         void Add(TEntity entity);
-        void Delete(Guid id);
+        void Delete(Guid id, Expression<Func<TEntity, bool>> filter = null);
         void Update(TEntity entity);
         void Hide(Guid id, string value);
         Task<int> CountAsync(Expression<Func<TEntity, bool>> filter = null);

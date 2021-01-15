@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using ApplicationCore.Services;
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
+using System.Linq;
 
 namespace PromotionEngineAPI.Controllers
 {
@@ -11,11 +12,13 @@ namespace PromotionEngineAPI.Controllers
     [ApiController]
     public class PromotionsController : ControllerBase
     {
-        private readonly IPromotionService _service;
+        private readonly IPromotionService _promotionService;
+        private readonly IPromotionStoreMappingService _promotionStoreMappingService;
 
-        public PromotionsController(IPromotionService service)
+        public PromotionsController(IPromotionService service, IPromotionStoreMappingService promotionStoreMappingService)
         {
-            _service = service;
+            _promotionService = service;
+            _promotionStoreMappingService = promotionStoreMappingService;
         }
 
         // GET: api/Promotions
@@ -26,12 +29,13 @@ namespace PromotionEngineAPI.Controllers
 
             if (status.Equals(AppConstant.Status.ALL))
             {
-                return Ok(await _service.GetAsync(
+                return Ok(await _promotionService.GetAsync(
                 pageIndex: param.PageIndex,
                 pageSize: param.PageSize,
+                orderBy: el => el.OrderByDescending(b => b.InsDate),
                 filter: el => el.DelFlg.Equals("0") && el.BrandId.Equals(BrandId)));
             }
-            else return Ok(await _service.GetAsync(
+            else return Ok(await _promotionService.GetAsync(
               pageIndex: param.PageIndex,
               pageSize: param.PageSize,
               filter: el => el.DelFlg.Equals("0") && el.BrandId.Equals(BrandId)
@@ -42,7 +46,7 @@ namespace PromotionEngineAPI.Controllers
         [Route("countSearch")]
         public async Task<IActionResult> CountPromotion([FromQuery] SearchPagingRequestParam param, [FromQuery] Guid BrandId)
         {
-            return Ok(await _service.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE)
+            return Ok(await _promotionService.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE)
             && el.BrandId.Equals(BrandId)
             && el.PromotionName.ToLower().Contains(param.SearchContent.ToLower())));
         }
@@ -53,7 +57,7 @@ namespace PromotionEngineAPI.Controllers
         // api/Promotions?SearchContent=...?pageIndex=...&pageSize=...
         public async Task<IActionResult> SearchPromotion([FromQuery] SearchPagingRequestParam param, [FromQuery] Guid BrandId)
         {
-            var result = await _service.GetAsync(
+            var result = await _promotionService.GetAsync(
                 pageIndex: param.PageIndex,
                 pageSize: param.PageSize,
                 filter: el => el.DelFlg.Equals("0")
@@ -73,11 +77,11 @@ namespace PromotionEngineAPI.Controllers
         {
             if (status != null && !status.Equals(AppConstant.Status.ALL))
             {
-                return Ok(await _service.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE)
+                return Ok(await _promotionService.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE)
                 && el.BrandId.Equals(brandId)
                 && el.Status.Equals(status)));
             }
-            return Ok(await _service.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE)
+            return Ok(await _promotionService.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE)
             && el.BrandId.Equals(brandId)));
         }
 
@@ -85,7 +89,7 @@ namespace PromotionEngineAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPromotion([FromRoute]Guid id)
         {
-            var result = await _service.GetByIdAsync(id);
+            var result = await _promotionService.GetByIdAsync(id);
             if (result == null)
             {
                 return NotFound();
@@ -103,8 +107,11 @@ namespace PromotionEngineAPI.Controllers
             }
 
             dto.UpdDate = DateTime.Now;
-
-            var result = await _service.UpdateAsync(dto);
+            if(dto.PromotionStoreMapping != null)
+            {
+                await _promotionStoreMappingService.DeletePromotionStoreMapping(dto.PromotionId);
+            }
+            var result = await _promotionService.UpdateAsync(dto);
 
             if (result == null)
             {
@@ -121,7 +128,7 @@ namespace PromotionEngineAPI.Controllers
         {
             dto.PromotionId = Guid.NewGuid();
 
-            var result = await _service.CreateAsync(dto);
+            var result = await _promotionService.CreateAsync(dto);
 
             if (result == null)
             {
@@ -141,7 +148,7 @@ namespace PromotionEngineAPI.Controllers
             {
                 return BadRequest();
             }
-            var result = await _service.DeleteAsync(id);
+            var result = await _promotionService.DeleteAsync(id);
             if (result == false)
             {
                 return NotFound();
@@ -149,6 +156,6 @@ namespace PromotionEngineAPI.Controllers
             return Ok();
         }
 
-        
+
     }
 }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Infrastructure.Models;
+using System;
+using System.Collections.Generic;
 
 namespace Infrastructure.DTOs
 {
@@ -28,5 +30,7 @@ namespace Infrastructure.DTOs
         public string Rank { get; set; }
         public string Status { get; set; }
         public string IsActive { get; set; }
+
+        public virtual ICollection<PromotionStoreMappingDto> PromotionStoreMapping { get; set; }
     }
 }

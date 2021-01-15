@@ -1,5 +1,5 @@
 ﻿using ApplicationCore.Models.PromotionTier;
-using Infrastructure.DTOs.PromotionTier;
+using Infrastructure.DTOs;
 using Infrastructure.Models;
 using System;
 using System.Collections.Generic;

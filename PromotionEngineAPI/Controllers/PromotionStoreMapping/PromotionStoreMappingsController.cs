@@ -11,7 +11,6 @@ using ApplicationCore.Utils;
 using ApplicationCore.Models.PromotionStoreMapping;
 using Infrastructure.Helper;
 using Infrastructure.DTOs;
-using Infrastructure.DTOs.PromotionStoreMapping;
 
 namespace PromotionEngineAPI.Controllers
 {

@@ -2,7 +2,6 @@
 using ApplicationCore.Services;
 using ApplicationCore.Utils;
 using Infrastructure.DTOs;
-using Infrastructure.DTOs.PromotionTier;
 using Infrastructure.Helper;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;

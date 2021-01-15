@@ -1,7 +1,7 @@
 ﻿using ApplicationCore.Models.PromotionTier;
 using ApplicationCore.Utils;
 using AutoMapper;
-using Infrastructure.DTOs.PromotionTier;
+using Infrastructure.DTOs;
 using Infrastructure.Models;
 using Infrastructure.Repository;
 using Infrastructure.UnitOrWork;

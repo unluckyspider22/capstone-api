@@ -1,6 +1,6 @@
 ﻿using ApplicationCore.Services;
 using AutoMapper;
-using Infrastructure.DTOs.Role;
+using Infrastructure.DTOs;
 using Infrastructure.Models;
 using Infrastructure.Repository;
 using Infrastructure.UnitOrWork;

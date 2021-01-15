@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Infrastructure.DTOs.VoucherChannel
+namespace Infrastructure.DTOs
 {
     public class VoucherChannelDto : BaseDto
     {

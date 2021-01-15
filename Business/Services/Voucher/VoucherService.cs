@@ -1,6 +1,6 @@
 ﻿
 using AutoMapper;
-using Infrastructure.DTOs.Voucher;
+using Infrastructure.DTOs;
 using Infrastructure.Models;
 using Infrastructure.Repository;
 using Infrastructure.UnitOrWork;

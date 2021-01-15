@@ -1,7 +1,7 @@
 ﻿using ApplicationCore.Models.VoucherChannel;
 using ApplicationCore.Utils;
 using AutoMapper;
-using Infrastructure.DTOs.VoucherChannel;
+using Infrastructure.DTOs;
 using Infrastructure.Models;
 using Infrastructure.Repository;
 using Infrastructure.UnitOrWork;

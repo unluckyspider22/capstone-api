@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ApplicationCore.Utils;
 using ApplicationCore.Models.Store;
-using Infrastructure.DTOs.Store;
+using Infrastructure.DTOs;
 using AutoMapper;
 using Infrastructure.UnitOrWork;
 using Infrastructure.Repository;

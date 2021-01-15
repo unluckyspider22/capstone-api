@@ -1,4 +1,4 @@
-﻿using Infrastructure.DTOs.Role;
+﻿using Infrastructure.DTOs;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
