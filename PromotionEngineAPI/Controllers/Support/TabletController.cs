@@ -46,7 +46,7 @@ namespace PromotionEngineAPI.Controllers
         }
         private string hmacSha256Digest(string message, string secret)
         {
-            UTF32Encoding encoding = new UTF32Encoding();
+            ASCIIEncoding encoding = new ASCIIEncoding();
             byte[] keyBytes = encoding.GetBytes(secret);
             byte[] messageBytes = encoding.GetBytes(message);
             HMACSHA256 cryptographer = new HMACSHA256(keyBytes);
