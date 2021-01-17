@@ -693,6 +693,10 @@ namespace Infrastructure.Models
 
             modelBuilder.Entity<Voucher>(entity =>
             {
+                entity.HasIndex(e => e.VoucherCode)
+                    .HasName("UQ_Voucher")
+                    .IsUnique();
+
                 entity.Property(e => e.VoucherId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.DelFlg)
@@ -731,6 +735,11 @@ namespace Infrastructure.Models
                     .WithMany(p => p.Voucher)
                     .HasForeignKey(d => d.VoucherChannelId)
                     .HasConstraintName("FK_Voucher_VoucherChannel1");
+
+                entity.HasOne(d => d.VoucherGroup)
+                    .WithMany(p => p.Voucher)
+                    .HasForeignKey(d => d.VoucherGroupId)
+                    .HasConstraintName("FK_Voucher_VoucherGroup");
             });
 
             modelBuilder.Entity<VoucherChannel>(entity =>
@@ -787,11 +796,6 @@ namespace Infrastructure.Models
 
                 entity.Property(e => e.RedempedQuantity).HasColumnType("decimal(10, 0)");
 
-                entity.Property(e => e.Status)
-                    .HasMaxLength(1)
-                    .IsUnicode(false)
-                    .IsFixedLength();
-
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
@@ -799,6 +803,11 @@ namespace Infrastructure.Models
                 entity.Property(e => e.UsedQuantity).HasColumnType("decimal(10, 0)");
 
                 entity.Property(e => e.VoucherName).HasMaxLength(50);
+
+                entity.Property(e => e.VoucherType)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .IsFixedLength();
 
                 entity.HasOne(d => d.Brand)
                     .WithMany(p => p.VoucherGroup)

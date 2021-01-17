@@ -1,5 +1,4 @@
-﻿using ApplicationCore.Models.Store;
-using Infrastructure.DTOs;
+﻿using Infrastructure.DTOs;
 using Infrastructure.Models;
 using System;
 using System.Collections.Generic;

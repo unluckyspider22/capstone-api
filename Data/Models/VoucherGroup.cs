@@ -7,6 +7,7 @@ namespace Infrastructure.Models
     {
         public VoucherGroup()
         {
+            Voucher = new HashSet<Voucher>();
             VoucherChannel = new HashSet<VoucherChannel>();
         }
 
@@ -14,11 +15,10 @@ namespace Infrastructure.Models
         public Guid? PromotionId { get; set; }
         public Guid? BrandId { get; set; }
         public string VoucherName { get; set; }
+        public string VoucherType { get; set; }
         public decimal? Quantity { get; set; }
         public decimal? UsedQuantity { get; set; }
         public decimal? RedempedQuantity { get; set; }
-        public string Status { get; set; }
-        public bool? IsPublic { get; set; }
         public bool? IsActive { get; set; }
         public DateTime? PublicDate { get; set; }
         public string DelFlg { get; set; }
@@ -27,6 +27,7 @@ namespace Infrastructure.Models
 
         public virtual Brand Brand { get; set; }
         public virtual Promotion Promotion { get; set; }
+        public virtual ICollection<Voucher> Voucher { get; set; }
         public virtual ICollection<VoucherChannel> VoucherChannel { get; set; }
     }
 }
