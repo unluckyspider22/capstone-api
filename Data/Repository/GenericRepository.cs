@@ -91,7 +91,7 @@ namespace Infrastructure.Repository
                 query = orderBy(query);
             }
 
-            return pageIndex != 0 && pageSize != 0
+            return pageIndex != 0 && pageSize != 0 
                 ? await PaginatedList<TEntity>.CreateAsync(query.AsNoTracking(), pageIndex, pageSize)
                 : await query.ToListAsync();
         }

@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using Infrastructure.Helper;
 using Infrastructure.Repository;
 using Infrastructure.UnitOrWork;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -42,12 +44,19 @@ namespace ApplicationCore.Services
             }
 
             return await _unitOfWork.SaveAsync() > 0;
-             
+
         }
 
-        public async Task<IEnumerable<TEntity>> GetAsync(int pageIndex = 0, int pageSize = 0, Expression<Func<TEntity, bool>> filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, string includeProperties = "")
+        public async Task<GenericRespones<TEntity>> GetAsync(int pageIndex = 0, int pageSize = 0, Expression<Func<TEntity, bool>> filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, string includeProperties = "")
         {
-            return await _repository.Get(pageIndex, pageSize, filter, orderBy, includeProperties);
+            var list = await _repository.Get(pageIndex, pageSize, filter, orderBy, includeProperties);
+
+            MetaData metadata = new MetaData(pageIndex: pageIndex, pageSize: pageSize, totalItems: list.Count());
+
+            GenericRespones<TEntity> result = new GenericRespones<TEntity>(data: list.ToList(),metadata: metadata);
+
+
+            return result;
         }
 
         public virtual async Task<TDto> GetByIdAsync(Guid id)
@@ -56,7 +65,7 @@ namespace ApplicationCore.Services
             {
                 return _mapper.Map<TDto>(await _repository.GetById(id));
             }
-            return null; 
+            return null;
         }
 
         public virtual async Task<TDto> UpdateAsync(TDto dto)

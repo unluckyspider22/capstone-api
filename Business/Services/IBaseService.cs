@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Infrastructure.Helper;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -10,7 +11,7 @@ namespace ApplicationCore.Services
         where TEntity : class 
         where TDto : class
     {
-        Task<IEnumerable<TEntity>> GetAsync(int pageIndex = 0, int pageSize = 0, Expression<Func<TEntity, bool>> filter = null,
+        Task<GenericRespones<TEntity>> GetAsync(int pageIndex = 0, int pageSize = 0, Expression<Func<TEntity, bool>> filter = null,
                                                         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
                                                         string includeProperties = "");
         Task<TDto> CreateAsync(TDto dto);

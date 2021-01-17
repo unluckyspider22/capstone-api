@@ -28,6 +28,7 @@ namespace PromotionEngineAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetStore([FromQuery] PagingRequestParam param, [FromQuery] Guid BrandId)
         {
+          
             var result = await _service.GetAsync(
                 pageIndex: param.PageIndex,
                 pageSize: param.PageSize,
@@ -36,12 +37,13 @@ namespace PromotionEngineAPI.Controllers
                 );
             if (result == null)
             {
-                return NotFound();
+                return StatusCode(statusCode: 500, new ErrorResponse().InternalServerError);
             }
-            return Ok(result);
+             return Ok(result); 
+
         }
 
-   
+
 
         // GET: api/Stores/count
         [HttpGet]
@@ -58,7 +60,7 @@ namespace PromotionEngineAPI.Controllers
             var result = await _service.GetByIdAsync(id);
             if (result == null)
             {
-                return NotFound();
+                return StatusCode(statusCode: 500, new ErrorResponse().InternalServerError);
             }
             return Ok(result);
         }
@@ -69,7 +71,7 @@ namespace PromotionEngineAPI.Controllers
         {
             if (id != dto.StoreId)
             {
-                return BadRequest();
+                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
             }
 
             dto.UpdDate = DateTime.Now;
@@ -78,7 +80,7 @@ namespace PromotionEngineAPI.Controllers
 
             if (result == null)
             {
-                return NotFound();
+                return StatusCode(statusCode: 500, new ErrorResponse().InternalServerError);
             }
 
             return Ok(result);
@@ -95,7 +97,7 @@ namespace PromotionEngineAPI.Controllers
 
             if (result == null)
             {
-                return NotFound();
+                return StatusCode(statusCode: 500, new ErrorResponse().InternalServerError);
             }
 
             //var result = dto;
@@ -109,12 +111,12 @@ namespace PromotionEngineAPI.Controllers
         {
             if (id == null)
             {
-                return BadRequest();
+                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
             }
             var result = await _service.DeleteAsync(id);
             if (result == false)
             {
-                return NotFound();
+                return StatusCode(statusCode: 500, new ErrorResponse().InternalServerError);
             }
             return Ok();
         }

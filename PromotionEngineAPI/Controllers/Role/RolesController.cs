@@ -28,7 +28,7 @@ namespace PromotionEngineAPI.Controllers
             var result = await _service.GetAsync(pageIndex: param.PageIndex, pageSize: param.PageSize, filter: el => el.DelFlg.Equals("0"));
             if (result == null)
             {
-                return NotFound();
+                return  StatusCode(statusCode: 500, new ErrorResponse().InternalServerError); ;
             }
             return Ok(result);
         }

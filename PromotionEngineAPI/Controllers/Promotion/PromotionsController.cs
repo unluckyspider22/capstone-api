@@ -26,7 +26,7 @@ namespace PromotionEngineAPI.Controllers
         // api/Promotions?pageIndex=...&pageSize=...
         public async Task<IActionResult> GetPromotion([FromQuery] PagingRequestParam param, [FromQuery] Guid BrandId, [FromQuery] string status)
         {
-
+            if(status == null) return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
             if (status.Equals(AppConstant.Status.ALL))
             {
                 return Ok(await _promotionService.GetAsync(
@@ -40,6 +40,7 @@ namespace PromotionEngineAPI.Controllers
               pageSize: param.PageSize,
               filter: el => el.DelFlg.Equals("0") && el.BrandId.Equals(BrandId)
               && el.Status.Equals(status)));
+
         }
         // GET: api/Promotions/count
         [HttpGet]
