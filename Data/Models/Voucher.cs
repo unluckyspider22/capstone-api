@@ -13,7 +13,6 @@ namespace Infrastructure.Models
         public bool? IsUsed { get; set; }
         public bool? IsRedemped { get; set; }
         public DateTime? UsedDate { get; set; }
-        public string IsLimited { get; set; }
         public DateTime? RedempedDate { get; set; }
         public bool? IsActive { get; set; }
         public string DelFlg { get; set; }

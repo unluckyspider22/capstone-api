@@ -693,11 +693,14 @@ namespace Infrastructure.Models
 
             modelBuilder.Entity<Voucher>(entity =>
             {
-                entity.HasIndex(e => e.VoucherCode)
-                    .HasName("UQ_Voucher")
-                    .IsUnique();
+                entity.HasKey(e => new { e.VoucherId, e.VoucherCode })
+                    .HasName("PK_Voucher_1");
 
                 entity.Property(e => e.VoucherId).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.VoucherCode)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.DelFlg)
                     .HasMaxLength(1)
@@ -709,11 +712,6 @@ namespace Infrastructure.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.IsLimited)
-                    .HasMaxLength(1)
-                    .IsUnicode(false)
-                    .IsFixedLength();
-
                 entity.Property(e => e.RedempedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.UpdDate)
@@ -721,10 +719,6 @@ namespace Infrastructure.Models
                     .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.UsedDate).HasColumnType("datetime");
-
-                entity.Property(e => e.VoucherCode)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
 
                 entity.HasOne(d => d.Membership)
                     .WithMany(p => p.Voucher)
@@ -789,6 +783,11 @@ namespace Infrastructure.Models
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.IsLimit)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .IsFixedLength();
 
                 entity.Property(e => e.PublicDate).HasColumnType("datetime");
 

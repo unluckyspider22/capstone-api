@@ -20,22 +20,36 @@ namespace ApplicationCore.Services
 
         protected override IGenericRepository<VoucherGroup> _repository => _unitOfWork.VoucherGroupRepository;
 
-        public List<VoucherDto> GenerateVoucher(decimal? quantity, string charset, string prefix, string postFix, int codeLength = 10, string customCharset = "")
+        public List<VoucherDto> GenerateBulkCodeVoucher(VoucherGroupDto dto)
         {
             List<VoucherDto> result = new List<VoucherDto>();
-            for (var i = 0; i < quantity; i++)
+            if (dto.IsLimit.Equals(AppConstant.ENVIRONMENT_VARIABLE.ISLIMIT))
             {
-                VoucherDto dto = new VoucherDto();
-                string randomVoucher = RandomString(charset, customCharset,codeLength);
-                dto.VoucherCode = prefix + randomVoucher + postFix;
-                result.Add(dto);
-
+                for (var i = 0; i < dto.Quantity; i++)
+                {
+                    VoucherDto voucher = new VoucherDto();
+                    string randomVoucher = RandomString(dto.Charset, dto.CustomCharset, dto.CodeLength);
+                    voucher.VoucherCode = dto.Prefix + randomVoucher + dto.Postfix;
+                    result.Add(voucher);
+                }
             }
+            else
+            {
+                VoucherDto voucher = new VoucherDto();
+                string randomVoucher = RandomString(dto.Charset, dto.CustomCharset, dto.CodeLength);
+                voucher.VoucherCode = dto.Prefix + randomVoucher + dto.Postfix;
+                result.Add(voucher);
+            }
+
             return result;
         }
         private Random Random = new Random();
         public string RandomString(string charset, string customCode, int length)
         {
+            if (length == 0)
+            {
+                length = 10;
+            }
             string randomCode = "";
             string chars = "";
             switch (charset)
@@ -71,6 +85,17 @@ namespace ApplicationCore.Services
                     break;
             }
             return randomCode;
+        }
+
+        public List<VoucherDto> GenerateStandaloneVoucher(VoucherGroupDto dto)
+        {
+            List<VoucherDto> result = new List<VoucherDto>();
+            VoucherDto voucher = new VoucherDto
+            {
+                VoucherCode = dto.Prefix + dto.CustomCode + dto.Postfix
+            };
+            result.Add(voucher);
+            return result;
         }
     }
 

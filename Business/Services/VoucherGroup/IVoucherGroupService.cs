@@ -10,6 +10,8 @@ namespace ApplicationCore.Services
 {
     public interface IVoucherGroupService : IBaseService<VoucherGroup, VoucherGroupDto>
     {
-        public List<VoucherDto> GenerateVoucher(decimal? quantity, string charset, string prefix, string postFix, int codeLength = 10, string customCharset = "");
+        public List<VoucherDto> GenerateBulkCodeVoucher(VoucherGroupDto dto);
+
+        public List<VoucherDto> GenerateStandaloneVoucher(VoucherGroupDto dto);
     }
 }

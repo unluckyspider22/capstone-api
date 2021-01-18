@@ -8,13 +8,16 @@ namespace Infrastructure.DTOs
     public class VoucherGroupDto : BaseDto
     {
         public Guid VoucherGroupId { get; set; }
+        public Guid? PromotionId { get; set; }
         public Guid? BrandId { get; set; }
         public string VoucherName { get; set; }
         public string VoucherType { get; set; }
+        public string IsLimit { get; set; }
         public decimal? Quantity { get; set; }
         public decimal? UsedQuantity { get; set; }
         public decimal? RedempedQuantity { get; set; }
         public bool? IsActive { get; set; }
+
         public DateTime? PublicDate { get; set; }
 
         public string Charset { get; set; }

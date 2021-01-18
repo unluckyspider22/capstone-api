@@ -90,12 +90,14 @@ namespace PromotionEngineAPI.Controllers
 
             if (dto.VoucherType.Equals(AppConstant.ENVIRONMENT_VARIABLE.VOUCHER_TYPE.BULK_CODE))
             {
-                if(dto.CodeLength == 0)
-                {
-                    dto.CodeLength = 10;
-                }
-                List<VoucherDto> generateVoucher = _service.GenerateVoucher(dto.Quantity, dto.Charset, dto.Prefix, dto.Postfix, codeLength: dto.CodeLength, customCharset: dto.CustomCharset);
+                List<VoucherDto> generateVoucher = _service.GenerateBulkCodeVoucher(dto);
                 dto.Voucher = generateVoucher;
+            } else
+            {
+
+                List<VoucherDto> vouchers = _service.GenerateStandaloneVoucher(dto);
+                dto.Voucher = vouchers;
+                
             }
 
             var result = await _service.CreateAsync(dto);
