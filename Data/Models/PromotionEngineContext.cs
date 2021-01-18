@@ -693,7 +693,14 @@ namespace Infrastructure.Models
 
             modelBuilder.Entity<Voucher>(entity =>
             {
+                entity.HasKey(e => new { e.VoucherId, e.VoucherCode })
+                    .HasName("PK_Voucher_1");
+
                 entity.Property(e => e.VoucherId).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.VoucherCode)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.DelFlg)
                     .HasMaxLength(1)
@@ -705,11 +712,6 @@ namespace Infrastructure.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.IsLimited)
-                    .HasMaxLength(1)
-                    .IsUnicode(false)
-                    .IsFixedLength();
-
                 entity.Property(e => e.RedempedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.UpdDate)
@@ -717,10 +719,6 @@ namespace Infrastructure.Models
                     .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.UsedDate).HasColumnType("datetime");
-
-                entity.Property(e => e.VoucherCode)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
 
                 entity.HasOne(d => d.Membership)
                     .WithMany(p => p.Voucher)
@@ -731,6 +729,11 @@ namespace Infrastructure.Models
                     .WithMany(p => p.Voucher)
                     .HasForeignKey(d => d.VoucherChannelId)
                     .HasConstraintName("FK_Voucher_VoucherChannel1");
+
+                entity.HasOne(d => d.VoucherGroup)
+                    .WithMany(p => p.Voucher)
+                    .HasForeignKey(d => d.VoucherGroupId)
+                    .HasConstraintName("FK_Voucher_VoucherGroup");
             });
 
             modelBuilder.Entity<VoucherChannel>(entity =>
@@ -781,16 +784,16 @@ namespace Infrastructure.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.Property(e => e.IsLimit)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .IsFixedLength();
+
                 entity.Property(e => e.PublicDate).HasColumnType("datetime");
 
                 entity.Property(e => e.Quantity).HasColumnType("decimal(10, 0)");
 
                 entity.Property(e => e.RedempedQuantity).HasColumnType("decimal(10, 0)");
-
-                entity.Property(e => e.Status)
-                    .HasMaxLength(1)
-                    .IsUnicode(false)
-                    .IsFixedLength();
 
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
@@ -799,6 +802,11 @@ namespace Infrastructure.Models
                 entity.Property(e => e.UsedQuantity).HasColumnType("decimal(10, 0)");
 
                 entity.Property(e => e.VoucherName).HasMaxLength(50);
+
+                entity.Property(e => e.VoucherType)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .IsFixedLength();
 
                 entity.HasOne(d => d.Brand)
                     .WithMany(p => p.VoucherGroup)

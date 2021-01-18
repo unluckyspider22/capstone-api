@@ -1,6 +1,5 @@
 ﻿
-using ApplicationCore.Models;
-using ApplicationCore.Utils;
+
 using AutoMapper;
 using Infrastructure.DTOs;
 using Infrastructure.Models;
