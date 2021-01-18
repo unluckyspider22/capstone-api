@@ -1,6 +1,6 @@
-﻿using ApplicationCore.Models.VoucherGroup;
+﻿
 using ApplicationCore.Services;
-using ApplicationCore.Utils;
+
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
 using Infrastructure.Models;
@@ -26,9 +26,13 @@ namespace PromotionEngineAPI.Controllers
         // GET: api/VoucherGroups
         [HttpGet]
         // api/VoucherGroups?pageIndex=...&pageSize=...
-        public async Task<IActionResult> GetVoucherGroup([FromQuery] PagingRequestParam param)
+        public async Task<IActionResult> GetVoucherGroup([FromQuery] PagingRequestParam param, [FromQuery] Guid brandId, string voucherType)
         {
-            var result = await _service.GetAsync(pageIndex: param.PageIndex, pageSize: param.PageSize, filter: el => el.DelFlg.Equals("0"));
+            var result = await _service.GetAsync(pageIndex: param.PageIndex,
+                pageSize: param.PageSize,
+                filter: el => el.DelFlg.Equals("0")
+                && el.BrandId.Equals(brandId)
+                && el.VoucherType.Equals(voucherType));
             if (result == null)
             {
 
@@ -87,6 +91,18 @@ namespace PromotionEngineAPI.Controllers
         {
             dto.VoucherGroupId = Guid.NewGuid();
 
+            if (dto.VoucherType.Equals(AppConstant.ENVIRONMENT_VARIABLE.VOUCHER_TYPE.BULK_CODE))
+            {
+                List<VoucherDto> generateVoucher = _service.GenerateBulkCodeVoucher(dto);
+                dto.Voucher = generateVoucher;
+            } else
+            {
+
+                List<VoucherDto> vouchers = _service.GenerateStandaloneVoucher(dto);
+                dto.Voucher = vouchers;
+                
+            }
+
             var result = await _service.CreateAsync(dto);
 
             if (result == null)
@@ -117,6 +133,6 @@ namespace PromotionEngineAPI.Controllers
             return Ok();
         }
 
-        
+
     }
 }

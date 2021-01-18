@@ -1,4 +1,4 @@
-﻿using ApplicationCore.Models.PromotionTier;
+﻿
 using Infrastructure.DTOs;
 using Infrastructure.Models;
 using System;

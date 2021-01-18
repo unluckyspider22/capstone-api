@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.Models;
 using ApplicationCore.Services;
-using ApplicationCore.Utils;
-using ApplicationCore.Models.PromotionStoreMapping;
+
+
 using Infrastructure.Helper;
 using Infrastructure.DTOs;
 
