@@ -6,13 +6,19 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.DTOs
 {
-    public class ErrorObj
+    public class ErrorObj : Exception
     {
         public ErrorObj()
         {
         }
 
-        public ErrorObj(int code, string message,string description)
+        public ErrorObj(int code, string message)
+        {
+            Code = code;
+            Message = message;
+        }
+
+        public ErrorObj(int code, string description, string message)
         {
             Code = code;
             Message = message;
@@ -21,6 +27,6 @@ namespace Infrastructure.DTOs
 
         public int Code { get; set; }
         public string Description{get;set;}
-        public string Message { get; set; }
+        public string Message{ get; set; }
     }
 }

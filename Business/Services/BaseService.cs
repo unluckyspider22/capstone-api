@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Infrastructure.DTOs;
 using Infrastructure.Helper;
 using Infrastructure.Repository;
 using Infrastructure.UnitOrWork;
@@ -27,67 +28,114 @@ namespace ApplicationCore.Services
 
         public virtual async Task<TDto> CreateAsync(TDto dto)
         {
-            var entity = _mapper.Map<TEntity>(dto);
-
-            _repository.Add(entity);
-
-            await _unitOfWork.SaveAsync();
-
-            return _mapper.Map<TDto>(entity);
+            try
+            {   
+                var entity = _mapper.Map<TEntity>(dto);
+                _repository.Add(entity);
+                await _unitOfWork.SaveAsync();
+                return _mapper.Map<TDto>(entity);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("\n\nError at CreateAsync: \n" + e.Message);
+                throw new ErrorObj(code: 500,message: "Oops !!! Something Wrong. Try Again.",description: "Internal Server Error");
+            }            
         }
 
         public virtual async Task<bool> DeleteAsync(Guid id)
         {
-            if (id != null)
-            {
-                _repository.Delete(id);
+           
+            try
+            {   
+                _repository.Delete(id);             
+                return await _unitOfWork.SaveAsync() > 0;
             }
-
-            return await _unitOfWork.SaveAsync() > 0;
+            catch (Exception e)
+            {
+                Debug.WriteLine("\n\nError at DeleteAsync: \n" + e.Message);
+                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+            }
+         
 
         }
 
         public async Task<GenericRespones<TEntity>> GetAsync(int pageIndex = 0, int pageSize = 0, Expression<Func<TEntity, bool>> filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, string includeProperties = "")
-        {
-            var list = await _repository.Get(pageIndex, pageSize, filter, orderBy, includeProperties);
+        {                   
+            try
+            {
+                var list = await _repository.Get(pageIndex, pageSize, filter, orderBy, includeProperties);
 
-            MetaData metadata = new MetaData(pageIndex: pageIndex, pageSize: pageSize, totalItems: list.Count());
+                MetaData metadata = new MetaData(pageIndex: pageIndex, pageSize: pageSize, totalItems: list.Count());
 
-            GenericRespones<TEntity> result = new GenericRespones<TEntity>(data: list.ToList(),metadata: metadata);
-
-
-            return result;
+                GenericRespones<TEntity> result = new GenericRespones<TEntity>(data: list.ToList(), metadata: metadata);
+                return result;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("\n\nError at GetAsync: \n" + e.Message);
+                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+            }
         }
 
         public virtual async Task<TDto> GetByIdAsync(Guid id)
         {
-            if (id != null)
-            {
-                return _mapper.Map<TDto>(await _repository.GetById(id));
+            try
+            {             
+                    return _mapper.Map<TDto>(await _repository.GetById(id));
             }
-            return null;
+            catch (Exception e)
+            {
+                Debug.WriteLine("\n\nError at GetByIdAsync: \n" + e.Message);
+                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+            }
         }
 
         public virtual async Task<TDto> UpdateAsync(TDto dto)
-        {
-            var entity = _mapper.Map<TEntity>(dto);
-            _repository.Update(entity);
-            await _unitOfWork.SaveAsync();
-            return _mapper.Map<TDto>(entity);
+        {        
+            try
+            {
+                var entity = _mapper.Map<TEntity>(dto);
+                _repository.Update(entity);
+                await _unitOfWork.SaveAsync();
+                return _mapper.Map<TDto>(entity);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("\n\nError at UpdateAsync: \n" + e.Message);
+                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+            }
         }
 
         public virtual async Task<bool> HideAsync(Guid id, string value)
         {
-            if (id != null)
+           
+            try
             {
-                _repository.Hide(id, value);
+                if (id != null)
+                {
+                    _repository.Hide(id, value);
+                }
+                return await _unitOfWork.SaveAsync() > 0;
             }
-            return await _unitOfWork.SaveAsync() > 0;
+            catch (Exception e)
+            {
+                Debug.WriteLine("\n\nError at HideAsync: \n" + e.Message);
+                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+            }
         }
 
         public Task<int> CountAsync(Expression<Func<TEntity, bool>> filter = null)
         {
-            return _repository.CountAsync(filter);
+            try
+            {
+                return _repository.CountAsync(filter);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("\n\nError at CountAsync: \n" + e.Message);
+                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+            }
+            
         }
     }
 }

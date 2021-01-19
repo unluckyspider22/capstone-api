@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.DTOs
 {
-    public class ErrorResponse
+    public class ErrorResponse : Exception
     {
         public ErrorResponse()
         {
@@ -32,7 +32,7 @@ namespace Infrastructure.DTOs
 
         public ErrorObj Unauthorized { get; set; } = new ErrorObj(code: 401, message: "Unauthorized.", description: "Unauthorized");
 
-
+        public ErrorObj Error;
         public String Stack_trace { get; set; }
         public String Message { get; set; }
         public List<Object> Data { get; set; }

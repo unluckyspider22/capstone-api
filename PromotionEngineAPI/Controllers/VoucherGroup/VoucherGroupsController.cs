@@ -4,6 +4,7 @@ using ApplicationCore.Services;
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
 using Infrastructure.Models;
+using Infrastructure.RequestParams;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -26,62 +27,103 @@ namespace PromotionEngineAPI.Controllers
         // GET: api/VoucherGroups
         [HttpGet]
         // api/VoucherGroups?pageIndex=...&pageSize=...
-        public async Task<IActionResult> GetVoucherGroup([FromQuery] PagingRequestParam param, [FromQuery] Guid brandId, string voucherType)
+        public async Task<IActionResult> GetVoucherGroup([FromQuery] PagingRequestParam param)
         {
-            var result = await _service.GetAsync(pageIndex: param.PageIndex,
-                pageSize: param.PageSize,
-                filter: el => el.DelFlg.Equals("0")
-                && el.BrandId.Equals(brandId)
-                && el.VoucherType.Equals(voucherType));
-            if (result == null)
+            try
             {
-
-                return StatusCode(statusCode: 500, new ErrorResponse().InternalServerError);
+                return Ok(await _service.GetAsync(
+                filter: el => el.DelFlg.Equals("0"),
+                orderBy: el => el.OrderByDescending(obj => obj.InsDate)
+                ));
             }
-            return Ok(result);
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
         }
 
+        [HttpGet]
+        [Route("game")]
+        // api/VoucherGroups/game
+        public async Task<IActionResult> GetVoucherGroupForGame([FromQuery] string StoreCode,[FromQuery] string BrandCode
+           )
+        {
+            try
+            {
+                return Ok(await _service.GetAsync(
+                filter: el => 
+                //điều kiện tiên quyết để lấy voucher cho game (VoucherGroup)
+                el.DelFlg.Equals("0") 
+                && el.VoucherType.Equals("1") 
+                && el.IsActive == true
+                && el.PublicDate.Value.CompareTo(DateTime.Now) <= 0
+                && el.UsedQuantity < el.Quantity
+                && el.RedempedQuantity < el.Quantity
+                //điều kiện tùy chọn để lấy voucher cho game (Promotion)
+                && !el.Promotion.PromotionType.Equals("2")
+                && el.Promotion.Status.Equals("2")
+                && el.Promotion.IsActive.Equals("1")
+                && el.Promotion.DelFlg.Equals("0")
+                && el.Promotion.StartDate.Value.CompareTo(DateTime.Now) <= 0
+                && el.Promotion.EndDate.Value.CompareTo(DateTime.Now) >= 0
+                //điều kiện tùy chọn để lấy voucher cho game (Brand)
+                && el.Promotion.Brand.BrandCode.Equals(BrandCode)
+                //điều kiện tùy chọn để lấy voucher cho game (Store)
+                && el.Promotion.PromotionStoreMapping.Any(x => x.Store.StoreCode.Equals(StoreCode))
+                
+                
+                
+                ));;
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
         // GET: api/VoucherGroups/count
         [HttpGet]
         [Route("count")]
         public async Task<IActionResult> CountVoucherGroup()
         {
-            return Ok(await _service.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE)));
+            try
+            {
+                return Ok(await _service.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE)));
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
         }
 
         // GET: api/VoucherGroups/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetVoucherGroup([FromRoute] Guid id)
         {
-            var result = await _service.GetByIdAsync(id);
-            if (result == null)
-            {
-
-                return StatusCode(statusCode: 500, new ErrorResponse().InternalServerError);
+            try
+            {             
+                return Ok(await _service.GetByIdAsync(id));
             }
-            return Ok(result);
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
         }
 
         // PUT: api/VoucherGroups/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutVoucherGroup([FromRoute] Guid id, [FromBody] VoucherGroupDto dto)
         {
-            if (id != dto.VoucherGroupId)
+            try
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                if (id != dto.VoucherGroupId)
+                    return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                dto.UpdDate = DateTime.Now;
+                return Ok(await _service.UpdateAsync(dto));
             }
-
-            dto.UpdDate = DateTime.Now;
-
-            var result = await _service.UpdateAsync(dto);
-
-            if (result == null)
+            catch (ErrorObj e)
             {
-
-                return StatusCode(statusCode: 500, new ErrorResponse().InternalServerError);
+                return StatusCode(statusCode: e.Code, e);
             }
-
-            return Ok(result);
 
         }
 
@@ -89,50 +131,32 @@ namespace PromotionEngineAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> PostVoucherGroup([FromBody] VoucherGroupDto dto)
         {
-            dto.VoucherGroupId = Guid.NewGuid();
-
-            if (dto.VoucherType.Equals(AppConstant.ENVIRONMENT_VARIABLE.VOUCHER_TYPE.BULK_CODE))
+            try
             {
-                List<VoucherDto> generateVoucher = _service.GenerateBulkCodeVoucher(dto);
-                dto.Voucher = generateVoucher;
-            } else
-            {
-
-                List<VoucherDto> vouchers = _service.GenerateStandaloneVoucher(dto);
-                dto.Voucher = vouchers;
-                
+                dto.VoucherGroupId = Guid.NewGuid();
+                return Ok(await _service.CreateAsync(dto));
             }
-
-            var result = await _service.CreateAsync(dto);
-
-            if (result == null)
+            catch (ErrorObj e)
             {
-
-                return StatusCode(statusCode: 500, new ErrorResponse().InternalServerError);
+                return StatusCode(statusCode: e.Code, e);
             }
-
-            //var result = dto;
-
-            return Ok(result);
         }
 
         // DELETE: api/VoucherGroups/5
         [HttpDelete]
         public async Task<IActionResult> DeleteVoucherGroup([FromQuery] Guid id)
         {
-            if (id == null)
+            try
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                var result = await _service.DeleteAsync(id);
+                return Ok(result);
             }
-            var result = await _service.DeleteAsync(id);
-            if (result == false)
+            catch (ErrorObj e)
             {
-
-                return StatusCode(statusCode: 500, new ErrorResponse().InternalServerError);
+                return StatusCode(statusCode: e.Code, e);
             }
-            return Ok();
         }
 
-
+        
     }
 }

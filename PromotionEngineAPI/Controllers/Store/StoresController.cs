@@ -28,18 +28,19 @@ namespace PromotionEngineAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetStore([FromQuery] PagingRequestParam param, [FromQuery] Guid BrandId)
         {
-          
-            var result = await _service.GetAsync(
+            try
+            {
+                return Ok(await _service.GetAsync(
                 pageIndex: param.PageIndex,
                 pageSize: param.PageSize,
                 filter: el => el.DelFlg.Equals("0") && el.BrandId.Equals(BrandId),
                 orderBy: el => el.OrderByDescending(obj => obj.InsDate)
-                );
-            if (result == null)
-            {
-                return StatusCode(statusCode: 500, new ErrorResponse().InternalServerError);
+                ));
             }
-             return Ok(result); 
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
 
         }
 
@@ -50,75 +51,80 @@ namespace PromotionEngineAPI.Controllers
         [Route("count")]
         public async Task<IActionResult> CountStore([FromQuery] Guid BrandId)
         {
-            return Ok(await _service.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE) && el.BrandId.Equals(BrandId)));
+            try
+            {
+                return Ok(await _service.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE) && el.BrandId.Equals(BrandId)));
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+
         }
 
         // GET: api/Stores/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetStore([FromRoute] Guid id)
         {
-            var result = await _service.GetByIdAsync(id);
-            if (result == null)
-            {
-                return StatusCode(statusCode: 500, new ErrorResponse().InternalServerError);
+            try
+            {             
+                return Ok(await _service.GetByIdAsync(id));
             }
-            return Ok(result);
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+
         }
 
         // PUT: api/Stores/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutStore([FromRoute] Guid id, [FromBody] StoreDto dto)
         {
-            if (id != dto.StoreId)
+            try
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                if (id != dto.StoreId)
+                    return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                dto.UpdDate = DateTime.Now;
+                return Ok(await _service.UpdateAsync(dto));
             }
-
-            dto.UpdDate = DateTime.Now;
-
-            var result = await _service.UpdateAsync(dto);
-
-            if (result == null)
+            catch (ErrorObj e)
             {
-                return StatusCode(statusCode: 500, new ErrorResponse().InternalServerError);
+                return StatusCode(statusCode: e.Code, e);
             }
-
-            return Ok(result);
-
         }
 
         // POST: api/Stores
         [HttpPost]
         public async Task<IActionResult> PostStore([FromBody] StoreDto dto)
         {
-            dto.StoreId = Guid.NewGuid();
-
-            var result = await _service.CreateAsync(dto);
-
-            if (result == null)
+            try
             {
-                return StatusCode(statusCode: 500, new ErrorResponse().InternalServerError);
+                dto.StoreId = Guid.NewGuid();
+                return Ok(await _service.CreateAsync(dto));
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
             }
 
-            //var result = dto;
-
-            return Ok(result);
         }
 
         // DELETE: api/Stores/5
         [HttpDelete]
         public async Task<IActionResult> DeleteStore([FromQuery] Guid id)
         {
-            if (id == null)
+            try
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                var result = await _service.DeleteAsync(id);
+                return Ok(result);
             }
-            var result = await _service.DeleteAsync(id);
-            if (result == false)
+            catch (ErrorObj e)
             {
-                return StatusCode(statusCode: 500, new ErrorResponse().InternalServerError);
+                return StatusCode(statusCode: e.Code, e);
             }
-            return Ok();
+
+
         }
     }
 }

@@ -25,12 +25,16 @@ namespace PromotionEngineAPI.Controllers
         // api/Roles?pageIndex=...&pageSize=...
         public async Task<IActionResult> GetRole([FromQuery] PagingRequestParam param)
         {
-            var result = await _service.GetAsync(pageIndex: param.PageIndex, pageSize: param.PageSize, filter: el => el.DelFlg.Equals("0"));
-            if (result == null)
+            try
             {
-                return  StatusCode(statusCode: 500, new ErrorResponse().InternalServerError); ;
+                return Ok(await _service.GetAsync(
+                filter: el => el.DelFlg.Equals("0")
+                ));
             }
-            return Ok(result);
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
         }
 
         // GET: api/Roles/count
