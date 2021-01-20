@@ -6,7 +6,7 @@ namespace ApplicationCore.Services
 {
     public interface IVoucherService : IBaseService<Voucher, VoucherDto>
     {
-        Task<int> get();
+
     }
 
 }
