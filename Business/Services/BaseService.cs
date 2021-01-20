@@ -37,6 +37,7 @@ namespace ApplicationCore.Services
             }
             catch (Exception e)
             {
+                //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at CreateAsync: \n" + e.Message);
                 throw new ErrorObj(code: 500,message: "Oops !!! Something Wrong. Try Again.",description: "Internal Server Error");
             }            
@@ -52,6 +53,7 @@ namespace ApplicationCore.Services
             }
             catch (Exception e)
             {
+                //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at DeleteAsync: \n" + e.Message);
                 throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
             }
@@ -72,6 +74,7 @@ namespace ApplicationCore.Services
             }
             catch (Exception e)
             {
+                //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at GetAsync: \n" + e.Message);
                 throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
             }
@@ -85,6 +88,7 @@ namespace ApplicationCore.Services
             }
             catch (Exception e)
             {
+                //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at GetByIdAsync: \n" + e.Message);
                 throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
             }
@@ -101,6 +105,7 @@ namespace ApplicationCore.Services
             }
             catch (Exception e)
             {
+                //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at UpdateAsync: \n" + e.Message);
                 throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
             }
@@ -119,6 +124,7 @@ namespace ApplicationCore.Services
             }
             catch (Exception e)
             {
+                //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at HideAsync: \n" + e.Message);
                 throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
             }
@@ -132,6 +138,7 @@ namespace ApplicationCore.Services
             }
             catch (Exception e)
             {
+                //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at CountAsync: \n" + e.Message);
                 throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
             }
