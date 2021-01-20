@@ -18,10 +18,16 @@ namespace PromotionEngineAPI.Controllers
     public class ConditionRulesController : ControllerBase
     {
         private readonly IConditionRuleService _service;
+        private readonly IProductConditionService _productService;
+        private readonly IOrderConditionService _orderService;
+        private readonly IMembershipConditionService _membershipService;
 
-        public ConditionRulesController(IConditionRuleService service)
+        public ConditionRulesController(IConditionRuleService service, IProductConditionService productService, IOrderConditionService orderService, IMembershipConditionService membershipService)
         {
             _service = service;
+            _productService = productService;
+            _orderService = orderService;
+            _membershipService = membershipService;
         }
 
         // GET: api/ConditionRules
@@ -86,20 +92,45 @@ namespace PromotionEngineAPI.Controllers
 
         // POST: api/ConditionRules
         [HttpPost]
-        public async Task<IActionResult> PostConditionRule([FromBody] ConditionRuleDto dto)
+        public async Task<IActionResult> PostConditionRule(
+            [FromBody] ConditionParamDto param)
         {
-            dto.ConditionRuleId = Guid.NewGuid();
-
-            var result = await _service.CreateAsync(dto);
-
-            if (result == null)
+            try
             {
-                return NotFound();
+                ConditionParamDto response = new ConditionParamDto();
+
+                // Insert condition rule
+                param.conditionRule.ConditionRuleId = Guid.NewGuid();
+                response.conditionRule = await _service.CreateAsync(param.conditionRule);
+
+                // Insert list product condition
+                foreach (var condition in param.productConditions)
+                {
+                    condition.ProductConditionId = Guid.NewGuid();
+                    condition.ConditionRuleId = param.conditionRule.ConditionRuleId;
+                    response.productConditions.Add(await _productService.CreateAsync(condition));
+                }
+                // Insert list order condition
+                foreach (var condition in param.orderConditions)
+                {
+                    condition.OrderConditionId = Guid.NewGuid();
+                    condition.ConditionRuleId = param.conditionRule.ConditionRuleId;
+                    response.orderConditions.Add(await _orderService.CreateAsync(condition));
+                }
+                // Insert list membership condition
+                foreach (var condition in param.membershipConditions)
+                {
+                    condition.MembershipConditionId = Guid.NewGuid();
+                    condition.ConditionRuleId = param.conditionRule.ConditionRuleId;
+                    response.membershipConditions.Add(await _membershipService.CreateAsync(condition));
+                }
+                return Ok(response);
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
             }
 
-            //var result = dto;
-
-            return Ok(result);
         }
 
         // DELETE: api/ConditionRules/5
@@ -118,6 +149,6 @@ namespace PromotionEngineAPI.Controllers
             return Ok();
         }
 
-        
+
     }
 }
