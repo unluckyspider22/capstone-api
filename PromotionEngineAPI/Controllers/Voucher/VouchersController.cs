@@ -89,6 +89,21 @@ namespace PromotionEngineAPI.Controllers
             }
 
         }
+        // PUT: api/Vouchers/active
+        [HttpPut]
+        [Route("active")]
+        public async Task<IActionResult> ActiveVoucher([FromBody] VoucherGroupDto dto)
+        {
+            try
+            {                             
+                return Ok(await _service.activeAllVoucherInGroup(dto));
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+
+        }
 
         // POST: api/Vouchers
         [HttpPost]

@@ -4,7 +4,6 @@ using ApplicationCore.Services;
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
 using Infrastructure.Models;
-using Infrastructure.RequestParams;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -45,35 +44,13 @@ namespace PromotionEngineAPI.Controllers
         [HttpGet]
         [Route("game")]
         // api/VoucherGroups/game
-        public async Task<IActionResult> GetVoucherGroupForGame([FromQuery] string StoreCode,[FromQuery] string BrandCode
-           )
+        public async Task<IActionResult> GetVoucherGroupForGame([FromQuery] string BrandCode, [FromQuery] string StoreCode)
         {
             try
             {
-                return Ok(await _service.GetAsync(
-                filter: el => 
-                //điều kiện tiên quyết để lấy voucher cho game (VoucherGroup)
-                el.DelFlg.Equals("0") 
-                && el.VoucherType.Equals("1") 
-                && el.IsActive == true
-                && el.PublicDate.Value.CompareTo(DateTime.Now) <= 0
-                && el.UsedQuantity < el.Quantity
-                && el.RedempedQuantity < el.Quantity
-                //điều kiện tùy chọn để lấy voucher cho game (Promotion)
-                && !el.Promotion.PromotionType.Equals("2")
-                && el.Promotion.Status.Equals("2")
-                && el.Promotion.IsActive.Equals("1")
-                && el.Promotion.DelFlg.Equals("0")
-                && el.Promotion.StartDate.Value.CompareTo(DateTime.Now) <= 0
-                && el.Promotion.EndDate.Value.CompareTo(DateTime.Now) >= 0
-                //điều kiện tùy chọn để lấy voucher cho game (Brand)
-                && el.Promotion.Brand.BrandCode.Equals(BrandCode)
-                //điều kiện tùy chọn để lấy voucher cho game (Store)
-                && el.Promotion.PromotionStoreMapping.Any(x => x.Store.StoreCode.Equals(StoreCode))
-                
-                
-                
-                ));;
+                if (StoreCode == null || BrandCode == null) 
+                    return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return Ok(await _service.getVoucherForGame(BrandCode, StoreCode)); ;
             }
             catch (ErrorObj e)
             {
@@ -100,7 +77,7 @@ namespace PromotionEngineAPI.Controllers
         public async Task<IActionResult> GetVoucherGroup([FromRoute] Guid id)
         {
             try
-            {             
+            {
                 return Ok(await _service.GetByIdAsync(id));
             }
             catch (ErrorObj e)
@@ -157,6 +134,6 @@ namespace PromotionEngineAPI.Controllers
             }
         }
 
-        
+
     }
 }
