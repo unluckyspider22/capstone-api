@@ -132,21 +132,23 @@ namespace ApplicationCore.Services
                     //Debug.WriteLine("\n" + "voucherrrrr  " + voucherInGroup.VoucherCode.ToString());
                     // đến khi gặp được voucher thỏa điều kiện là isActive/isUsed/isRedemped/DelFlg
 
-                    //bool flag;
-                    //do
-                    //{
-                    //    flag = false;
-                    //    voucherInGroup = voucherGroup.Voucher.ElementAt(order);
-                    //    if (voucherInGroup.IsActive == true && voucherInGroup.IsRedemped == false && voucherInGroup.DelFlg.Equals("0")) flag = true;
-                    //    order++;
-                    //} while (flag!=true);                 
+                    bool flag;
+                    do
+                    {
+                        flag = false;
+                        voucherInGroup = voucherGroup.Voucher.ElementAt(order);
+                        if (voucherInGroup.IsActive.Equals(AppConstant.ACTIVE)
+                            && voucherInGroup.IsRedemped.Equals(AppConstant.UNREDEMPED)
+                                && voucherInGroup.DelFlg.Equals(AppConstant.DelFlg.UNHIDE)) flag = true;
+                        order++;
+                    } while (flag != true);
                     Debug.WriteLine("\n" + "voucherrrrr  " + voucherGroup.Voucher.Count);
                     VoucherParamResponse uiuiu = new VoucherParamResponse(
                              voucherGroupId: voucherGroup.VoucherGroupId,
                              voucherGroupName: voucherGroup.VoucherName,
                              voucherId: voucherInGroup.VoucherId,
                              //voucherInGroup.VoucherId,
-                             code: voucherInGroup.VoucherCode);                 
+                             code: voucherInGroup.VoucherCode);
                     result.Add(uiuiu);
                     //voucherInGroup.VoucherCode));
                 }
