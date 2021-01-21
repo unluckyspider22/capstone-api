@@ -389,9 +389,7 @@ namespace Infrastructure.Models
                     .IsFixedLength()
                     .HasDefaultValueSql("((0))");
 
-                entity.Property(e => e.GroupNo)
-                    .HasMaxLength(2)
-                    .IsUnicode(false);
+                
 
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")

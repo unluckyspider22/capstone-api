@@ -1,6 +1,7 @@
 ﻿
 using AutoMapper;
 using Infrastructure.DTOs;
+using Infrastructure.Helper;
 using Infrastructure.Models;
 using Infrastructure.Repository;
 using Infrastructure.UnitOrWork;
@@ -25,12 +26,12 @@ namespace ApplicationCore.Services
             try
             {
                 int result = 0;
-                var listVoucher = await _repository.Get(filter: el => el.IsActive == false || el.IsActive == null
+                var listVoucher = await _repository.Get(filter: el => el.IsActive.Equals("0") || el.IsActive == null
                 && el.VoucherGroupId.Equals(Dto.VoucherGroupId));
                 foreach (Voucher voucher in listVoucher.ToList())
                 {
                     voucher.UpdDate = DateTime.Now;
-                    voucher.IsActive = true;
+                    voucher.IsActive = "1";
                     _repository.Update(voucher);
                     await _unitOfWork.SaveAsync();
                     result++;
