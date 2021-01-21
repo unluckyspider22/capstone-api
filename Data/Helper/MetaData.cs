@@ -15,7 +15,7 @@ namespace Infrastructure.Helper
         }
 
         public int PageIndex { get; set; } = 1;
-        public int PageSize { get; set; } = 30;
+        public int PageSize { get; set; } = 10;
         public int TotalItems { get;  set; }
 
         

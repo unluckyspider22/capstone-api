@@ -61,13 +61,14 @@ namespace ApplicationCore.Services
 
         }
 
-        public async Task<GenericRespones<TEntity>> GetAsync(int pageIndex = 0, int pageSize = 0, Expression<Func<TEntity, bool>> filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, string includeProperties = "")
+        public async Task<GenericRespones<TEntity>> GetAsync(int pageIndex = 0, int pageSize = 0, Expression<Func<TEntity, bool>> filter = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, string includeProperties = "")
         {                   
             try
             {
                 var list = await _repository.Get(pageIndex, pageSize, filter, orderBy, includeProperties);
-
-                MetaData metadata = new MetaData(pageIndex: pageIndex, pageSize: pageSize, totalItems: list.Count());
+                var totalItem = await _repository.CountAsync();
+                MetaData metadata  = new MetaData(pageIndex: pageIndex, pageSize: pageSize, totalItems: totalItem);
 
                 GenericRespones<TEntity> result = new GenericRespones<TEntity>(data: list.ToList(), metadata: metadata);
                 return result;

@@ -14,6 +14,9 @@ namespace Infrastructure.Helper
 
 
         }
+        public const string ACTIVE = "1";
+        public const string UNREDEMPED = "0";
+        public const string UNUSED = "0";
         public struct Status
         {
             public const string ALL = "0";
