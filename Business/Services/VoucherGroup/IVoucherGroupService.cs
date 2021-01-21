@@ -14,6 +14,6 @@ namespace ApplicationCore.Services
 
         public List<VoucherDto> GenerateStandaloneVoucher(VoucherGroupDto dto);
 
-        public Task<IEnumerable<VoucherParamResponse>> getVoucherForGame(string BrandCode, string StoreCode,int voucherQuantity);
+        public Task<IEnumerable<VoucherParamResponse>> GetVoucherForGame(int PageIndex = 0,int PageSize = 0,string BrandCode = null, string StoreCode = null);
     }
 }

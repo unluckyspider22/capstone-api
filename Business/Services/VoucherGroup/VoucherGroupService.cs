@@ -100,11 +100,11 @@ namespace ApplicationCore.Services
             return result;
         }
 
-        public async Task<IEnumerable<VoucherParamResponse>> getVoucherForGame(string BrandCode, string StoreCode, int voucherQuantity)
+        public async Task<IEnumerable<VoucherParamResponse>> GetVoucherForGame(int PageIndex = 0, int PageSize = 0, string BrandCode = null, string StoreCode = null)
         {
             try
             {
-                var listVoucherGroup = await _repository.Get(includeProperties: "Voucher", filter: el =>
+                var listVoucherGroup = await _repository.Get(pageIndex:PageIndex, pageSize:PageSize,includeProperties: "Voucher", filter: el =>
                  //điều kiện tiên quyết để lấy voucher cho game (VoucherGroup)
                  el.DelFlg.Equals("0")
                  && el.VoucherType.Equals("1")
@@ -122,8 +122,7 @@ namespace ApplicationCore.Services
                  //điều kiện tùy chọn để lấy voucher cho game (Brand)
                  && el.Promotion.Brand.BrandCode.Equals(BrandCode)
                  //điều kiện tùy chọn để lấy voucher cho game (Store)
-                 && el.Promotion.PromotionStoreMapping.Any(x => x.Store.StoreCode.Equals(StoreCode))
-                );
+                 && el.Promotion.PromotionStoreMapping.Any(x => x.Store.StoreCode.Equals(StoreCode)));
                 List<VoucherParamResponse> result = new List<VoucherParamResponse>();
                 foreach (VoucherGroup voucherGroup in listVoucherGroup.ToList())
                 {
@@ -144,7 +143,8 @@ namespace ApplicationCore.Services
                     } while (flag != true);
                     //nếu lấy được voucher thì cập nhật lại IsRedemped là 1 (đã được phát đi)
                     voucherInGroup.IsRedemped = "1";
-                    voucherInGroup.UpdDate = DateTime.Now;                  
+                    voucherInGroup.RedempedDate = DateTime.Now;
+                    voucherInGroup.UpdDate = DateTime.Now;
                     _repositoryVoucher.Update(voucherInGroup);
                     await _unitOfWork.SaveAsync();
                     //cập nhập lại số lượng đã redeemped trên Voucher Group

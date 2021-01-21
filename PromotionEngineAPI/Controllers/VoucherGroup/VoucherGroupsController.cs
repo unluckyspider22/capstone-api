@@ -26,15 +26,16 @@ namespace PromotionEngineAPI.Controllers
         // GET: api/VoucherGroups
         [HttpGet]
         // api/VoucherGroups?pageIndex=...&pageSize=...
-        public async Task<IActionResult> GetVoucherGroup([FromQuery] PagingRequestParam param,Guid BrandId)
+        public async Task<IActionResult> GetVoucherGroup([FromQuery] PagingRequestParam param, [FromQuery] Guid BrandId, string voucherType)
         {
             try
             {
-                return Ok(await _service.GetAsync(
-                    pageIndex: param.PageIndex,pageSize: param.PageSize,
-                filter: el => el.DelFlg.Equals("0") && el.BrandId.Equals(BrandId),
-                orderBy: el => el.OrderByDescending(obj => obj.InsDate)
-                ));
+                var result = await _service.GetAsync(pageIndex: param.PageIndex,
+                pageSize: param.PageSize,
+                filter: el => el.DelFlg.Equals("0")
+                && el.BrandId.Equals(BrandId)
+                && el.VoucherType.Equals(voucherType));            
+                return Ok(result);
             }
             catch (ErrorObj e)
             {
@@ -45,15 +46,36 @@ namespace PromotionEngineAPI.Controllers
         [HttpGet]
         [Route("game")]
         // api/VoucherGroups/game
-        public async Task<IActionResult> GetVoucherGroupForGame([FromQuery] string BrandCode, 
-            [FromQuery] string StoreCode,
-            [FromQuery] int voucherQuantity)
+        public async Task<IActionResult> GetVoucherGroupForGame([FromQuery] PagingRequestParam param, [FromQuery] string BrandCode,
+            [FromQuery] string StoreCode)
         {
             try
             {
-                if (StoreCode == null || BrandCode == null) 
+                if (StoreCode == null || BrandCode == null)
                     return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
-                return Ok(await _service.getVoucherForGame(BrandCode, StoreCode,voucherQuantity)); ;
+                return Ok(await _service.GetVoucherForGame(PageIndex: param.PageIndex, PageSize: param.PageSize, StoreCode: StoreCode, BrandCode: BrandCode)); ;
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
+
+        // GET: api/vouchergroups/
+        [HttpGet]
+        [Route("search")]
+        // api/vouchergroups?SearchContent=...?pageIndex=...&pageSize=...
+        public async Task<IActionResult> SearchVoucherGroup([FromQuery] SearchPagingRequestParam param, [FromQuery] Guid BrandId)
+        {
+            try
+            {
+                var result = await _service.GetAsync(
+                pageIndex: param.PageIndex,
+                pageSize: param.PageSize,
+                filter: el => el.DelFlg.Equals("0")
+                && el.VoucherName.ToLower().Contains(param.SearchContent.ToLower())
+                && el.BrandId.Equals(BrandId));
+                return Ok(result);
             }
             catch (ErrorObj e)
             {
@@ -114,7 +136,25 @@ namespace PromotionEngineAPI.Controllers
             try
             {
                 dto.VoucherGroupId = Guid.NewGuid();
-                return Ok(await _service.CreateAsync(dto));
+
+                if (dto.VoucherType.Equals(AppConstant.ENVIRONMENT_VARIABLE.VOUCHER_TYPE.BULK_CODE))
+                {
+                    List<VoucherDto> generateVoucher = _service.GenerateBulkCodeVoucher(dto);
+                    dto.Voucher = generateVoucher;
+                }
+                else
+                {
+
+                    List<VoucherDto> vouchers = _service.GenerateStandaloneVoucher(dto);
+                    dto.Voucher = vouchers;
+
+                }
+
+                var result = await _service.CreateAsync(dto);         
+
+                //var result = dto;
+
+                return Ok(result);
             }
             catch (ErrorObj e)
             {
