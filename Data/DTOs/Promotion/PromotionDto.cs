@@ -22,9 +22,9 @@ namespace Infrastructure.DTOs
         public string PaymentMethod { get; set; }
         public string ForHoliday { get; set; }
         public string ForMembership { get; set; }
-        public bool? IsLimitInDay { get; set; }
+        public string IsLimitInDay { get; set; }
         public decimal? LimitCount { get; set; }
-        public bool? IsForStore { get; set; }
+        public string IsForStore { get; set; }
         public string DayFilter { get; set; }
         public string HourFilter { get; set; }
         public string Rank { get; set; }

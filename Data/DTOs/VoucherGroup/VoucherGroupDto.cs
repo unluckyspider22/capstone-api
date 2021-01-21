@@ -16,7 +16,7 @@ namespace Infrastructure.DTOs
         public decimal? Quantity { get; set; }
         public decimal? UsedQuantity { get; set; }
         public decimal? RedempedQuantity { get; set; }
-        public bool? IsActive { get; set; }
+        public string IsActive { get; set; }
 
         public DateTime? PublicDate { get; set; }
 

@@ -10,7 +10,7 @@ namespace Infrastructure.DTOs
         public Guid MembershipConditionId { get; set; }
         public Guid? ConditionRuleId { get; set; }
         public string GroupNo { get; set; }
-        public bool? ForNewMember { get; set; }
+        public string ForNewMember { get; set; }
         public string MembershipLevel { get; set; }
     }
 }

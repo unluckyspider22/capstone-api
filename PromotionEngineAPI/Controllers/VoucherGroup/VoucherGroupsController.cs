@@ -45,13 +45,15 @@ namespace PromotionEngineAPI.Controllers
         [HttpGet]
         [Route("game")]
         // api/VoucherGroups/game
-        public async Task<IActionResult> GetVoucherGroupForGame([FromQuery] string BrandCode, [FromQuery] string StoreCode)
+        public async Task<IActionResult> GetVoucherGroupForGame([FromQuery] string BrandCode, 
+            [FromQuery] string StoreCode,
+            [FromQuery] int voucherQuantity)
         {
             try
             {
                 if (StoreCode == null || BrandCode == null) 
                     return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
-                return Ok(await _service.getVoucherForGame(BrandCode, StoreCode)); ;
+                return Ok(await _service.getVoucherForGame(BrandCode, StoreCode,voucherQuantity)); ;
             }
             catch (ErrorObj e)
             {

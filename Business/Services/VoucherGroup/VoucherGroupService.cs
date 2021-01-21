@@ -21,7 +21,7 @@ namespace ApplicationCore.Services
         }
 
         protected override IGenericRepository<VoucherGroup> _repository => _unitOfWork.VoucherGroupRepository;
-
+        protected IGenericRepository<Voucher> _repositoryVoucher => _unitOfWork.VoucherRepository;
         public List<VoucherDto> GenerateBulkCodeVoucher(VoucherGroupDto dto)
         {
             List<VoucherDto> result = new List<VoucherDto>();
@@ -100,7 +100,7 @@ namespace ApplicationCore.Services
             return result;
         }
 
-        public async Task<IEnumerable<VoucherParamResponse>> getVoucherForGame(string BrandCode, string StoreCode)
+        public async Task<IEnumerable<VoucherParamResponse>> getVoucherForGame(string BrandCode, string StoreCode, int voucherQuantity)
         {
             try
             {
@@ -108,7 +108,7 @@ namespace ApplicationCore.Services
                  //điều kiện tiên quyết để lấy voucher cho game (VoucherGroup)
                  el.DelFlg.Equals("0")
                  && el.VoucherType.Equals("1")
-                 && el.IsActive == true
+                 && el.IsActive.Equals("1")
                  && el.PublicDate.Value.CompareTo(DateTime.Now) <= 0
                  && el.UsedQuantity < el.Quantity
                  && el.RedempedQuantity < el.Quantity
@@ -142,7 +142,18 @@ namespace ApplicationCore.Services
                                 && voucherInGroup.DelFlg.Equals(AppConstant.DelFlg.UNHIDE)) flag = true;
                         order++;
                     } while (flag != true);
+                    //nếu lấy được voucher thì cập nhật lại IsRedemped là 1 (đã được phát đi)
+                    voucherInGroup.IsRedemped = "1";
+                    voucherInGroup.UpdDate = DateTime.Now;                  
+                    _repositoryVoucher.Update(voucherInGroup);
+                    await _unitOfWork.SaveAsync();
+                    //cập nhập lại số lượng đã redeemped trên Voucher Group
+                    voucherGroup.UpdDate = DateTime.Now;
+                    voucherGroup.RedempedQuantity = voucherGroup.RedempedQuantity + 1;
+                    _repository.Update(voucherGroup);
+                    await _unitOfWork.SaveAsync();
                     Debug.WriteLine("\n" + "voucherrrrr  " + voucherGroup.Voucher.Count);
+                    //thêm voucher vào list result, list này để cho game
                     VoucherParamResponse uiuiu = new VoucherParamResponse(
                              voucherGroupId: voucherGroup.VoucherGroupId,
                              voucherGroupName: voucherGroup.VoucherName,

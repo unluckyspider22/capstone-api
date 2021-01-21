@@ -7,7 +7,6 @@ namespace Infrastructure.Models
     {
         public Guid OrderConditionId { get; set; }
         public Guid? ConditionRuleId { get; set; }
-        public string GroupNo { get; set; }
         public decimal? MinQuantity { get; set; }
         public decimal? MaxQuantity { get; set; }
         public decimal? MinAmount { get; set; }
