@@ -30,6 +30,14 @@ namespace PromotionEngineAPI.Controllers
         {
             try
             {
+
+                if (voucherType == null || voucherType.Equals("")) {
+                    var resultNofilterVoucherType = await _service.GetAsync(pageIndex: param.PageIndex,
+                pageSize: param.PageSize,
+                filter: el => el.DelFlg.Equals("0")
+                && el.BrandId.Equals(BrandId));
+                    return Ok(resultNofilterVoucherType);
+                }
                 var result = await _service.GetAsync(pageIndex: param.PageIndex,
                 pageSize: param.PageSize,
                 filter: el => el.DelFlg.Equals("0")
