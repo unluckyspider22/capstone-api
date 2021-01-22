@@ -7,6 +7,6 @@ namespace Infrastructure.DTOs
 {
     public class SearchPagingRequestParam : PagingRequestParam
     {
-        public string SearchContent { get; set; }
+        public string SearchContent { get; set; } = "";
     }
 }

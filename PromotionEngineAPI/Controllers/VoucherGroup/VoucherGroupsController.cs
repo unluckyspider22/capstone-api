@@ -26,10 +26,19 @@ namespace PromotionEngineAPI.Controllers
         // GET: api/VoucherGroups
         [HttpGet]
         // api/VoucherGroups?pageIndex=...&pageSize=...
-        public async Task<IActionResult> GetVoucherGroup([FromQuery] PagingRequestParam param, [FromQuery] Guid BrandId, string voucherType)
+        public async Task<IActionResult> GetVoucherGroup([FromQuery] SearchPagingRequestParam param, [FromQuery] Guid BrandId, string voucherType)
         {
             try
             {
+
+                if (voucherType == null || voucherType.Equals("")) {
+                    var resultNofilterVoucherType = await _service.GetAsync(pageIndex: param.PageIndex,
+                pageSize: param.PageSize,
+                filter: el => el.DelFlg.Equals("0")
+                && el.VoucherName.ToLower().Contains(param.SearchContent.ToLower())
+                && el.BrandId.Equals(BrandId));
+                    return Ok(resultNofilterVoucherType);
+                }
                 var result = await _service.GetAsync(pageIndex: param.PageIndex,
                 pageSize: param.PageSize,
                 filter: el => el.DelFlg.Equals("0")
@@ -61,27 +70,7 @@ namespace PromotionEngineAPI.Controllers
             }
         }
 
-        // GET: api/vouchergroups/
-        [HttpGet]
-        [Route("search")]
-        // api/vouchergroups?SearchContent=...?pageIndex=...&pageSize=...
-        public async Task<IActionResult> SearchVoucherGroup([FromQuery] SearchPagingRequestParam param, [FromQuery] Guid BrandId)
-        {
-            try
-            {
-                var result = await _service.GetAsync(
-                pageIndex: param.PageIndex,
-                pageSize: param.PageSize,
-                filter: el => el.DelFlg.Equals("0")
-                && el.VoucherName.ToLower().Contains(param.SearchContent.ToLower())
-                && el.BrandId.Equals(BrandId));
-                return Ok(result);
-            }
-            catch (ErrorObj e)
-            {
-                return StatusCode(statusCode: e.Code, e);
-            }
-        }
+    
         // GET: api/VoucherGroups/count
         [HttpGet]
         [Route("count")]
