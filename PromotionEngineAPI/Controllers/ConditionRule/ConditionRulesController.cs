@@ -32,12 +32,12 @@ namespace PromotionEngineAPI.Controllers
 
         // GET: api/ConditionRules
         [HttpGet]
-        public async Task<IActionResult> GetConditionRule([FromQuery] PagingRequestParam param)
+        public async Task<IActionResult> GetConditionRule([FromQuery] PagingRequestParam param, Guid BrandId)
         {
             var result = await _service.GetAsync(
                 pageIndex: param.PageIndex,
                 pageSize: param.PageSize,
-                filter: el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE),
+                filter: el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE) && el.BrandId.Equals(BrandId),
                 orderBy: el => el.OrderByDescending(b => b.InsDate)
                 );
 

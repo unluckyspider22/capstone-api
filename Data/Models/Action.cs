@@ -12,7 +12,6 @@ namespace Infrastructure.Models
 
         public Guid ActionId { get; set; }
         public Guid? PromotionTierId { get; set; }
-        public string GroupNo { get; set; }
         public string ActionType { get; set; }
         public string IsLimitAmount { get; set; }
         public string ProductCode { get; set; }

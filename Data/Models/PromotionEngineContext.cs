@@ -104,6 +104,11 @@ namespace Infrastructure.Models
                     .IsUnicode(false)
                     .IsFixedLength();
 
+                entity.Property(e => e.ApplyLadderPrice)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .IsFixedLength();
+
                 entity.Property(e => e.DelFlg)
                     .HasMaxLength(1)
                     .IsUnicode(false)
@@ -118,13 +123,19 @@ namespace Infrastructure.Models
 
                 entity.Property(e => e.FixedPrice).HasColumnType("decimal(10, 2)");
 
-                entity.Property(e => e.GroupNo)
-                    .HasMaxLength(2)
-                    .IsUnicode(false);
+                entity.Property(e => e.ForCurrentProduct)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .IsFixedLength();
 
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.IsLimitAmount)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .IsFixedLength();
 
                 entity.Property(e => e.MaxAmount).HasColumnType("decimal(10, 2)");
 
@@ -359,6 +370,11 @@ namespace Infrastructure.Models
                     .IsFixedLength()
                     .HasDefaultValueSql("((0))");
 
+                entity.Property(e => e.ForNewMember)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .IsFixedLength();
+
                 entity.Property(e => e.GroupNo)
                     .HasMaxLength(2)
                     .IsUnicode(false);
@@ -383,25 +399,33 @@ namespace Infrastructure.Models
             {
                 entity.Property(e => e.OrderConditionId).HasDefaultValueSql("(newid())");
 
+                entity.Property(e => e.Amount).HasColumnType("decimal(10, 2)");
+
                 entity.Property(e => e.DelFlg)
                     .HasMaxLength(1)
                     .IsUnicode(false)
                     .IsFixedLength()
                     .HasDefaultValueSql("((0))");
 
-                
+                entity.Property(e => e.GroupNo)
+                    .HasMaxLength(2)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.MaxAmount).HasColumnType("decimal(10, 2)");
+                entity.Property(e => e.OperatorAmount)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .IsFixedLength();
 
-                entity.Property(e => e.MaxQuantity).HasColumnType("decimal(10, 0)");
+                entity.Property(e => e.OperatorQuantity)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .IsFixedLength();
 
-                entity.Property(e => e.MinAmount).HasColumnType("decimal(10, 2)");
-
-                entity.Property(e => e.MinQuantity).HasColumnType("decimal(10, 0)");
+                entity.Property(e => e.Quantity).HasColumnType("decimal(10, 0)");
 
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
@@ -497,12 +521,14 @@ namespace Infrastructure.Models
                 entity.Property(e => e.ForHoliday)
                     .HasMaxLength(1)
                     .IsUnicode(false)
-                    .IsFixedLength();
+                    .IsFixedLength()
+                    .HasDefaultValueSql("((0))");
 
                 entity.Property(e => e.ForMembership)
                     .HasMaxLength(1)
                     .IsUnicode(false)
-                    .IsFixedLength();
+                    .IsFixedLength()
+                    .HasDefaultValueSql("((0))");
 
                 entity.Property(e => e.Gender)
                     .HasMaxLength(1)
@@ -524,9 +550,23 @@ namespace Infrastructure.Models
                 entity.Property(e => e.IsActive)
                     .HasMaxLength(1)
                     .IsUnicode(false)
+                    .IsFixedLength()
+                    .HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.IsForStore)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
                     .IsFixedLength();
 
-                entity.Property(e => e.LimitCount).HasColumnType("decimal(10, 0)");
+                entity.Property(e => e.IsLimitInDay)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .IsFixedLength()
+                    .HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.LimitCount)
+                    .HasColumnType("decimal(10, 0)")
+                    .HasDefaultValueSql("((0))");
 
                 entity.Property(e => e.PaymentMethod)
                     .HasMaxLength(10)
@@ -546,7 +586,8 @@ namespace Infrastructure.Models
 
                 entity.Property(e => e.Rank)
                     .HasMaxLength(3)
-                    .IsUnicode(false);
+                    .IsUnicode(false)
+                    .HasDefaultValueSql("((0))");
 
                 entity.Property(e => e.SaleMode)
                     .HasMaxLength(1)
@@ -558,7 +599,8 @@ namespace Infrastructure.Models
                 entity.Property(e => e.Status)
                     .HasMaxLength(1)
                     .IsUnicode(false)
-                    .IsFixedLength();
+                    .IsFixedLength()
+                    .HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
@@ -710,6 +752,24 @@ namespace Infrastructure.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.Property(e => e.IsActive)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .IsFixedLength()
+                    .HasDefaultValueSql("((1))");
+
+                entity.Property(e => e.IsRedemped)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .IsFixedLength()
+                    .HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.IsUsed)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .IsFixedLength()
+                    .HasDefaultValueSql("((0))");
+
                 entity.Property(e => e.RedempedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.UpdDate)
@@ -782,22 +842,35 @@ namespace Infrastructure.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.Property(e => e.IsActive)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .IsFixedLength()
+                    .HasDefaultValueSql("((1))");
+
                 entity.Property(e => e.IsLimit)
                     .HasMaxLength(1)
                     .IsUnicode(false)
-                    .IsFixedLength();
+                    .IsFixedLength()
+                    .HasDefaultValueSql("((0))");
 
                 entity.Property(e => e.PublicDate).HasColumnType("datetime");
 
-                entity.Property(e => e.Quantity).HasColumnType("decimal(10, 0)");
+                entity.Property(e => e.Quantity)
+                    .HasColumnType("decimal(10, 0)")
+                    .HasDefaultValueSql("((1))");
 
-                entity.Property(e => e.RedempedQuantity).HasColumnType("decimal(10, 0)");
+                entity.Property(e => e.RedempedQuantity)
+                    .HasColumnType("decimal(10, 0)")
+                    .HasDefaultValueSql("((0))");
 
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.UsedQuantity).HasColumnType("decimal(10, 0)");
+                entity.Property(e => e.UsedQuantity)
+                    .HasColumnType("decimal(10, 0)")
+                    .HasDefaultValueSql("((0))");
 
                 entity.Property(e => e.VoucherName).HasMaxLength(50);
 
