@@ -42,6 +42,15 @@ namespace PromotionEngineAPI.Controllers
               && el.Status.Equals(status)));
 
         }
+        // GET: api/Promotions/prepare
+        [HttpGet]
+        // api/Promotions/prepare?pageIndex=...&pageSize=...
+        [Route("prepare")]
+        public async Task<IActionResult> checkVoucherCode([FromQuery] PagingRequestParam param, [FromQuery] Guid BrandId, [FromQuery] string status)
+        {
+
+            return null;
+        }
         // GET: api/Promotions/count
         [HttpGet]
         [Route("countSearch")]

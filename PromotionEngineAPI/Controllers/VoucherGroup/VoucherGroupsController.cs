@@ -7,6 +7,7 @@ using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -30,12 +31,14 @@ namespace PromotionEngineAPI.Controllers
         {
             try
             {
-
-                if (voucherType == null || voucherType.Equals("")) {
+                if (String.IsNullOrWhiteSpace(param.SearchContent)) param.SearchContent = "";
+                if (String.IsNullOrWhiteSpace(voucherType))
+                //if (voucherType == null)
+                {
                     var resultNofilterVoucherType = await _service.GetAsync(pageIndex: param.PageIndex,
                 pageSize: param.PageSize,
                 filter: el => el.DelFlg.Equals("0")
-                && el.VoucherName.ToLower().Contains(param.SearchContent.ToLower())
+                && el.VoucherName.ToLower().Contains(param.SearchContent.ToLower().Trim())
                 && el.BrandId.Equals(BrandId));
                     return Ok(resultNofilterVoucherType);
                 }
@@ -43,12 +46,17 @@ namespace PromotionEngineAPI.Controllers
                 pageSize: param.PageSize,
                 filter: el => el.DelFlg.Equals("0")
                 && el.BrandId.Equals(BrandId)
-                && el.VoucherType.Equals(voucherType));            
+                && el.VoucherName.ToLower().Contains(param.SearchContent.ToLower().Trim())
+                && el.VoucherType.Equals(voucherType));
                 return Ok(result);
             }
             catch (ErrorObj e)
             {
                 return StatusCode(statusCode: e.Code, e);
+            }
+            catch (Exception ex) {
+                Debug.WriteLine(ex.Message);
+                return StatusCode(500);
             }
         }
 
