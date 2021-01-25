@@ -17,7 +17,7 @@ namespace Infrastructure.Models
         public Guid? BrandId { get; set; }
         public string RuleName { get; set; }
         public string Description { get; set; }
-        public string DelFlg { get; set; }
+        public bool DelFlg { get; set; }
         public DateTime? InsDate { get; set; }
         public DateTime? UpdDate { get; set; }
 

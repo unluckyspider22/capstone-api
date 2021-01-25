@@ -34,14 +34,14 @@ namespace PromotionEngineAPI.Controllers
                 if (voucherType == null || voucherType.Equals("")) {
                     var resultNofilterVoucherType = await _service.GetAsync(pageIndex: param.PageIndex,
                 pageSize: param.PageSize,
-                filter: el => el.DelFlg.Equals("0")
+                filter: el => !el.DelFlg
                 && el.VoucherName.ToLower().Contains(param.SearchContent.ToLower())
                 && el.BrandId.Equals(BrandId));
                     return Ok(resultNofilterVoucherType);
                 }
                 var result = await _service.GetAsync(pageIndex: param.PageIndex,
                 pageSize: param.PageSize,
-                filter: el => el.DelFlg.Equals("0")
+                filter: el => !el.DelFlg
                 && el.BrandId.Equals(BrandId)
                 && el.VoucherType.Equals(voucherType));            
                 return Ok(result);
@@ -78,7 +78,7 @@ namespace PromotionEngineAPI.Controllers
         {
             try
             {
-                return Ok(await _service.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE)));
+                return Ok(await _service.CountAsync(el => !el.DelFlg));
             }
             catch (ErrorObj e)
             {

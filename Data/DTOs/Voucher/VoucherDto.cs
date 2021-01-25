@@ -12,10 +12,10 @@ namespace Infrastructure.DTOs
         public Guid? VoucherChannelId { get; set; }
         public Guid? VoucherGroupId { get; set; }
         public Guid? MembershipId { get; set; }
-        public string IsUsed { get; set; }
-        public string IsRedemped { get; set; }
+        public bool IsUsed { get; set; }
+        public bool IsRedemped { get; set; }
         public DateTime? UsedDate { get; set; }
         public DateTime? RedempedDate { get; set; }
-        public string IsActive { get; set; }
+        public bool IsActive { get; set; }
     }
 }

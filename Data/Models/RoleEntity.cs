@@ -13,7 +13,7 @@ namespace Infrastructure.Models
         [Key]
         public int RoleId { get; set; }
         public string Name { get; set; }
-        public string DelFlg { get; set; }
+        public bool DelFlg { get; set; }
         public DateTime? InsDate { get; set; }
         public DateTime? UpdDate { get; set; }
 

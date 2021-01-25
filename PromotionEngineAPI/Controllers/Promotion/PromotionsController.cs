@@ -33,12 +33,12 @@ namespace PromotionEngineAPI.Controllers
                 pageIndex: param.PageIndex,
                 pageSize: param.PageSize,
                 orderBy: el => el.OrderByDescending(b => b.InsDate),
-                filter: el => el.DelFlg.Equals("0") && el.BrandId.Equals(BrandId)));
+                filter: el => !el.DelFlg && el.BrandId.Equals(BrandId)));
             }
             else return Ok(await _promotionService.GetAsync(
               pageIndex: param.PageIndex,
               pageSize: param.PageSize,
-              filter: el => el.DelFlg.Equals("0") && el.BrandId.Equals(BrandId)
+              filter: el => !el.DelFlg && el.BrandId.Equals(BrandId)
               && el.Status.Equals(status)));
 
         }
@@ -47,7 +47,7 @@ namespace PromotionEngineAPI.Controllers
         [Route("countSearch")]
         public async Task<IActionResult> CountPromotion([FromQuery] SearchPagingRequestParam param, [FromQuery] Guid BrandId)
         {
-            return Ok(await _promotionService.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE)
+            return Ok(await _promotionService.CountAsync(el => !el.DelFlg
             && el.BrandId.Equals(BrandId)
             && el.PromotionName.ToLower().Contains(param.SearchContent.ToLower())));
         }
@@ -61,7 +61,7 @@ namespace PromotionEngineAPI.Controllers
             var result = await _promotionService.GetAsync(
                 pageIndex: param.PageIndex,
                 pageSize: param.PageSize,
-                filter: el => el.DelFlg.Equals("0")
+                filter: el => !el.DelFlg
                 && el.PromotionName.ToLower().Contains(param.SearchContent.ToLower())
                 && el.BrandId.Equals(BrandId));
             if (result == null)
@@ -78,11 +78,11 @@ namespace PromotionEngineAPI.Controllers
         {
             if (status != null && !status.Equals(AppConstant.Status.ALL))
             {
-                return Ok(await _promotionService.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE)
+                return Ok(await _promotionService.CountAsync(el => !el.DelFlg
                 && el.BrandId.Equals(brandId)
                 && el.Status.Equals(status)));
             }
-            return Ok(await _promotionService.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE)
+            return Ok(await _promotionService.CountAsync(el => !el.DelFlg
             && el.BrandId.Equals(brandId)));
         }
 

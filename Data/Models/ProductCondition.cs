@@ -14,7 +14,7 @@ namespace Infrastructure.Models
         public string ProductName { get; set; }
         public decimal? ProductQuantity { get; set; }
         public string ProductTag { get; set; }
-        public string DelFlg { get; set; }
+        public bool DelFlg { get; set; }
         public DateTime? InsDate { get; set; }
         public DateTime? UpdDate { get; set; }
 

@@ -7,11 +7,13 @@ namespace Infrastructure.Models
     {
         public Guid OrderConditionId { get; set; }
         public Guid? ConditionRuleId { get; set; }
-        public decimal? MinQuantity { get; set; }
-        public decimal? MaxQuantity { get; set; }
-        public decimal? MinAmount { get; set; }
-        public decimal? MaxAmount { get; set; }
-        public string DelFlg { get; set; }
+        public string GroupNo { get; set; }
+        public decimal? Quantity { get; set; }
+        public decimal? Amount { get; set; }
+        public string OperatorQuantity { get; set; }
+        public string OperatorAmount { get; set; }
+        public bool DelFlg { get; set; }
+
         public DateTime? InsDate { get; set; }
         public DateTime? UpdDate { get; set; }
 

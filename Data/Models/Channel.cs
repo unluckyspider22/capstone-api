@@ -14,7 +14,7 @@ namespace Infrastructure.Models
         public Guid? BrandId { get; set; }
         public string ChannelName { get; set; }
         public string ChannelCode { get; set; }
-        public string DelFlg { get; set; }
+        public bool DelFlg { get; set; }
         public DateTime? InsDate { get; set; }
         public DateTime? UpdDate { get; set; }
 

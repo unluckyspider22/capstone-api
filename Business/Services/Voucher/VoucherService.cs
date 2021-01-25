@@ -31,7 +31,7 @@ namespace ApplicationCore.Services
                 foreach (Voucher voucher in listVoucher.ToList())
                 {
                     voucher.UpdDate = DateTime.Now;
-                    voucher.IsActive = "1";
+                    voucher.IsActive = true;
                     _repository.Update(voucher);
                     await _unitOfWork.SaveAsync();
                     result++;

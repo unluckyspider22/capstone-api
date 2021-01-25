@@ -33,7 +33,7 @@ namespace PromotionEngineAPI.Controllers
                 return Ok(await _service.GetAsync(
                 pageIndex: param.PageIndex,
                 pageSize: param.PageSize,
-                filter: el => el.DelFlg.Equals("0") && el.BrandId.Equals(BrandId),
+                filter: el => !el.DelFlg && el.BrandId.Equals(BrandId),
                 orderBy: el => el.OrderByDescending(obj => obj.InsDate)
                 ));
             }
@@ -53,7 +53,7 @@ namespace PromotionEngineAPI.Controllers
         {
             try
             {
-                return Ok(await _service.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE) && el.BrandId.Equals(BrandId)));
+                return Ok(await _service.CountAsync(el => !el.DelFlg && el.BrandId.Equals(BrandId)));
             }
             catch (ErrorObj e)
             {

@@ -11,7 +11,6 @@ namespace Infrastructure.Models
         public Guid? PromotionId { get; set; }
         public Guid? MembershipActionId { get; set; }
         public Guid? VoucherGroupId { get; set; }
-        public string DelFlg { get; set; }
         public DateTime? InsDate { get; set; }
         public DateTime? UpdDate { get; set; }
 

@@ -33,7 +33,7 @@ namespace PromotionEngineAPI.Controllers
                 return Ok(await _service.GetAsync(
                 pageIndex: param.PageIndex,
                 pageSize: param.PageSize,
-                filter: el => el.DelFlg.Equals("0") && el.VoucherGroupId.Equals(VoucherGroupId),
+                filter: el => el.VoucherGroupId.Equals(VoucherGroupId),
                 orderBy: el => el.OrderByDescending(obj => obj.InsDate)
                 ));
             }
@@ -50,7 +50,7 @@ namespace PromotionEngineAPI.Controllers
         {
             try
             {
-                return Ok(await _service.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE) && el.VoucherGroupId.Equals(VoucherGroupId)));
+                return Ok(await _service.CountAsync(el => el.VoucherGroupId.Equals(VoucherGroupId)));
             }
             catch (ErrorObj e)
             {

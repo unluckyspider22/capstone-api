@@ -104,25 +104,43 @@ namespace ApplicationCore.Services
         {
             try
             {
-                var listVoucherGroup = await _repository.Get(pageIndex:PageIndex, pageSize:PageSize,includeProperties: "Voucher", filter: el =>
-                 //điều kiện tiên quyết để lấy voucher cho game (VoucherGroup)
-                 el.DelFlg.Equals("0")
-                 && el.VoucherType.Equals("1")
-                 && el.IsActive.Equals("1")
-                 && el.PublicDate.Value.CompareTo(DateTime.Now) <= 0
-                 && el.UsedQuantity < el.Quantity
-                 && el.RedempedQuantity < el.Quantity
-                 //điều kiện tùy chọn để lấy voucher cho game (Promotion)
-                 && !el.Promotion.PromotionType.Equals("2")
-                 && el.Promotion.Status.Equals("2")
-                 && el.Promotion.IsActive.Equals("1")
-                 && el.Promotion.DelFlg.Equals("0")
-                 && el.Promotion.StartDate.Value.CompareTo(DateTime.Now) <= 0
-                 && el.Promotion.EndDate.Value.CompareTo(DateTime.Now) >= 0
-                 //điều kiện tùy chọn để lấy voucher cho game (Brand)
-                 && el.Promotion.Brand.BrandCode.Equals(BrandCode)
-                 //điều kiện tùy chọn để lấy voucher cho game (Store)
-                 && el.Promotion.PromotionStoreMapping.Any(x => x.Store.StoreCode.Equals(StoreCode)));
+                /* var listVoucherGroup = await _repository.Get(pageIndex: PageIndex, pageSize: PageSize, includeProperties: "Voucher",
+                     filter: (el =>
+                      !el.DelFlg &&
+                     el.VoucherType.Equals(AppConstant.ENVIRONMENT_VARIABLE.VOUCHER_TYPE.BULK_CODE)
+                         && el.IsActive
+                         && el.PublicDate.Value.CompareTo(DateTime.Now) <= 0
+                         && el.UsedQuantity < el.Quantity
+                         && el.RedempedQuantity < el.Quantity
+                         //điều kiện tùy chọn để lấy voucher cho game (Promotion)
+                         && !el.Promotion.PromotionType.Equals(AppConstant.ENVIRONMENT_VARIABLE.PROMOTION_TYPE.PROMOTION)
+                         && el.Promotion.Status.Equals(AppConstant.ENVIRONMENT_VARIABLE.PROMOTION_STATUS.PUBLISH)
+                         && el.Promotion.IsActive
+                         && el.Promotion.DelFlg
+                         && el.Promotion.StartDate.Value.CompareTo(DateTime.Now) <= 0
+                         && el.Promotion.EndDate.Value.CompareTo(DateTime.Now) >= 0
+                         //điều kiện tùy chọn để lấy voucher cho game (Brand)
+                         && el.Promotion.Brand.BrandCode.Equals(BrandCode)
+                         //điều kiện tùy chọn để lấy voucher cho game (Store)
+                         && el.Promotion.PromotionStoreMapping.Any(x => x.Store.StoreCode.Equals(StoreCode))));*/
+                var listVoucherGroup = await _repository.Get(pageIndex: PageIndex, pageSize: PageSize, includeProperties: "Voucher"
+                    , filter: (el => !el.DelFlg
+                    && el.VoucherType.Equals(AppConstant.ENVIRONMENT_VARIABLE.VOUCHER_TYPE.BULK_CODE)
+                     && el.IsActive
+                     && el.PublicDate.Value.CompareTo(DateTime.Now) <= 0
+                     && el.UsedQuantity < el.Quantity
+                     && el.RedempedQuantity < el.Quantity
+                     && !el.Promotion.PromotionType.Equals(AppConstant.ENVIRONMENT_VARIABLE.PROMOTION_TYPE.PROMOTION)
+                     && el.Promotion.IsActive
+                     && el.Promotion.DelFlg
+                         && el.Promotion.StartDate.Value.CompareTo(DateTime.Now) <= 0
+                         && el.Promotion.EndDate.Value.CompareTo(DateTime.Now) >= 0
+                         //điều kiện tùy chọn để lấy voucher cho game (Brand)
+                         && el.Promotion.Brand.BrandCode.Equals(BrandCode)
+                    //điều kiện tùy chọn để lấy voucher cho game (Store)
+                    && el.Promotion.PromotionStoreMapping.Any(x => x.Store.StoreCode.Equals(StoreCode))
+                    )
+                                        );
                 List<VoucherParamResponse> result = new List<VoucherParamResponse>();
                 foreach (VoucherGroup voucherGroup in listVoucherGroup.ToList())
                 {
@@ -137,12 +155,11 @@ namespace ApplicationCore.Services
                         flag = false;
                         voucherInGroup = voucherGroup.Voucher.ElementAt(order);
                         if (voucherInGroup.IsActive.Equals(AppConstant.ACTIVE)
-                            && voucherInGroup.IsRedemped.Equals(AppConstant.UNREDEMPED)
-                                && voucherInGroup.DelFlg.Equals(AppConstant.DelFlg.UNHIDE)) flag = true;
+                            && voucherInGroup.IsRedemped.Equals(AppConstant.UNREDEMPED)) flag = true;
                         order++;
                     } while (flag != true);
                     //nếu lấy được voucher thì cập nhật lại IsRedemped là 1 (đã được phát đi)
-                    voucherInGroup.IsRedemped = "1";
+                    voucherInGroup.IsRedemped = true;
                     voucherInGroup.RedempedDate = DateTime.Now;
                     voucherInGroup.UpdDate = DateTime.Now;
                     _repositoryVoucher.Update(voucherInGroup);

@@ -14,7 +14,7 @@ namespace Infrastructure.Models
         public Guid? VoucherGroupId { get; set; }
         public Guid? PromotionId { get; set; }
         public Guid? ChannelId { get; set; }
-        public string DelFlg { get; set; }
+        public bool DelFlg { get; set; }
         public DateTime? InsDate { get; set; }
         public DateTime? UpdDate { get; set; }
 

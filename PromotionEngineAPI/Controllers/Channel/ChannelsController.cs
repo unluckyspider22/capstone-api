@@ -31,7 +31,7 @@ namespace PromotionEngineAPI.Controllers
             var result = await _service.GetAsync(
                 pageIndex: param.PageIndex,
                 pageSize: param.PageSize,
-                filter: el => el.DelFlg.Equals("0") && el.BrandId.Equals(BrandId),
+                filter: el => !el.DelFlg && el.BrandId.Equals(BrandId),
                 orderBy: el => el.OrderByDescending(b => b.InsDate)
                 );
 
@@ -47,7 +47,7 @@ namespace PromotionEngineAPI.Controllers
         [Route("count")]
         public async Task<IActionResult> CountChannel([FromQuery] Guid BrandId)
         {
-            return Ok(await _service.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE) && el.BrandId.Equals(BrandId)));
+            return Ok(await _service.CountAsync(el => !el.DelFlg && el.BrandId.Equals(BrandId)));
         }
 
         // GET: api/Channels/5
