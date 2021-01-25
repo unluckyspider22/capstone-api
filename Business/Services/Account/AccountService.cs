@@ -31,7 +31,7 @@ namespace ApplicationCore.Services
         {
             var result = await _repository.GetFirst(
                 el => el.Username.Equals(username)
-                && el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE), 
+                && !el.DelFlg, 
                 includeProperties: "Brand"
                 );
 

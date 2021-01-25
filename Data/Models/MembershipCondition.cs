@@ -8,9 +8,9 @@ namespace Infrastructure.Models
         public Guid MembershipConditionId { get; set; }
         public Guid? ConditionRuleId { get; set; }
         public string GroupNo { get; set; }
-        public string ForNewMember { get; set; }
+        public bool ForNewMember { get; set; }
         public string MembershipLevel { get; set; }
-        public string DelFlg { get; set; }
+        public bool DelFlg { get; set; }
         public DateTime? InsDate { get; set; }
         public DateTime? UpdDate { get; set; }
 

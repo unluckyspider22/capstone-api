@@ -15,7 +15,7 @@ namespace Infrastructure.Models
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
         public string Fullname { get; set; }
-        public string DelFlg { get; set; }
+        public bool DelFlg { get; set; }
         public DateTime? InsDate { get; set; }
         public DateTime? UpdDate { get; set; }
 

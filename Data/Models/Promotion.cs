@@ -31,15 +31,15 @@ namespace Infrastructure.Models
         public string PaymentMethod { get; set; }
         public string ForHoliday { get; set; }
         public string ForMembership { get; set; }
-        public string IsLimitInDay { get; set; }
+        public bool IsLimitInDay { get; set; }
         public decimal? LimitCount { get; set; }
-        public string IsForStore { get; set; }
+        public bool IsForStore { get; set; }
         public string DayFilter { get; set; }
         public string HourFilter { get; set; }
         public string Rank { get; set; }
         public string Status { get; set; }
-        public string IsActive { get; set; }
-        public string DelFlg { get; set; }
+        public bool IsActive { get; set; }
+        public bool DelFlg { get; set; }
         public DateTime? InsDate { get; set; }
         public DateTime? UpdDate { get; set; }
 

@@ -10,11 +10,12 @@ namespace Infrastructure.Models
         public string GroupNo { get; set; }
         public decimal? Quantity { get; set; }
         public decimal? Amount { get; set; }
-        public string DelFlg { get; set; }
-        public DateTime? InsDate { get; set; }
-        public DateTime? UpdDate { get; set; }
         public string OperatorQuantity { get; set; }
         public string OperatorAmount { get; set; }
+        public bool DelFlg { get; set; }
+
+        public DateTime? InsDate { get; set; }
+        public DateTime? UpdDate { get; set; }
 
         public virtual ConditionRule ConditionRule { get; set; }
     }

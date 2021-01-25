@@ -8,7 +8,7 @@ namespace Infrastructure.Models
         public Guid Id { get; set; }
         public Guid? StoreId { get; set; }
         public Guid? PromotionId { get; set; }
-        public string DelFlg { get; set; }
+        public bool DelFlg { get; set; }
         public DateTime? InsDate { get; set; }
         public DateTime? UpdDate { get; set; }
 

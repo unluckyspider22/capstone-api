@@ -38,7 +38,7 @@ namespace PromotionEngineAPI.Controllers
               pageIndex: param.PageIndex,
               pageSize: param.PageSize,
               orderBy: el => el.OrderByDescending(b => b.InsDate),
-              filter: handlePromotionFilter(promotionId, status, BrandId),
+              filter: HandlePromotionFilter(promotionId, status, BrandId),
               includeProperties: "PromotionStoreMapping,PromotionTier,VoucherChannel,VoucherGroup"));
 
             }
@@ -77,7 +77,7 @@ namespace PromotionEngineAPI.Controllers
             var result = await _promotionService.GetAsync(
                 pageIndex: param.PageIndex,
                 pageSize: param.PageSize,
-                filter: el => el.DelFlg.Equals("0")
+                filter: el => el.DelFlg
                 && el.PromotionName.ToLower().Contains(param.SearchContent.ToLower())
                 && el.BrandId.Equals(BrandId));
             if (result == null)
@@ -108,7 +108,7 @@ namespace PromotionEngineAPI.Controllers
         {
             try
             {
-                return Ok(await _promotionService.GetFirst(filter: el => el.PromotionId.Equals(id) && el.DelFlg.Equals("0"),
+                return Ok(await _promotionService.GetFirst(filter: el => el.PromotionId.Equals(id) && el.DelFlg,
                     includeProperties: "VoucherGroup,VoucherGroup.Voucher,VoucherChannel,PromotionStoreMapping"));
             }
             catch (ErrorObj e)
@@ -180,7 +180,7 @@ namespace PromotionEngineAPI.Controllers
 
 
 
-        Expression<Func<Promotion, bool>> handlePromotionFilter(Guid promotionId, String status, Guid BrandId)
+        Expression<Func<Promotion, bool>> HandlePromotionFilter(Guid promotionId, String status, Guid BrandId)
         {
             Expression<Func<Promotion, bool>> filterParam;
             Debug.WriteLine("Promotion id:" + promotionId);
@@ -192,14 +192,14 @@ namespace PromotionEngineAPI.Controllers
                     filterParam = el =>
                     el.PromotionId.Equals(promotionId) &&
                     el.BrandId.Equals(BrandId) &&
-                    el.DelFlg.Equals("0");
+                    el.DelFlg;
                 }
                 else
                 {
                     filterParam = el =>
                     el.PromotionId.Equals(promotionId) &&
                     el.BrandId.Equals(BrandId) &&
-                    el.DelFlg.Equals("0") &&
+                    el.DelFlg &&
                     el.Status.Equals(status);
                 }
             }
@@ -209,14 +209,14 @@ namespace PromotionEngineAPI.Controllers
                 {
                     Debug.WriteLine("1");
                     filterParam = el =>
-                    el.DelFlg.Equals("0") &&
+                    el.DelFlg &&
                     el.BrandId.Equals(BrandId);
                 }
                 else
                 {
                     Debug.WriteLine("2");
                     filterParam = el =>
-                    el.DelFlg.Equals("0") &&
+                    el.DelFlg &&
                     el.BrandId.Equals(BrandId) &&
                     el.Status.Equals(status);
                 }

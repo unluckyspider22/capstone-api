@@ -28,8 +28,7 @@ namespace PromotionEngineAPI.Controllers
             try
             {
                 return Ok(await _service.GetAsync(
-                filter: el => el.DelFlg.Equals("0")
-                ));
+                filter: el => !el.DelFlg));
             }
             catch (ErrorObj e)
             {
@@ -42,7 +41,7 @@ namespace PromotionEngineAPI.Controllers
         [Route("count")]
         public async Task<IActionResult> CountRole()
         {
-            return Ok(await _service.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE)));
+            return Ok(await _service.CountAsync(el => !el.DelFlg));
         }
 
        

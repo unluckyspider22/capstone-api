@@ -23,7 +23,7 @@ namespace PromotionEngineAPI.Controllers
         // api/MembershipActions?pageIndex=...&pageSize=...
         public async Task<IActionResult> GetMembershipAction([FromQuery] PagingRequestParam param)
         {
-            var result = await _service.GetAsync(pageIndex: param.PageIndex, pageSize: param.PageSize, filter: el => el.DelFlg.Equals("0"));
+            var result = await _service.GetAsync(pageIndex: param.PageIndex, pageSize: param.PageSize, filter: el => !el.DelFlg);
             if (result == null)
             {
                 return NotFound();
@@ -36,7 +36,7 @@ namespace PromotionEngineAPI.Controllers
         [Route("count")]
         public async Task<IActionResult> CountMembershipAction()
         {
-            return Ok(await _service.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE)));
+            return Ok(await _service.CountAsync(el => !el.DelFlg));
         }
 
         // GET: api/MembershipActions/5

@@ -16,8 +16,5 @@ namespace Infrastructure.DTOs
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
         public string ImgUrl { get; set; }
-
-        public virtual RoleEntity Role { get; set; }
-        public virtual Brand Brand { get; set; }
     }
 }

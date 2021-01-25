@@ -7,7 +7,7 @@ namespace Infrastructure.DTOs
 {
     public class BaseDto
     {
-        public string DelFlg { get; set; }
+        public bool DelFlg { get; set; }
         public DateTime? InsDate { get; set; }
         public DateTime? UpdDate { get; set; }
     }

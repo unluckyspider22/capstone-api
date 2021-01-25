@@ -12,12 +12,11 @@ namespace Infrastructure.DTOs
         public Guid? BrandId { get; set; }
         public string VoucherName { get; set; }
         public string VoucherType { get; set; }
-        public string IsLimit { get; set; }
+        public bool IsLimit { get; set; }
         public decimal? Quantity { get; set; }
         public decimal? UsedQuantity { get; set; }
         public decimal? RedempedQuantity { get; set; }
-        public string IsActive { get; set; }
-
+        public bool IsActive { get; set; }
         public DateTime? PublicDate { get; set; }
 
         public string Charset { get; set; }
