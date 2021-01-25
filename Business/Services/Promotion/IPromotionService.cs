@@ -9,5 +9,6 @@ namespace ApplicationCore.Services
 {
     public interface IPromotionService : IBaseService<Promotion,PromotionDto>
     {
+        Task<List<PromotionTier>> GetActionCondition(Guid promotionId);
     }
 }

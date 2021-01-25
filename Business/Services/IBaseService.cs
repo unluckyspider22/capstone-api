@@ -20,6 +20,7 @@ namespace ApplicationCore.Services
         Task<bool> HideAsync(Guid id, string value);
         Task<TDto> GetByIdAsync(Guid id);
         Task<int> CountAsync(Expression<Func<TEntity, bool>> filter = null);
+        Task<TEntity> GetFirst(Expression<Func<TEntity, bool>> filter = null, string includeProperties = "");
 
     }
 }
