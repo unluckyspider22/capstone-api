@@ -106,7 +106,7 @@ namespace PromotionEngineAPI.Controllers
         {
             try
             {
-                return Ok(await _promotionService.GetFirst(filter: el => el.PromotionId.Equals(id) && el.DelFlg,
+                return Ok(await _promotionService.GetFirst(filter: el => el.PromotionId.Equals(id) && !el.DelFlg,
                     includeProperties: "VoucherGroup,VoucherGroup.Voucher,VoucherChannel,PromotionStoreMapping"));
             }
             catch (ErrorObj e)
@@ -225,12 +225,13 @@ namespace PromotionEngineAPI.Controllers
         }
 
         [HttpGet]
-        [Route("promotion-detail")]
-        public async Task<IActionResult> GetActionCondition([FromRoute] Guid promotionId)
+        [Route("promotion-tier-detail")]
+        public async Task<IActionResult> GetPromotionTierDetail([FromQuery] Guid promotionId)
         {
+            Debug.WriteLine(promotionId);
             try
             {
-                return Ok(await _promotionService.GetActionCondition(promotionId));
+                return Ok(await _promotionService.GetPromotionTierDetail(promotionId));
             }
             catch (ErrorObj e)
             {

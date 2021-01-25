@@ -21,18 +21,15 @@ namespace ApplicationCore.Services
 
         protected override IGenericRepository<Promotion> _repository => _unitOfWork.PromotionRepository;
 
-        public async Task<List<PromotionTier>> GetActionCondition(Guid promotionId)
+        public async Task<List<PromotionTier>> GetPromotionTierDetail(Guid promotionId)
         {
             //List<PromotionTierResponse> result = new List<PromotionTierResponse>();
 
             IGenericRepository<PromotionTier> _tierRepo = _unitOfWork.PromotionTierRepository;
-            IGenericRepository<ConditionRule> _conditionRuleRepo = _unitOfWork.ConditionRuleRepository;
-            IGenericRepository<Infrastructure.Models.Action> _actionRepo = _unitOfWork.ActionRepository;
-            IGenericRepository<MembershipAction> _membershipActionRepo = _unitOfWork.MembershipActionRepository;
             try
             {
                 // Lấy danh sách promotion tier
-                Expression<Func<PromotionTier, bool>> filter = el => el.PromotionId.Equals(promotionId);
+                Expression<Func<PromotionTier, bool>> filter = el => el.PromotionId.Equals(promotionId) ;
                 var tiers = (
                     await _tierRepo.Get(0, 0, filter: filter, 
                     includeProperties: "ConditionRule,ConditionRule.ProductCondition,ConditionRule.OrderCondition,ConditionRule.MembershipCondition,MembershipAction,Action"))
