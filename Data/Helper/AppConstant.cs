@@ -22,7 +22,7 @@ namespace Infrastructure.Helper
             public const string ALL = "0";
         }
 
-        
+
         public struct ENVIRONMENT_VARIABLE
         {
             public const int SUCCESS = 1;
@@ -31,7 +31,7 @@ namespace Infrastructure.Helper
             public const int DUPLICATE = 2;
             public const string DELETED = "1";
             public const string UNLIMIT = "0";
-            public const string ISLIMIT = "1";            
+            public const string ISLIMIT = "1";
             public struct CHARSET_TYPE
             {
                 public const string ALPHANUMERIC = "Alphanumeric";
@@ -74,6 +74,7 @@ namespace Infrastructure.Helper
                 public const string GLOBAL = "3";
             }
         }
+        public const string EMPTY_GUID = "00000000-0000-0000-0000-000000000000";
 
     }
 }
