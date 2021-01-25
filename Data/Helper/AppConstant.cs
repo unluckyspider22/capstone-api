@@ -74,7 +74,6 @@ namespace Infrastructure.Helper
                 public const string GLOBAL = "3";
             }
         }
-        public const string EMPTY_GUID = "00000000-0000-0000-0000-000000000000";
 
     }
 }

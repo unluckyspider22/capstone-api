@@ -18,8 +18,6 @@ namespace PromotionEngineAPI.Controllers
         private readonly IPromotionService _promotionService;
         private readonly IPromotionStoreMappingService _promotionStoreMappingService;
 
-        public Guid EMPTY_GUID { get; private set; }
-
         public PromotionsController(IPromotionService service, IPromotionStoreMappingService promotionStoreMappingService)
         {
             _promotionService = service;
@@ -94,11 +92,11 @@ namespace PromotionEngineAPI.Controllers
         {
             if (status != null && !status.Equals(AppConstant.Status.ALL))
             {
-                return Ok(await _promotionService.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE)
+                return Ok(await _promotionService.CountAsync(el => !el.DelFlg
                 && el.BrandId.Equals(brandId)
                 && el.Status.Equals(status)));
             }
-            return Ok(await _promotionService.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE)
+            return Ok(await _promotionService.CountAsync(el => !el.DelFlg
             && el.BrandId.Equals(brandId)));
         }
 
@@ -183,23 +181,25 @@ namespace PromotionEngineAPI.Controllers
         Expression<Func<Promotion, bool>> HandlePromotionFilter(Guid promotionId, String status, Guid BrandId)
         {
             Expression<Func<Promotion, bool>> filterParam;
-            Debug.WriteLine("Promotion id:" + promotionId);
-
-            if (!promotionId.Equals(EMPTY_GUID))
+            //Debug.WriteLine("Promotion id:" + promotionId);
+            //Debug.WriteLine(promotionId != Guid.Empty);
+            if (promotionId != Guid.Empty)
             {
                 if (status.Equals(AppConstant.Status.ALL))
                 {
+                    Debug.WriteLine("1");
                     filterParam = el =>
                     el.PromotionId.Equals(promotionId) &&
                     el.BrandId.Equals(BrandId) &&
-                    el.DelFlg;
+                    !el.DelFlg;
                 }
                 else
                 {
+                    Debug.WriteLine("2");
                     filterParam = el =>
                     el.PromotionId.Equals(promotionId) &&
                     el.BrandId.Equals(BrandId) &&
-                    el.DelFlg &&
+                    !el.DelFlg &&
                     el.Status.Equals(status);
                 }
             }
@@ -207,16 +207,16 @@ namespace PromotionEngineAPI.Controllers
             {
                 if (status.Equals(AppConstant.Status.ALL))
                 {
-                    Debug.WriteLine("1");
+                    Debug.WriteLine("3");
                     filterParam = el =>
-                    el.DelFlg &&
+                    !el.DelFlg &&
                     el.BrandId.Equals(BrandId);
                 }
                 else
                 {
-                    Debug.WriteLine("2");
+                    Debug.WriteLine("4");
                     filterParam = el =>
-                    el.DelFlg &&
+                    !el.DelFlg &&
                     el.BrandId.Equals(BrandId) &&
                     el.Status.Equals(status);
                 }
@@ -226,7 +226,7 @@ namespace PromotionEngineAPI.Controllers
 
         [HttpGet]
         [Route("promotion-detail")]
-        public async Task<IActionResult> GetActionCondition([FromQuery] Guid promotionId)
+        public async Task<IActionResult> GetActionCondition([FromRoute] Guid promotionId)
         {
             try
             {
