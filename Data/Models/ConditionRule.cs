@@ -10,7 +10,6 @@ namespace Infrastructure.Models
             MembershipCondition = new HashSet<MembershipCondition>();
             OrderCondition = new HashSet<OrderCondition>();
             ProductCondition = new HashSet<ProductCondition>();
-            PromotionTier = new HashSet<PromotionTier>();
         }
 
         public Guid ConditionRuleId { get; set; }
@@ -22,9 +21,9 @@ namespace Infrastructure.Models
         public DateTime? UpdDate { get; set; }
 
         public virtual Brand Brand { get; set; }
+        public virtual PromotionTier PromotionTier { get; set; }
         public virtual ICollection<MembershipCondition> MembershipCondition { get; set; }
         public virtual ICollection<OrderCondition> OrderCondition { get; set; }
         public virtual ICollection<ProductCondition> ProductCondition { get; set; }
-        public virtual ICollection<PromotionTier> PromotionTier { get; set; }
     }
 }

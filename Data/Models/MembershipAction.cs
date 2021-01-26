@@ -5,13 +5,7 @@ namespace Infrastructure.Models
 {
     public partial class MembershipAction
     {
-        public MembershipAction()
-        {
-            PromotionTier = new HashSet<PromotionTier>();
-        }
-
         public Guid MembershipActionId { get; set; }
-        public Guid? PromotionTierId { get; set; }
         public string GroupNo { get; set; }
         public string ActionType { get; set; }
         public string GiftProductCode { get; set; }
@@ -22,6 +16,6 @@ namespace Infrastructure.Models
         public DateTime? InsDate { get; set; }
         public DateTime? UpdDate { get; set; }
 
-        public virtual ICollection<PromotionTier> PromotionTier { get; set; }
+        public virtual PromotionTier PromotionTier { get; set; }
     }
 }

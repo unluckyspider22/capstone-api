@@ -5,11 +5,6 @@ namespace Infrastructure.Models
 {
     public partial class Action
     {
-        public Action()
-        {
-            PromotionTier = new HashSet<PromotionTier>();
-        }
-
         public Guid ActionId { get; set; }
         public Guid? PromotionTierId { get; set; }
         public string ActionType { get; set; }
@@ -25,6 +20,6 @@ namespace Infrastructure.Models
         public DateTime? InsDate { get; set; }
         public DateTime? UpdDate { get; set; }
 
-        public virtual ICollection<PromotionTier> PromotionTier { get; set; }
+        public virtual PromotionTier PromotionTier { get; set; }
     }
 }

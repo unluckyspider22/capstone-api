@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 using ApplicationCore.Services;
@@ -32,12 +33,17 @@ namespace PromotionEngineAPI.Controllers
 
         // GET: api/ConditionRules
         [HttpGet]
-        public async Task<IActionResult> GetConditionRule([FromQuery] PagingRequestParam param, Guid BrandId)
+        public async Task<IActionResult> GetConditionRule([FromQuery] PagingRequestParam param, Guid BrandId, bool available)
         {
+            Expression<Func<ConditionRule, bool>> filter = el => !el.DelFlg && el.BrandId.Equals(BrandId);
+            if (available != null && available)
+            {
+                filter = el => !el.DelFlg && el.BrandId.Equals(BrandId) && (el.PromotionTier == null);
+            }
             var result = await _service.GetAsync(
                 pageIndex: param.PageIndex,
                 pageSize: param.PageSize,
-                filter: el => el.DelFlg && el.BrandId.Equals(BrandId),
+                filter: el => !el.DelFlg && el.BrandId.Equals(BrandId),
                 orderBy: el => el.OrderByDescending(b => b.InsDate),
                 includeProperties: "PromotionTier,ProductCondition,OrderCondition,MembershipCondition"
                 );
@@ -59,7 +65,7 @@ namespace PromotionEngineAPI.Controllers
 
         // GET: api/ConditionRules/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetConditionRule([FromRoute]Guid id)
+        public async Task<IActionResult> GetConditionRule([FromRoute] Guid id)
         {
             var result = await _service.GetByIdAsync(id);
             if (result == null)
@@ -71,7 +77,7 @@ namespace PromotionEngineAPI.Controllers
 
         // PUT: api/ConditionRules/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutConditionRule([FromRoute]Guid id, [FromBody] ConditionRuleDto dto)
+        public async Task<IActionResult> PutConditionRule([FromRoute] Guid id, [FromBody] ConditionRuleDto dto)
         {
             if (id != dto.ConditionRuleId)
             {
@@ -136,7 +142,7 @@ namespace PromotionEngineAPI.Controllers
 
         // DELETE: api/ConditionRules/5
         [HttpDelete]
-        public async Task<IActionResult> DeleteConditionRule([FromQuery]Guid id)
+        public async Task<IActionResult> DeleteConditionRule([FromQuery] Guid id)
         {
             if (id == null)
             {

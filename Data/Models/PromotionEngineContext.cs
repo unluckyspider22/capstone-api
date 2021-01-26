@@ -528,6 +528,18 @@ namespace Infrastructure.Models
 
             modelBuilder.Entity<PromotionTier>(entity =>
             {
+                entity.HasIndex(e => e.ActionId)
+                    .HasName("ActionId")
+                    .IsUnique();
+
+                entity.HasIndex(e => e.ConditionRuleId)
+                    .HasName("ConditionRuleId")
+                    .IsUnique();
+
+                entity.HasIndex(e => e.MembershipActionId)
+                    .HasName("MembershipActionId")
+                    .IsUnique();
+
                 entity.Property(e => e.PromotionTierId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.InsDate)
@@ -539,18 +551,18 @@ namespace Infrastructure.Models
                     .HasDefaultValueSql("(getdate())");
 
                 entity.HasOne(d => d.Action)
-                    .WithMany(p => p.PromotionTier)
-                    .HasForeignKey(d => d.ActionId)
+                    .WithOne(p => p.PromotionTier)
+                    .HasForeignKey<PromotionTier>(d => d.ActionId)
                     .HasConstraintName("FK_PromotionTier_Action");
 
                 entity.HasOne(d => d.ConditionRule)
-                    .WithMany(p => p.PromotionTier)
-                    .HasForeignKey(d => d.ConditionRuleId)
+                    .WithOne(p => p.PromotionTier)
+                    .HasForeignKey<PromotionTier>(d => d.ConditionRuleId)
                     .HasConstraintName("FK_PromotionTier_ConditionRule");
 
                 entity.HasOne(d => d.MembershipAction)
-                    .WithMany(p => p.PromotionTier)
-                    .HasForeignKey(d => d.MembershipActionId)
+                    .WithOne(p => p.PromotionTier)
+                    .HasForeignKey<PromotionTier>(d => d.MembershipActionId)
                     .HasConstraintName("FK_PromotionTier_MembershipAction");
 
                 entity.HasOne(d => d.Promotion)
@@ -561,13 +573,6 @@ namespace Infrastructure.Models
 
             modelBuilder.Entity<RoleEntity>(entity =>
             {
-                entity.Property(e => e.DelFlg)
-                    .IsRequired()
-                    .HasMaxLength(1)
-                    .IsUnicode(false)
-                    .IsFixedLength()
-                    .HasDefaultValueSql("((0))");
-
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
