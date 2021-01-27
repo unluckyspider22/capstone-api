@@ -6,7 +6,7 @@ namespace Infrastructure.Models
     public partial class PromotionTier
     {
         public Guid PromotionTierId { get; set; }
-        public Guid ConditionRuleId { get; set; }
+        public Guid? ConditionRuleId { get; set; }
         public Guid? ActionId { get; set; }
         public Guid? PromotionId { get; set; }
         public Guid? MembershipActionId { get; set; }
@@ -15,7 +15,7 @@ namespace Infrastructure.Models
 
         public virtual ConditionRule ConditionRule { get; set; }
         public virtual Promotion Promotion { get; set; }
-        public virtual MembershipAction PromotionTier1 { get; set; }
-        public virtual Action PromotionTierNavigation { get; set; }
+        public virtual Action Action { get; set; }
+        public virtual MembershipAction MembershipAction { get; set; }
     }
 }

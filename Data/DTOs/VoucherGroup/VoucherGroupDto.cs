@@ -13,6 +13,8 @@ namespace Infrastructure.DTOs
         public string VoucherName { get; set; }
         public string VoucherType { get; set; }
         public bool IsLimit { get; set; }
+        public bool IsLimitInDay { get; set; }
+        public decimal? LimitInDayCount { get; set; }
         public decimal? Quantity { get; set; }
         public decimal? UsedQuantity { get; set; }
         public decimal? RedempedQuantity { get; set; }

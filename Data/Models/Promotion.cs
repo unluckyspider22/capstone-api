@@ -16,6 +16,7 @@ namespace Infrastructure.Models
         public Guid PromotionId { get; set; }
         public Guid? VoucherGroupId { get; set; }
         public Guid? BrandId { get; set; }
+        public string PromotionCode { get; set; }
         public string PromotionName { get; set; }
         public string PromotionType { get; set; }
         public string ActionType { get; set; }
@@ -31,8 +32,6 @@ namespace Infrastructure.Models
         public string PaymentMethod { get; set; }
         public string ForHoliday { get; set; }
         public string ForMembership { get; set; }
-        public bool IsLimitInDay { get; set; }
-        public decimal? LimitCount { get; set; }
         public bool IsForStore { get; set; }
         public string DayFilter { get; set; }
         public string HourFilter { get; set; }

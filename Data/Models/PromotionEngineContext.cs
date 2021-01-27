@@ -125,11 +125,14 @@ namespace Infrastructure.Models
                     .HasMaxLength(30)
                     .IsUnicode(false);
 
-                entity.Property(e => e.PromotionTierId).IsRequired();
-
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
+
+                entity.HasOne(d => d.PromotionTier)
+                    .WithOne(p => p.Action)
+                    .HasForeignKey<Action>(d => d.PromotionTierId)
+                    .HasConstraintName("Action_FK");
             });
 
             modelBuilder.Entity<Brand>(entity =>
@@ -312,11 +315,14 @@ namespace Infrastructure.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.PromotionTierId).IsRequired();
-
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
+
+                entity.HasOne(d => d.PromotionTier)
+                    .WithOne(p => p.MembershipAction)
+                    .HasForeignKey<MembershipAction>(d => d.PromotionTierId)
+                    .HasConstraintName("MembershipAction_FK");
             });
 
             modelBuilder.Entity<MembershipCondition>(entity =>
@@ -477,12 +483,12 @@ namespace Infrastructure.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.LimitCount)
-                    .HasColumnType("decimal(10, 0)")
-                    .HasDefaultValueSql("((0))");
-
                 entity.Property(e => e.PaymentMethod)
                     .HasMaxLength(10)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PromotionCode)
+                    .HasMaxLength(6)
                     .IsUnicode(false);
 
                 entity.Property(e => e.PromotionLevel)
@@ -573,20 +579,6 @@ namespace Infrastructure.Models
                     .WithMany(p => p.PromotionTier)
                     .HasForeignKey(d => d.PromotionId)
                     .HasConstraintName("FK_PromotionTier_Promotion");
-
-                entity.HasOne(d => d.PromotionTierNavigation)
-                    .WithOne(p => p.PromotionTier)
-                    .HasPrincipalKey<Action>(p => p.PromotionTierId)
-                    .HasForeignKey<PromotionTier>(d => d.PromotionTierId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_PromotionTier_Action");
-
-                entity.HasOne(d => d.PromotionTier1)
-                    .WithOne(p => p.PromotionTier)
-                    .HasPrincipalKey<MembershipAction>(p => p.PromotionTierId)
-                    .HasForeignKey<PromotionTier>(d => d.PromotionTierId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_PromotionTier_MembershipAction");
             });
 
             modelBuilder.Entity<RoleEntity>(entity =>
@@ -702,6 +694,8 @@ namespace Infrastructure.Models
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.LimitInDayCount).HasColumnType("decimal(10, 0)");
 
                 entity.Property(e => e.PublicDate).HasColumnType("datetime");
 
