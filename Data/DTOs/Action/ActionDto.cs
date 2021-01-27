@@ -8,8 +8,9 @@ namespace Infrastructure.DTOs
     public class ActionDto : BaseDto
     {
         public Guid ActionId { get; set; }
-        public Guid? PromotionTierId { get; set; }
+        public Guid PromotionTierId { get; set; }
         public string ActionType { get; set; }
+        public string DiscountType { get; set; }
         public bool IsLimitAmount { get; set; }
         public string ProductCode { get; set; }
         public decimal? DiscountQuantity { get; set; }

@@ -91,6 +91,10 @@ namespace Infrastructure.Models
 
             modelBuilder.Entity<Action>(entity =>
             {
+                entity.HasIndex(e => e.PromotionTierId)
+                    .HasName("IX_Action")
+                    .IsUnique();
+
                 entity.Property(e => e.ActionId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.ActionType)
@@ -104,6 +108,11 @@ namespace Infrastructure.Models
 
                 entity.Property(e => e.DiscountQuantity).HasColumnType("decimal(10, 0)");
 
+                entity.Property(e => e.DiscountType)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .IsFixedLength();
+
                 entity.Property(e => e.FixedPrice).HasColumnType("decimal(10, 2)");
 
                 entity.Property(e => e.InsDate)
@@ -115,6 +124,8 @@ namespace Infrastructure.Models
                 entity.Property(e => e.ProductCode)
                     .HasMaxLength(30)
                     .IsUnicode(false);
+
+                entity.Property(e => e.PromotionTierId).IsRequired();
 
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
@@ -265,6 +276,10 @@ namespace Infrastructure.Models
 
             modelBuilder.Entity<MembershipAction>(entity =>
             {
+                entity.HasIndex(e => e.PromotionTierId)
+                    .HasName("IX_MembershipAction")
+                    .IsUnique();
+
                 entity.Property(e => e.MembershipActionId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.ActionType)
@@ -273,6 +288,11 @@ namespace Infrastructure.Models
                     .IsFixedLength();
 
                 entity.Property(e => e.BonusPoint).HasColumnType("decimal(10, 2)");
+
+                entity.Property(e => e.DiscountType)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .IsFixedLength();
 
                 entity.Property(e => e.GiftName).HasMaxLength(50);
 
@@ -291,6 +311,8 @@ namespace Infrastructure.Models
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.PromotionTierId).IsRequired();
 
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
@@ -528,16 +550,8 @@ namespace Infrastructure.Models
 
             modelBuilder.Entity<PromotionTier>(entity =>
             {
-                entity.HasIndex(e => e.ActionId)
-                    .HasName("ActionId")
-                    .IsUnique();
-
                 entity.HasIndex(e => e.ConditionRuleId)
-                    .HasName("ConditionRuleId")
-                    .IsUnique();
-
-                entity.HasIndex(e => e.MembershipActionId)
-                    .HasName("MembershipActionId")
+                    .HasName("ConditionRule")
                     .IsUnique();
 
                 entity.Property(e => e.PromotionTierId).HasDefaultValueSql("(newid())");
@@ -550,25 +564,29 @@ namespace Infrastructure.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.HasOne(d => d.Action)
-                    .WithOne(p => p.PromotionTier)
-                    .HasForeignKey<PromotionTier>(d => d.ActionId)
-                    .HasConstraintName("FK_PromotionTier_Action");
-
                 entity.HasOne(d => d.ConditionRule)
                     .WithOne(p => p.PromotionTier)
                     .HasForeignKey<PromotionTier>(d => d.ConditionRuleId)
                     .HasConstraintName("FK_PromotionTier_ConditionRule");
 
-                entity.HasOne(d => d.MembershipAction)
-                    .WithOne(p => p.PromotionTier)
-                    .HasForeignKey<PromotionTier>(d => d.MembershipActionId)
-                    .HasConstraintName("FK_PromotionTier_MembershipAction");
-
                 entity.HasOne(d => d.Promotion)
                     .WithMany(p => p.PromotionTier)
                     .HasForeignKey(d => d.PromotionId)
                     .HasConstraintName("FK_PromotionTier_Promotion");
+
+                entity.HasOne(d => d.PromotionTierNavigation)
+                    .WithOne(p => p.PromotionTier)
+                    .HasPrincipalKey<Action>(p => p.PromotionTierId)
+                    .HasForeignKey<PromotionTier>(d => d.PromotionTierId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_PromotionTier_Action");
+
+                entity.HasOne(d => d.PromotionTier1)
+                    .WithOne(p => p.PromotionTier)
+                    .HasPrincipalKey<MembershipAction>(p => p.PromotionTierId)
+                    .HasForeignKey<PromotionTier>(d => d.PromotionTierId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_PromotionTier_MembershipAction");
             });
 
             modelBuilder.Entity<RoleEntity>(entity =>

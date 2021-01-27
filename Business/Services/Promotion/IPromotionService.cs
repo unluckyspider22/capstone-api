@@ -10,5 +10,6 @@ namespace ApplicationCore.Services
     public interface IPromotionService : IBaseService<Promotion,PromotionDto>
     {
         Task<List<PromotionTier>> GetPromotionTierDetail(Guid promotionId);
+        Task<PromotionTierParam> CreatePromotionTier(Guid promotionId, PromotionTierParam promotionTierParam);
     }
 }

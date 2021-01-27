@@ -27,7 +27,7 @@ namespace PromotionEngineAPI.Controllers
         // GET: api/Promotions
         [HttpGet]
         // api/Promotions?pageIndex=...&pageSize=...
-        public async Task<IActionResult> GetPromotion([FromQuery] PagingRequestParam param, [FromQuery] Guid BrandId, [FromQuery] string status, [FromQuery] Guid promotionId)
+        public async Task<IActionResult> GetPromotion([FromQuery] PagingRequestParam param, [FromQuery] Guid BrandId, [FromQuery] string status)
         {
             if (status == null) return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
             try
@@ -36,7 +36,7 @@ namespace PromotionEngineAPI.Controllers
               pageIndex: param.PageIndex,
               pageSize: param.PageSize,
               orderBy: el => el.OrderByDescending(b => b.InsDate),
-              filter: HandlePromotionFilter(promotionId, status, BrandId),
+              filter: HandlePromotionFilter(status, BrandId),
               includeProperties: "PromotionStoreMapping,PromotionTier,VoucherChannel,VoucherGroup"));
 
             }
@@ -146,18 +146,21 @@ namespace PromotionEngineAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> PostPromotion([FromBody] PromotionDto dto)
         {
-            dto.PromotionId = Guid.NewGuid();
-
-            var result = await _promotionService.CreateAsync(dto);
-
-            if (result == null)
+            try
             {
-                return NotFound();
+                dto.PromotionId = Guid.NewGuid();
+
+                return Ok(await _promotionService.CreateAsync(dto));
+
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
             }
 
-            //var result = dto;
 
-            return Ok(result);
+
+
         }
 
         // DELETE: api/Promotions/5
@@ -178,57 +181,33 @@ namespace PromotionEngineAPI.Controllers
 
 
 
-        Expression<Func<Promotion, bool>> HandlePromotionFilter(Guid promotionId, String status, Guid BrandId)
+        Expression<Func<Promotion, bool>> HandlePromotionFilter(String status, Guid BrandId)
         {
             Expression<Func<Promotion, bool>> filterParam;
-            //Debug.WriteLine("Promotion id:" + promotionId);
-            //Debug.WriteLine(promotionId != Guid.Empty);
-            if (promotionId != Guid.Empty)
+
+            if (status.Equals(AppConstant.Status.ALL))
             {
-                if (status.Equals(AppConstant.Status.ALL))
-                {
-                    Debug.WriteLine("1");
-                    filterParam = el =>
-                    el.PromotionId.Equals(promotionId) &&
-                    el.BrandId.Equals(BrandId) &&
-                    !el.DelFlg;
-                }
-                else
-                {
-                    Debug.WriteLine("2");
-                    filterParam = el =>
-                    el.PromotionId.Equals(promotionId) &&
-                    el.BrandId.Equals(BrandId) &&
-                    !el.DelFlg &&
-                    el.Status.Equals(status);
-                }
+
+                filterParam = el =>
+                !el.DelFlg &&
+                el.BrandId.Equals(BrandId);
             }
             else
             {
-                if (status.Equals(AppConstant.Status.ALL))
-                {
-                    Debug.WriteLine("3");
-                    filterParam = el =>
-                    !el.DelFlg &&
-                    el.BrandId.Equals(BrandId);
-                }
-                else
-                {
-                    Debug.WriteLine("4");
-                    filterParam = el =>
-                    !el.DelFlg &&
-                    el.BrandId.Equals(BrandId) &&
-                    el.Status.Equals(status);
-                }
+
+                filterParam = el =>
+                !el.DelFlg &&
+                el.BrandId.Equals(BrandId) &&
+                el.Status.Equals(status);
             }
+
             return filterParam;
         }
 
         [HttpGet]
-        [Route("promotion-tier-detail")]
-        public async Task<IActionResult> GetPromotionTierDetail([FromQuery] Guid promotionId)
+        [Route("{promotionId}/promotion-tier-detail")]
+        public async Task<IActionResult> GetPromotionTierDetail([FromRoute] Guid promotionId)
         {
-            Debug.WriteLine(promotionId);
             try
             {
                 return Ok(await _promotionService.GetPromotionTierDetail(promotionId));
@@ -238,6 +217,19 @@ namespace PromotionEngineAPI.Controllers
                 return StatusCode(statusCode: e.Code, e);
             }
 
+        }
+        [HttpPost]
+        [Route("{promotionId}/create-tier")]
+        public async Task<IActionResult> CreatePromotionTier([FromRoute] Guid promotionId, [FromBody] PromotionTierParam promotionTierParam)
+        {
+            try
+            {
+                return Ok(await _promotionService.CreatePromotionTier(promotionId: promotionId, promotionTierParam: promotionTierParam));
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
         }
     }
 
