@@ -126,7 +126,7 @@ namespace ApplicationCore.Services
             foreach (var condition in param.productConditions)
             {
                 condition.ProductConditionId = Guid.NewGuid();
-                condition.ConditionRuleId = param.conditionRule.ConditionRuleId;
+                //condition.ConditionRuleId = param.conditionRule.ConditionRuleId;
                 var productConditionEntity = _mapper.Map<ProductCondition>(condition);
                 _productConditionRepo.Add(productConditionEntity);
                 await _unitOfWork.SaveAsync();
@@ -144,7 +144,7 @@ namespace ApplicationCore.Services
             foreach (var condition in param.orderConditions)
             {
                 condition.OrderConditionId = Guid.NewGuid();
-                condition.ConditionRuleId = param.conditionRule.ConditionRuleId;
+                //condition.ConditionRuleId = param.conditionRule.ConditionRuleId;
                 var orderConditionEntity = _mapper.Map<OrderCondition>(condition);
                 _orderConditionRepo.Add(orderConditionEntity);
                 await _unitOfWork.SaveAsync();
@@ -160,7 +160,7 @@ namespace ApplicationCore.Services
             foreach (var condition in param.membershipConditions)
             {
                 condition.MembershipConditionId = Guid.NewGuid();
-                condition.ConditionRuleId = param.conditionRule.ConditionRuleId;
+                //condition.ConditionRuleId = param.conditionRule.ConditionRuleId;
                 var membershipConditionEntity = _mapper.Map<MembershipCondition>(condition);
                 _membershipRuleRepo.Add(membershipConditionEntity);
                 await _unitOfWork.SaveAsync();

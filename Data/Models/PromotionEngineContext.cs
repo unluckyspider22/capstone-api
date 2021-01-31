@@ -19,6 +19,7 @@ namespace Infrastructure.Models
         public virtual DbSet<Action> Action { get; set; }
         public virtual DbSet<Brand> Brand { get; set; }
         public virtual DbSet<Channel> Channel { get; set; }
+        public virtual DbSet<ConditionGroup> ConditionGroup { get; set; }
         public virtual DbSet<ConditionRule> ConditionRule { get; set; }
         public virtual DbSet<Holiday> Holiday { get; set; }
         public virtual DbSet<Membership> Membership { get; set; }
@@ -98,31 +99,53 @@ namespace Infrastructure.Models
                 entity.Property(e => e.ActionId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.ActionType)
+                    .IsRequired()
                     .HasMaxLength(1)
                     .IsUnicode(false)
                     .IsFixedLength();
 
-                entity.Property(e => e.DiscountAmount).HasColumnType("decimal(10, 2)");
+                entity.Property(e => e.BundlePrice).HasColumnType("decimal(10, 0)");
 
-                entity.Property(e => e.DiscountPercentage).HasColumnType("decimal(10, 2)");
+                entity.Property(e => e.BundleQuantity).HasColumnType("decimal(6, 0)");
 
-                entity.Property(e => e.DiscountQuantity).HasColumnType("decimal(10, 0)");
+                entity.Property(e => e.BundleStrategy)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .IsFixedLength();
+
+                entity.Property(e => e.DiscountAmount).HasColumnType("decimal(10, 0)");
+
+                entity.Property(e => e.DiscountPercentage).HasColumnType("decimal(3, 2)");
+
+                entity.Property(e => e.DiscountQuantity).HasColumnType("decimal(6, 0)");
 
                 entity.Property(e => e.DiscountType)
+                    .IsRequired()
                     .HasMaxLength(1)
                     .IsUnicode(false)
                     .IsFixedLength();
 
-                entity.Property(e => e.FixedPrice).HasColumnType("decimal(10, 2)");
+                entity.Property(e => e.FixedPrice).HasColumnType("decimal(10, 0)");
 
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.MaxAmount).HasColumnType("decimal(10, 2)");
+                entity.Property(e => e.LadderPrice).HasColumnType("decimal(10, 0)");
+
+                entity.Property(e => e.MaxAmount).HasColumnType("decimal(10, 0)");
+
+                entity.Property(e => e.MinPriceAfter).HasColumnType("decimal(10, 0)");
+
+                entity.Property(e => e.OrderLadderProduct).HasColumnType("decimal(2, 0)");
+
+                entity.Property(e => e.ParentCode)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.ProductCode)
-                    .HasMaxLength(30)
+                    .IsRequired()
+                    .HasMaxLength(200)
                     .IsUnicode(false);
 
                 entity.Property(e => e.UpdDate)
@@ -132,6 +155,7 @@ namespace Infrastructure.Models
                 entity.HasOne(d => d.PromotionTier)
                     .WithOne(p => p.Action)
                     .HasForeignKey<Action>(d => d.PromotionTierId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("Action_FK");
             });
 
@@ -205,6 +229,23 @@ namespace Infrastructure.Models
                     .WithMany(p => p.Channel)
                     .HasForeignKey(d => d.BrandId)
                     .HasConstraintName("FK_Channel_Brand");
+            });
+
+            modelBuilder.Entity<ConditionGroup>(entity =>
+            {
+                entity.Property(e => e.ConditionGroupId).ValueGeneratedNever();
+
+                entity.Property(e => e.GroupNo).HasColumnType("decimal(5, 0)");
+
+                entity.Property(e => e.InsDate).HasColumnType("datetime");
+
+                entity.Property(e => e.UpdDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.ConditionRule)
+                    .WithMany(p => p.ConditionGroup)
+                    .HasForeignKey(d => d.ConditionRuleId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ConditionGroup_ConditionRule");
             });
 
             modelBuilder.Entity<ConditionRule>(entity =>
@@ -286,6 +327,7 @@ namespace Infrastructure.Models
                 entity.Property(e => e.MembershipActionId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.ActionType)
+                    .IsRequired()
                     .HasMaxLength(1)
                     .IsUnicode(false)
                     .IsFixedLength();
@@ -293,6 +335,7 @@ namespace Infrastructure.Models
                 entity.Property(e => e.BonusPoint).HasColumnType("decimal(10, 2)");
 
                 entity.Property(e => e.DiscountType)
+                    .IsRequired()
                     .HasMaxLength(1)
                     .IsUnicode(false)
                     .IsFixedLength();
@@ -303,12 +346,10 @@ namespace Infrastructure.Models
                     .HasMaxLength(20)
                     .IsUnicode(false);
 
-                entity.Property(e => e.GiftVoucherCode)
-                    .HasMaxLength(20)
-                    .IsUnicode(false);
+                entity.Property(e => e.GiftQuantity).HasColumnType("decimal(6, 0)");
 
-                entity.Property(e => e.GroupNo)
-                    .HasMaxLength(2)
+                entity.Property(e => e.GiftVoucherCode)
+                    .HasMaxLength(100)
                     .IsUnicode(false);
 
                 entity.Property(e => e.InsDate)
@@ -322,6 +363,7 @@ namespace Infrastructure.Models
                 entity.HasOne(d => d.PromotionTier)
                     .WithOne(p => p.MembershipAction)
                     .HasForeignKey<MembershipAction>(d => d.PromotionTierId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("MembershipAction_FK");
             });
 
@@ -329,90 +371,105 @@ namespace Infrastructure.Models
             {
                 entity.Property(e => e.MembershipConditionId).HasDefaultValueSql("(newid())");
 
-                entity.Property(e => e.GroupNo)
-                    .HasMaxLength(2)
-                    .IsUnicode(false);
-
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.MembershipLevel).HasMaxLength(10);
 
+                entity.Property(e => e.NextOperator)
+                    .IsRequired()
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .IsFixedLength();
+
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.HasOne(d => d.ConditionRule)
+                entity.HasOne(d => d.ConditionGroup)
                     .WithMany(p => p.MembershipCondition)
-                    .HasForeignKey(d => d.ConditionRuleId)
-                    .HasConstraintName("FK_MembershipCondition_ConditionRule");
+                    .HasForeignKey(d => d.ConditionGroupId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_MembershipCondition_ConditionGroup");
             });
 
             modelBuilder.Entity<OrderCondition>(entity =>
             {
                 entity.Property(e => e.OrderConditionId).HasDefaultValueSql("(newid())");
 
-                entity.Property(e => e.Amount).HasColumnType("decimal(10, 2)");
+                entity.Property(e => e.Amount).HasColumnType("decimal(10, 0)");
 
-                entity.Property(e => e.GroupNo)
-                    .HasMaxLength(2)
-                    .IsUnicode(false);
+                entity.Property(e => e.AmountOperator)
+                    .IsRequired()
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .IsFixedLength();
 
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.OperatorAmount)
+                entity.Property(e => e.Quantity).HasColumnType("decimal(6, 0)");
+
+                entity.Property(e => e.QuantityOperator)
+                    .IsRequired()
                     .HasMaxLength(1)
                     .IsUnicode(false)
                     .IsFixedLength();
-
-                entity.Property(e => e.OperatorQuantity)
-                    .HasMaxLength(1)
-                    .IsUnicode(false)
-                    .IsFixedLength();
-
-                entity.Property(e => e.Quantity).HasColumnType("decimal(10, 0)");
 
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.HasOne(d => d.ConditionRule)
-                    .WithMany(p => p.OrderCondition)
-                    .HasForeignKey(d => d.ConditionRuleId)
-                    .HasConstraintName("FK_OrderCondition_ConditionRule");
+                entity.HasOne(d => d.OrderConditionNavigation)
+                    .WithOne(p => p.OrderCondition)
+                    .HasForeignKey<OrderCondition>(d => d.OrderConditionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_OrderCondition_ConditionGroup");
             });
 
             modelBuilder.Entity<ProductCondition>(entity =>
             {
                 entity.Property(e => e.ProductConditionId).HasDefaultValueSql("(newid())");
 
-                entity.Property(e => e.GroupNo)
-                    .HasMaxLength(2)
-                    .IsUnicode(false);
-
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.ProductCode)
-                    .HasMaxLength(30)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.ProductConditionType)
+                entity.Property(e => e.NextOperator)
+                    .IsRequired()
                     .HasMaxLength(1)
                     .IsUnicode(false)
                     .IsFixedLength();
 
-                entity.Property(e => e.ProductName).HasMaxLength(100);
+                entity.Property(e => e.ParentCode).HasMaxLength(50);
 
-                entity.Property(e => e.ProductQuantity).HasColumnType("decimal(10, 0)");
+                entity.Property(e => e.ProductCode)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
-                entity.Property(e => e.ProductTag).HasMaxLength(20);
+                entity.Property(e => e.ProductConditionType)
+                    .IsRequired()
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .IsFixedLength();
+
+                entity.Property(e => e.ProductName)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.ProductQuantity).HasColumnType("decimal(6, 0)");
 
                 entity.Property(e => e.ProductType)
+                    .IsRequired()
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .IsFixedLength();
+
+                entity.Property(e => e.QuantityOperator)
+                    .IsRequired()
                     .HasMaxLength(1)
                     .IsUnicode(false)
                     .IsFixedLength();
@@ -421,10 +478,11 @@ namespace Infrastructure.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.HasOne(d => d.ConditionRule)
+                entity.HasOne(d => d.ConditionGroup)
                     .WithMany(p => p.ProductCondition)
-                    .HasForeignKey(d => d.ConditionRuleId)
-                    .HasConstraintName("FK_ProductCondition_ConditionRule");
+                    .HasForeignKey(d => d.ConditionGroupId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ProductCondition_ConditionGroup");
             });
 
             modelBuilder.Entity<Promotion>(entity =>

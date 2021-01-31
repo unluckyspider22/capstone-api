@@ -7,9 +7,7 @@ namespace Infrastructure.Models
     {
         public ConditionRule()
         {
-            MembershipCondition = new HashSet<MembershipCondition>();
-            OrderCondition = new HashSet<OrderCondition>();
-            ProductCondition = new HashSet<ProductCondition>();
+            ConditionGroup = new HashSet<ConditionGroup>();
         }
 
         public Guid ConditionRuleId { get; set; }
@@ -22,8 +20,6 @@ namespace Infrastructure.Models
 
         public virtual Brand Brand { get; set; }
         public virtual PromotionTier PromotionTier { get; set; }
-        public virtual ICollection<MembershipCondition> MembershipCondition { get; set; }
-        public virtual ICollection<OrderCondition> OrderCondition { get; set; }
-        public virtual ICollection<ProductCondition> ProductCondition { get; set; }
+        public virtual ICollection<ConditionGroup> ConditionGroup { get; set; }
     }
 }
