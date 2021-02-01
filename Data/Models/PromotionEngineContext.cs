@@ -422,11 +422,11 @@ namespace Infrastructure.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.HasOne(d => d.OrderConditionNavigation)
-                    .WithOne(p => p.OrderCondition)
-                    .HasForeignKey<OrderCondition>(d => d.OrderConditionId)
+                entity.HasOne(d => d.ConditionGroup)
+                    .WithMany(p => p.OrderCondition)
+                    .HasForeignKey(d => d.ConditionGroupId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_OrderCondition_ConditionGroup");
+                    .HasConstraintName("FK_OrderCondition_ConditionGroup1");
             });
 
             modelBuilder.Entity<ProductCondition>(entity =>

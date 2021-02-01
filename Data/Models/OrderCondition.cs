@@ -15,6 +15,6 @@ namespace Infrastructure.Models
         public DateTime InsDate { get; set; }
         public DateTime UpdDate { get; set; }
 
-        public virtual ConditionGroup OrderConditionNavigation { get; set; }
+        public virtual ConditionGroup ConditionGroup { get; set; }
     }
 }
