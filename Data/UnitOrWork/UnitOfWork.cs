@@ -68,6 +68,9 @@ namespace Infrastructure.UnitOrWork
         //VoucherGroup
         public IGenericRepository<VoucherGroup> VoucherGroupRepository { get; set; }
 
+        //Condition Group
+        public IGenericRepository<ConditionGroup> ConditionGroupRepository { get; set; }
+
 
 
         private void initRepository()
@@ -110,6 +113,8 @@ namespace Infrastructure.UnitOrWork
             VoucherChannelRepository = new GenericRepository<VoucherChannel>(_context);
             //VoucherGroup
             VoucherGroupRepository = new GenericRepository<VoucherGroup>(_context);
+            // Condition Group
+            ConditionGroupRepository = new GenericRepository<ConditionGroup>(_context);
         }
         public void Dispose()
         {

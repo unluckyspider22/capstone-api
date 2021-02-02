@@ -51,7 +51,7 @@ namespace PromotionEngineAPI.Controllers
         [HttpGet]
         // api/Promotions/prepare?pageIndex=...&pageSize=...
         [Route("prepare")]
-        public async Task<IActionResult> checkVoucherCode([FromQuery] PagingRequestParam param, [FromQuery] Guid BrandId, [FromQuery] string status)
+        public async Task<IActionResult> CheckVoucherCode([FromQuery] PagingRequestParam param, [FromQuery] Guid BrandId, [FromQuery] string status)
         {
 
             return null;
@@ -222,9 +222,13 @@ namespace PromotionEngineAPI.Controllers
         [Route("{promotionId}/create-tier")]
         public async Task<IActionResult> CreatePromotionTier([FromRoute] Guid promotionId, [FromBody] PromotionTierParam promotionTierParam)
         {
+            if (!promotionId.Equals(promotionTierParam.PromotionId))
+            {
+                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+            }
             try
             {
-                return Ok(await _promotionService.CreatePromotionTier(promotionId: promotionId, promotionTierParam: promotionTierParam));
+                return Ok(await _promotionService.CreatePromotionTier(promotionTierParam: promotionTierParam));
             }
             catch (ErrorObj e)
             {

@@ -115,7 +115,7 @@ namespace Infrastructure.Models
 
                 entity.Property(e => e.DiscountAmount).HasColumnType("decimal(10, 0)");
 
-                entity.Property(e => e.DiscountPercentage).HasColumnType("decimal(3, 2)");
+                entity.Property(e => e.DiscountPercentage).HasColumnType("decimal(18, 0)");
 
                 entity.Property(e => e.DiscountQuantity).HasColumnType("decimal(6, 0)");
 
@@ -233,13 +233,22 @@ namespace Infrastructure.Models
 
             modelBuilder.Entity<ConditionGroup>(entity =>
             {
-                entity.Property(e => e.ConditionGroupId).ValueGeneratedNever();
+                entity.Property(e => e.ConditionGroupId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.GroupNo).HasColumnType("decimal(5, 0)");
 
-                entity.Property(e => e.InsDate).HasColumnType("datetime");
+                entity.Property(e => e.InsDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.UpdDate).HasColumnType("datetime");
+                entity.Property(e => e.NextOperator)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .IsFixedLength();
+
+                entity.Property(e => e.UpdDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
 
                 entity.HasOne(d => d.ConditionRule)
                     .WithMany(p => p.ConditionGroup)
@@ -258,7 +267,9 @@ namespace Infrastructure.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.RuleName).HasMaxLength(30);
+                entity.Property(e => e.RuleName)
+                    .IsRequired()
+                    .HasMaxLength(30);
 
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
@@ -267,6 +278,7 @@ namespace Infrastructure.Models
                 entity.HasOne(d => d.Brand)
                     .WithMany(p => p.ConditionRule)
                     .HasForeignKey(d => d.BrandId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ConditionRule_Brand");
             });
 

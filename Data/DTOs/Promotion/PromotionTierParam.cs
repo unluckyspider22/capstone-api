@@ -7,8 +7,10 @@ namespace Infrastructure.DTOs
 {
     public class PromotionTierParam
     {
-        public ConditionParamDto Condition { get; set; }
-        public ActionDto Action { get; set; }
-        public MembershipActionDto MembershipAction { get; set; }
+        public Guid PromotionId { get; set; }
+        public ConditionRequestParam ConditionRule { get; set; }
+        public List<ConditionGroupDto> ConditionGroups { get; set; }
+        public ActionRequestParam Action { get; set; }
+        public MembershipActionRequestParam MembershipAction { get; set; }
     }
 }

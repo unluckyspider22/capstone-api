@@ -11,12 +11,12 @@ namespace Infrastructure.Models
         }
 
         public Guid ConditionRuleId { get; set; }
-        public Guid? BrandId { get; set; }
+        public Guid BrandId { get; set; }
         public string RuleName { get; set; }
         public string Description { get; set; }
         public bool DelFlg { get; set; }
-        public DateTime? InsDate { get; set; }
-        public DateTime? UpdDate { get; set; }
+        public DateTime InsDate { get; set; }
+        public DateTime UpdDate { get; set; }
 
         public virtual Brand Brand { get; set; }
         public virtual PromotionTier PromotionTier { get; set; }

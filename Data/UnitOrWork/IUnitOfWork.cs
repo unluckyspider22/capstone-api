@@ -44,6 +44,8 @@ namespace Infrastructure.UnitOrWork
         IGenericRepository<VoucherChannel> VoucherChannelRepository { get; }
         //VoucherGroup
         IGenericRepository<VoucherGroup> VoucherGroupRepository { get; }
+        //Condition group
+        IGenericRepository<ConditionGroup> ConditionGroupRepository { get; }
 
         Task<int> SaveAsync();
     }

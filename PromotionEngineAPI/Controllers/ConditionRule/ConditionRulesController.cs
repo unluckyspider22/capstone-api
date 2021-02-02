@@ -113,21 +113,21 @@ namespace PromotionEngineAPI.Controllers
                 // Insert list product condition
                 foreach (var condition in param.productConditions)
                 {
-                    condition.ProductConditionId = Guid.NewGuid();
+                    //condition.ProductConditionId = Guid.NewGuid();
                     //condition.ConditionRuleId = param.conditionRule.ConditionRuleId;
                     response.productConditions.Add(await _productService.CreateAsync(condition));
                 }
                 // Insert list order condition
                 foreach (var condition in param.orderConditions)
                 {
-                    condition.OrderConditionId = Guid.NewGuid();
+                    //condition.OrderConditionId = Guid.NewGuid();
                     //condition.ConditionRuleId = param.conditionRule.ConditionRuleId;
                     response.orderConditions.Add(await _orderService.CreateAsync(condition));
                 }
                 // Insert list membership condition
                 foreach (var condition in param.membershipConditions)
                 {
-                    condition.MembershipConditionId = Guid.NewGuid();
+                    //condition.MembershipConditionId = Guid.NewGuid();
                     //condition.ConditionRuleId = param.conditionRule.ConditionRuleId;
                     response.membershipConditions.Add(await _membershipService.CreateAsync(condition));
                 }

@@ -55,21 +55,22 @@ namespace PromotionEngineAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutProductCondition([FromRoute]Guid id, [FromBody] ProductConditionDto dto)
         {
-            if (id != dto.ProductConditionId)
-            {
-                return BadRequest();
-            }
+            //if (id != dto.ProductConditionId)
+            //{
+            //    return BadRequest();
+            //}
 
-            dto.UpdDate = DateTime.Now;
+            //dto.UpdDate = DateTime.Now;
 
-            var result = await _service.UpdateAsync(dto);
+            //var result = await _service.UpdateAsync(dto);
 
-            if (result == null)
-            {
-                return NotFound();
-            }
+            //if (result == null)
+            //{
+            //    return NotFound();
+            //}
 
-            return Ok(result);
+            //return Ok(result); 
+            return Ok();
 
         }
 
@@ -77,7 +78,7 @@ namespace PromotionEngineAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> PostProductCondition([FromBody] ProductConditionDto dto)
         {
-            dto.ProductConditionId = Guid.NewGuid();
+            //dto.ProductConditionId = Guid.NewGuid();
 
             var result = await _service.CreateAsync(dto);
 

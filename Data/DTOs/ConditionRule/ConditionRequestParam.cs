@@ -1,17 +1,17 @@
-﻿using Infrastructure.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Infrastructure.DTOs
 {
-    public class ConditionRuleDto : BaseDto
+    public class ConditionRequestParam
     {
-        public Guid ConditionRuleId { get; set; }
         public Guid? BrandId { get; set; }
+        [StringLength(30)]
         public string RuleName { get; set; }
+        [StringLength(200)]
         public string Description { get; set; }
-        public virtual ICollection<ConditionGroupDto> ConditionGroup { get; set; }
     }
 }

@@ -15,6 +15,7 @@ namespace Infrastructure.Models
         public Guid ConditionGroupId { get; set; }
         public Guid ConditionRuleId { get; set; }
         public decimal GroupNo { get; set; }
+        public string NextOperator { get; set; }
         public DateTime InsDate { get; set; }
         public DateTime UpdDate { get; set; }
 

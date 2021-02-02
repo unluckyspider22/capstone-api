@@ -65,6 +65,18 @@ namespace Infrastructure.AutoMapper
             //VoucherGroup
             CreateMap<VoucherGroup, VoucherGroupDto>();
             CreateMap<VoucherGroupDto, VoucherGroup>();
+            //VoucherGroup
+            CreateMap<ConditionGroup, ConditionGroupDto>();
+            CreateMap<ConditionGroupDto, ConditionGroup>();
+            //ConditionRequestParam
+            CreateMap<ConditionRule, ConditionRequestParam>();
+            CreateMap<ConditionRequestParam, ConditionRule>();
+            //Action request param
+            CreateMap<Models.Action, ActionRequestParam>();
+            CreateMap<ActionRequestParam, Models.Action>();
+            //Membership request param
+            CreateMap<MembershipAction, MembershipActionRequestParam>();
+            CreateMap<MembershipActionRequestParam, MembershipAction>();
         }
     }
 }
