@@ -32,6 +32,9 @@ namespace Infrastructure.Helper
             public const string DELETED = "1";
             public const string UNLIMIT = "0";
             public const string ISLIMIT = "1";
+            public const string FOR_WEEKEND = "1";
+            public const string NO_FILTER = "0";
+            public const string FOR_MEMBER = "1";
             public struct CHARSET_TYPE
             {
                 public const string ALPHANUMERIC = "Alphanumeric";
@@ -67,11 +70,20 @@ namespace Infrastructure.Helper
                 public const string PUBLISH = "2";
                 public const string EXPIRED = "3";
             }
+
             public struct EXCLULSIVE
             {
-                public const string NONE = "1";
-                public const string LEVEL = "2";
-                public const string GLOBAL = "3";
+                public const string NoneExclusive = "0";
+                public const string GlobalExclusive = "1";
+                public const string ClassExclusiveOrder = "2";
+                public const string ClassExclusiveProduct = "3";
+                public const string ClassExclusiveShipping = "4";
+            }
+            public struct HOLIDAY
+            {
+                public const int FRIDAY = 5;
+                public const int SATURDAY = 6;
+                public const int SUNDAY = 0;
             }
         }
         public class ErrMessage
@@ -101,10 +113,11 @@ namespace Infrastructure.Helper
             public const string NotMathCondition = "Đơn hàng không thỏa mãn các điều kiện của khuyến mãi.";
             public const string Invalid_Store = "Đơn hàng không áp dụng tại cửa hàng này.";
 
-
+            public const string Invalid_TimeFrame = "Khuyến mãi không áp dụng vào thời gian này.";
             public const string Invalid_Operator = "Invalid Logic Operator";
 
         }
+
 
         public class Operator
         {
