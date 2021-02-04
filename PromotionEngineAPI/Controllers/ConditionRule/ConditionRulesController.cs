@@ -45,7 +45,7 @@ namespace PromotionEngineAPI.Controllers
                 pageSize: param.PageSize,
                 filter: el => !el.DelFlg && el.BrandId.Equals(BrandId),
                 orderBy: el => el.OrderByDescending(b => b.InsDate),
-                includeProperties: "PromotionTier,ProductCondition,OrderCondition,MembershipCondition"
+                includeProperties: "ConditionGroup,ConditionGroup.ProductCondition,ConditionGroup.OrderCondition,ConditionGroup.MembershipCondition"
                 );
 
             if (result == null)
