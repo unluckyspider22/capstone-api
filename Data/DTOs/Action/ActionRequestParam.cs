@@ -12,6 +12,8 @@ namespace Infrastructure.DTOs
         public string ActionType { get; set; }
         [StringLength(1)]
         public string DiscountType { get; set; }
+        [StringLength(1)]
+        public string ProductType { get; set; }
         [StringLength(50)]
         public string ParentCode { get; set; }
         [StringLength(200)]

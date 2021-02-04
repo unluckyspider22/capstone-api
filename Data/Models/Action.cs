@@ -9,6 +9,7 @@ namespace Infrastructure.Models
         public Guid PromotionTierId { get; set; }
         public string ActionType { get; set; }
         public string DiscountType { get; set; }
+        public string ProductType { get; set; }
         public string ParentCode { get; set; }
         public string ProductCode { get; set; }
         public decimal? DiscountQuantity { get; set; }

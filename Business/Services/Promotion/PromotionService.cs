@@ -164,7 +164,7 @@ namespace ApplicationCore.Services
                 Expression<Func<PromotionTier, bool>> filter = el => el.PromotionId.Equals(promotionId);
                 var tiers = (
                     await _tierRepo.Get(0, 0, filter: filter,
-                    includeProperties: "ConditionRule,MembershipAction,Action"))
+                    includeProperties: "ConditionRule,ConditionRule.ConditionGroup,ConditionRule.ConditionGroup.MembershipCondition,ConditionRule.ConditionGroup.OrderCondition,ConditionRule.ConditionGroup.ProductCondition,MembershipAction,Action"))
                     .ToList();
                 return tiers;
             }
