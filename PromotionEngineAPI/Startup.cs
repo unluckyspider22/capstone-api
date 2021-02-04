@@ -107,14 +107,14 @@ namespace PromotionEngineAPI
             services.AddScoped<IApplyPromotionHandler, ApplyPromotionHandler>();
             //PromotionHandle
             services.AddScoped<IPromotionHandle, PromotionHandle>();
-            //OrderHandle
-            services.AddScoped<IOrderHandle, OrderHandle>();
-            //ProductHandle
-            services.AddScoped<IProductHandle, ProductHandle>();
             //TimeframeHandle
             services.AddScoped<ITimeframeHandle, TimeframeHandle>();
             //MembershipHandle
             services.AddScoped<IMembershipHandle, MembershipHandle>();
+            //OrderHandle
+            services.AddScoped<IOrderHandle, OrderHandle>();
+            //ProductHandle
+            services.AddScoped<IProductHandle, ProductHandle>();
 
         }
         #endregion
