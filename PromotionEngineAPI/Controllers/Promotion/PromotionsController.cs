@@ -8,6 +8,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using Infrastructure.Models;
 using System.Diagnostics;
+using ApplicationCore.Request;
+using System.Collections.Generic;
 
 namespace PromotionEngineAPI.Controllers
 {
@@ -16,12 +18,37 @@ namespace PromotionEngineAPI.Controllers
     public class PromotionsController : ControllerBase
     {
         private readonly IPromotionService _promotionService;
+        private readonly IVoucherService _voucherService;
         private readonly IPromotionStoreMappingService _promotionStoreMappingService;
 
-        public PromotionsController(IPromotionService service, IPromotionStoreMappingService promotionStoreMappingService)
+        public PromotionsController(IPromotionService service, IPromotionStoreMappingService promotionStoreMappingService, IVoucherService voucherService)
         {
             _promotionService = service;
             _promotionStoreMappingService = promotionStoreMappingService;
+            _voucherService = voucherService;
+        }
+
+        [HttpPost]
+        [Route("check-voucher")]
+        public async Task<IActionResult> CheckVoucher([FromBody] OrderResponseModel responseModel)
+        {
+            //Lấy promotion bởi voucher code
+            var result = responseModel;
+            try
+            {
+                var promotions = await _voucherService.CheckVoucher(responseModel);
+                if (promotions != null && promotions.Count() > 0)
+                {
+                    responseModel.Promotions = promotions;
+                    //Check promotion
+                    result = await _promotionService.HandlePromotion(responseModel);
+                }
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+            return Ok(result);
         }
 
         // GET: api/Promotions

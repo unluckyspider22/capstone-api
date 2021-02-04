@@ -1,3 +1,4 @@
+using ApplicationCore.Chain;
 using ApplicationCore.Services;
 using AutoMapper;
 using Infrastructure.Models;
@@ -54,7 +55,7 @@ namespace PromotionEngineAPI
 
 
         }
-
+        #region Add Scope
         private void ServiceAddScoped(IServiceCollection services)
         {
 
@@ -97,8 +98,26 @@ namespace PromotionEngineAPI
             //VoucherGroup
             services.AddScoped<IVoucherGroupService, VoucherGroupService>();
 
+            ChainOfResponsibilityServices(services);
 
         }
+        private void ChainOfResponsibilityServices(IServiceCollection services)
+        {
+            //ApplyPromotionHandler
+            services.AddScoped<IApplyPromotionHandler, ApplyPromotionHandler>();
+            //PromotionHandle
+            services.AddScoped<IPromotionHandle, PromotionHandle>();
+            //OrderHandle
+            services.AddScoped<IOrderHandle, OrderHandle>();
+            //ProductHandle
+            services.AddScoped<IProductHandle, ProductHandle>();
+            //TimeframeHandle
+            services.AddScoped<ITimeframeHandle, TimeframeHandle>();
+            //MembershipHandle
+            services.AddScoped<IMembershipHandle, MembershipHandle>();
+
+        }
+        #endregion
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
