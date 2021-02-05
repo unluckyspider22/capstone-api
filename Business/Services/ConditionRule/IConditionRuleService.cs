@@ -10,6 +10,6 @@ namespace ApplicationCore.Services
 {
     public interface IConditionRuleService : IBaseService<ConditionRule, ConditionRuleDto>
     {
-
+        public Task<List<ConditionRuleResponse>> ReorderResult(List<ConditionRule> paramList);
     }
 }

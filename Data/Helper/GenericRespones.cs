@@ -14,5 +14,6 @@ namespace Infrastructure.Helper
             this.Metadata = metadata;
             this.Data = data;
         }
+
     }
 }

@@ -7,6 +7,7 @@ namespace Infrastructure.Models
     {
         public Guid OrderConditionId { get; set; }
         public Guid ConditionGroupId { get; set; }
+        public int? IndexGroup { get; set; }
         public decimal Quantity { get; set; }
         public string QuantityOperator { get; set; }
         public decimal Amount { get; set; }

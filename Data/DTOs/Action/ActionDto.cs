@@ -18,6 +18,7 @@ namespace Infrastructure.DTOs
         public decimal? DiscountPercentage { get; set; }
         public decimal? FixedPrice { get; set; }
         public decimal? MaxAmount { get; set; }
+        public decimal? MaxQuantity { get; set; }
         public decimal? MinPriceAfter { get; set; }
         public decimal? OrderLadderProduct { get; set; }
         public decimal? LadderPrice { get; set; }

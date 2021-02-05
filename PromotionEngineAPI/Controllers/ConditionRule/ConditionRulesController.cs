@@ -40,19 +40,23 @@ namespace PromotionEngineAPI.Controllers
             {
                 filter = el => !el.DelFlg && el.BrandId.Equals(BrandId) && (el.PromotionTier == null);
             }
-            var result = await _service.GetAsync(
-                pageIndex: param.PageIndex,
-                pageSize: param.PageSize,
-                filter: el => !el.DelFlg && el.BrandId.Equals(BrandId),
-                orderBy: el => el.OrderByDescending(b => b.InsDate),
-                includeProperties: "ConditionGroup,ConditionGroup.ProductCondition,ConditionGroup.OrderCondition,ConditionGroup.MembershipCondition"
-                );
-
-            if (result == null)
+            try
             {
-                return NotFound();
+                var conditionRules = await _service.GetAsync(
+               pageIndex: param.PageIndex,
+               pageSize: param.PageSize,
+               filter: el => !el.DelFlg && el.BrandId.Equals(BrandId),
+               orderBy: el => el.OrderByDescending(b => b.InsDate),
+               includeProperties: "ConditionGroup,ConditionGroup.ProductCondition,ConditionGroup.OrderCondition,ConditionGroup.MembershipCondition"
+               );
+                GenericRespones<ConditionRuleResponse> result = new GenericRespones<ConditionRuleResponse>(await _service.ReorderResult(conditionRules.Data), conditionRules.Metadata);
+                return Ok(result);
             }
-            return Ok(result);
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+
         }
 
         // GET: api/ConditionRules/count

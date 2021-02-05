@@ -26,11 +26,16 @@ namespace ApplicationCore.Services
             try
             {
                 // Create condition rule
+                // Nếu param truyền vào không có condition rule id thì add mới vào db
                 IGenericRepository<ConditionRule> conditionRuleRepo = _unitOfWork.ConditionRuleRepository;
                 var conditionRuleEntity = _mapper.Map<ConditionRule>(param.ConditionRule);
-                conditionRuleEntity.ConditionRuleId = Guid.NewGuid();
-                conditionRuleRepo.Add(conditionRuleEntity);
-                //await _unitOfWork.SaveAsync();
+                if (param.ConditionRule.ConditionRuleId.Equals(Guid.Empty))
+                {
+                    conditionRuleEntity.ConditionRuleId = Guid.NewGuid();
+                    param.ConditionRule.ConditionRuleId = conditionRuleEntity.ConditionRuleId;
+                    conditionRuleRepo.Add(conditionRuleEntity);
+                }
+
 
                 // Create condition group
                 IGenericRepository<ConditionGroup> conditionGroupRepo = _unitOfWork.ConditionGroupRepository;
@@ -81,7 +86,7 @@ namespace ApplicationCore.Services
 
                         }
                     }
-                   
+
                     // Create membership condition
                     if (group.MembershipCondition.Count > 0)
                     {
@@ -97,7 +102,7 @@ namespace ApplicationCore.Services
 
                         }
                     }
-                   
+
                 }
                 //await _unitOfWork.SaveAsync();
 
@@ -191,9 +196,9 @@ namespace ApplicationCore.Services
             {
                 Debug.WriteLine(e.StackTrace);
                 throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.", description: "Internal Server Error");
-            } 
-           
-            
+            }
+
+
         }
 
         public async Task<List<PromotionTier>> GetPromotionTierDetail(Guid promotionId)

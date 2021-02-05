@@ -8,6 +8,7 @@ namespace Infrastructure.DTOs
 {
     public class ConditionRequestParam
     {
+        public Guid ConditionRuleId { get; set; }
         public Guid? BrandId { get; set; }
         [StringLength(30)]
         public string RuleName { get; set; }
