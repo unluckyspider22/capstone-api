@@ -6,10 +6,6 @@ using System.Threading.Tasks;
 
 namespace ApplicationCore.Models
 {
-    public class ConditionResponseModel
-    {
-        public List<ConditionModel> ConditionModels { get; set; }
-    }
     public class ConditionModel
     {
         public Guid Id { get; set; }

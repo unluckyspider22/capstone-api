@@ -14,16 +14,16 @@ namespace ApplicationCore.Chain
     {
         private readonly IPromotionHandle _promotionHandle;
         private readonly ITimeframeHandle _timeframeHandle;
-        private readonly IMembershipHandle _membershipHandle;
-        private readonly IPromotionConditionHandle _promotionConditionHandle;
-        private readonly IProductHandle _productHandle;
+        private readonly IMembershipConditionHandle _membershipHandle;
+        private readonly IConditionHandle _conditionHandle;
+        private readonly IProductConditionHandle _productHandle;
 
-        public ApplyPromotionHandler(IPromotionHandle promotionHandle, ITimeframeHandle timeframeHandle, IMembershipHandle membershipHandle, IPromotionConditionHandle orderHandle, IProductHandle productHandle)
+        public ApplyPromotionHandler(IPromotionHandle promotionHandle, ITimeframeHandle timeframeHandle, IMembershipConditionHandle membershipHandle, IConditionHandle conditionHandle, IProductConditionHandle productHandle)
         {
             _promotionHandle = promotionHandle;
             _timeframeHandle = timeframeHandle;
             _membershipHandle = membershipHandle;
-            _promotionConditionHandle = orderHandle;
+            _conditionHandle = conditionHandle;
             _productHandle = productHandle;
         }
 
@@ -32,9 +32,8 @@ namespace ApplicationCore.Chain
             #region Check condition
             Setorder(order);
             //Thứ tự là:
-            //ApplyHandle => PromotionHandle => TimeframeHandle(nếu có) => PromotionConditionHandle
-            _promotionHandle.SetNext(_timeframeHandle)
-                .SetNext(_promotionConditionHandle);
+            //ApplyHandle => PromotionHandle => TimeframeHandle(nếu có) => ConditionHandle
+            _promotionHandle.SetNext(_conditionHandle);
             _promotionHandle.Handle(order);
             #endregion
 

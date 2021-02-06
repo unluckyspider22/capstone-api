@@ -15,16 +15,10 @@ namespace ApplicationCore.Chain
     public class PromotionHandle : Handler<OrderResponseModel>, IPromotionHandle
     {
         private readonly ITimeframeHandle _timeframeHandle;
-        private readonly IMembershipHandle _membershipHandle;
-        private readonly IPromotionConditionHandle _orderHandle;
-        private readonly IProductHandle _productHandle;
 
-        public PromotionHandle(ITimeframeHandle timeframeHandle, IMembershipHandle membershipHandle, IPromotionConditionHandle orderHandle, IProductHandle productHandle)
+        public PromotionHandle(ITimeframeHandle timeframeHandle)
         {
             _timeframeHandle = timeframeHandle;
-            _membershipHandle = membershipHandle;
-            _orderHandle = orderHandle;
-            _productHandle = productHandle;
         }
 
         public override void Handle(OrderResponseModel order)
@@ -103,11 +97,11 @@ namespace ApplicationCore.Chain
             }
             if (!promotion.DayFilter.Equals(AppConstant.ENVIRONMENT_VARIABLE.NO_FILTER))
             {
-                CheckTimeframe(promotion, order);
+                _timeframeHandle.Handle(order);
             }
             if (!promotion.HourFilter.Equals(AppConstant.ENVIRONMENT_VARIABLE.NO_FILTER))
             {
-                CheckTimeframe(promotion, order);
+                _timeframeHandle.Handle(order);
             }
         }
         #endregion

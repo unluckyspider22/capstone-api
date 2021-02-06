@@ -110,12 +110,13 @@ namespace PromotionEngineAPI
             //TimeframeHandle
             services.AddScoped<ITimeframeHandle, TimeframeHandle>();
             //MembershipHandle
-            services.AddScoped<IMembershipHandle, MembershipHandle>();
+            services.AddScoped<IMembershipConditionHandle, MembershipConditionHandle>();
             //OrderHandle
-            services.AddScoped<IPromotionConditionHandle, PromotionConditionHandle>();
+            services.AddScoped<IConditionHandle, ConditionHandle>();
             //ProductHandle
-            services.AddScoped<IProductHandle, ProductHandle>();
-
+            services.AddScoped<IProductConditionHandle, ProducConditiontHandle>();
+            //OrderConditionHandle
+            services.AddScoped<IOrderConditionHandle, OrderConditionHandle>();
         }
         #endregion
 

@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using ApplicationCore.Models;
+using AutoMapper;
 using Infrastructure.DTOs;
 using Infrastructure.Models;
 
@@ -77,6 +78,17 @@ namespace Infrastructure.AutoMapper
             //Membership request param
             CreateMap<MembershipAction, MembershipActionRequestParam>();
             CreateMap<MembershipActionRequestParam, MembershipAction>();
+            //OrderConditionModel
+            CreateMap<OrderCondition, OrderConditionModel>();
+            CreateMap<OrderConditionModel, OrderCondition>();
+            //ProductConditionModel
+            CreateMap<ProductCondition, ProductConditionModel>();
+            CreateMap<ProductConditionModel, ProductCondition>();
+            //MembersipConditionModel
+            CreateMap<MembershipCondition, MembershipConditionModel>();
+            CreateMap<MembershipConditionModel, MembershipCondition>();
+
+
         }
     }
 }
