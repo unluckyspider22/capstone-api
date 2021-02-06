@@ -134,7 +134,7 @@ namespace PromotionEngineAPI.Controllers
             {
                 dto.VoucherGroupId = Guid.NewGuid();
 
-                if (dto.VoucherType.Equals(AppConstant.ENVIRONMENT_VARIABLE.VOUCHER_TYPE.BULK_CODE))
+                if (dto.VoucherType.Equals(AppConstant.EnvVar.VoucherType.BULK_CODE))
                 {
                     List<VoucherDto> generateVoucher = _service.GenerateBulkCodeVoucher(dto);
                     dto.Voucher = generateVoucher;

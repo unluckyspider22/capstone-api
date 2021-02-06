@@ -1,4 +1,5 @@
 ﻿
+using ApplicationCore.Request;
 using Infrastructure.DTOs;
 using Infrastructure.Models;
 using System;
@@ -11,6 +12,8 @@ namespace ApplicationCore.Services
     {
         Task<List<PromotionTier>> GetPromotionTierDetail(Guid promotionId);
         Task<PromotionTierParam> CreatePromotionTier(PromotionTierParam promotionTierParam);
+
+        Task<OrderResponseModel> HandlePromotion(OrderResponseModel orderResponse);
         Task<bool> DeletePromotionTier(DeleteTierRequestParam deleteTierRequestParam);
     }
 }

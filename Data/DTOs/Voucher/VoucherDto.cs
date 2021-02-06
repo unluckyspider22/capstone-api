@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Infrastructure.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,5 +18,6 @@ namespace Infrastructure.DTOs
         public DateTime? UsedDate { get; set; }
         public DateTime? RedempedDate { get; set; }
         public bool IsActive { get; set; }
+        public virtual VoucherGroup VoucherGroup { get; set; }
     }
 }
