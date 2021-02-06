@@ -32,7 +32,9 @@ namespace Infrastructure.Helper
             public const string DELETED = "1";
             public const string UNLIMIT = "0";
             public const string ISLIMIT = "1";
+            
             public const string FOR_WEEKEND = "1";
+            public const string FOR_HOLIDAY = "2";
             public const string NO_FILTER = "0";
             public const string FOR_MEMBER = "1";
             public struct CHARSET_TYPE
@@ -110,7 +112,7 @@ namespace Infrastructure.Helper
             public const string Invalid_PaymentType = "Loại hình thanh toán không phù hợp.";
             public const string NotExisted_Product = "Đơn hàng không có sản phẩm yêu cầu.";
             public const string Quantity_Product = "Sản phẩm yêu cầu thấp hơn quy định.";
-            public const string NotMathCondition = "Đơn hàng không thỏa mãn các điều kiện của khuyến mãi.";
+            public const string NotMatchCondition = "Đơn hàng không thỏa mãn các điều kiện của khuyến mãi.";
             public const string Invalid_Store = "Đơn hàng không áp dụng tại cửa hàng này.";
 
             public const string Invalid_TimeFrame = "Khuyến mãi không áp dụng vào thời gian này.";

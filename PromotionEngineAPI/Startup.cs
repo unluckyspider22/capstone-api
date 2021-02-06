@@ -112,7 +112,7 @@ namespace PromotionEngineAPI
             //MembershipHandle
             services.AddScoped<IMembershipHandle, MembershipHandle>();
             //OrderHandle
-            services.AddScoped<IOrderHandle, OrderHandle>();
+            services.AddScoped<IPromotionConditionHandle, PromotionConditionHandle>();
             //ProductHandle
             services.AddScoped<IProductHandle, ProductHandle>();
 

@@ -28,7 +28,8 @@ namespace ApplicationCore.Request
         public decimal? Discount { get; set; }
         public decimal? DiscountOrderDetail { get; set; }
         public decimal? FinalAmount { get; set; }
-
+        public List<Guid> PromotionTierIds { get; set; }
+        public List<OrderActionModel> OrderAction { get; set; }
     }
 
     public class OrderInfoModel
@@ -50,7 +51,7 @@ namespace ApplicationCore.Request
 
         public List<OrderDetailResponseModel> OrderDetailResponses { get; set; }
 
-
+        
     }
     public class Gift
     {
@@ -86,15 +87,25 @@ namespace ApplicationCore.Request
         public string PromotionCode { get; set; }
 
     }
-    public class OrderDetailActionModel
+    public class OrderActionModel
     {
         public Guid ActionId { get; set; }
-        public Guid PromotionId { get; set; }
-        public string ActionDescription { get; set; }
-        public string PromotionDescription { get; set; }
-        public string VoucherCode { get; set; }
-        public string PromotionCode { get; set; }
+        public Guid PromotionTierId { get; set; }
+        public string ActionType { get; set; }
+        public string DiscountType { get; set; }
+        public string ParentCode { get; set; }
+        public string ProductCode { get; set; }
+        public decimal? DiscountQuantity { get; set; }
         public decimal? DiscountAmount { get; set; }
+        public decimal? DiscountPercentage { get; set; }
+        public decimal? FixedPrice { get; set; }
+        public decimal? MaxAmount { get; set; }
+        public decimal? MinPriceAfter { get; set; }
+        public decimal? OrderLadderProduct { get; set; }
+        public decimal? LadderPrice { get; set; }
+        public decimal? BundlePrice { get; set; }
+        public decimal? BundleQuantity { get; set; }
+        public string BundleStrategy { get; set; }
     }
     public class CustomerInfo
     {

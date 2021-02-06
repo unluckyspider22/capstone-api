@@ -1,4 +1,5 @@
 ﻿using ApplicationCore.Request;
+using Infrastructure.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,12 @@ namespace ApplicationCore.Chain
     }
     public class MembershipHandle : Handler<OrderResponseModel>, IMembershipHandle
     {
-        
+        public override void Handle(OrderResponseModel request)
+        {
+            /*throw new ErrorObj(code: 400, message: "MembershipHandle");*/
+
+            base.Handle(request);
+        }
+
     }
 }

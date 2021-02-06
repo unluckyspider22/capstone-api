@@ -22,15 +22,15 @@ namespace ApplicationCore.Utils
               };
 
           }*/
-        public static bool Compare<T>(string op, T left, T right) where T : IComparable<T>
+        public static bool Compare<T>(string op, T orderAmount, T minAmount) where T : IComparable<T>
         {
             return op switch
             {
-                AppConstant.Operator.GREATER_THAN => left.CompareTo(right) > 0,
-                AppConstant.Operator.GREATER_THAN_OR_EQUAL => left.CompareTo(right) >= 0,
-                AppConstant.Operator.LESS_THAN => left.CompareTo(right) < 0,
-                AppConstant.Operator.LESS_THAN_OR_EQUAL => left.CompareTo(right) <= 0,
-                AppConstant.Operator.EQUAL => left.CompareTo(right) == 0,
+                AppConstant.Operator.GREATER_THAN => orderAmount.CompareTo(minAmount) > 0,
+                AppConstant.Operator.GREATER_THAN_OR_EQUAL => orderAmount.CompareTo(minAmount) >= 0,
+                AppConstant.Operator.LESS_THAN => orderAmount.CompareTo(minAmount) < 0,
+                AppConstant.Operator.LESS_THAN_OR_EQUAL => orderAmount.CompareTo(minAmount) <= 0,
+                AppConstant.Operator.EQUAL => orderAmount.CompareTo(minAmount) == 0,
                 _ => throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.Invalid_Operator),
             };
         }

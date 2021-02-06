@@ -1,4 +1,5 @@
 ﻿using ApplicationCore.Request;
+using Infrastructure.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +13,11 @@ namespace ApplicationCore.Chain
     }
     public class TimeframeHandle : Handler<OrderResponseModel>, ITimeframeHandle
     {
+        public override void Handle(OrderResponseModel order)
+        {
+           
+
+            base.Handle(order);
+        }
     }
 }

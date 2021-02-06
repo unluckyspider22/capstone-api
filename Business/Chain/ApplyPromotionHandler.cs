@@ -13,21 +13,35 @@ namespace ApplicationCore.Chain
     public class ApplyPromotionHandler : Handler<OrderResponseModel>, IApplyPromotionHandler
     {
         private readonly IPromotionHandle _promotionHandle;
+        private readonly ITimeframeHandle _timeframeHandle;
+        private readonly IMembershipHandle _membershipHandle;
+        private readonly IPromotionConditionHandle _promotionConditionHandle;
+        private readonly IProductHandle _productHandle;
 
-
-        public ApplyPromotionHandler(IPromotionHandle promotionHandle)
+        public ApplyPromotionHandler(IPromotionHandle promotionHandle, ITimeframeHandle timeframeHandle, IMembershipHandle membershipHandle, IPromotionConditionHandle orderHandle, IProductHandle productHandle)
         {
             _promotionHandle = promotionHandle;
+            _timeframeHandle = timeframeHandle;
+            _membershipHandle = membershipHandle;
+            _promotionConditionHandle = orderHandle;
+            _productHandle = productHandle;
         }
 
         public override void Handle(OrderResponseModel order)
         {
             #region Check condition
             Setorder(order);
-            /*_promotionHandle.SetNext(_orderHandle).SetNext(_productHandle);*/
+            //Thứ tự là:
+            //ApplyHandle => PromotionHandle => TimeframeHandle(nếu có) => PromotionConditionHandle
+            _promotionHandle.SetNext(_timeframeHandle)
+                .SetNext(_promotionConditionHandle);
             _promotionHandle.Handle(order);
             #endregion
-            base.Handle(order);
+
+            #region Apply action
+
+            #endregion
+            /*base.Handle(order);*/
         }
 
         private void Setorder(OrderResponseModel order)
