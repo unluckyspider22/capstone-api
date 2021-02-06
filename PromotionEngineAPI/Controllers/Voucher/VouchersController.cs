@@ -26,7 +26,7 @@ namespace PromotionEngineAPI.Controllers
         // GET: api/Vouchers
         [HttpGet]
         // api/Vouchers?pageIndex=...&pageSize=...
-        public async Task<IActionResult> GetVoucher([FromQuery] PagingRequestParam param,[FromQuery] Guid VoucherGroupId)
+        public async Task<IActionResult> GetVoucher([FromQuery] PagingRequestParam param, [FromQuery] Guid VoucherGroupId)
         {
             try
             {
@@ -63,7 +63,7 @@ namespace PromotionEngineAPI.Controllers
         public async Task<IActionResult> GetVoucher([FromRoute] Guid id)
         {
             try
-            {             
+            {
                 return Ok(await _service.GetByIdAsync(id));
             }
             catch (ErrorObj e)
@@ -71,7 +71,6 @@ namespace PromotionEngineAPI.Controllers
                 return StatusCode(statusCode: e.Code, e);
             }
         }
-
         // PUT: api/Vouchers/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutVoucher([FromRoute] Guid id, [FromBody] VoucherDto dto)
@@ -95,7 +94,7 @@ namespace PromotionEngineAPI.Controllers
         public async Task<IActionResult> ActiveVoucher([FromBody] VoucherGroupDto dto)
         {
             try
-            {                             
+            {
                 return Ok(await _service.activeAllVoucherInGroup(dto));
             }
             catch (ErrorObj e)
@@ -135,6 +134,6 @@ namespace PromotionEngineAPI.Controllers
             }
         }
 
-        
+
     }
 }

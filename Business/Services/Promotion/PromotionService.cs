@@ -1,6 +1,10 @@
 ﻿
+using ApplicationCore.Chain;
+using ApplicationCore.Request;
+using ApplicationCore.Utils;
 using AutoMapper;
 using Infrastructure.DTOs;
+using Infrastructure.Helper;
 using Infrastructure.Models;
 using Infrastructure.Repository;
 using Infrastructure.UnitOrWork;
@@ -15,11 +19,15 @@ namespace ApplicationCore.Services
 {
     public class PromotionService : BaseService<Promotion, PromotionDto>, IPromotionService
     {
-        public PromotionService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
+        private readonly IApplyPromotionHandler _applyPromotionHandler;
+        public PromotionService(IUnitOfWork unitOfWork, IMapper mapper, IApplyPromotionHandler promotionHandle) : base(unitOfWork, mapper)
         {
+            _applyPromotionHandler = promotionHandle;
         }
 
         protected override IGenericRepository<Promotion> _repository => _unitOfWork.PromotionRepository;
+
+
 
         public async Task<PromotionTierParam> CreatePromotionTier(PromotionTierParam param)
         {
@@ -226,5 +234,40 @@ namespace ApplicationCore.Services
         }
 
 
+
+        #region check voucher
+        public async Task<OrderResponseModel> HandlePromotion(OrderResponseModel orderResponse)
+        {
+            try
+            {
+                var now = Common.GetCurrentDatetime();
+                foreach (Promotion promotion in orderResponse.Promotions)
+                {
+                    //Check promotion is active
+                    if (!promotion.IsActive) throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.InActive_Promotion, description: AppConstant.ErrMessage.InActive_Promotion);
+                    //Check promotion is time
+                    if (promotion.StartDate > now)
+                    {
+                        throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.Invalid_Time, description: AppConstant.ErrMessage.Invalid_Time);
+                    }
+                    //Check promotion is expired
+                    if (promotion.EndDate < now)
+                    {
+                        throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.Expire_Promotion, description: AppConstant.ErrMessage.Expire_Promotion);
+                    }
+                }
+                _applyPromotionHandler.Handle(orderResponse);
+            }
+            catch (ErrorObj e)
+            {
+                throw new ErrorObj(code: 400, message: e.Message);
+            }
+            catch (Exception ex)
+            {
+                throw new ErrorObj(code: 500, message: ex.ToString());
+            }
+            return orderResponse;
+        }
+        #endregion
     }
 }

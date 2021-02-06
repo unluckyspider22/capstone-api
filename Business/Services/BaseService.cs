@@ -39,7 +39,7 @@ namespace ApplicationCore.Services
             {
                 //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at CreateAsync: \n" + e.Message);
-                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.", description: "Internal Server Error");
+                throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
             }
         }
 
@@ -77,7 +77,7 @@ namespace ApplicationCore.Services
             {
                 //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at GetAsync: \n" + e.Message);
-                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+                throw new ErrorObj(code: 500, message: "GetAsync:" + e.Message);
             }
         }
 
@@ -91,7 +91,7 @@ namespace ApplicationCore.Services
             {
                 //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at GetByIdAsync: \n" + e.Message);
-                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+                throw new ErrorObj(code: 500, message: e.Message);
             }
         }
 
