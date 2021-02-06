@@ -26,8 +26,6 @@ namespace Infrastructure.DTOs
         public decimal? DiscountPercentage { get; set; }
         [Range(0, 9999999999)]
         public decimal? FixedPrice { get; set; }
-        [Range(0, 9999999999)]
-        public decimal? MaxAmount { get; set; }
         [Range(0, 999999)]
         public decimal? MaxQuantity { get; set; }
         [Range(0, 9999999999)]

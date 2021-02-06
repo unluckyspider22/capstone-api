@@ -4,6 +4,7 @@ using Infrastructure.DTOs;
 using Infrastructure.Models;
 using Infrastructure.Repository;
 using Infrastructure.UnitOrWork;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -25,23 +26,48 @@ namespace ApplicationCore.Services
         {
             try
             {
-                // Create condition rule
-                // Nếu param truyền vào không có condition rule id thì add mới vào db
+
                 IGenericRepository<ConditionRule> conditionRuleRepo = _unitOfWork.ConditionRuleRepository;
-                var conditionRuleEntity = _mapper.Map<ConditionRule>(param.ConditionRule);
-                if (param.ConditionRule.ConditionRuleId.Equals(Guid.Empty))
-                {
-                    conditionRuleEntity.ConditionRuleId = Guid.NewGuid();
-                    param.ConditionRule.ConditionRuleId = conditionRuleEntity.ConditionRuleId;
-                    conditionRuleRepo.Add(conditionRuleEntity);
-                }
-
-
-                // Create condition group
                 IGenericRepository<ConditionGroup> conditionGroupRepo = _unitOfWork.ConditionGroupRepository;
                 IGenericRepository<ProductCondition> productConditionRepo = _unitOfWork.ProductConditionRepository;
                 IGenericRepository<OrderCondition> orderConditionRepo = _unitOfWork.OrderConditionRepository;
                 IGenericRepository<MembershipCondition> membershipConditionRepo = _unitOfWork.MembershipConditionRepository;
+                // Create condition rule
+
+                var conditionRuleEntity = _mapper.Map<ConditionRule>(param.ConditionRule);
+                // Nếu param truyền vào không có condition rule id thì add mới vào db
+                if (param.ConditionRule.ConditionRuleId.Equals(Guid.Empty))
+                {
+
+                    conditionRuleEntity.ConditionRuleId = Guid.NewGuid();
+                    param.ConditionRule.ConditionRuleId = conditionRuleEntity.ConditionRuleId;
+                    conditionRuleRepo.Add(conditionRuleEntity);
+
+
+                }
+                else
+                {
+                    // Nếu đã có condition rule 
+                    conditionRuleEntity.UpdDate = DateTime.Now;
+                    conditionRuleEntity.InsDate = null;
+                    conditionRuleRepo.Update(conditionRuleEntity);
+                    //Delete old condition group of condition rule
+                    List<ConditionGroup> oldGroups = (await conditionGroupRepo.Get(pageIndex: 0, pageSize: 0, filter: o => o.ConditionRuleId.Equals(conditionRuleEntity.ConditionRuleId))).ToList();
+                    if (oldGroups.Count > 0)
+                    {
+                        foreach (var group in oldGroups)
+                        {
+                            productConditionRepo.Delete(id: Guid.Empty, filter: o => o.ConditionGroupId.Equals(group.ConditionGroupId));
+                            orderConditionRepo.Delete(id: Guid.Empty, filter: o => o.ConditionGroupId.Equals(group.ConditionGroupId));
+                            membershipConditionRepo.Delete(id: Guid.Empty, filter: o => o.ConditionGroupId.Equals(group.ConditionGroupId));
+                            conditionGroupRepo.Delete(id: group.ConditionGroupId);
+                        }
+                        await _unitOfWork.SaveAsync();
+                    }
+
+
+                }
+                // Create condition group
                 foreach (var group in param.ConditionGroups)
                 {
                     ConditionGroup conditionGroupEntity = new ConditionGroup
@@ -49,10 +75,12 @@ namespace ApplicationCore.Services
                         ConditionGroupId = Guid.NewGuid(),
                         GroupNo = group.GroupNo,
                         ConditionRuleId = conditionRuleEntity.ConditionRuleId,
+                        NextOperator = group.NextOperator,
                         InsDate = DateTime.Now,
                         UpdDate = DateTime.Now
                     };
                     conditionGroupRepo.Add(conditionGroupEntity);
+                    group.ConditionGroupId = conditionGroupEntity.ConditionGroupId;
                     //await _unitOfWork.SaveAsync();
 
                     // Create product condition
@@ -67,6 +95,7 @@ namespace ApplicationCore.Services
                             productConditionEntity.UpdDate = DateTime.Now;
                             productConditionEntity.InsDate = DateTime.Now;
                             productConditionRepo.Add(productConditionEntity);
+                            productCondition.ProductConditionId = productConditionEntity.ProductConditionId;
 
                         }
                     }
@@ -83,6 +112,7 @@ namespace ApplicationCore.Services
                             orderConditionEntity.UpdDate = DateTime.Now;
                             orderConditionEntity.InsDate = DateTime.Now;
                             orderConditionRepo.Add(orderConditionEntity);
+                            orderCondition.OrderConditionId = orderConditionEntity.OrderConditionId;
 
                         }
                     }
@@ -99,12 +129,14 @@ namespace ApplicationCore.Services
                             membershipConditionEntity.UpdDate = DateTime.Now;
                             membershipConditionEntity.InsDate = DateTime.Now;
                             membershipConditionRepo.Add(membershipConditionEntity);
+                            membershipCondition.MembershipConditionId = membershipConditionEntity.MembershipConditionId;
 
                         }
                     }
 
                 }
-                //await _unitOfWork.SaveAsync();
+
+
 
                 // Create promotion tier
                 IGenericRepository<PromotionTier> promotionTierRepo = _unitOfWork.PromotionTierRepository;
@@ -126,6 +158,7 @@ namespace ApplicationCore.Services
                     promotionTier.ActionId = actionEntity.ActionId;
                     promotionTierRepo.Add(promotionTier);
                     actionRepo.Add(actionEntity);
+                    param.Action = _mapper.Map<ActionRequestParam>(actionEntity);
 
                 }
                 else
@@ -139,6 +172,7 @@ namespace ApplicationCore.Services
                     promotionTier.MembershipActionId = membershipAction.MembershipActionId;
                     promotionTierRepo.Add(promotionTier);
                     membershipActionRepo.Add(membershipAction);
+                    param.MembershipAction = _mapper.Map<MembershipActionRequestParam>(membershipAction);
                 }
                 else
                 {
@@ -181,11 +215,6 @@ namespace ApplicationCore.Services
                 // Delete promotion tier
                 IGenericRepository<PromotionTier> tierRepo = _unitOfWork.PromotionTierRepository;
                 tierRepo.Delete(param.PromotionTierId);
-                // Update promotion tier id of condition rule
-                //IGenericRepository<ConditionRule> ruleRepo = _unitOfWork.ConditionRuleRepository;
-                //var rule = param.ConditionRule;
-                //rule.PromotionTier = null;
-                //ruleRepo.Update(_mapper.Map<ConditionRule>(rule));
                 return await _unitOfWork.SaveAsync() > 0;
             }
             catch (ErrorObj e)
@@ -217,6 +246,7 @@ namespace ApplicationCore.Services
             }
             catch (Exception e)
             {
+                Debug.WriteLine(e.GetType());
                 Debug.WriteLine(e.StackTrace);
                 throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.", description: "Internal Server Error");
             }

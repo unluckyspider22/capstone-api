@@ -8,6 +8,7 @@ namespace Infrastructure.DTOs
 {
     public class ConditionGroupDto
     {
+        public Guid ConditionGroupId { get; set; }
         [Range(0,99999)]
         public decimal GroupNo { get; set; }
         [StringLength(1)]

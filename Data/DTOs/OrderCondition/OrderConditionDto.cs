@@ -9,6 +9,8 @@ namespace Infrastructure.DTOs
     public class OrderConditionDto
     {
         public Guid OrderConditionId { get; set; }
+        [StringLength(1)]
+        public string NextOperator { get; set; }
         [Range(0,999999)]
         public decimal Quantity { get; set; }
         [StringLength(1)]
