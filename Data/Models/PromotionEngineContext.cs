@@ -135,8 +135,6 @@ namespace Infrastructure.Models
 
                 entity.Property(e => e.MaxAmount).HasColumnType("decimal(10, 0)");
 
-                entity.Property(e => e.MaxQuantity).HasColumnType("decimal(6, 0)");
-
                 entity.Property(e => e.MinPriceAfter).HasColumnType("decimal(10, 0)");
 
                 entity.Property(e => e.OrderLadderProduct).HasColumnType("decimal(2, 0)");
@@ -429,6 +427,11 @@ namespace Infrastructure.Models
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.NextOperator)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .IsFixedLength();
 
                 entity.Property(e => e.Quantity).HasColumnType("decimal(6, 0)");
 
