@@ -8,18 +8,28 @@ using System.Threading.Tasks;
 
 namespace ApplicationCore.Chain
 {
-    public interface IMembershipConditionHandle : IHandler<ConditionModel>
+    public interface IMembershipConditionHandle : IHandler<OrderResponseModel>
     {
-
+        void SetConditionModel(ConditionModel conditions);
     }
-    public class MembershipConditionHandle : Handler<ConditionModel>, IMembershipConditionHandle
+    public class MembershipConditionHandle : Handler<OrderResponseModel>, IMembershipConditionHandle
     {
-        public override void Handle(ConditionModel request)
+        private ConditionModel _condition;
+
+        public override void Handle(OrderResponseModel order)
         {
-            /*throw new ErrorObj(code: 400, message: "MembershipHandle");*/
+            if (_condition is MembershipConditionModel)
+            {
 
-            base.Handle(request);
+            }
+            else
+            {
+                base.Handle(order);
+            }
         }
-
+        public void SetConditionModel(ConditionModel conditions)
+        {
+            _condition = conditions;
+        }
     }
 }

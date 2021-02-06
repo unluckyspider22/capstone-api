@@ -11,5 +11,7 @@ namespace ApplicationCore.Models
         public Guid Id { get; set; }
         public int? Index { get; set; }
         public string NextOperator { get; set; }
+
+        public bool IsMatch { get; set; } = true;
     }
 }

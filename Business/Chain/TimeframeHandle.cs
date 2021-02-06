@@ -15,8 +15,6 @@ namespace ApplicationCore.Chain
     {
         public override void Handle(OrderResponseModel order)
         {
-           
-
             base.Handle(order);
         }
     }

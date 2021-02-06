@@ -264,7 +264,7 @@ namespace ApplicationCore.Services
             }
             catch (Exception ex)
             {
-                throw new ErrorObj(code: 500, message: ex.Message);
+                throw new ErrorObj(code: 500, message: ex.ToString());
             }
             return orderResponse;
         }

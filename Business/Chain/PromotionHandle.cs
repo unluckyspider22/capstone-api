@@ -39,19 +39,19 @@ namespace ApplicationCore.Chain
         private void HandleExclusive(OrderResponseModel order)
         {
             var promotions = order.Promotions;
-            if (promotions.Any(w => w.Exclusive.Equals(AppConstant.ENVIRONMENT_VARIABLE.EXCLULSIVE.GlobalExclusive)) && promotions.Count() > 1)
+            if (promotions.Any(w => w.Exclusive.Equals(AppConstant.EnvVar.Exclusive.GlobalExclusive)) && promotions.Count() > 1)
             {
                 throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Exclusive_Promotion);
             }
-            if (promotions.Where(w => w.Exclusive.Equals(AppConstant.ENVIRONMENT_VARIABLE.EXCLULSIVE.ClassExclusiveOrder)).Count() > 1)
+            if (promotions.Where(w => w.Exclusive.Equals(AppConstant.EnvVar.Exclusive.ClassExclusiveOrder)).Count() > 1)
             {
                 throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Exclusive_Promotion);
             }
-            if (promotions.Where(w => w.Exclusive.Equals(AppConstant.ENVIRONMENT_VARIABLE.EXCLULSIVE.ClassExclusiveProduct)).Count() > 1)
+            if (promotions.Where(w => w.Exclusive.Equals(AppConstant.EnvVar.Exclusive.ClassExclusiveProduct)).Count() > 1)
             {
                 throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Exclusive_Promotion);
             }
-            if (promotions.Where(w => w.Exclusive.Equals(AppConstant.ENVIRONMENT_VARIABLE.EXCLULSIVE.ClassExclusiveShipping)).Count() > 1)
+            if (promotions.Where(w => w.Exclusive.Equals(AppConstant.EnvVar.Exclusive.ClassExclusiveShipping)).Count() > 1)
             {
                 throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Exclusive_Promotion);
             }
@@ -87,19 +87,19 @@ namespace ApplicationCore.Chain
         #region Handle Holiday
         private void HandleHoliday(Promotion promotion, OrderResponseModel order)
         {
-            if (promotion.ForHoliday.Equals(AppConstant.ENVIRONMENT_VARIABLE.FOR_WEEKEND))
+            if (promotion.ForHoliday.Equals(AppConstant.EnvVar.FOR_WEEKEND))
             {
                 CheckTimeframe(promotion, order, isWeekend: true);
             }
-            if (promotion.ForHoliday.Equals(AppConstant.ENVIRONMENT_VARIABLE.FOR_HOLIDAY))
+            if (promotion.ForHoliday.Equals(AppConstant.EnvVar.FOR_HOLIDAY))
             {
                 CheckTimeframe(promotion, order, isHoliday: true);
             }
-            if (!promotion.DayFilter.Equals(AppConstant.ENVIRONMENT_VARIABLE.NO_FILTER))
+            if (!promotion.DayFilter.Equals(AppConstant.EnvVar.NO_FILTER))
             {
                 _timeframeHandle.Handle(order);
             }
-            if (!promotion.HourFilter.Equals(AppConstant.ENVIRONMENT_VARIABLE.NO_FILTER))
+            if (!promotion.HourFilter.Equals(AppConstant.EnvVar.NO_FILTER))
             {
                 _timeframeHandle.Handle(order);
             }
@@ -121,9 +121,9 @@ namespace ApplicationCore.Chain
             if (isWeekend && !isHoliday)
             {
                 var bookingDayOfWeek = order.OrderDetail.BookingDate.DayOfWeek;
-                if ((int)bookingDayOfWeek == AppConstant.ENVIRONMENT_VARIABLE.HOLIDAY.FRIDAY
-                    || (int)bookingDayOfWeek == AppConstant.ENVIRONMENT_VARIABLE.HOLIDAY.SATURDAY
-                    || (int)bookingDayOfWeek == AppConstant.ENVIRONMENT_VARIABLE.HOLIDAY.SUNDAY)
+                if ((int)bookingDayOfWeek == AppConstant.EnvVar.Holiday.FRIDAY
+                    || (int)bookingDayOfWeek == AppConstant.EnvVar.Holiday.SATURDAY
+                    || (int)bookingDayOfWeek == AppConstant.EnvVar.Holiday.SUNDAY)
                 {
                     throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_TimeFrame);
                 }

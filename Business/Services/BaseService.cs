@@ -77,7 +77,7 @@ namespace ApplicationCore.Services
             {
                 //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at GetAsync: \n" + e.Message);
-                throw new ErrorObj(code: 500, message: e.Message);
+                throw new ErrorObj(code: 500, message: "GetAsync:" + e.Message);
             }
         }
 

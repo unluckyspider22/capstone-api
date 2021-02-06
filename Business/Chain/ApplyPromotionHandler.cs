@@ -13,18 +13,12 @@ namespace ApplicationCore.Chain
     public class ApplyPromotionHandler : Handler<OrderResponseModel>, IApplyPromotionHandler
     {
         private readonly IPromotionHandle _promotionHandle;
-        private readonly ITimeframeHandle _timeframeHandle;
-        private readonly IMembershipConditionHandle _membershipHandle;
         private readonly IConditionHandle _conditionHandle;
-        private readonly IProductConditionHandle _productHandle;
 
-        public ApplyPromotionHandler(IPromotionHandle promotionHandle, ITimeframeHandle timeframeHandle, IMembershipConditionHandle membershipHandle, IConditionHandle conditionHandle, IProductConditionHandle productHandle)
+        public ApplyPromotionHandler(IPromotionHandle promotionHandle, IConditionHandle conditionHandle)
         {
             _promotionHandle = promotionHandle;
-            _timeframeHandle = timeframeHandle;
-            _membershipHandle = membershipHandle;
             _conditionHandle = conditionHandle;
-            _productHandle = productHandle;
         }
 
         public override void Handle(OrderResponseModel order)

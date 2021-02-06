@@ -23,7 +23,7 @@ namespace Infrastructure.Helper
         }
 
 
-        public struct ENVIRONMENT_VARIABLE
+        public struct EnvVar
         {
             public const int SUCCESS = 1;
             public const int FAIL = 0;
@@ -37,7 +37,10 @@ namespace Infrastructure.Helper
             public const string FOR_HOLIDAY = "2";
             public const string NO_FILTER = "0";
             public const string FOR_MEMBER = "1";
-            public struct CHARSET_TYPE
+            public const string INCLUDE = "0";
+            public const string EXCLUDE = "1";
+
+            public struct CharsetType
             {
                 public const string ALPHANUMERIC = "Alphanumeric";
                 public const string ALPHABETIC = "Alphabetic";
@@ -46,7 +49,7 @@ namespace Infrastructure.Helper
                 public const string NUMBERS = "Numbers";
                 public const string CUSTOM = "Custom";
             }
-            public static class CHARSET_CHARS
+            public struct CharsetChars
             {
                 public const string ALPHANUMERIC = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
                 public const string ALPHABETIC = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -54,26 +57,38 @@ namespace Infrastructure.Helper
                 public const string ALPHABETIC_UPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
                 public const string NUMBERS = "0123456789";
             }
-            public struct VOUCHER_TYPE
+            public struct ProductType
+            {
+                public const string SINGLE_PRODUCT = "1";
+                public const string COLLECTION = "2";
+                public const string CATEGORY = "3";
+                public const string TAG = "4";
+                public const string GENERAL = "5";
+                public const string COMBO = "6";
+                public const string COMPLEX = "7";
+                public const string EXTRA = "8";
+            }
+           
+            public struct VoucherType
             {
                 public const string BULK_CODE = "1";
                 public const string STANDALONE_CODE = "2";
             }
-            public struct PROMOTION_TYPE
+            public struct PromotionType
             {
                 public const string DISCOUNT = "1";
                 public const string PROMOTION = "2";
                 public const string GIFT = "3";
                 public const string BONUS_POINT = "4";
             }
-            public struct PROMOTION_STATUS
+            public struct PromotionStatus
             {
                 public const string DRAFT = "1";
                 public const string PUBLISH = "2";
                 public const string EXPIRED = "3";
             }
 
-            public struct EXCLULSIVE
+            public struct Exclusive
             {
                 public const string NoneExclusive = "0";
                 public const string GlobalExclusive = "1";
@@ -81,7 +96,7 @@ namespace Infrastructure.Helper
                 public const string ClassExclusiveProduct = "3";
                 public const string ClassExclusiveShipping = "4";
             }
-            public struct HOLIDAY
+            public struct Holiday
             {
                 public const int FRIDAY = 5;
                 public const int SATURDAY = 6;
@@ -128,6 +143,9 @@ namespace Infrastructure.Helper
             public const string LESS_THAN = "3";
             public const string LESS_THAN_OR_EQUAL = "4";
             public const string EQUAL = "5";
+            public const string AND = "1";
+            public const string OR = "2";
+
         }
     }
 }

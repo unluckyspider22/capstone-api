@@ -14,6 +14,7 @@ namespace ApplicationCore.Request
             Promotions = new List<Promotion>();
             Gift = new List<Gift>();
             Customer = new CustomerInfo();
+            PromotionTierIds = new List<Guid>();
 
         }
 
@@ -31,6 +32,20 @@ namespace ApplicationCore.Request
         public List<Guid> PromotionTierIds { get; set; }
         public List<OrderActionModel> OrderAction { get; set; }
     }
+    public class TestOperator
+    {
+        public int? Index { get; set; }
+        public bool IsMatch { get; set; }
+        public string NextOperator { get; set; }
+
+        public TestOperator(int index, bool isMatch, string nextOperator)
+        {
+            Index = index;
+            IsMatch = isMatch;
+            NextOperator = nextOperator;
+        }
+    }
+
 
     public class OrderInfoModel
     {
@@ -51,7 +66,7 @@ namespace ApplicationCore.Request
 
         public List<OrderDetailResponseModel> OrderDetailResponses { get; set; }
 
-        
+
     }
     public class Gift
     {
@@ -69,7 +84,7 @@ namespace ApplicationCore.Request
         public string StoreId { get; set; }
         public string StoreName { get; set; }
         public Guid BrandId { get; set; }
-        
+
         public string Applier { get; set; }
         public string IpAddress { get; set; }
     }

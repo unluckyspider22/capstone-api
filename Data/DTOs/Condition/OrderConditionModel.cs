@@ -11,5 +11,6 @@ namespace ApplicationCore.Models
         public string QuantityOperator { get; set; }
         public decimal Amount { get; set; }
         public string AmountOperator { get; set; }
+        
     }
 }

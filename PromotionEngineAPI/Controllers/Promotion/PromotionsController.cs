@@ -10,6 +10,7 @@ using Infrastructure.Models;
 using System.Diagnostics;
 using ApplicationCore.Request;
 using System.Collections.Generic;
+using ApplicationCore.Models;
 
 namespace PromotionEngineAPI.Controllers
 {

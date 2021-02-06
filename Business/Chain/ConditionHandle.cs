@@ -3,6 +3,7 @@ using ApplicationCore.Request;
 using ApplicationCore.Utils;
 using AutoMapper;
 using Infrastructure.DTOs;
+using Infrastructure.DTOs.Condition;
 using Infrastructure.Helper;
 using Infrastructure.Models;
 using System;
@@ -25,15 +26,12 @@ namespace ApplicationCore.Chain
         private readonly IMembershipConditionHandle _membershipConditionHandle;
         private readonly IMapper _mapper;
 
-        private List<ConditionModel> _conditionModels;
-
-        public ConditionHandle(IOrderConditionHandle orderConditionHandle, IProductConditionHandle productConditionHandle, IMembershipConditionHandle membershipConditionHandle, IMapper mapper, List<ConditionModel> conditionModels)
+        public ConditionHandle(IOrderConditionHandle orderConditionHandle, IProductConditionHandle productConditionHandle, IMembershipConditionHandle membershipConditionHandle, IMapper mapper)
         {
             _orderConditionHandle = orderConditionHandle;
             _productConditionHandle = productConditionHandle;
             _membershipConditionHandle = membershipConditionHandle;
             _mapper = mapper;
-            _conditionModels = conditionModels;
         }
 
         public override void Handle(OrderResponseModel order)
@@ -44,7 +42,7 @@ namespace ApplicationCore.Chain
                 foreach (var promotionTier in promotion.PromotionTier)
                 {
                     #region Handle Condition
-                    var handle = HandleCondition(promotionTier, order);
+                    var handle = HandleConditionGroup(promotionTier, order);
                     #endregion
                     if (handle > 0)
                     {
@@ -61,83 +59,154 @@ namespace ApplicationCore.Chain
             }
             base.Handle(order);
         }
-        private int HandleCondition(PromotionTier promotionTier, OrderResponseModel order)
+        private int HandleConditionGroup(PromotionTier promotionTier, OrderResponseModel order)
         {
             int invalidPromotionDetails = 0;
-
+            var conditionGroupModels = new List<ConditionGroupModel>();
             foreach (var conditionGroup in promotionTier.ConditionRule.ConditionGroup)
             {
-                InitConditionModel(conditionGroup);
+                var conditions = InitConditionModel(conditionGroup);
+                if (conditions != null)
+                {
+                    foreach (var condition in conditions)
+                    {
+                        #region Handle cho từng condition dựa vào loại của nó
+                        //Tạo chuỗi handle cho từng loại condition
+                        _orderConditionHandle.SetNext(_productConditionHandle).SetNext(_membershipConditionHandle);
+                        _orderConditionHandle.SetConditionModel(condition);
+                        _productConditionHandle.SetConditionModel(condition);
+                        _membershipConditionHandle.SetConditionModel(condition);
+                        _orderConditionHandle.Handle(order);
+                        #endregion
+                    }
+                    var conditionResult = CompareConditionInGroup(conditions);
+                    var groupModel = new ConditionGroupModel(conditionGroup.GroupNo, conditionGroup.NextOperator, conditionResult);
+                    conditionGroupModels.Add(groupModel);
+                }
             }
-
-            /*foreach (var conditionGroup in promotionTier.ConditionRule.ConditionGroup)
+            var result = CompareConditionGroup(conditionGroupModels);
+            if (!result)
             {
-                _orderConditionHandle.Handle(order);
-            }*/
+                invalidPromotionDetails++;
+            }
             return invalidPromotionDetails;
         }
-
-        private void InitConditionModel(ConditionGroup conditionGroup)
+        private bool CompareConditionInGroup(List<ConditionModel> conditions)
         {
-            if (_conditionModels == null)
+            conditions = conditions.OrderBy(el => el.Index).ToList();
+            bool result = conditions.First().IsMatch;
+            foreach (var condition in conditions)
             {
-                _conditionModels = new List<ConditionModel>();
+                if (conditions.Count() == 1)
+                {
+                    return condition.IsMatch;
+                }
+                else
+                {
+                    int index = (int)condition.Index;
+                    if (index != conditions.Count() - 1)
+                    {
+                        if (!string.IsNullOrEmpty(condition.NextOperator))
+                        {
+                            int nextIndex = index + 1;
+                            if (condition.NextOperator.Equals(AppConstant.Operator.AND))
+                            {
+                                result = result && conditions[nextIndex].IsMatch;
+
+                            }
+                            else
+                            if (condition.NextOperator.Equals(AppConstant.Operator.OR))
+                            {
+                                result = result || conditions[nextIndex].IsMatch;
+                            }
+
+                        }
+                    }
+
+                }
             }
+            return result;
+        }
+
+        private bool CompareConditionGroup(List<ConditionGroupModel> conditionGroups)
+        {
+            conditionGroups = conditionGroups.OrderBy(el => el.GroupNo).ToList();
+            bool result = conditionGroups.First().IsMatch;
+            foreach (var condition in conditionGroups)
+            {
+                if (conditionGroups.Count() == 1)
+                {
+                    return condition.IsMatch;
+                }
+                else
+                {
+                    int index = (int)condition.GroupNo;
+                    if (index != conditionGroups.Count() - 1)
+                    {
+                        if (!string.IsNullOrEmpty(condition.NextOperator))
+                        {
+                            int nextIndex = index + 1;
+                            if (condition.NextOperator.Equals(AppConstant.Operator.AND))
+                            {
+                                result = result && conditionGroups[nextIndex].IsMatch;
+
+                            }
+                            else
+                            if (condition.NextOperator.Equals(AppConstant.Operator.OR))
+                            {
+                                result = result || conditionGroups[nextIndex].IsMatch;
+                            }
+
+                        }
+                    }
+
+                }
+            }
+            return result;
+        }
+
+        /*  private List<ConditionGroupModel> InitConditionGroupModel(ConditionRule conditionRule)
+          {
+              List<ConditionGroupModel> conditionGroups = new List<ConditionGroupModel>();
+              foreach()
+
+              return conditionGroups;
+          }*/
+
+        #region Tạo 1 list condition
+        private List<ConditionModel> InitConditionModel(ConditionGroup conditionGroup)
+        {
+            List<ConditionModel> conditionModels = new List<ConditionModel>();
 
             foreach (var orderCondition in conditionGroup.OrderCondition)
             {
                 var entity = _mapper.Map<OrderConditionModel>(orderCondition);
                 entity.Id = orderCondition.OrderConditionId;
                 entity.Index = orderCondition.IndexGroup;
-                /*entity.NextOperator = orderCondition;*/
-                _conditionModels.Add(entity);
+                entity.NextOperator = orderCondition.NextOperator;
+                conditionModels.Add(entity);
             }
-        }
-
-
-        private void HandleOrderCondition()
-        {
-            /*  var errMsg = new List<string>();
-              foreach (var orderCondition in conditionGroup.OrderCondition)
-              {
-                  #region Handle order condition
-                  string messageHandleMinAmount = HandleMinAmount(orderCondition, order);
-                  if (!string.IsNullOrEmpty(messageHandleMinAmount))
-                  {
-                      errMsg.Add(messageHandleMinAmount);
-                  }
-                  string messageHandleMinQuantity = HandleMinQuantity(orderCondition, order);
-                  if (!string.IsNullOrEmpty(messageHandleMinQuantity))
-                  {
-                      errMsg.Add(messageHandleMinQuantity);
-                  }
-                  #endregion
-              }
-              if (errMsg.Count() > 0)
-              {
-                  invalidPromotionDetails++;
-
-              }*/
-        }
-
-        private string HandleMinAmount(OrderCondition orderCondition, OrderResponseModel order)
-        {
-            /*throw new ErrorObj(code: 400, message:"Compare: "+ Common.Compare<decimal>(orderCondition.AmountOperator, order.OrderDetail.Amount, orderCondition.Amount));*/
-            if (!Common.Compare<decimal>(orderCondition.AmountOperator, order.OrderDetail.Amount, orderCondition.Amount))
+            foreach (var productCondition in conditionGroup.ProductCondition)
             {
-                return AppConstant.ErrMessage.Invalid_MinAmount;
+                var entity = _mapper.Map<ProductConditionModel>(productCondition);
+                entity.Id = productCondition.ProductConditionId;
+                entity.Index = productCondition.IndexGroup;
+                entity.NextOperator = productCondition.NextOperator;
+                conditionModels.Add(entity);
             }
-
-            return string.Empty;
-        }
-        private string HandleMinQuantity(OrderCondition orderCondition, OrderResponseModel order)
-        {
-            if (!Common.Compare<decimal>(orderCondition.QuantityOperator, order.OrderDetail.OrderDetailResponses.Count(), orderCondition.Quantity))
+            foreach (var membershipCondition in conditionGroup.MembershipCondition)
             {
-                return AppConstant.ErrMessage.Invalid_Min_Quantity;
+                var entity = _mapper.Map<ProductConditionModel>(membershipCondition);
+                entity.Id = membershipCondition.MembershipConditionId;
+                entity.Index = membershipCondition.IndexGroup;
+                entity.NextOperator = membershipCondition.NextOperator;
+                conditionModels.Add(entity);
             }
-
-            return string.Empty;
+            conditionModels = conditionModels.OrderBy(el => el.Index).ToList();
+            return conditionModels;
         }
+        #endregion
+
+
     }
 }

@@ -25,7 +25,7 @@ namespace ApplicationCore.Services
         public List<VoucherDto> GenerateBulkCodeVoucher(VoucherGroupDto dto)
         {
             List<VoucherDto> result = new List<VoucherDto>();
-            if (dto.IsLimit.Equals(AppConstant.ENVIRONMENT_VARIABLE.ISLIMIT))
+            if (dto.IsLimit.Equals(AppConstant.EnvVar.ISLIMIT))
             {
                 for (var i = 0; i < dto.Quantity; i++)
                 {
@@ -56,32 +56,32 @@ namespace ApplicationCore.Services
             string chars = "";
             switch (charset)
             {
-                case AppConstant.ENVIRONMENT_VARIABLE.CHARSET_TYPE.ALPHABETIC:
-                    chars = AppConstant.ENVIRONMENT_VARIABLE.CHARSET_CHARS.ALPHABETIC;
+                case AppConstant.EnvVar.CharsetType.ALPHABETIC:
+                    chars = AppConstant.EnvVar.CharsetChars.ALPHABETIC;
 
                     randomCode = new string(Enumerable.Repeat(chars, length).Select(s => s[Random.Next(s.Length)]).ToArray());
                     break;
-                case AppConstant.ENVIRONMENT_VARIABLE.CHARSET_TYPE.ALPHANUMERIC:
-                    chars = AppConstant.ENVIRONMENT_VARIABLE.CHARSET_CHARS.ALPHANUMERIC;
+                case AppConstant.EnvVar.CharsetType.ALPHANUMERIC:
+                    chars = AppConstant.EnvVar.CharsetChars.ALPHANUMERIC;
 
                     randomCode = new string(Enumerable.Repeat(chars, length).Select(s => s[Random.Next(s.Length)]).ToArray());
                     break;
-                case AppConstant.ENVIRONMENT_VARIABLE.CHARSET_TYPE.ALPHABETIC_UPERCASE:
-                    chars = AppConstant.ENVIRONMENT_VARIABLE.CHARSET_CHARS.ALPHABETIC_UPERCASE;
+                case AppConstant.EnvVar.CharsetType.ALPHABETIC_UPERCASE:
+                    chars = AppConstant.EnvVar.CharsetChars.ALPHABETIC_UPERCASE;
 
                     randomCode = new string(Enumerable.Repeat(chars, length).Select(s => s[Random.Next(s.Length)]).ToArray());
                     break;
-                case AppConstant.ENVIRONMENT_VARIABLE.CHARSET_TYPE.ALPHABETIC_LOWERCASE:
-                    chars = AppConstant.ENVIRONMENT_VARIABLE.CHARSET_CHARS.ALPHABETIC_LOWERCASE;
+                case AppConstant.EnvVar.CharsetType.ALPHABETIC_LOWERCASE:
+                    chars = AppConstant.EnvVar.CharsetChars.ALPHABETIC_LOWERCASE;
 
                     randomCode = new string(Enumerable.Repeat(chars, length).Select(s => s[Random.Next(s.Length)]).ToArray());
                     break;
-                case AppConstant.ENVIRONMENT_VARIABLE.CHARSET_TYPE.NUMBERS:
-                    chars = AppConstant.ENVIRONMENT_VARIABLE.CHARSET_CHARS.NUMBERS;
+                case AppConstant.EnvVar.CharsetType.NUMBERS:
+                    chars = AppConstant.EnvVar.CharsetChars.NUMBERS;
 
                     randomCode = new string(Enumerable.Repeat(chars, length).Select(s => s[Random.Next(s.Length)]).ToArray());
                     break;
-                case AppConstant.ENVIRONMENT_VARIABLE.CHARSET_TYPE.CUSTOM:
+                case AppConstant.EnvVar.CharsetType.CUSTOM:
                     chars = customCode;
                     randomCode = new string(Enumerable.Repeat(chars, length).Select(s => s[Random.Next(s.Length)]).ToArray());
                     break;
@@ -125,12 +125,12 @@ namespace ApplicationCore.Services
                          && el.Promotion.PromotionStoreMapping.Any(x => x.Store.StoreCode.Equals(StoreCode))));*/
                 var listVoucherGroup = await _repository.Get(pageIndex: PageIndex, pageSize: PageSize, includeProperties: "Voucher"
                     , filter: (el => !el.DelFlg
-                    && el.VoucherType.Equals(AppConstant.ENVIRONMENT_VARIABLE.VOUCHER_TYPE.BULK_CODE)
+                    && el.VoucherType.Equals(AppConstant.EnvVar.VoucherType.BULK_CODE)
                      && el.IsActive
                      && el.PublicDate.Value.CompareTo(DateTime.Now) <= 0
                      && el.UsedQuantity < el.Quantity
                      && el.RedempedQuantity < el.Quantity
-                     && !el.Promotion.PromotionType.Equals(AppConstant.ENVIRONMENT_VARIABLE.PROMOTION_TYPE.PROMOTION)
+                     && !el.Promotion.PromotionType.Equals(AppConstant.EnvVar.PromotionType.PROMOTION)
                      && el.Promotion.IsActive
                      && el.Promotion.DelFlg
                          && el.Promotion.StartDate.Value.CompareTo(DateTime.Now) <= 0
