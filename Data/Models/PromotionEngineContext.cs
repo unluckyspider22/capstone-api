@@ -30,7 +30,7 @@ namespace Infrastructure.Models
         public virtual DbSet<Promotion> Promotion { get; set; }
         public virtual DbSet<PromotionStoreMapping> PromotionStoreMapping { get; set; }
         public virtual DbSet<PromotionTier> PromotionTier { get; set; }
-        public virtual DbSet<RoleEntity> Role { get; set; }
+        public virtual DbSet<Role> Role { get; set; }
         public virtual DbSet<Store> Store { get; set; }
         public virtual DbSet<Voucher> Voucher { get; set; }
         public virtual DbSet<VoucherChannel> VoucherChannel { get; set; }
@@ -430,6 +430,11 @@ namespace Infrastructure.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.Property(e => e.NextOperator)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .IsFixedLength();
+
                 entity.Property(e => e.Quantity).HasColumnType("decimal(6, 0)");
 
                 entity.Property(e => e.QuantityOperator)
@@ -659,7 +664,7 @@ namespace Infrastructure.Models
                     .HasConstraintName("FK_PromotionTier_Promotion");
             });
 
-            modelBuilder.Entity<RoleEntity>(entity =>
+            modelBuilder.Entity<Role>(entity =>
             {
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")

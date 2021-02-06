@@ -88,7 +88,8 @@ namespace ApplicationCore.Chain
             {
                 var entity = _mapper.Map<OrderConditionModel>(orderCondition);
                 entity.Id = orderCondition.OrderConditionId;
-                
+                entity.Index = orderCondition.IndexGroup;
+                /*entity.NextOperator = orderCondition;*/
                 _conditionModels.Add(entity);
             }
         }
