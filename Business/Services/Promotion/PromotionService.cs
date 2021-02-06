@@ -34,11 +34,16 @@ namespace ApplicationCore.Services
             try
             {
                 // Create condition rule
+                // Nếu param truyền vào không có condition rule id thì add mới vào db
                 IGenericRepository<ConditionRule> conditionRuleRepo = _unitOfWork.ConditionRuleRepository;
                 var conditionRuleEntity = _mapper.Map<ConditionRule>(param.ConditionRule);
-                conditionRuleEntity.ConditionRuleId = Guid.NewGuid();
-                conditionRuleRepo.Add(conditionRuleEntity);
-                //await _unitOfWork.SaveAsync();
+                if (param.ConditionRule.ConditionRuleId.Equals(Guid.Empty))
+                {
+                    conditionRuleEntity.ConditionRuleId = Guid.NewGuid();
+                    param.ConditionRule.ConditionRuleId = conditionRuleEntity.ConditionRuleId;
+                    conditionRuleRepo.Add(conditionRuleEntity);
+                }
+
 
                 // Create condition group
                 IGenericRepository<ConditionGroup> conditionGroupRepo = _unitOfWork.ConditionGroupRepository;
@@ -162,6 +167,48 @@ namespace ApplicationCore.Services
             }
         }
 
+        public async Task<bool> DeletePromotionTier(DeleteTierRequestParam param)
+        {
+            try
+            {
+                // Delete action or membership action
+                if (!param.ActionId.Equals(Guid.Empty))
+                {
+                    IGenericRepository<Infrastructure.Models.Action> actionRepo = _unitOfWork.ActionRepository;
+                    actionRepo.Delete(param.ActionId);
+                }
+                else if (!param.MembershipActionId.Equals(Guid.Empty))
+                {
+                    IGenericRepository<MembershipAction> membershipActionRepo = _unitOfWork.MembershipActionRepository;
+                    membershipActionRepo.Delete(param.MembershipActionId);
+                }
+                else
+                {
+                    throw new ErrorObj(code: 400, message: "Action or Membership action is not null", description: "Invalid param");
+                }
+                // Delete promotion tier
+                IGenericRepository<PromotionTier> tierRepo = _unitOfWork.PromotionTierRepository;
+                tierRepo.Delete(param.PromotionTierId);
+                // Update promotion tier id of condition rule
+                //IGenericRepository<ConditionRule> ruleRepo = _unitOfWork.ConditionRuleRepository;
+                //var rule = param.ConditionRule;
+                //rule.PromotionTier = null;
+                //ruleRepo.Update(_mapper.Map<ConditionRule>(rule));
+                return await _unitOfWork.SaveAsync() > 0;
+            }
+            catch (ErrorObj e)
+            {
+                throw e;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.StackTrace);
+                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.", description: "Internal Server Error");
+            }
+
+
+        }
+
         public async Task<List<PromotionTier>> GetPromotionTierDetail(Guid promotionId)
         {
 
@@ -172,7 +219,7 @@ namespace ApplicationCore.Services
                 Expression<Func<PromotionTier, bool>> filter = el => el.PromotionId.Equals(promotionId);
                 var tiers = (
                     await _tierRepo.Get(0, 0, filter: filter,
-                    includeProperties: "ConditionRule,MembershipAction,Action"))
+                    includeProperties: "ConditionRule,ConditionRule.ConditionGroup,ConditionRule.ConditionGroup.MembershipCondition,ConditionRule.ConditionGroup.OrderCondition,ConditionRule.ConditionGroup.ProductCondition,MembershipAction,Action"))
                     .ToList();
                 return tiers;
             }

@@ -8,6 +8,7 @@ namespace Infrastructure.DTOs
 {
     public class OrderConditionDto
     {
+        public Guid OrderConditionId { get; set; }
         [Range(0,999999)]
         public decimal Quantity { get; set; }
         [StringLength(1)]
@@ -16,5 +17,7 @@ namespace Infrastructure.DTOs
         public decimal Amount { get; set; }
         [StringLength(1)]
         public string AmountOperator { get; set; }
+        [Range(0, 999)]
+        public int IndexGroup { get; set; }
     }
 }

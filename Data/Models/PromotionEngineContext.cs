@@ -135,6 +135,8 @@ namespace Infrastructure.Models
 
                 entity.Property(e => e.MaxAmount).HasColumnType("decimal(10, 0)");
 
+                entity.Property(e => e.MaxQuantity).HasColumnType("decimal(6, 0)");
+
                 entity.Property(e => e.MinPriceAfter).HasColumnType("decimal(10, 0)");
 
                 entity.Property(e => e.OrderLadderProduct).HasColumnType("decimal(2, 0)");
@@ -147,6 +149,12 @@ namespace Infrastructure.Models
                     .IsRequired()
                     .HasMaxLength(200)
                     .IsUnicode(false);
+
+                entity.Property(e => e.ProductType)
+                    .IsRequired()
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .IsFixedLength();
 
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
@@ -355,7 +363,7 @@ namespace Infrastructure.Models
                 entity.Property(e => e.GiftName).HasMaxLength(50);
 
                 entity.Property(e => e.GiftProductCode)
-                    .HasMaxLength(20)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.GiftQuantity).HasColumnType("decimal(6, 0)");
@@ -387,7 +395,7 @@ namespace Infrastructure.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.MembershipLevel).HasMaxLength(10);
+                entity.Property(e => e.MembershipLevel).HasMaxLength(50);
 
                 entity.Property(e => e.NextOperator)
                     .IsRequired()

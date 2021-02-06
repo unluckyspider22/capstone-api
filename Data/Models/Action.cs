@@ -9,6 +9,7 @@ namespace Infrastructure.Models
         public Guid PromotionTierId { get; set; }
         public string ActionType { get; set; }
         public string DiscountType { get; set; }
+        public string ProductType { get; set; }
         public string ParentCode { get; set; }
         public string ProductCode { get; set; }
         public decimal? DiscountQuantity { get; set; }
@@ -16,6 +17,7 @@ namespace Infrastructure.Models
         public decimal? DiscountPercentage { get; set; }
         public decimal? FixedPrice { get; set; }
         public decimal? MaxAmount { get; set; }
+        public decimal? MaxQuantity { get; set; }
         public decimal? MinPriceAfter { get; set; }
         public decimal? OrderLadderProduct { get; set; }
         public decimal? LadderPrice { get; set; }

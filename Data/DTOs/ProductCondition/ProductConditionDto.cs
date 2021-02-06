@@ -8,6 +8,7 @@ namespace Infrastructure.DTOs
 {
     public class ProductConditionDto
     {
+        public Guid ProductConditionId { get; set; }
         [StringLength(1)]
         public string ProductConditionType { get; set; }
         [StringLength(1)]
@@ -24,5 +25,7 @@ namespace Infrastructure.DTOs
         public string ParentCode { get; set; }
         [StringLength(1)]
         public string NextOperator { get; set; }
+        [Range(0,999)]
+        public int IndexGroup { get; set; }
     }
 }
