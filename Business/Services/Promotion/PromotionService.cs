@@ -21,9 +21,11 @@ namespace ApplicationCore.Services
     public class PromotionService : BaseService<Promotion, PromotionDto>, IPromotionService
     {
         private readonly IApplyPromotionHandler _applyPromotionHandler;
-        public PromotionService(IUnitOfWork unitOfWork, IMapper mapper, IApplyPromotionHandler promotionHandle) : base(unitOfWork, mapper)
+        private readonly IConditionRuleService _conditionRuleService;
+        public PromotionService(IUnitOfWork unitOfWork, IMapper mapper, IApplyPromotionHandler promotionHandle, IConditionRuleService conditionRuleService) : base(unitOfWork, mapper)
         {
             _applyPromotionHandler = promotionHandle;
+            _conditionRuleService = conditionRuleService;
         }
 
         protected override IGenericRepository<Promotion> _repository => _unitOfWork.PromotionRepository;
@@ -238,7 +240,7 @@ namespace ApplicationCore.Services
 
         }
 
-        public async Task<List<PromotionTier>> GetPromotionTierDetail(Guid promotionId)
+        public async Task<List<PromotionTierResponseParam>> GetPromotionTierDetail(Guid promotionId)
         {
 
             IGenericRepository<PromotionTier> _tierRepo = _unitOfWork.PromotionTierRepository;
@@ -250,7 +252,24 @@ namespace ApplicationCore.Services
                     await _tierRepo.Get(0, 0, filter: filter,
                     includeProperties: "ConditionRule,ConditionRule.ConditionGroup,ConditionRule.ConditionGroup.MembershipCondition,ConditionRule.ConditionGroup.OrderCondition,ConditionRule.ConditionGroup.ProductCondition,MembershipAction,Action"))
                     .ToList();
-                return tiers;
+                // Reorder các condition trong group
+                List<PromotionTierResponseParam> result = new List<PromotionTierResponseParam>();
+                foreach (var tier in tiers)
+                {
+                    PromotionTierResponseParam responseParam = new PromotionTierResponseParam
+                    {
+                        Action = tier.Action,
+                        ActionId = tier.ActionId,
+                        MembershipAction = tier.MembershipAction,
+                        MembershipActionId = tier.MembershipActionId,
+                        PromotionId = tier.PromotionId,
+                        PromotionTierId = tier.PromotionTierId,
+                        ConditionRuleId = tier.ConditionRuleId,
+                        ConditionRule = await _conditionRuleService.ReorderResult(tier.ConditionRule)
+                    };
+                    result.Add(responseParam);
+                }
+                return result;
             }
             catch (Exception e)
             {

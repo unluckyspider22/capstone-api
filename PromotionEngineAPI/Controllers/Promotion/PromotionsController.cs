@@ -21,8 +21,9 @@ namespace PromotionEngineAPI.Controllers
         private readonly IPromotionService _promotionService;
         private readonly IVoucherService _voucherService;
         private readonly IPromotionStoreMappingService _promotionStoreMappingService;
+        
 
-        public PromotionsController(IPromotionService service, IPromotionStoreMappingService promotionStoreMappingService, IVoucherService voucherService)
+        public PromotionsController(IPromotionService service, IPromotionStoreMappingService promotionStoreMappingService, IVoucherService voucherService, IConditionRuleService conditionRuleService)
         {
             _promotionService = service;
             _promotionStoreMappingService = promotionStoreMappingService;

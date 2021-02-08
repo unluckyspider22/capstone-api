@@ -36,19 +36,22 @@ namespace PromotionEngineAPI.Controllers
         public async Task<IActionResult> GetConditionRule([FromQuery] PagingRequestParam param, Guid BrandId, bool available)
         {
             Expression<Func<ConditionRule, bool>> filter = el => !el.DelFlg && el.BrandId.Equals(BrandId);
+            string includedProperties = "ConditionGroup,ConditionGroup.ProductCondition,ConditionGroup.OrderCondition,ConditionGroup.MembershipCondition";
             if (available != null && available)
             {
                 filter = el => !el.DelFlg && el.BrandId.Equals(BrandId) && (el.PromotionTier == null);
+                includedProperties = "ConditionGroup,ConditionGroup.ProductCondition,ConditionGroup.OrderCondition,ConditionGroup.MembershipCondition,PromotionTier";
             }
             try
             {
                 var conditionRules = await _service.GetAsync(
                pageIndex: param.PageIndex,
                pageSize: param.PageSize,
-               filter: el => !el.DelFlg && el.BrandId.Equals(BrandId),
+               filter: filter,
                orderBy: el => el.OrderByDescending(b => b.InsDate),
-               includeProperties: "ConditionGroup,ConditionGroup.ProductCondition,ConditionGroup.OrderCondition,ConditionGroup.MembershipCondition"
+               includeProperties: includedProperties
                );
+          
                 GenericRespones<ConditionRuleResponse> result = new GenericRespones<ConditionRuleResponse>(await _service.ReorderResult(conditionRules.Data), conditionRules.Metadata);
                 return Ok(result);
             }
