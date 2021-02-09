@@ -30,5 +30,6 @@ namespace ApplicationCore.Chain
         {
             _condition = condition;
         }
+        
     }
 }

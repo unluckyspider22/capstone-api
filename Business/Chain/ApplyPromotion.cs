@@ -23,7 +23,7 @@ namespace ApplicationCore.Chain
             {
                 //Lấy những Tier có ID đc thỏa hết các điều kiện
                 var promotionTiers = promotion.PromotionTier.Where(el => el.PromotionTierId.Equals(order.PromotionTierIds.FirstOrDefault(w => w.Equals(el.PromotionTierId)))).ToList();
-                
+
                 var actions = FilterAction(promotionTiers.Select(el => el.Action).ToList());
                 if (actions.Count() > 0)
                 {
@@ -54,11 +54,10 @@ namespace ApplicationCore.Chain
             else
             {
 
-                if (actions.Select(el => el.DiscountType.Equals(AppConstant.EnvVar.DiscountType.Amount)).Count() > 1
-                    || actions.Select(el => el.DiscountType.Equals(AppConstant.EnvVar.DiscountType.Percentage)).Count() > 1
-                    || actions.Select(el => el.DiscountType.Equals(AppConstant.EnvVar.DiscountType.Shipping)).Count() > 1)
+                if (actions.Where(el => el.DiscountType.Equals(AppConstant.EnvVar.DiscountType.Amount)).Count() > 1
+                    || actions.Where(el => el.DiscountType.Equals(AppConstant.EnvVar.DiscountType.Percentage)).Count() > 1
+                    || actions.Where(el => el.DiscountType.Equals(AppConstant.EnvVar.DiscountType.Shipping)).Count() > 1)
                 {
-                    throw new ErrorObj(code: 400, message: "actions: " + actions.Count());
 
                     var actionAmount = actions
                         .Where(w =>
@@ -71,11 +70,13 @@ namespace ApplicationCore.Chain
                     }
                     var actionPercent = actions.Where(w =>
                     w.DiscountPercentage > 0 && w.DiscountPercentage == actions.Max(m => m.DiscountPercentage)).SingleOrDefault();
+
                     if (actionPercent != null)
                     {
                         result.Add(actionPercent);
                     }
                 }
+                else return actions;
 
             }
             return result;
@@ -90,12 +91,14 @@ namespace ApplicationCore.Chain
             {
                 discount = (decimal)final * (decimal)action.DiscountPercentage / 100;
                 discount = discount > (decimal)action.MaxAmount ? (decimal)action.MaxAmount : discount;
+
             }
             else if (action.DiscountType.Equals(AppConstant.EnvVar.DiscountType.Amount))
             {
                 discount = (decimal)action.DiscountAmount;
             }
             discount = discount > (decimal)final ? (decimal)final : discount;
+            /*throw new ErrorObj(code: 400, message: "discount: " + discount + ", final: " + final);*/
             SetDiscountFromOrder(order, discount, final, promotion);
 
             if (order.OrderAction == null)
@@ -117,7 +120,7 @@ namespace ApplicationCore.Chain
                 ActionId = action.ActionId,
                 DiscountAmount = discount,
                 PromotionCode = promotionCodes,
-                VoucherCode= voucherCode
+                VoucherCode = voucherCode
             });
 
         }
@@ -128,8 +131,9 @@ namespace ApplicationCore.Chain
 
             order.OrderDetail.OrderDetailResponses = order.OrderDetail.OrderDetailResponses.Select(el =>
             {
-                el.DiscountFromOrder += (el.TotalAmount - el.DiscountFromOrder) * discountPercent;
-                el.FinalAmount = el.TotalAmount - (el.DiscountFromOrder + el.Discount);
+                var finalAmount = el.TotalAmount - (el.DiscountFromOrder + el.Discount);
+                el.DiscountFromOrder += (finalAmount - el.DiscountFromOrder) * discountPercent;
+                el.FinalAmount = finalAmount;
                 el.PromotionCode = promotion.PromotionCode;
                 return el;
             }).ToList();
@@ -139,9 +143,9 @@ namespace ApplicationCore.Chain
         {
             order.TotalAmount = order.OrderDetail.Amount;
             order.DiscountOrderDetail = order.OrderDetail.OrderDetailResponses.Sum(s => s.Discount);
-            order.Discount = order.OrderDetail.OrderDetailResponses.Sum(s => s.DiscountFromOrder)
-                + order.DiscountOrderDetail;
-            order.FinalAmount = order.TotalAmount - order.Discount;
+            order.Discount = (decimal)order.OrderDetail.OrderDetailResponses.Sum(s => s.DiscountFromOrder)
+                + (decimal)order.DiscountOrderDetail;
+            order.FinalAmount =Math.Ceiling((decimal)(order.TotalAmount - order.Discount)) ;
         }
     }
 }
