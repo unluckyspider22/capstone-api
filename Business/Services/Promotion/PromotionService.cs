@@ -21,37 +21,34 @@ namespace ApplicationCore.Services
     public class PromotionService : BaseService<Promotion, PromotionDto>, IPromotionService
     {
         private readonly IApplyPromotionHandler _applyPromotionHandler;
-        public PromotionService(IUnitOfWork unitOfWork, IMapper mapper, IApplyPromotionHandler promotionHandle) : base(unitOfWork, mapper)
+        private readonly IConditionRuleService _conditionRuleService;
+        public PromotionService(IUnitOfWork unitOfWork, IMapper mapper, IApplyPromotionHandler promotionHandle, IConditionRuleService conditionRuleService) : base(unitOfWork, mapper)
         {
             _applyPromotionHandler = promotionHandle;
+            _conditionRuleService = conditionRuleService;
         }
 
         protected override IGenericRepository<Promotion> _repository => _unitOfWork.PromotionRepository;
 
 
-
+        #region CRUD promotion tier
         public async Task<PromotionTierParam> CreatePromotionTier(PromotionTierParam param)
         {
             try
             {
-
                 IGenericRepository<ConditionRule> conditionRuleRepo = _unitOfWork.ConditionRuleRepository;
                 IGenericRepository<ConditionGroup> conditionGroupRepo = _unitOfWork.ConditionGroupRepository;
                 IGenericRepository<ProductCondition> productConditionRepo = _unitOfWork.ProductConditionRepository;
                 IGenericRepository<OrderCondition> orderConditionRepo = _unitOfWork.OrderConditionRepository;
                 IGenericRepository<MembershipCondition> membershipConditionRepo = _unitOfWork.MembershipConditionRepository;
                 // Create condition rule
-
                 var conditionRuleEntity = _mapper.Map<ConditionRule>(param.ConditionRule);
                 // Nếu param truyền vào không có condition rule id thì add mới vào db
                 if (param.ConditionRule.ConditionRuleId.Equals(Guid.Empty))
                 {
-
                     conditionRuleEntity.ConditionRuleId = Guid.NewGuid();
                     param.ConditionRule.ConditionRuleId = conditionRuleEntity.ConditionRuleId;
                     conditionRuleRepo.Add(conditionRuleEntity);
-
-
                 }
                 else
                 {
@@ -60,92 +57,10 @@ namespace ApplicationCore.Services
                     //conditionRuleEntity.InsDate = null;
                     conditionRuleRepo.Update(conditionRuleEntity);
                     //Delete old condition group of condition rule
-                    List<ConditionGroup> oldGroups = (await conditionGroupRepo.Get(pageIndex: 0, pageSize: 0, filter: o => o.ConditionRuleId.Equals(conditionRuleEntity.ConditionRuleId))).ToList();
-                    if (oldGroups.Count > 0)
-                    {
-                        foreach (var group in oldGroups)
-                        {
-                            productConditionRepo.Delete(id: Guid.Empty, filter: o => o.ConditionGroupId.Equals(group.ConditionGroupId));
-                            orderConditionRepo.Delete(id: Guid.Empty, filter: o => o.ConditionGroupId.Equals(group.ConditionGroupId));
-                            membershipConditionRepo.Delete(id: Guid.Empty, filter: o => o.ConditionGroupId.Equals(group.ConditionGroupId));
-                            conditionGroupRepo.Delete(id: group.ConditionGroupId);
-                        }
-                        await _unitOfWork.SaveAsync();
-                    }
-
-
+                    await DeleteOldGroups(conditionRuleEntity: conditionRuleEntity);
                 }
                 // Create condition group
-                foreach (var group in param.ConditionGroups)
-                {
-                    ConditionGroup conditionGroupEntity = new ConditionGroup
-                    {
-                        ConditionGroupId = Guid.NewGuid(),
-                        GroupNo = group.GroupNo,
-                        ConditionRuleId = conditionRuleEntity.ConditionRuleId,
-                        NextOperator = group.NextOperator,
-                        InsDate = DateTime.Now,
-                        UpdDate = DateTime.Now
-                    };
-                    conditionGroupRepo.Add(conditionGroupEntity);
-                    group.ConditionGroupId = conditionGroupEntity.ConditionGroupId;
-                    //await _unitOfWork.SaveAsync();
-
-                    // Create product condition
-                    if (group.ProductCondition.Count > 0)
-                    {
-                        foreach (var productCondition in group.ProductCondition)
-                        {
-                            var productConditionEntity = _mapper.Map<ProductCondition>(productCondition);
-                            productConditionEntity.ConditionGroupId = conditionGroupEntity.ConditionGroupId;
-                            productConditionEntity.ProductConditionId = Guid.NewGuid();
-                            productConditionEntity.DelFlg = false;
-                            productConditionEntity.UpdDate = DateTime.Now;
-                            productConditionEntity.InsDate = DateTime.Now;
-                            productConditionRepo.Add(productConditionEntity);
-                            productCondition.ProductConditionId = productConditionEntity.ProductConditionId;
-
-                        }
-                    }
-
-                    // Create order condition
-                    if (group.OrderCondition.Count > 0)
-                    {
-                        foreach (var orderCondition in group.OrderCondition)
-                        {
-                            var orderConditionEntity = _mapper.Map<OrderCondition>(orderCondition);
-                            orderConditionEntity.ConditionGroupId = conditionGroupEntity.ConditionGroupId;
-                            orderConditionEntity.OrderConditionId = Guid.NewGuid();
-                            orderConditionEntity.DelFlg = false;
-                            orderConditionEntity.UpdDate = DateTime.Now;
-                            orderConditionEntity.InsDate = DateTime.Now;
-                            orderConditionRepo.Add(orderConditionEntity);
-                            orderCondition.OrderConditionId = orderConditionEntity.OrderConditionId;
-
-                        }
-                    }
-
-                    // Create membership condition
-                    if (group.MembershipCondition.Count > 0)
-                    {
-                        foreach (var membershipCondition in group.MembershipCondition)
-                        {
-                            var membershipConditionEntity = _mapper.Map<MembershipCondition>(membershipCondition);
-                            membershipConditionEntity.ConditionGroupId = conditionGroupEntity.ConditionGroupId;
-                            membershipConditionEntity.MembershipConditionId = Guid.NewGuid();
-                            membershipConditionEntity.DelFlg = false;
-                            membershipConditionEntity.UpdDate = DateTime.Now;
-                            membershipConditionEntity.InsDate = DateTime.Now;
-                            membershipConditionRepo.Add(membershipConditionEntity);
-                            membershipCondition.MembershipConditionId = membershipConditionEntity.MembershipConditionId;
-
-                        }
-                    }
-
-                }
-
-
-
+                InsertConditionGroup(conditionGroups: param.ConditionGroups, conditionRuleEntity: conditionRuleEntity);
                 // Create promotion tier
                 IGenericRepository<PromotionTier> promotionTierRepo = _unitOfWork.PromotionTierRepository;
                 PromotionTier promotionTier = new PromotionTier
@@ -153,7 +68,6 @@ namespace ApplicationCore.Services
                     PromotionTierId = Guid.NewGuid(),
                     PromotionId = param.PromotionId,
                     ConditionRuleId = conditionRuleEntity.ConditionRuleId,
-
                 };
 
                 // Create action
@@ -167,7 +81,6 @@ namespace ApplicationCore.Services
                     promotionTierRepo.Add(promotionTier);
                     actionRepo.Add(actionEntity);
                     param.Action = _mapper.Map<ActionRequestParam>(actionEntity);
-
                 }
                 else
                 if (param.MembershipAction.ActionType != null)
@@ -184,15 +97,14 @@ namespace ApplicationCore.Services
                 }
                 else
                 {
-                    throw new Exception();
+                    throw new ErrorObj(code: 400, message: "Action or Membership action is not null", description: "Invalid param");
                 }
                 await _unitOfWork.SaveAsync();
-
-
-
                 return param;
-
-
+            }
+            catch (ErrorObj e)
+            {
+                throw e;
             }
             catch (Exception e)
             {
@@ -234,13 +146,10 @@ namespace ApplicationCore.Services
                 Debug.WriteLine(e.StackTrace);
                 throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.", description: "Internal Server Error");
             }
-
-
         }
 
-        public async Task<List<PromotionTier>> GetPromotionTierDetail(Guid promotionId)
+        public async Task<List<PromotionTierResponseParam>> GetPromotionTierDetail(Guid promotionId)
         {
-
             IGenericRepository<PromotionTier> _tierRepo = _unitOfWork.PromotionTierRepository;
             try
             {
@@ -250,19 +159,173 @@ namespace ApplicationCore.Services
                     await _tierRepo.Get(0, 0, filter: filter,
                     includeProperties: "ConditionRule,ConditionRule.ConditionGroup,ConditionRule.ConditionGroup.MembershipCondition,ConditionRule.ConditionGroup.OrderCondition,ConditionRule.ConditionGroup.ProductCondition,MembershipAction,Action"))
                     .ToList();
-                return tiers;
+                // Reorder các condition trong group
+                List<PromotionTierResponseParam> result = new List<PromotionTierResponseParam>();
+                foreach (var tier in tiers)
+                {
+                    PromotionTierResponseParam responseParam = new PromotionTierResponseParam
+                    {
+                        Action = tier.Action,
+                        ActionId = tier.ActionId,
+                        MembershipAction = tier.MembershipAction,
+                        MembershipActionId = tier.MembershipActionId,
+                        PromotionId = tier.PromotionId,
+                        PromotionTierId = tier.PromotionTierId,
+                        ConditionRuleId = tier.ConditionRuleId,
+                        ConditionRule = await _conditionRuleService.ReorderResult(tier.ConditionRule)
+                    };
+                    result.Add(responseParam);
+                }
+                return result;
             }
             catch (Exception e)
             {
-                Debug.WriteLine(e.GetType());
                 Debug.WriteLine(e.StackTrace);
                 throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.", description: "Internal Server Error");
             }
+        }
+        public async Task<PromotionTierUpdateParam> UpdatePromotionTier(PromotionTierUpdateParam updateParam)
+        {
 
-            //return result;
+            try
+            {
+                // update action
+                if (!updateParam.Action.ActionId.Equals(Guid.Empty))
+                {
+                    var actionEntity = _mapper.Map<Infrastructure.Models.Action>(updateParam.Action);
+                    IGenericRepository<Infrastructure.Models.Action> actionRepo = _unitOfWork.ActionRepository;
+                    actionEntity.UpdDate = DateTime.Now;
+                    actionEntity.InsDate = null;
+                    actionEntity.PromotionTierId = updateParam.PromotionTierId;
+                    actionRepo.Update(actionEntity);
+                }
+                else if (!updateParam.MembershipAction.MembershipActionId.Equals(Guid.Empty))
+                {
+                    var membershipActionEntity = _mapper.Map<MembershipAction>(updateParam.MembershipAction);
+                    IGenericRepository<MembershipAction> membershipActionRepo = _unitOfWork.MembershipActionRepository;
+                    membershipActionEntity.UpdDate = DateTime.Now;
+                    membershipActionEntity.InsDate = null;
+                    membershipActionEntity.PromotionTierId = updateParam.PromotionTierId;
+                    membershipActionRepo.Update(membershipActionEntity);
+                }
+                else
+                {
+                    throw new ErrorObj(code: 400, message: "Action or Membership action is not null", description: "Invalid param");
+                }
+                // update condition rule
+                IGenericRepository<ConditionRule> conditionRepo = _unitOfWork.ConditionRuleRepository;
+                var conditionRuleEntity = _mapper.Map<ConditionRule>(updateParam.ConditionRule);
+                conditionRuleEntity.UpdDate = DateTime.Now;
+                conditionRepo.Update(conditionRuleEntity);
+                // Update condition group
+                await DeleteOldGroups(conditionRuleEntity: conditionRuleEntity);
+                InsertConditionGroup(conditionGroups: updateParam.ConditionGroups, conditionRuleEntity: conditionRuleEntity);
+
+                await _unitOfWork.SaveAsync();
+                return updateParam;
+            }
+            catch (ErrorObj e)
+            {
+                throw e;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.StackTrace);
+                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.", description: "Internal Server Error");
+            }
+        }
+        async Task<bool> DeleteOldGroups(ConditionRule conditionRuleEntity)
+        {
+            IGenericRepository<ConditionGroup> conditionGroupRepo = _unitOfWork.ConditionGroupRepository;
+            IGenericRepository<ProductCondition> productConditionRepo = _unitOfWork.ProductConditionRepository;
+            IGenericRepository<OrderCondition> orderConditionRepo = _unitOfWork.OrderConditionRepository;
+            IGenericRepository<MembershipCondition> membershipConditionRepo = _unitOfWork.MembershipConditionRepository;
+
+            // Delete old groups and old conditions
+            List<ConditionGroup> oldGroups = (await conditionGroupRepo.Get(pageIndex: 0, pageSize: 0, filter: o => o.ConditionRuleId.Equals(conditionRuleEntity.ConditionRuleId))).ToList();
+            if (oldGroups.Count > 0)
+            {
+                foreach (var group in oldGroups)
+                {
+                    membershipConditionRepo.Delete(id: Guid.Empty, filter: o => o.ConditionGroupId.Equals(group.ConditionGroupId));
+                    productConditionRepo.Delete(id: Guid.Empty, filter: o => o.ConditionGroupId.Equals(group.ConditionGroupId));
+                    orderConditionRepo.Delete(id: Guid.Empty, filter: o => o.ConditionGroupId.Equals(group.ConditionGroupId));
+                    conditionGroupRepo.Delete(id: group.ConditionGroupId);
+                }
+            }
+            return true;
+        }
+        void InsertConditionGroup(List<ConditionGroupDto> conditionGroups, ConditionRule conditionRuleEntity)
+        {
+            IGenericRepository<ConditionGroup> conditionGroupRepo = _unitOfWork.ConditionGroupRepository;
+            IGenericRepository<ProductCondition> productConditionRepo = _unitOfWork.ProductConditionRepository;
+            IGenericRepository<OrderCondition> orderConditionRepo = _unitOfWork.OrderConditionRepository;
+            IGenericRepository<MembershipCondition> membershipConditionRepo = _unitOfWork.MembershipConditionRepository;
+
+            //Insert new condition groups
+            foreach (var group in conditionGroups)
+            {
+                ConditionGroup conditionGroupEntity = new ConditionGroup
+                {
+                    ConditionGroupId = Guid.NewGuid(),
+                    GroupNo = group.GroupNo,
+                    ConditionRuleId = conditionRuleEntity.ConditionRuleId,
+                    NextOperator = group.NextOperator,
+                    InsDate = DateTime.Now,
+                    UpdDate = DateTime.Now
+                };
+                conditionGroupRepo.Add(conditionGroupEntity);
+                group.ConditionGroupId = conditionGroupEntity.ConditionGroupId;
+                // Create product condition
+                if (group.ProductCondition != null && group.ProductCondition.Count > 0)
+                {
+                    foreach (var productCondition in group.ProductCondition)
+                    {
+                        var productConditionEntity = _mapper.Map<ProductCondition>(productCondition);
+                        productConditionEntity.ConditionGroupId = conditionGroupEntity.ConditionGroupId;
+                        productConditionEntity.ProductConditionId = Guid.NewGuid();
+                        productConditionEntity.DelFlg = false;
+                        productConditionEntity.UpdDate = DateTime.Now;
+                        productConditionEntity.InsDate = DateTime.Now;
+                        productConditionRepo.Add(productConditionEntity);
+                        productCondition.ProductConditionId = productConditionEntity.ProductConditionId;
+                    }
+                }
+                // Create order condition
+                if (group.OrderCondition != null && group.OrderCondition.Count > 0)
+                {
+                    foreach (var orderCondition in group.OrderCondition)
+                    {
+                        var orderConditionEntity = _mapper.Map<OrderCondition>(orderCondition);
+                        orderConditionEntity.ConditionGroupId = conditionGroupEntity.ConditionGroupId;
+                        orderConditionEntity.OrderConditionId = Guid.NewGuid();
+                        orderConditionEntity.DelFlg = false;
+                        orderConditionEntity.UpdDate = DateTime.Now;
+                        orderConditionEntity.InsDate = DateTime.Now;
+                        orderConditionRepo.Add(orderConditionEntity);
+                        orderCondition.OrderConditionId = orderConditionEntity.OrderConditionId;
+                    }
+                }
+
+                //    // Create membership condition
+                if (group.MembershipCondition != null && group.MembershipCondition.Count > 0)
+                {
+                    foreach (var membershipCondition in group.MembershipCondition)
+                    {
+                        var membershipConditionEntity = _mapper.Map<MembershipCondition>(membershipCondition);
+                        membershipConditionEntity.ConditionGroupId = conditionGroupEntity.ConditionGroupId;
+                        membershipConditionEntity.MembershipConditionId = Guid.NewGuid();
+                        membershipConditionEntity.DelFlg = false;
+                        membershipConditionEntity.UpdDate = DateTime.Now;
+                        membershipConditionEntity.InsDate = DateTime.Now;
+                        membershipConditionRepo.Add(membershipConditionEntity);
+                        membershipCondition.MembershipConditionId = membershipConditionEntity.MembershipConditionId;
+                    }
+                }
+            }
 
         }
-
+        #endregion
 
 
         #region check voucher
@@ -299,5 +362,6 @@ namespace ApplicationCore.Services
             return orderResponse;
         }
         #endregion
+
     }
 }
