@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Linq.Expressions;
+using System;
 
 namespace ApplicationCore.Services
 {
@@ -73,6 +74,7 @@ namespace ApplicationCore.Services
                         : ((MembershipConditionDto)o).IndexGroup)).ToList();
                     conditionRuleResponse.ConditionGroups.Add(groupResponse);
                 }
+                conditionRuleResponse.ConditionGroups = conditionRuleResponse.ConditionGroups.OrderBy(o => o.GroupNo).ToList();
                 result.Add(conditionRuleResponse);
             }
             return result;
@@ -128,6 +130,7 @@ namespace ApplicationCore.Services
                     : o.GetType() == typeof(OrderConditionDto) ? ((OrderConditionDto)o).IndexGroup
                     : ((MembershipConditionDto)o).IndexGroup)).ToList();
                 conditionRuleResponse.ConditionGroups.Add(groupResponse);
+                conditionRuleResponse.ConditionGroups = conditionRuleResponse.ConditionGroups.OrderBy(o => o.GroupNo).ToList();
             }
 
             return conditionRuleResponse;

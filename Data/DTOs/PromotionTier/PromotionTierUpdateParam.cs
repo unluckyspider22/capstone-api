@@ -58,7 +58,7 @@ namespace Infrastructure.DTOs
         public Guid MembershipActionId { get; set; }
         [StringLength(1)]
         public string ActionType { get; set; }
-        [StringLength(1)]
+        [StringLength(2)]
         public string DiscountType { get; set; }
         [Range(0, 999999)]
         public decimal? GiftQuantity { get; set; }
