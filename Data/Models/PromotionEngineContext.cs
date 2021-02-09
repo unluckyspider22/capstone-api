@@ -30,7 +30,7 @@ namespace Infrastructure.Models
         public virtual DbSet<Promotion> Promotion { get; set; }
         public virtual DbSet<PromotionStoreMapping> PromotionStoreMapping { get; set; }
         public virtual DbSet<PromotionTier> PromotionTier { get; set; }
-        public virtual DbSet<RoleEntity> Role { get; set; }
+        public virtual DbSet<Role> Role { get; set; }
         public virtual DbSet<Store> Store { get; set; }
         public virtual DbSet<Voucher> Voucher { get; set; }
         public virtual DbSet<VoucherChannel> VoucherChannel { get; set; }
@@ -662,7 +662,7 @@ namespace Infrastructure.Models
                     .HasConstraintName("FK_PromotionTier_Promotion");
             });
 
-            modelBuilder.Entity<RoleEntity>(entity =>
+            modelBuilder.Entity<Role>(entity =>
             {
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
@@ -770,6 +770,10 @@ namespace Infrastructure.Models
 
             modelBuilder.Entity<VoucherGroup>(entity =>
             {
+                entity.HasIndex(e => e.PromotionId)
+                    .HasName("VoucherGroup_UN")
+                    .IsUnique();
+
                 entity.Property(e => e.VoucherGroupId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.InsDate)
@@ -809,8 +813,8 @@ namespace Infrastructure.Models
                     .HasConstraintName("FK_VoucherGroup_Brand");
 
                 entity.HasOne(d => d.Promotion)
-                    .WithMany(p => p.VoucherGroup)
-                    .HasForeignKey(d => d.PromotionId)
+                    .WithOne(p => p.VoucherGroup)
+                    .HasForeignKey<VoucherGroup>(d => d.PromotionId)
                     .HasConstraintName("FK_VoucherGroup_Promotion");
             });
 

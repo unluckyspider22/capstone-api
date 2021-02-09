@@ -14,11 +14,13 @@ namespace ApplicationCore.Chain
     {
         private readonly IPromotionHandle _promotionHandle;
         private readonly IConditionHandle _conditionHandle;
+        private readonly IApplyPromotion _applyPromotion;
 
-        public ApplyPromotionHandler(IPromotionHandle promotionHandle, IConditionHandle conditionHandle)
+        public ApplyPromotionHandler(IPromotionHandle promotionHandle, IConditionHandle conditionHandle, IApplyPromotion applyPromotion)
         {
             _promotionHandle = promotionHandle;
             _conditionHandle = conditionHandle;
+            _applyPromotion = applyPromotion;
         }
 
         public override void Handle(OrderResponseModel order)
@@ -32,7 +34,7 @@ namespace ApplicationCore.Chain
             #endregion
 
             #region Apply action
-
+            _applyPromotion.Apply(order);
             #endregion
             /*base.Handle(order);*/
         }

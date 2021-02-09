@@ -64,7 +64,11 @@ namespace ApplicationCore.Services
                     var voucher = await _repository.Get(filter: el => el.IsActive
                     && el.VoucherCode.Equals(voucherModel.VoucherCode)
                     && !el.IsUsed
-                    && el.VoucherGroup.Promotion.PromotionCode.Equals(voucherModel.PromotionCode), includeProperties: "VoucherGroup.Promotion.PromotionTier.Action,VoucherGroup.Promotion.PromotionTier.ConditionRule.ConditionGroup.OrderCondition,VoucherGroup.Promotion.PromotionStoreMapping.Store");
+                    && el.VoucherGroup.Promotion.PromotionCode.Equals(voucherModel.PromotionCode), 
+                    includeProperties: 
+                    "VoucherGroup.Promotion.PromotionTier.Action," +
+                    "VoucherGroup.Promotion.PromotionTier.ConditionRule.ConditionGroup.OrderCondition," +
+                    "VoucherGroup.Promotion.PromotionStoreMapping.Store");
                     if (voucher.Count() > 1)
                     {
                         throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.Duplicate_VoucherCode, description: AppConstant.ErrMessage.Duplicate_VoucherCode);

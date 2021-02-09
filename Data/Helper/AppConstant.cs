@@ -32,7 +32,7 @@ namespace Infrastructure.Helper
             public const string DELETED = "1";
             public const string UNLIMIT = "0";
             public const string ISLIMIT = "1";
-            
+
             public const string FOR_WEEKEND = "1";
             public const string FOR_HOLIDAY = "2";
             public const string NO_FILTER = "0";
@@ -40,6 +40,19 @@ namespace Infrastructure.Helper
             public const string INCLUDE = "0";
             public const string EXCLUDE = "1";
 
+            public struct ActionType
+            {
+                public const string Product = "1";
+                public const string Order = "2";
+            }
+
+            public struct DiscountType
+            {
+                public const string Amount = "1";
+                public const string Percentage = "2";
+                public const string Shipping = "4";
+
+            }
             public struct CharsetType
             {
                 public const string ALPHANUMERIC = "Alphanumeric";
@@ -68,7 +81,7 @@ namespace Infrastructure.Helper
                 public const string COMPLEX = "7";
                 public const string EXTRA = "8";
             }
-           
+
             public struct VoucherType
             {
                 public const string BULK_CODE = "1";

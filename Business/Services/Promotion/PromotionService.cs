@@ -57,7 +57,7 @@ namespace ApplicationCore.Services
                 {
                     // Nếu đã có condition rule 
                     conditionRuleEntity.UpdDate = DateTime.Now;
-                    conditionRuleEntity.InsDate = null;
+                    //conditionRuleEntity.InsDate = null;
                     conditionRuleRepo.Update(conditionRuleEntity);
                     //Delete old condition group of condition rule
                     List<ConditionGroup> oldGroups = (await conditionGroupRepo.Get(pageIndex: 0, pageSize: 0, filter: o => o.ConditionRuleId.Equals(conditionRuleEntity.ConditionRuleId))).ToList();

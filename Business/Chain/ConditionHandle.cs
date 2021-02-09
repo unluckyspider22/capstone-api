@@ -91,42 +91,6 @@ namespace ApplicationCore.Chain
             }
             return invalidPromotionDetails;
         }
-        private bool CompareConditionInGroup(List<ConditionModel> conditions)
-        {
-            conditions = conditions.OrderBy(el => el.Index).ToList();
-            bool result = conditions.First().IsMatch;
-            foreach (var condition in conditions)
-            {
-                if (conditions.Count() == 1)
-                {
-                    return condition.IsMatch;
-                }
-                else
-                {
-                    int index = (int)condition.Index;
-                    if (index != conditions.Count() - 1)
-                    {
-                        if (!string.IsNullOrEmpty(condition.NextOperator))
-                        {
-                            int nextIndex = index + 1;
-                            if (condition.NextOperator.Equals(AppConstant.Operator.AND))
-                            {
-                                result = result && conditions[nextIndex].IsMatch;
-
-                            }
-                            else
-                            if (condition.NextOperator.Equals(AppConstant.Operator.OR))
-                            {
-                                result = result || conditions[nextIndex].IsMatch;
-                            }
-
-                        }
-                    }
-
-                }
-            }
-            return result;
-        }
 
         private bool CompareConditionGroup(List<ConditionGroupModel> conditionGroups)
         {
@@ -172,6 +136,43 @@ namespace ApplicationCore.Chain
 
               return conditionGroups;
           }*/
+
+        private bool CompareConditionInGroup(List<ConditionModel> conditions)
+        {
+            conditions = conditions.OrderBy(el => el.Index).ToList();
+            bool result = conditions.First().IsMatch;
+            foreach (var condition in conditions)
+            {
+                if (conditions.Count() == 1)
+                {
+                    return condition.IsMatch;
+                }
+                else
+                {
+                    int index = (int)condition.Index;
+                    if (index != conditions.Count() - 1)
+                    {
+                        if (!string.IsNullOrEmpty(condition.NextOperator))
+                        {
+                            int nextIndex = index + 1;
+                            if (condition.NextOperator.Equals(AppConstant.Operator.AND))
+                            {
+                                result = result && conditions[nextIndex].IsMatch;
+
+                            }
+                            else
+                            if (condition.NextOperator.Equals(AppConstant.Operator.OR))
+                            {
+                                result = result || conditions[nextIndex].IsMatch;
+                            }
+
+                        }
+                    }
+
+                }
+            }
+            return result;
+        }
 
         #region Tạo 1 list condition
         private List<ConditionModel> InitConditionModel(ConditionGroup conditionGroup)

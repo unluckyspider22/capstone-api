@@ -117,6 +117,8 @@ namespace PromotionEngineAPI
             services.AddScoped<IProductConditionHandle, ProducConditiontHandle>();
             //OrderConditionHandle
             services.AddScoped<IOrderConditionHandle, OrderConditionHandle>();
+            //ApplyPromotion
+            services.AddScoped<IApplyPromotion, ApplyPromotion>();
         }
         #endregion
 
