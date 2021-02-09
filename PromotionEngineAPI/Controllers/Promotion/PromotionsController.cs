@@ -282,6 +282,23 @@ namespace PromotionEngineAPI.Controllers
                 return StatusCode(statusCode: e.Code, e);
             }
         }
+        [HttpPut]
+        [Route("{promotionId}/update-tier")]
+        public async Task<IActionResult> UpdatePromotionTier([FromRoute] Guid promotionId, [FromBody] PromotionTierUpdateParam updateParam)
+        {
+            if (!promotionId.Equals(updateParam.PromotionId))
+            {
+                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+            }
+            try
+            {
+                return Ok(await _promotionService.UpdatePromotionTier(updateParam: updateParam));
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
     }
 
 }

@@ -15,5 +15,6 @@ namespace ApplicationCore.Services
 
         Task<OrderResponseModel> HandlePromotion(OrderResponseModel orderResponse);
         Task<bool> DeletePromotionTier(DeleteTierRequestParam deleteTierRequestParam);
+        Task<PromotionTierUpdateParam> UpdatePromotionTier(PromotionTierUpdateParam updateParam);
     }
 }
