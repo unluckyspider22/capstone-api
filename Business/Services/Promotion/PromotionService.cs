@@ -212,13 +212,17 @@ namespace ApplicationCore.Services
                 {
                     throw new ErrorObj(code: 400, message: "Action or Membership action is not null", description: "Invalid param");
                 }
+                await _unitOfWork.SaveAsync();
                 // update condition rule
                 IGenericRepository<ConditionRule> conditionRepo = _unitOfWork.ConditionRuleRepository;
                 var conditionRuleEntity = _mapper.Map<ConditionRule>(updateParam.ConditionRule);
                 conditionRuleEntity.UpdDate = DateTime.Now;
+                conditionRuleEntity.InsDate = null;
                 conditionRepo.Update(conditionRuleEntity);
+                await _unitOfWork.SaveAsync();
                 // Update condition group
                 await DeleteOldGroups(conditionRuleEntity: conditionRuleEntity);
+                await _unitOfWork.SaveAsync();
                 InsertConditionGroup(conditionGroups: updateParam.ConditionGroups, conditionRuleEntity: conditionRuleEntity);
 
                 await _unitOfWork.SaveAsync();
@@ -230,7 +234,9 @@ namespace ApplicationCore.Services
             }
             catch (Exception e)
             {
-                Debug.WriteLine(e.StackTrace);
+                Debug.WriteLine(e.InnerException);
+                Debug.WriteLine(e.ToString());
+                Debug.WriteLine(e.Message);
                 throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.", description: "Internal Server Error");
             }
         }
@@ -272,7 +278,7 @@ namespace ApplicationCore.Services
                     ConditionRuleId = conditionRuleEntity.ConditionRuleId,
                     NextOperator = group.NextOperator,
                     InsDate = DateTime.Now,
-                    UpdDate = DateTime.Now
+                    UpdDate = DateTime.Now,
                 };
                 conditionGroupRepo.Add(conditionGroupEntity);
                 group.ConditionGroupId = conditionGroupEntity.ConditionGroupId;
