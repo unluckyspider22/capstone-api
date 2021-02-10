@@ -21,8 +21,9 @@ namespace PromotionEngineAPI.Controllers
         private readonly IPromotionService _promotionService;
         private readonly IVoucherService _voucherService;
         private readonly IPromotionStoreMappingService _promotionStoreMappingService;
+        
 
-        public PromotionsController(IPromotionService service, IPromotionStoreMappingService promotionStoreMappingService, IVoucherService voucherService)
+        public PromotionsController(IPromotionService service, IPromotionStoreMappingService promotionStoreMappingService, IVoucherService voucherService, IConditionRuleService conditionRuleService)
         {
             _promotionService = service;
             _promotionStoreMappingService = promotionStoreMappingService;
@@ -275,6 +276,23 @@ namespace PromotionEngineAPI.Controllers
             try
             {
                 return Ok(await _promotionService.DeletePromotionTier(deleteTierRequestParam: deleteTierRequestParam));
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
+        [HttpPut]
+        [Route("{promotionId}/update-tier")]
+        public async Task<IActionResult> UpdatePromotionTier([FromRoute] Guid promotionId, [FromBody] PromotionTierUpdateParam updateParam)
+        {
+            if (!promotionId.Equals(updateParam.PromotionId))
+            {
+                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+            }
+            try
+            {
+                return Ok(await _promotionService.UpdatePromotionTier(updateParam: updateParam));
             }
             catch (ErrorObj e)
             {

@@ -91,6 +91,12 @@ namespace Infrastructure.AutoMapper
             //Condition rule update param
             CreateMap<ConditionRule, ConditionRuleUpdateParam>();
             CreateMap<ConditionRuleUpdateParam, ConditionRule>();
+            //Condition rule update param
+            CreateMap<Action, ActionUpdateParam>();
+            CreateMap<ActionUpdateParam, Action>();
+            // MembershipActionUpdateParam
+            CreateMap<MembershipAction, MembershipActionUpdateParam>();
+            CreateMap<MembershipActionUpdateParam, MembershipAction>();
         }
     }
 }
