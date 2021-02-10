@@ -15,6 +15,8 @@ namespace ApplicationCore.Chain
     {
         public override void Handle(OrderResponseModel order)
         {
+            var promotions = order.Promotions;
+
             base.Handle(order);
         }
     }
