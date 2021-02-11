@@ -10,7 +10,7 @@ namespace Infrastructure.DTOs
     {
         public Guid ConditionRuleId { get; set; }
         public Guid? BrandId { get; set; }
-        [StringLength(30)]
+        [StringLength(50)]
         public string RuleName { get; set; }
         [StringLength(200)]
         public string Description { get; set; }
