@@ -129,14 +129,6 @@ namespace ApplicationCore.Chain
             return result;
         }
 
-        /*  private List<ConditionGroupModel> InitConditionGroupModel(ConditionRule conditionRule)
-          {
-              List<ConditionGroupModel> conditionGroups = new List<ConditionGroupModel>();
-              foreach()
-
-              return conditionGroups;
-          }*/
-
         private bool CompareConditionInGroup(List<ConditionModel> conditions)
         {
             conditions = conditions.OrderBy(el => el.Index).ToList();
