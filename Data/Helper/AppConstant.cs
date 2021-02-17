@@ -31,7 +31,7 @@ namespace Infrastructure.Helper
             public const int DUPLICATE = 2;
             public const string DELETED = "1";
             public const string UNLIMIT = "0";
-            public const string ISLIMIT = "1";
+            public const bool ISLIMIT = true;
 
             public const string FOR_WEEKEND = "1";
             public const string FOR_HOLIDAY = "2";
