@@ -50,8 +50,11 @@ namespace Infrastructure.Helper
             {
                 public const string Amount = "1";
                 public const string Percentage = "2";
+                public const string Unit = "3";
                 public const string Shipping = "4";
-
+                public const string Fixed = "5";
+                public const string Ladder = "6";
+                public const string Bundle = "7";
             }
             public struct CharsetType
             {

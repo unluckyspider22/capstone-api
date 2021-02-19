@@ -35,6 +35,7 @@ namespace ApplicationCore.Chain
                                 DiscountOrder(order, action, promotion);
                                 break;
                             case AppConstant.EnvVar.ActionType.Product:
+                                DiscountProduct(order, action, promotion);
                                 break;
                         }
                     }
@@ -45,7 +46,6 @@ namespace ApplicationCore.Chain
         }
         private List<Infrastructure.Models.Action> FilterAction(List<Infrastructure.Models.Action> actions)
         {
-
             var result = new List<Infrastructure.Models.Action>();
             if (actions.Count() > 0 && actions.Count() == 1)
             {
@@ -53,12 +53,10 @@ namespace ApplicationCore.Chain
             }
             else
             {
-
                 if (actions.Where(el => el.DiscountType.Equals(AppConstant.EnvVar.DiscountType.Amount)).Count() > 1
                     || actions.Where(el => el.DiscountType.Equals(AppConstant.EnvVar.DiscountType.Percentage)).Count() > 1
                     || actions.Where(el => el.DiscountType.Equals(AppConstant.EnvVar.DiscountType.Shipping)).Count() > 1)
                 {
-
                     var actionAmount = actions
                         .Where(w =>
                         w.DiscountAmount > 0
@@ -77,10 +75,10 @@ namespace ApplicationCore.Chain
                     }
                 }
                 else return actions;
-
             }
             return result;
         }
+        #region Discount Order
         private void DiscountOrder(OrderResponseModel order, Infrastructure.Models.Action action, Promotion promotion)
         {
             decimal discount = 0;
@@ -124,7 +122,6 @@ namespace ApplicationCore.Chain
             });
 
         }
-
         private void SetDiscountFromOrder(OrderResponseModel order, decimal discount, decimal final, Promotion promotion)
         {
             var discountPercent = discount / final;
@@ -139,13 +136,58 @@ namespace ApplicationCore.Chain
             }).ToList();
         }
 
+        #endregion
+
+        #region Discount for item
+        private void DiscountProduct(OrderResponseModel order, Infrastructure.Models.Action action, Promotion promotion)
+        {
+            foreach (var product in order.OrderDetail.OrderDetailResponses)
+            {
+                if (action.ProductCode.Contains(product.ProductCode))
+                {
+                    switch (action.DiscountType)
+                    {
+                        case AppConstant.EnvVar.DiscountType.Amount:
+                            DiscountProductAmount(product, action);
+                            break;
+                        case AppConstant.EnvVar.DiscountType.Percentage:
+                            break;
+                        case AppConstant.EnvVar.DiscountType.Unit:
+                            break;
+                        case AppConstant.EnvVar.DiscountType.Fixed:
+                            break;
+                        case AppConstant.EnvVar.DiscountType.Ladder:
+                            break;
+                        case AppConstant.EnvVar.DiscountType.Bundle:
+                            break;
+                    }
+                }
+
+            }
+
+        }
+        private void DiscountProductAmount(OrderDetailResponseModel product, Infrastructure.Models.Action action)
+        {
+            decimal discount = (decimal)action.DiscountAmount;
+            SetDiscountProduct(product, action, discount);
+        }
+        private void SetDiscountProduct(OrderDetailResponseModel product, Infrastructure.Models.Action action, decimal discount)
+        {
+            product.Discount -= discount;
+            if (action.DiscountType.Equals(AppConstant.EnvVar.DiscountType.Amount))
+            {
+                product.Discount = product.Discount < action.MinPriceAfter ? (decimal)action.MinPriceAfter : product.Discount;
+            }
+        }
+
+        #endregion
         private void SetFinalAmountApply(OrderResponseModel order)
         {
             order.TotalAmount = order.OrderDetail.Amount;
             order.DiscountOrderDetail = order.OrderDetail.OrderDetailResponses.Sum(s => s.Discount);
             order.Discount = (decimal)order.OrderDetail.OrderDetailResponses.Sum(s => s.DiscountFromOrder)
                 + (decimal)order.DiscountOrderDetail;
-            order.FinalAmount =Math.Ceiling((decimal)(order.TotalAmount - order.Discount)) ;
+            order.FinalAmount = Math.Ceiling((decimal)(order.TotalAmount - order.Discount));
         }
     }
 }

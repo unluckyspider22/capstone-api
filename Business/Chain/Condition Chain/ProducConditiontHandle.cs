@@ -1,5 +1,6 @@
 ﻿using ApplicationCore.Models;
 using ApplicationCore.Request;
+using ApplicationCore.Utils;
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
 using System;
@@ -75,25 +76,10 @@ namespace ApplicationCore.Chain
             _condition.IsMatch = false;
             foreach (var product in products)
             {
-                switch (condition.QuantityOperator)
-                {
-                    case AppConstant.Operator.GREATER_THAN:
-                       /* throw new ErrorObj(code: 400, "product.Quantity: " + product.Quantity + ",condition.ProductQuantity: " + condition.ProductQuantity);*/
-                        _condition.IsMatch = product.Quantity > condition.ProductQuantity;
-                        break;
-                    case AppConstant.Operator.GREATER_THAN_OR_EQUAL:
-                        _condition.IsMatch = product.Quantity >= condition.ProductQuantity;
-                        break;
-                    case AppConstant.Operator.LESS_THAN:
-                        _condition.IsMatch = product.Quantity < condition.ProductQuantity;
-                        break;
-                    case AppConstant.Operator.LESS_THAN_OR_EQUAL:
-                        _condition.IsMatch = product.Quantity <= condition.ProductQuantity;
-                        break;
-                    case AppConstant.Operator.EQUAL:
-                        _condition.IsMatch = product.Quantity == condition.ProductQuantity;
-                        break;
-                }
+                _condition.IsMatch = Common.Compare<int>(
+                    condition.QuantityOperator, 
+                    product.Quantity, 
+                    (int)condition.ProductQuantity);
                 if (_condition.IsMatch)
                 {
                     break;

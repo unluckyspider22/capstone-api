@@ -50,7 +50,6 @@ namespace ApplicationCore.Chain
                         continue;
                     }
                     order.PromotionTierIds.Add(promotionTier.PromotionTierId);
-
                 }
                 if (invalidPromotionDetails == promotion.PromotionTier.Count && invalidPromotionDetails > 0)
                 {
@@ -120,7 +119,6 @@ namespace ApplicationCore.Chain
                             {
                                 result = result || conditionGroups[nextIndex].IsMatch;
                             }
-
                         }
                     }
 
