@@ -21,5 +21,6 @@ namespace Infrastructure.Repository
         Task<int> CountAsync(Expression<Func<TEntity, bool>> filter = null);
         void DeleteUsername(string username);
         void HideUsername(string username, string value);
+
     }
 }

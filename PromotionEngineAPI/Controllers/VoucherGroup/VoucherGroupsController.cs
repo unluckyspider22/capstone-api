@@ -54,7 +54,8 @@ namespace PromotionEngineAPI.Controllers
             {
                 return StatusCode(statusCode: e.Code, e);
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 Debug.WriteLine(ex.Message);
                 return StatusCode(500);
             }
@@ -78,7 +79,7 @@ namespace PromotionEngineAPI.Controllers
             }
         }
 
-    
+
         // GET: api/VoucherGroups/count
         [HttpGet]
         [Route("count")]
@@ -133,25 +134,22 @@ namespace PromotionEngineAPI.Controllers
             try
             {
                 dto.VoucherGroupId = Guid.NewGuid();
+                List<VoucherDto> vouchers = new List<VoucherDto>(); 
 
                 if (dto.VoucherType.Equals(AppConstant.EnvVar.VoucherType.BULK_CODE))
                 {
-                    List<VoucherDto> generateVoucher = _service.GenerateBulkCodeVoucher(dto);
-                    dto.Voucher = generateVoucher;
+                    vouchers = _service.GenerateBulkCodeVoucher(dto);
+                    //dto.Voucher = generateVoucher;
                 }
                 else
                 {
-
-                    List<VoucherDto> vouchers = _service.GenerateStandaloneVoucher(dto);
-                    dto.Voucher = vouchers;
-
+                    vouchers = _service.GenerateStandaloneVoucher(dto);
+                    //dto.Voucher = vouchers;
                 }
-
-                var result = await _service.CreateAsync(dto);         
-
-                //var result = dto;
-
-                return Ok(result);
+                await _service.CreateAsync(dto);
+                await _service.CreateVoucherBulk(vouchers);
+                dto.Voucher = vouchers;
+                return Ok(dto);
             }
             catch (ErrorObj e)
             {
@@ -161,11 +159,72 @@ namespace PromotionEngineAPI.Controllers
 
         // DELETE: api/VoucherGroups/5
         [HttpDelete]
-        public async Task<IActionResult> DeleteVoucherGroup([FromQuery] Guid id)
+        [Route("{id}")]
+        public async Task<IActionResult> DeleteVoucherGroup([FromRoute] Guid id)
         {
+            if (id.Equals(Guid.Empty))
+            {
+                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+            }
             try
             {
-                var result = await _service.DeleteAsync(id);
+                var result = await _service.DeleteVoucherGroup(id);
+                return Ok(result);
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
+        [HttpPut]
+        [Route("hide/{id}")]
+        public async Task<IActionResult> HideVoucherGroup([FromRoute] Guid id)
+        {
+            if (id.Equals(Guid.Empty))
+            {
+                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+            }
+            try
+            {
+                var result = await _service.HideVoucherGroup(id);
+                return Ok(result);
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
+
+        [HttpPut]
+        [Route("assign")]
+        public async Task<IActionResult> AssignVoucherGroup([FromQuery] Guid voucherGroupId, [FromQuery] Guid promotionId)
+        {
+            if (voucherGroupId.Equals(Guid.Empty) || promotionId.Equals(Guid.Empty))
+            {
+                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+            }
+            try
+            {
+                var result = await _service.AssignVoucherGroup(promotionId: promotionId, voucherGroupId: voucherGroupId);
+                return Ok(result);
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
+
+        [HttpPut]
+        [Route("reject/{id}")]
+        public async Task<IActionResult> RejectVoucherGroup([FromRoute] Guid id)
+        {
+            if (id.Equals(Guid.Empty))
+            {
+                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+            }
+            try
+            {
+                var result = await _service.RejectVoucherGroup(id);
                 return Ok(result);
             }
             catch (ErrorObj e)
