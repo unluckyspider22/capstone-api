@@ -5,9 +5,12 @@ using Infrastructure.Models;
 using Infrastructure.UnitOrWork;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using PromotionEngineAPI.Hubs;
+using PromotionEngineAPI.Worker;
 using System;
 
 namespace PromotionEngineAPI
@@ -52,7 +55,7 @@ namespace PromotionEngineAPI
             ServiceAddScoped(services);
             // configure controller
             services.AddControllers().AddNewtonsoftJson(option => option.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
-
+            services.AddSignalR();
 
         }
         #region Add Scope
@@ -100,6 +103,8 @@ namespace PromotionEngineAPI
 
             ChainOfResponsibilityServices(services);
 
+            WorkerServices(services);
+
         }
         private void ChainOfResponsibilityServices(IServiceCollection services)
         {
@@ -119,6 +124,10 @@ namespace PromotionEngineAPI
             services.AddScoped<IOrderConditionHandle, OrderConditionHandle>();
             //ApplyPromotion
             services.AddScoped<IApplyPromotion, ApplyPromotion>();
+        }
+        private void WorkerServices(IServiceCollection services)
+        {
+            services.AddScoped<IVoucherWorker, VoucherWorker>();
         }
         #endregion
 
@@ -148,12 +157,18 @@ namespace PromotionEngineAPI
 
             app.UseCors("VueCorsPolicy");
 
+
             app.UseEndpoints(endpoints =>
             {
+                ReigsterHubs(endpoints);
                 endpoints.MapControllers();
             });
-
-
         }
+        #region Register hubs
+        private void ReigsterHubs(IEndpointRouteBuilder endpoints)
+        {
+            endpoints.MapHub<VoucherHub>("/voucher/notify");
+        }
+        #endregion
     }
 }

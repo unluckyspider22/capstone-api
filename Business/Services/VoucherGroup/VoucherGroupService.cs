@@ -198,12 +198,13 @@ namespace ApplicationCore.Services
         {
             try
             {
-                IVoucherRepository voucherRepo = new VoucherRepositoryImp();
+                //IVoucherRepository voucherRepo = new VoucherRepositoryImp();
                 // Delete vouchers
-                voucherRepo.DeleteBulk(voucherGroupId: id);
+                //voucherRepo.DeleteBulk(voucherGroupId: id);
                 // Delete voucher group
-                _repository.Delete(id: id, filter: null);
-                return await _unitOfWork.SaveAsync() > 0;
+                //_repository.Delete(id: id, filter: null);
+                //return await _unitOfWork.SaveAsync() > 0;
+                return true;
             }
             catch (Exception e)
             {
@@ -295,6 +296,11 @@ namespace ApplicationCore.Services
                 throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
             }
 
+        }
+
+        public async Task<List<Voucher>> MapVoucher(List<VoucherDto> vouchers)
+        {
+            return _mapper.Map<List<Voucher>>(vouchers);
         }
     }
 }
