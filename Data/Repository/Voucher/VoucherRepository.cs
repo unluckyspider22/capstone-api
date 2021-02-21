@@ -16,9 +16,12 @@ namespace Infrastructure.Repository.Voucher
     public class VoucherRepositoryImp : IVoucherRepository
     {
         private PromotionEngineContext ctx = new PromotionEngineContext();
-        public void DeleteBulk(Guid voucherGroupId)
+        public async void DeleteBulk(Guid voucherGroupId)
         {
             ctx.Voucher.Where(x => x.VoucherGroupId.Equals(voucherGroupId)).Delete();
+            ctx.VoucherGroup.Where(x => x.VoucherGroupId.Equals(voucherGroupId)).Delete();
+            await ctx.SaveChangesAsync();
+            ctx.Dispose();
         }
 
         public async Task<List<Models.Voucher>> InsertBulk(List<Models.Voucher> vouchers)

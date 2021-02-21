@@ -136,7 +136,7 @@ namespace PromotionEngineAPI.Controllers
             try
             {
                 return Ok(await _promotionService.GetFirst(filter: el => el.PromotionId.Equals(id) && !el.DelFlg,
-                    includeProperties: "VoucherGroup,VoucherGroup.Voucher,VoucherChannel,PromotionStoreMapping"));
+                    includeProperties: "VoucherGroup,VoucherChannel,PromotionStoreMapping"));
             }
             catch (ErrorObj e)
             {

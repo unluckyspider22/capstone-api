@@ -5,6 +5,7 @@ using Infrastructure.DTOs;
 using Infrastructure.Helper;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
+using PromotionEngineAPI.Worker;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,10 +19,12 @@ namespace PromotionEngineAPI.Controllers
     public class VoucherGroupsController : ControllerBase
     {
         private readonly IVoucherGroupService _service;
+        private readonly IVoucherWorker _workerService;
 
-        public VoucherGroupsController(IVoucherGroupService service)
+        public VoucherGroupsController(IVoucherGroupService service, IVoucherWorker workerService)
         {
             _service = service;
+            _workerService = workerService;
         }
 
         // GET: api/VoucherGroups
@@ -134,7 +137,7 @@ namespace PromotionEngineAPI.Controllers
             try
             {
                 dto.VoucherGroupId = Guid.NewGuid();
-                List<VoucherDto> vouchers = new List<VoucherDto>(); 
+                List<VoucherDto> vouchers = new List<VoucherDto>();
 
                 if (dto.VoucherType.Equals(AppConstant.EnvVar.VoucherType.BULK_CODE))
                 {
@@ -147,7 +150,9 @@ namespace PromotionEngineAPI.Controllers
                     //dto.Voucher = vouchers;
                 }
                 await _service.CreateAsync(dto);
-                await _service.CreateVoucherBulk(vouchers);
+                //_service.CreateVoucherBulk(vouchers);
+                var listVoucher = await _service.MapVoucher(vouchers);
+                _workerService.InsertVouchers(vouchers: listVoucher, voucherGroupId: dto.VoucherGroupId, promotionId: dto.PromotionId);
                 dto.Voucher = vouchers;
                 return Ok(dto);
             }
@@ -159,17 +164,18 @@ namespace PromotionEngineAPI.Controllers
 
         // DELETE: api/VoucherGroups/5
         [HttpDelete]
-        [Route("{id}")]
-        public async Task<IActionResult> DeleteVoucherGroup([FromRoute] Guid id)
+        public async Task<IActionResult> DeleteVoucherGroup([FromQuery] Guid voucherGroupId, [FromQuery] Guid promotionId)
         {
-            if (id.Equals(Guid.Empty))
+            if (voucherGroupId.Equals(Guid.Empty) || promotionId.Equals(Guid.Empty))
             {
                 return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
             }
             try
             {
-                var result = await _service.DeleteVoucherGroup(id);
-                return Ok(result);
+                //var result = await _service.DeleteVoucherGroup(id);
+                _workerService.DeleteVouchers(voucherGroupId: voucherGroupId, promotionId: promotionId);
+                //return Ok(result);
+                return Ok();
             }
             catch (ErrorObj e)
             {

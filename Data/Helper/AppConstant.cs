@@ -161,5 +161,22 @@ namespace Infrastructure.Helper
             public const string OR = "1";
 
         }
+
+        //public const string URL = "https://localhost:44367/";
+        public const string URL = "https://promoengine.azurewebsites.net/";
+
+        public struct NotiMess
+        {
+            public const string PROCESSING_MESS = "is processing";
+            public const string PROCESSED_MESS = "is finished";
+            public const string ERROR_MESS = "is error";
+            public const string VOUCHER_INSERT_MESS = "Inserting voucher";
+            public const string VOUCHER_DELETE_MESS = "Deleting voucher";
+            public struct Type
+            {
+                public const string INSERT_VOUCHERS = "INSERT_VOUCHERS";
+                public const string DELETE_VOUCHERS = "DELETE_VOUCHERS";
+            }
+        }
     }
 }
