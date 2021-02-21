@@ -11,6 +11,7 @@ using System.Diagnostics;
 using ApplicationCore.Request;
 using System.Collections.Generic;
 using ApplicationCore.Models;
+using System.Net;
 
 namespace PromotionEngineAPI.Controllers
 {
@@ -21,7 +22,7 @@ namespace PromotionEngineAPI.Controllers
         private readonly IPromotionService _promotionService;
         private readonly IVoucherService _voucherService;
         private readonly IPromotionStoreMappingService _promotionStoreMappingService;
-        
+
 
         public PromotionsController(IPromotionService service, IPromotionStoreMappingService promotionStoreMappingService, IVoucherService voucherService, IConditionRuleService conditionRuleService)
         {
@@ -45,6 +46,7 @@ namespace PromotionEngineAPI.Controllers
                     //Check promotion
                     result = await _promotionService.HandlePromotion(responseModel);
                 }
+                else throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Unmatch_Promotion);
             }
             catch (ErrorObj e)
             {

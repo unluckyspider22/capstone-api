@@ -154,10 +154,13 @@ namespace ApplicationCore.Chain
                             DiscountProductPercentage(product, action);
                             break;
                         case AppConstant.EnvVar.DiscountType.Unit:
+                            DiscountProductUnit(product, action);
                             break;
                         case AppConstant.EnvVar.DiscountType.Fixed:
+                            DiscountProductFixedPrice(product, action);
                             break;
                         case AppConstant.EnvVar.DiscountType.Ladder:
+                            DiscountProductLadderPrice(product, action);
                             break;
                         case AppConstant.EnvVar.DiscountType.Bundle:
                             break;
@@ -177,10 +180,32 @@ namespace ApplicationCore.Chain
             decimal discount = product.TotalAmount * (decimal)action.DiscountPercentage / 100;
             SetDiscountProduct(product, action, discount);
         }
+        private void DiscountProductUnit(OrderDetailResponseModel product, Infrastructure.Models.Action action)
+        {
+            decimal discount = 0;
+            if (product.Quantity >= action.DiscountQuantity)
+            {
+                discount = (decimal)(action.DiscountQuantity * product.UnitPrice);
+            }
+            SetDiscountProduct(product, action, discount);
+        }
+        private void DiscountProductFixedPrice(OrderDetailResponseModel product, Infrastructure.Models.Action action)
+        {
+            decimal discount = (decimal)(product.TotalAmount - action.FixedPrice * product.Quantity);
+            SetDiscountProduct(product, action, discount);
+        }
+        private void DiscountProductLadderPrice(OrderDetailResponseModel product, Infrastructure.Models.Action action)
+        {
+            decimal discount = 0;
+            if (product.Quantity >= action.OrderLadderProduct)
+            {
+                discount = (decimal)(product.TotalAmount - action.LadderPrice);
+            }
+            SetDiscountProduct(product, action, discount);
+        }
         private void SetDiscountProduct(OrderDetailResponseModel product, Infrastructure.Models.Action action, decimal discount)
         {
             product.Discount += discount;
-            /*throw new ErrorObj(code: 400, message: "discount: " + product.Discount);*/
             if (action.DiscountType.Equals(AppConstant.EnvVar.DiscountType.Amount))
             {
                 product.Discount = product.Discount < action.MinPriceAfter ? (decimal)action.MinPriceAfter : product.Discount;

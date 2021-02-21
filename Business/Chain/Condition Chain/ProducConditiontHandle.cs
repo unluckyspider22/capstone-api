@@ -68,24 +68,6 @@ namespace ApplicationCore.Chain
                 }
             }
         }
-        /*    private void IsIncludeProduct(ProductConditionModel condition, OrderDetailResponseModel product, bool isInclude)
-            {
-                if (condition.ProductType.Equals(AppConstant.EnvVar.ProductType.SINGLE_PRODUCT))
-                {
-                    if (product.ProductCode.Equals(condition.ProductCode) && isInclude)
-                    {
-                        _condition.IsMatch = true;
-                    }
-                }
-                else
-                {
-                    if (product.ProductCode.Equals(condition.ProductCode)
-                        && product.ParentCode.Equals(condition.ParentCode) && isInclude)
-                    {
-                        _condition.IsMatch = true;
-                    }
-                }
-            }*/
         private void HandleQuantity(ProductConditionModel condition, List<OrderDetailResponseModel> products)
         {
             if (condition.ProductQuantity > 0)

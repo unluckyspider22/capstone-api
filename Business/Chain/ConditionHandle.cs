@@ -58,32 +58,35 @@ namespace ApplicationCore.Chain
         {
             int invalidPromotionDetails = 0;
             var conditionGroupModels = new List<ConditionGroupModel>();
-            foreach (var conditionGroup in promotionTier.ConditionRule.ConditionGroup)
+            if (promotionTier.ConditionRule.ConditionGroup != null && promotionTier.ConditionRule.ConditionGroup.Count() > 0)
             {
-                var conditions = InitConditionModel(conditionGroup);
-                if (conditions != null)
+                foreach (var conditionGroup in promotionTier.ConditionRule.ConditionGroup)
                 {
-                    foreach (var condition in conditions)
+                    var conditions = InitConditionModel(conditionGroup);
+                    if (conditions != null)
                     {
-                        #region Handle cho từng condition dựa vào loại của nó
-                        //Tạo chuỗi handle cho từng loại condition
-                        _orderConditionHandle.SetNext(_productConditionHandle).SetNext(_membershipConditionHandle);
-                        _orderConditionHandle.SetConditionModel(condition);
-                        _productConditionHandle.SetConditionModel(condition);
-                        _membershipConditionHandle.SetConditionModel(condition);
-                        _orderConditionHandle.Handle(order);
-                        #endregion
-                    }
-                    var conditionResult = CompareConditionInGroup(conditions);
+                        foreach (var condition in conditions)
+                        {
+                            #region Handle cho từng condition dựa vào loại của nó
+                            //Tạo chuỗi handle cho từng loại condition
+                            _orderConditionHandle.SetNext(_productConditionHandle).SetNext(_membershipConditionHandle);
+                            _orderConditionHandle.SetConditionModel(condition);
+                            _productConditionHandle.SetConditionModel(condition);
+                            _membershipConditionHandle.SetConditionModel(condition);
+                            _orderConditionHandle.Handle(order);
+                            #endregion
+                        }
+                        var conditionResult = CompareConditionInGroup(conditions);
 
-                    var groupModel = new ConditionGroupModel(conditionGroup.GroupNo, conditionGroup.NextOperator, conditionResult);
-                    conditionGroupModels.Add(groupModel);
+                        var groupModel = new ConditionGroupModel(conditionGroup.GroupNo, conditionGroup.NextOperator, conditionResult);
+                        conditionGroupModels.Add(groupModel);
+                    }
                 }
-            }
-            var result = CompareConditionGroup(conditionGroupModels);
-            if (!result)
-            {
-                invalidPromotionDetails++;
+                var result = CompareConditionGroup(conditionGroupModels);
+                if (!result)
+                {
+                    invalidPromotionDetails++;
+                }
             }
             return invalidPromotionDetails;
         }

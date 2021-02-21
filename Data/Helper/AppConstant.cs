@@ -136,6 +136,7 @@ namespace Infrastructure.Helper
             public const string Exclusive_Promotion = "Khuyến mãi không dùng chung với các khuyến mãi khác";
             public const string Invalid_Gender = "Giới tính không phù hợp với khuyến mãi";
             public const string InActive_Promotion = "Khuyến mãi chưa được áp dụng";
+            public const string Unmatch_Promotion = "Không có khuyến mãi phù hợp với voucher này";
 
             public const string Invalid_SaleMode = "Khuyến mãi không dành cho loại đơn hàng này.";
             public const string Invalid_MinAmount = "Giá đơn hàng thấp hơn quy định.";
