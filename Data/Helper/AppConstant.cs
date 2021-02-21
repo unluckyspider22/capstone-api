@@ -150,8 +150,6 @@ namespace Infrastructure.Helper
             public const string Invalid_Operator = "Invalid Logic Operator";
 
         }
-
-
         public class Operator
         {
             public const string GREATER_THAN = "1";
@@ -159,8 +157,8 @@ namespace Infrastructure.Helper
             public const string LESS_THAN = "3";
             public const string LESS_THAN_OR_EQUAL = "4";
             public const string EQUAL = "5";
-            public const string AND = "1";
-            public const string OR = "2";
+            public const string AND = "2";
+            public const string OR = "1";
 
         }
     }

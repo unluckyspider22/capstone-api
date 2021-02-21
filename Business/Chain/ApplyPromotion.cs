@@ -151,6 +151,7 @@ namespace ApplicationCore.Chain
                             DiscountProductAmount(product, action);
                             break;
                         case AppConstant.EnvVar.DiscountType.Percentage:
+                            DiscountProductPercentage(product, action);
                             break;
                         case AppConstant.EnvVar.DiscountType.Unit:
                             break;
@@ -162,7 +163,7 @@ namespace ApplicationCore.Chain
                             break;
                     }
                 }
-
+                product.FinalAmount = product.TotalAmount - product.Discount;
             }
 
         }
@@ -171,12 +172,22 @@ namespace ApplicationCore.Chain
             decimal discount = (decimal)action.DiscountAmount;
             SetDiscountProduct(product, action, discount);
         }
+        private void DiscountProductPercentage(OrderDetailResponseModel product, Infrastructure.Models.Action action)
+        {
+            decimal discount = product.TotalAmount * (decimal)action.DiscountPercentage / 100;
+            SetDiscountProduct(product, action, discount);
+        }
         private void SetDiscountProduct(OrderDetailResponseModel product, Infrastructure.Models.Action action, decimal discount)
         {
-            product.Discount -= discount;
+            product.Discount += discount;
+            /*throw new ErrorObj(code: 400, message: "discount: " + product.Discount);*/
             if (action.DiscountType.Equals(AppConstant.EnvVar.DiscountType.Amount))
             {
                 product.Discount = product.Discount < action.MinPriceAfter ? (decimal)action.MinPriceAfter : product.Discount;
+            }
+            else if (action.DiscountType.Equals(AppConstant.EnvVar.DiscountType.Percentage))
+            {
+                product.Discount = (decimal)(product.Discount > action.MaxAmount ? action.MaxAmount : product.Discount);
             }
         }
 
