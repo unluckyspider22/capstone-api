@@ -40,7 +40,6 @@ namespace ApplicationCore.Chain
                         }
                     }
                 }
-                else throw new ErrorObj(code: 400, message: "Không có action nào");
                 SetFinalAmountApply(order);
             }
         }
@@ -163,6 +162,7 @@ namespace ApplicationCore.Chain
                             DiscountProductLadderPrice(product, action);
                             break;
                         case AppConstant.EnvVar.DiscountType.Bundle:
+                            DiscountProductBundlePrice(product, action);
                             break;
                     }
                 }
@@ -199,7 +199,24 @@ namespace ApplicationCore.Chain
             decimal discount = 0;
             if (product.Quantity >= action.OrderLadderProduct)
             {
-                discount = (decimal)(product.TotalAmount - action.LadderPrice);
+                discount = (decimal)(product.UnitPrice - action.LadderPrice);
+            }
+            SetDiscountProduct(product, action, discount);
+        }
+        private void DiscountProductBundlePrice(OrderDetailResponseModel product, Infrastructure.Models.Action action)
+        {
+            decimal discount = 0;
+            switch (action.BundleStrategy)
+            {
+                case AppConstant.BundleStrategy.CHEAPEST:
+
+                    break;
+                case AppConstant.BundleStrategy.MOST_EXPENSIVE:
+
+                    break;
+                case AppConstant.BundleStrategy.DEFAULT:
+
+                    break;
             }
             SetDiscountProduct(product, action, discount);
         }
