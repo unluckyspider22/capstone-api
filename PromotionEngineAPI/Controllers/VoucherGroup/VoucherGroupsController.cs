@@ -137,23 +137,21 @@ namespace PromotionEngineAPI.Controllers
             try
             {
                 dto.VoucherGroupId = Guid.NewGuid();
-                List<VoucherDto> vouchers = new List<VoucherDto>();
+                //List<VoucherDto> vouchers = new List<VoucherDto>();
 
-                if (dto.VoucherType.Equals(AppConstant.EnvVar.VoucherType.BULK_CODE))
-                {
-                    vouchers = _service.GenerateBulkCodeVoucher(dto);
-                    //dto.Voucher = generateVoucher;
-                }
-                else
-                {
-                    vouchers = _service.GenerateStandaloneVoucher(dto);
-                    //dto.Voucher = vouchers;
-                }
+                //if (dto.VoucherType.Equals(AppConstant.EnvVar.VoucherType.BULK_CODE))
+                //{
+                //    vouchers = _service.GenerateBulkCodeVoucher(dto);
+                //}
+                //else
+                //{
+                //    vouchers = _service.GenerateStandaloneVoucher(dto);
+                //}
                 await _service.CreateAsync(dto);
                 //_service.CreateVoucherBulk(vouchers);
-                var listVoucher = await _service.MapVoucher(vouchers);
-                _workerService.InsertVouchers(vouchers: listVoucher, voucherGroupId: dto.VoucherGroupId, promotionId: dto.PromotionId);
-                dto.Voucher = vouchers;
+                //var listVoucher = await _service.MapVoucher(vouchers);
+                _workerService.InsertVouchers(voucherDto: dto);
+                //dto.Voucher = vouchers;
                 return Ok(dto);
             }
             catch (ErrorObj e)

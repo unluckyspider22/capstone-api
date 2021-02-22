@@ -1,7 +1,9 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PromotionEngineAPI.Worker;
+using System;
 using System.Threading.Tasks;
 
 namespace PromotionEngineAPI
@@ -21,9 +23,15 @@ namespace PromotionEngineAPI
                    services.AddSingleton<VoucherWorker>();
                    services.AddHostedService<QueuedHostedService>();
                    services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
+                   #region automapper configure
+                   var mapperConfig = new MapperConfiguration(mc =>
+                   {
+                       mc.AddProfile(new Infrastructure.AutoMapper.AutoMapper());
+                   });
+                   IMapper mapper = mapperConfig.CreateMapper();
+                   services.AddSingleton(mapper);
                    #endregion
-
-
+                   #endregion
                })
                .Build();
             await host.StartAsync();
