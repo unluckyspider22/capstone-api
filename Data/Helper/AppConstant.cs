@@ -162,6 +162,13 @@ namespace Infrastructure.Helper
             public const string OR = "1";
 
         }
+        public class BundleStrategy
+        {
+            public const string CHEAPEST = "1";
+            public const string MOST_EXPENSIVE = "2";
+            public const string DEFAULT = "3";
+
+        }
 
         //public const string URL = "https://localhost:44367/";
         public const string URL = "https://promoengine.azurewebsites.net/";
