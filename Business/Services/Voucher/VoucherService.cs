@@ -61,6 +61,7 @@ namespace ApplicationCore.Services
                 var promotions = new List<Promotion>();
                 foreach (VoucherResponseModel voucherModel in vouchers)
                 {
+                   // throw new ErrorObj(code: 400, message:"voucherCode: " + voucherModel.VoucherCode + ", promotionCode: " + voucherModel.PromotionCode, description: AppConstant.ErrMessage.Invalid_VoucherCode);
                     var voucher = await _repository.Get(filter: el => el.IsActive
                     && el.VoucherCode.Equals(voucherModel.VoucherCode)
                     && !el.IsUsed
@@ -71,6 +72,8 @@ namespace ApplicationCore.Services
                     "VoucherGroup.Promotion.PromotionTier.ConditionRule.ConditionGroup.ProductCondition," +
                     "VoucherGroup.Promotion.PromotionTier.ConditionRule.ConditionGroup.MembershipCondition," +
                     "VoucherGroup.Promotion.PromotionStoreMapping.Store");
+                  //  throw new ErrorObj(code: 400, message:"count: " +voucher.Count(), description: AppConstant.ErrMessage.Invalid_VoucherCode);
+                     
                     if (voucher.Count() > 1)
                     {
                         throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.Duplicate_VoucherCode, description: AppConstant.ErrMessage.Duplicate_VoucherCode);

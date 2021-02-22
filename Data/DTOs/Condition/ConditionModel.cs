@@ -13,5 +13,11 @@ namespace ApplicationCore.Models
         public string NextOperator { get; set; }
 
         public bool IsMatch { get; set; } = true;
+
+        public override string ToString()
+        {
+            string opera = NextOperator.Equals("1") ? "OR" : "AND";
+            return IsMatch + " " + opera + " ";
+        }
     }
 }

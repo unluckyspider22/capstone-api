@@ -1,17 +1,13 @@
 ﻿using ApplicationCore.Models;
 using ApplicationCore.Request;
-using ApplicationCore.Utils;
 using AutoMapper;
 using Infrastructure.DTOs;
 using Infrastructure.DTOs.Condition;
 using Infrastructure.Helper;
 using Infrastructure.Models;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 
 namespace ApplicationCore.Chain
 {
@@ -50,7 +46,6 @@ namespace ApplicationCore.Chain
                         continue;
                     }
                     order.PromotionTierIds.Add(promotionTier.PromotionTierId);
-
                 }
                 if (invalidPromotionDetails == promotion.PromotionTier.Count && invalidPromotionDetails > 0)
                 {
@@ -63,31 +58,35 @@ namespace ApplicationCore.Chain
         {
             int invalidPromotionDetails = 0;
             var conditionGroupModels = new List<ConditionGroupModel>();
-            foreach (var conditionGroup in promotionTier.ConditionRule.ConditionGroup)
+            if (promotionTier.ConditionRule.ConditionGroup != null && promotionTier.ConditionRule.ConditionGroup.Count() > 0)
             {
-                var conditions = InitConditionModel(conditionGroup);
-                if (conditions != null)
+                foreach (var conditionGroup in promotionTier.ConditionRule.ConditionGroup)
                 {
-                    foreach (var condition in conditions)
+                    var conditions = InitConditionModel(conditionGroup);
+                    if (conditions != null)
                     {
-                        #region Handle cho từng condition dựa vào loại của nó
-                        //Tạo chuỗi handle cho từng loại condition
-                        _orderConditionHandle.SetNext(_productConditionHandle).SetNext(_membershipConditionHandle);
-                        _orderConditionHandle.SetConditionModel(condition);
-                        _productConditionHandle.SetConditionModel(condition);
-                        _membershipConditionHandle.SetConditionModel(condition);
-                        _orderConditionHandle.Handle(order);
-                        #endregion
+                        foreach (var condition in conditions)
+                        {
+                            #region Handle cho từng condition dựa vào loại của nó
+                            //Tạo chuỗi handle cho từng loại condition
+                            _orderConditionHandle.SetNext(_productConditionHandle).SetNext(_membershipConditionHandle);
+                            _orderConditionHandle.SetConditionModel(condition);
+                            _productConditionHandle.SetConditionModel(condition);
+                            _membershipConditionHandle.SetConditionModel(condition);
+                            _orderConditionHandle.Handle(order);
+                            #endregion
+                        }
+                        var conditionResult = CompareConditionInGroup(conditions);
+
+                        var groupModel = new ConditionGroupModel(conditionGroup.GroupNo, conditionGroup.NextOperator, conditionResult);
+                        conditionGroupModels.Add(groupModel);
                     }
-                    var conditionResult = CompareConditionInGroup(conditions);
-                    var groupModel = new ConditionGroupModel(conditionGroup.GroupNo, conditionGroup.NextOperator, conditionResult);
-                    conditionGroupModels.Add(groupModel);
                 }
-            }
-            var result = CompareConditionGroup(conditionGroupModels);
-            if (!result)
-            {
-                invalidPromotionDetails++;
+                var result = CompareConditionGroup(conditionGroupModels);
+                if (!result)
+                {
+                    invalidPromotionDetails++;
+                }
             }
             return invalidPromotionDetails;
         }
@@ -120,7 +119,6 @@ namespace ApplicationCore.Chain
                             {
                                 result = result || conditionGroups[nextIndex].IsMatch;
                             }
-
                         }
                     }
 
@@ -133,8 +131,18 @@ namespace ApplicationCore.Chain
         {
             conditions = conditions.OrderBy(el => el.Index).ToList();
             bool result = conditions.First().IsMatch;
+
+            /*string str = "";
+            foreach (var con in conditions)
+            {
+                str += con.ToString() + " ";
+            }
+            throw new ErrorObj(code: 400, message: " str : " + str);*/
+
             foreach (var condition in conditions)
             {
+
+
                 if (conditions.Count() == 1)
                 {
                     return condition.IsMatch;
@@ -150,7 +158,6 @@ namespace ApplicationCore.Chain
                             if (condition.NextOperator.Equals(AppConstant.Operator.AND))
                             {
                                 result = result && conditions[nextIndex].IsMatch;
-
                             }
                             else
                             if (condition.NextOperator.Equals(AppConstant.Operator.OR))

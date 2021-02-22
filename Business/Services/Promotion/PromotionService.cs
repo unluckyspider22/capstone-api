@@ -347,6 +347,7 @@ namespace ApplicationCore.Services
             try
             {
                 var now = Common.GetCurrentDatetime();
+
                 foreach (Promotion promotion in orderResponse.Promotions)
                 {
                     //Check promotion is active
@@ -363,6 +364,7 @@ namespace ApplicationCore.Services
                     }
                 }
                 _applyPromotionHandler.Handle(orderResponse);
+
             }
             catch (ErrorObj e)
             {
@@ -370,7 +372,7 @@ namespace ApplicationCore.Services
             }
             catch (Exception ex)
             {
-                throw new ErrorObj(code: 500, message: ex.ToString());
+                throw new ErrorObj(code: 500, message: ex.Message);
             }
             return orderResponse;
         }
