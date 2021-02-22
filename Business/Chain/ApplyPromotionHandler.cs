@@ -1,4 +1,5 @@
 ﻿using ApplicationCore.Request;
+using Infrastructure.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +33,6 @@ namespace ApplicationCore.Chain
             _promotionHandle.SetNext(_conditionHandle);
             _promotionHandle.Handle(order);
             #endregion
-
             #region Apply action
             _applyPromotion.Apply(order);
             #endregion

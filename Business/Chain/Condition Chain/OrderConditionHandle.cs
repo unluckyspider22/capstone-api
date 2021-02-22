@@ -25,12 +25,15 @@ namespace ApplicationCore.Chain
                 HandleMinAmount((OrderConditionModel)_condition, order);
                 
                 HandleMinQuantity((OrderConditionModel)_condition, order);
+
+                //throw new ErrorObj(code: 400, message: " orderCondition.IsMatch : " + _condition.IsMatch);
             }
             else
             {
                 base.Handle(order);
             }
         }
+
         private void HandleMinAmount(OrderConditionModel orderCondition, OrderResponseModel order)
         {
             /*throw new ErrorObj(code: 400, message:"Compare: "+ Common.Compare<decimal>(orderCondition.AmountOperator, order.OrderDetail.Amount, orderCondition.Amount));*/
@@ -38,7 +41,6 @@ namespace ApplicationCore.Chain
             {
                 orderCondition.IsMatch = false;
             }
-            
         }
         private void HandleMinQuantity(OrderConditionModel orderCondition, OrderResponseModel order)
         {

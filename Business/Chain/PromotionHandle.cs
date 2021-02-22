@@ -108,7 +108,7 @@ namespace ApplicationCore.Chain
         #region Handle Gender
         private void HandleGender(Promotion promotion, OrderResponseModel order)
         {
-            if (!promotion.Gender.Equals(order.Customer.CustomerGender))
+            if (!Common.CompareBinary(order.Customer.CustomerGender,promotion.Gender))
             {
                 throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_Gender);
             }

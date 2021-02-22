@@ -50,8 +50,11 @@ namespace Infrastructure.Helper
             {
                 public const string Amount = "1";
                 public const string Percentage = "2";
+                public const string Unit = "3";
                 public const string Shipping = "4";
-
+                public const string Fixed = "5";
+                public const string Ladder = "6";
+                public const string Bundle = "7";
             }
             public struct CharsetType
             {
@@ -133,6 +136,7 @@ namespace Infrastructure.Helper
             public const string Exclusive_Promotion = "Khuyến mãi không dùng chung với các khuyến mãi khác";
             public const string Invalid_Gender = "Giới tính không phù hợp với khuyến mãi";
             public const string InActive_Promotion = "Khuyến mãi chưa được áp dụng";
+            public const string Unmatch_Promotion = "Không có khuyến mãi phù hợp với voucher này";
 
             public const string Invalid_SaleMode = "Khuyến mãi không dành cho loại đơn hàng này.";
             public const string Invalid_MinAmount = "Giá đơn hàng thấp hơn quy định.";
@@ -147,8 +151,6 @@ namespace Infrastructure.Helper
             public const string Invalid_Operator = "Invalid Logic Operator";
 
         }
-
-
         public class Operator
         {
             public const string GREATER_THAN = "1";
@@ -156,8 +158,15 @@ namespace Infrastructure.Helper
             public const string LESS_THAN = "3";
             public const string LESS_THAN_OR_EQUAL = "4";
             public const string EQUAL = "5";
-            public const string AND = "1";
-            public const string OR = "2";
+            public const string AND = "2";
+            public const string OR = "1";
+
+        }
+        public class BundleStrategy
+        {
+            public const string CHEAPEST = "1";
+            public const string MOST_EXPENSIVE = "2";
+            public const string DEFAULT = "3";
 
         }
 
