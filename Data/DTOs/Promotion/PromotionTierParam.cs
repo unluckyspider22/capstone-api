@@ -44,7 +44,7 @@ namespace Infrastructure.DTOs
         public decimal? MaxAmount { get; set; }
         [Range(0, 9999999999)]
         public decimal? MinPriceAfter { get; set; }
-        [Range(0, 9999999999)]
+        [Range(0, 99)]
         public decimal? OrderLadderProduct { get; set; }
         [Range(0, 9999999999)]
         public decimal? LadderPrice { get; set; }

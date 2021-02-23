@@ -158,7 +158,13 @@ namespace ApplicationCore.Services
                 var tiers = (
                     await _tierRepo.Get(0, 0, filter: filter,
                     orderBy: el => el.OrderBy(o => o.InsDate),
-                    includeProperties: "ConditionRule,ConditionRule.ConditionGroup,ConditionRule.ConditionGroup.MembershipCondition,ConditionRule.ConditionGroup.OrderCondition,ConditionRule.ConditionGroup.ProductCondition,MembershipAction,Action"))
+                    includeProperties: "ConditionRule," +
+                    "ConditionRule.ConditionGroup," +
+                    "ConditionRule.ConditionGroup.MembershipCondition," +
+                    "ConditionRule.ConditionGroup.OrderCondition," +
+                    "ConditionRule.ConditionGroup.ProductCondition," +
+                    "MembershipAction," +
+                    "Action"))
                     .ToList();
                 // Reorder các condition trong group
                 List<PromotionTierResponseParam> result = new List<PromotionTierResponseParam>();
@@ -341,6 +347,7 @@ namespace ApplicationCore.Services
             try
             {
                 var now = Common.GetCurrentDatetime();
+
                 foreach (Promotion promotion in orderResponse.Promotions)
                 {
                     //Check promotion is active
@@ -357,6 +364,7 @@ namespace ApplicationCore.Services
                     }
                 }
                 _applyPromotionHandler.Handle(orderResponse);
+
             }
             catch (ErrorObj e)
             {
@@ -364,7 +372,7 @@ namespace ApplicationCore.Services
             }
             catch (Exception ex)
             {
-                throw new ErrorObj(code: 500, message: ex.ToString());
+                throw new ErrorObj(code: 500, message: ex.Message);
             }
             return orderResponse;
         }

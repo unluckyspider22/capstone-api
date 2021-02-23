@@ -4,6 +4,7 @@ using Infrastructure.DTOs;
 using Infrastructure.Helper;
 using Infrastructure.Models;
 using Infrastructure.Repository;
+using Infrastructure.Repository.Voucher;
 using Infrastructure.UnitOrWork;
 using System;
 using System.Collections.Generic;
@@ -25,13 +26,14 @@ namespace ApplicationCore.Services
         public List<VoucherDto> GenerateBulkCodeVoucher(VoucherGroupDto dto)
         {
             List<VoucherDto> result = new List<VoucherDto>();
-            if (dto.IsLimit.Equals(AppConstant.EnvVar.ISLIMIT))
+            if (!dto.IsLimit)
             {
                 for (var i = 0; i < dto.Quantity; i++)
                 {
                     VoucherDto voucher = new VoucherDto();
                     string randomVoucher = RandomString(dto.Charset, dto.CustomCharset, dto.CodeLength);
                     voucher.VoucherCode = dto.Prefix + randomVoucher + dto.Postfix;
+                    voucher.VoucherGroupId = dto.VoucherGroupId;
                     result.Add(voucher);
                 }
             }
@@ -40,6 +42,7 @@ namespace ApplicationCore.Services
                 VoucherDto voucher = new VoucherDto();
                 string randomVoucher = RandomString(dto.Charset, dto.CustomCharset, dto.CodeLength);
                 voucher.VoucherCode = dto.Prefix + randomVoucher + dto.Postfix;
+                voucher.VoucherGroupId = dto.VoucherGroupId;
                 result.Add(voucher);
             }
 
@@ -94,7 +97,8 @@ namespace ApplicationCore.Services
             List<VoucherDto> result = new List<VoucherDto>();
             VoucherDto voucher = new VoucherDto
             {
-                VoucherCode = dto.Prefix + dto.CustomCode + dto.Postfix
+                VoucherCode = dto.Prefix + dto.CustomCode + dto.Postfix,
+                VoucherGroupId = dto.VoucherGroupId
             };
             result.Add(voucher);
             return result;
@@ -188,6 +192,115 @@ namespace ApplicationCore.Services
                 Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.Message);
                 throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
             }
+        }
+
+        public async Task<bool> DeleteVoucherGroup(Guid id)
+        {
+            try
+            {
+                //IVoucherRepository voucherRepo = new VoucherRepositoryImp();
+                // Delete vouchers
+                //voucherRepo.DeleteBulk(voucherGroupId: id);
+                // Delete voucher group
+                //_repository.Delete(id: id, filter: null);
+                //return await _unitOfWork.SaveAsync() > 0;
+                return true;
+            }
+            catch (Exception e)
+            {
+                //chạy bằng debug mode để xem log
+                Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.Message);
+                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+            }
+        }
+
+        public async Task<bool> RejectVoucherGroup(Guid id)
+        {
+            try
+            {
+                // Reject voucher group
+                var voucherGroupEntity = await _repository.GetFirst(filter: o => o.VoucherGroupId.Equals(id) && !o.DelFlg);
+                if (voucherGroupEntity != null)
+                {
+                    voucherGroupEntity.PromotionId = null;
+                    _repository.Update(voucherGroupEntity);
+                }
+                return await _unitOfWork.SaveAsync() > 0;
+            }
+
+            catch (Exception e)
+            {
+                //chạy bằng debug mode để xem log
+                Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.Message);
+                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+            }
+        }
+
+        public async Task<bool> AssignVoucherGroup(Guid promotionId, Guid voucherGroupId)
+        {
+            try
+            {
+                // Assign voucher group
+                var voucherGroupEntity = await _repository.GetFirst(filter: o => o.VoucherGroupId.Equals(voucherGroupId) && !o.DelFlg);
+                if (voucherGroupEntity != null)
+                {
+                    voucherGroupEntity.PromotionId = promotionId;
+                    _repository.Update(voucherGroupEntity);
+                }
+                return await _unitOfWork.SaveAsync() > 0;
+            }
+
+            catch (Exception e)
+            {
+                //chạy bằng debug mode để xem log
+                Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.Message);
+                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+            }
+        }
+
+        public async Task<bool> HideVoucherGroup(Guid id)
+        {
+            try
+            {
+                // Hide voucher group
+                var voucherGroupEntity = await _repository.GetFirst(filter: o => o.VoucherGroupId.Equals(id) && !o.DelFlg);
+                if (voucherGroupEntity != null)
+                {
+                    voucherGroupEntity.DelFlg = true;
+                    _repository.Update(voucherGroupEntity);
+                }
+                return await _unitOfWork.SaveAsync() > 0;
+            }
+
+            catch (Exception e)
+            {
+                //chạy bằng debug mode để xem log
+                Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.Message);
+                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+            }
+        }
+
+        public async Task<List<VoucherDto>> CreateVoucherBulk(List<VoucherDto> vouchers)
+        {
+            try
+            {
+                IVoucherRepository voucherRepository = new VoucherRepositoryImp();
+                List<Voucher> listEntities = _mapper.Map<List<Voucher>>(vouchers);
+                await voucherRepository.InsertBulk(listEntities);
+                return vouchers;
+            }
+            catch (Exception e)
+            {
+                //chạy bằng debug mode để xem log
+                Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.Message);
+                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+            }
+
+        }
+
+        public async Task<List<Voucher>> MapVoucher(List<VoucherDto> vouchers)
+        {
+            return _mapper.Map<List<Voucher>>(vouchers);
         }
     }
 }

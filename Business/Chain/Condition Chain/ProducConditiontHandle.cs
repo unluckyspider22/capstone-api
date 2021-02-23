@@ -1,5 +1,8 @@
 ﻿using ApplicationCore.Models;
 using ApplicationCore.Request;
+using ApplicationCore.Utils;
+using Infrastructure.DTOs;
+using Infrastructure.Helper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +13,7 @@ namespace ApplicationCore.Chain
     public interface IProductConditionHandle : IHandler<OrderResponseModel>
     {
         void SetConditionModel(ConditionModel condition);
+
     }
     public class ProducConditiontHandle : Handler<OrderResponseModel>, IProductConditionHandle
     {
@@ -19,7 +23,11 @@ namespace ApplicationCore.Chain
         {
             if (_condition is ProductConditionModel)
             {
+                var products = order.OrderDetail.OrderDetailResponses;
+                HandleIncludeExclude((ProductConditionModel)_condition, products);
 
+
+                HandleQuantity((ProductConditionModel)_condition, products);
             }
             else
             {
@@ -29,6 +37,54 @@ namespace ApplicationCore.Chain
         public void SetConditionModel(ConditionModel condition)
         {
             _condition = condition;
+        }
+
+        private void HandleIncludeExclude(ProductConditionModel productCondition, List<OrderDetailResponseModel> products)
+        {
+            productCondition.IsMatch = false;
+            foreach (var product in products)
+            {
+                bool isMatch = product.ProductCode.Equals(productCondition.ProductCode);
+                if (productCondition.ProductType.Equals(AppConstant.EnvVar.ProductType.SINGLE_PRODUCT))
+                {
+                    if (productCondition.ProductConditionType.Equals(AppConstant.EnvVar.EXCLUDE))
+                    {
+                        productCondition.IsMatch = !isMatch;
+                    }
+                    else productCondition.IsMatch = isMatch;
+                }
+                else
+                {
+                    if (product.ParentCode.Equals(productCondition.ParentCode)
+                        && productCondition.ProductConditionType.Equals(AppConstant.EnvVar.EXCLUDE))
+                    {
+                        productCondition.IsMatch = !isMatch;
+                    }
+                    else productCondition.IsMatch = isMatch;
+                }
+                if (productCondition.IsMatch)
+                {
+                    break;
+                }
+            }
+        }
+        private void HandleQuantity(ProductConditionModel condition, List<OrderDetailResponseModel> products)
+        {
+            if (condition.ProductQuantity > 0)
+            {
+                foreach (var product in products)
+                {
+                    condition.IsMatch = Common.Compare<int>(
+                        condition.QuantityOperator,
+                        product.Quantity,
+                        (int)condition.ProductQuantity);
+                    if (condition.IsMatch)
+                    {
+                        break;
+                    }
+                }
+            }
+
         }
     }
 }
