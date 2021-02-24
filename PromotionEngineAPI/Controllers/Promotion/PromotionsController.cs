@@ -152,24 +152,25 @@ namespace PromotionEngineAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutPromotion([FromRoute] Guid id, [FromBody] PromotionDto dto)
         {
-            if (id != dto.PromotionId)
+            try
             {
-                return BadRequest();
+                if (id != dto.PromotionId || id.Equals(Guid.Empty) || dto.PromotionId.Equals(Guid.Empty))
+                {
+                    return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                }
+                if (dto.PromotionStoreMapping != null)
+                {
+                    await _promotionStoreMappingService.DeletePromotionStoreMapping(dto.PromotionId);
+                }
+                var result = await _promotionService.UpdatePromotion(dto);
+
+                return Ok(result);
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
             }
 
-            dto.UpdDate = DateTime.Now;
-            if (dto.PromotionStoreMapping != null)
-            {
-                await _promotionStoreMappingService.DeletePromotionStoreMapping(dto.PromotionId);
-            }
-            var result = await _promotionService.UpdateAsync(dto);
-
-            if (result == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(result);
 
         }
 
