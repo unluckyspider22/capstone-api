@@ -181,18 +181,14 @@ namespace PromotionEngineAPI.Controllers
             try
             {
                 dto.PromotionId = Guid.NewGuid();
-
+                dto.InsDate = DateTime.Now;
+                dto.UpdDate = DateTime.Now;
                 return Ok(await _promotionService.CreateAsync(dto));
-
             }
             catch (ErrorObj e)
             {
                 return StatusCode(statusCode: e.Code, e);
             }
-
-
-
-
         }
 
         // DELETE: api/Promotions/5
@@ -240,6 +236,10 @@ namespace PromotionEngineAPI.Controllers
         [Route("{promotionId}/promotion-tier-detail")]
         public async Task<IActionResult> GetPromotionTierDetail([FromRoute] Guid promotionId)
         {
+            //if (!promotionId.Equals(Guid.Empty))
+            //{
+            //    return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+            //}
             try
             {
                 return Ok(await _promotionService.GetPromotionTierDetail(promotionId));
