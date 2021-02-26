@@ -196,7 +196,7 @@ namespace ApplicationCore.Chain
             }
             foreach (var membershipCondition in conditionGroup.MembershipCondition)
             {
-                var entity = _mapper.Map<ProductConditionModel>(membershipCondition);
+                var entity = _mapper.Map<MembershipConditionModel>(membershipCondition);
                 entity.Id = membershipCondition.MembershipConditionId;
                 entity.Index = membershipCondition.IndexGroup;
                 entity.NextOperator = membershipCondition.NextOperator;

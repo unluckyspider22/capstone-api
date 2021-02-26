@@ -25,8 +25,6 @@ namespace ApplicationCore.Chain
             {
                 var products = order.OrderDetail.OrderDetailResponses;
                 HandleIncludeExclude((ProductConditionModel)_condition, products);
-
-
                 HandleQuantity((ProductConditionModel)_condition, products);
             }
             else

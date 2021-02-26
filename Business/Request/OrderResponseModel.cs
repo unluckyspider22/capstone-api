@@ -119,5 +119,6 @@ namespace ApplicationCore.Request
         public string CustomerEmail { get; set; }
         public string CustomerPhoneNo { get; set; }
         public string CustomerGender { get; set; }
+        public string CustomerLevel { get; set; }
     }
 }
