@@ -24,5 +24,6 @@ namespace ApplicationCore.Services
         public Task<bool> AssignVoucherGroup(Guid promotionId, Guid voucherGroupId);
         public Task<List<VoucherDto>> CreateVoucherBulk(List<VoucherDto> vouchers);
         public Task<List<Voucher>> MapVoucher(List<VoucherDto> vouchers);
+        public Task<String> GetPromotionCode(Guid promotionId);
     }
 }

@@ -152,24 +152,25 @@ namespace PromotionEngineAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutPromotion([FromRoute] Guid id, [FromBody] PromotionDto dto)
         {
-            if (id != dto.PromotionId)
+            try
             {
-                return BadRequest();
+                if (id != dto.PromotionId || id.Equals(Guid.Empty) || dto.PromotionId.Equals(Guid.Empty))
+                {
+                    return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                }
+                if (dto.PromotionStoreMapping != null)
+                {
+                    await _promotionStoreMappingService.DeletePromotionStoreMapping(dto.PromotionId);
+                }
+                var result = await _promotionService.UpdatePromotion(dto);
+
+                return Ok(result);
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
             }
 
-            dto.UpdDate = DateTime.Now;
-            if (dto.PromotionStoreMapping != null)
-            {
-                await _promotionStoreMappingService.DeletePromotionStoreMapping(dto.PromotionId);
-            }
-            var result = await _promotionService.UpdateAsync(dto);
-
-            if (result == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(result);
 
         }
 
@@ -180,18 +181,14 @@ namespace PromotionEngineAPI.Controllers
             try
             {
                 dto.PromotionId = Guid.NewGuid();
-
+                dto.InsDate = DateTime.Now;
+                dto.UpdDate = DateTime.Now;
                 return Ok(await _promotionService.CreateAsync(dto));
-
             }
             catch (ErrorObj e)
             {
                 return StatusCode(statusCode: e.Code, e);
             }
-
-
-
-
         }
 
         // DELETE: api/Promotions/5
@@ -239,6 +236,10 @@ namespace PromotionEngineAPI.Controllers
         [Route("{promotionId}/promotion-tier-detail")]
         public async Task<IActionResult> GetPromotionTierDetail([FromRoute] Guid promotionId)
         {
+            //if (!promotionId.Equals(Guid.Empty))
+            //{
+            //    return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+            //}
             try
             {
                 return Ok(await _promotionService.GetPromotionTierDetail(promotionId));
