@@ -106,7 +106,7 @@ namespace PromotionEngineAPI.Controllers
             var result = await _promotionService.GetAsync(
                 pageIndex: param.PageIndex,
                 pageSize: param.PageSize,
-                filter: el => el.DelFlg
+                filter: el => !el.DelFlg
                 && el.PromotionName.ToLower().Contains(param.SearchContent.ToLower())
                 && el.BrandId.Equals(BrandId));
             if (result == null)
