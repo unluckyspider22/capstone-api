@@ -352,13 +352,13 @@ namespace ApplicationCore.Services
                 {
                     //Check promotion is active
                     if (!promotion.IsActive) throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.InActive_Promotion, description: AppConstant.ErrMessage.InActive_Promotion);
-                    //Check promotion is time
-                    if (promotion.StartDate <= orderResponse.OrderDetail.BookingDate)
+                    //Check promotion is time 
+                    if (promotion.StartDate >= orderResponse.OrderDetail.BookingDate)
                     {
                         throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.Invalid_Time, description: AppConstant.ErrMessage.Invalid_Time);
                     }
                     //Check promotion is expired
-                    if (promotion.EndDate >= orderResponse.OrderDetail.BookingDate)
+                    if (promotion.EndDate <= orderResponse.OrderDetail.BookingDate)
                     {
                         throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.Expire_Promotion, description: AppConstant.ErrMessage.Expire_Promotion);
                     }

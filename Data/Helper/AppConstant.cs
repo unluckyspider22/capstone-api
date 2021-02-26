@@ -141,6 +141,8 @@ namespace Infrastructure.Helper
             public const string Invalid_SaleMode = "Khuyến mãi không dành cho loại đơn hàng này.";
             public const string Invalid_MinAmount = "Giá đơn hàng thấp hơn quy định.";
             public const string Invalid_Time = "Thời gian khuyến mãi không phù hợp";
+            public const string Invalid_HourFrame = "Khung giờ khuyến mãi không phù hợp";
+            public const string Invalid_DayInWeek = "Ngày trong tuần của khuyến mãi không phù hợp";
             public const string Invalid_PaymentType = "Loại hình thanh toán không phù hợp.";
             public const string NotExisted_Product = "Đơn hàng không có sản phẩm yêu cầu.";
             public const string Quantity_Product = "Sản phẩm yêu cầu thấp hơn quy định.";

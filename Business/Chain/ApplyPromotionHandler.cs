@@ -33,8 +33,8 @@ namespace ApplicationCore.Chain
             Setorder(order);
             //Thứ tự là:
             //ApplyHandle => PromotionHandle => TimeframeHandle(nếu có) => ConditionHandle
-            _promotionHandle.SetNext(_timeframeHandle);
-            _promotionHandle.SetNext(_conditionHandle);
+
+            _promotionHandle.SetNext(_timeframeHandle).SetNext(_conditionHandle);
             _promotionHandle.Handle(order);
             #endregion
             #region Apply action

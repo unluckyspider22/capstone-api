@@ -9,6 +9,7 @@
     <PackageReference Include="Google.Apis.Calendar.v3" Version="1.50.0.2224" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0" />
     <PackageReference Include="Nager.Date" Version="1.28.1" />
+    <PackageReference Include="ShaNetHoliday.Engine.Standard" Version="1.0.1" />
   </ItemGroup>
 
   <ItemGroup>

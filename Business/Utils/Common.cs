@@ -45,10 +45,16 @@ namespace ApplicationCore.Utils
             int compareString_Decimal = Int32.Parse(compareString);
             return (input_Decimal & compareString_Decimal) == input_Decimal;
         }
-        public static bool CompareBinaryForDayHour(int input, string compareString) {
+        public static bool CompareBinaryForHour(int input, string compareString) {
             int input_Decimal = (Int32)Math.Pow(2, input);
             int compareString_Decimal = Int32.Parse(compareString);
             return (input_Decimal & compareString_Decimal) == input_Decimal;
+        }
+        public static bool CompareBinaryForDay(int input, string compareString)
+        {
+            
+            int compareString_Decimal = Int32.Parse(compareString);
+            return (input & compareString_Decimal) == input;
         }
     }
 }
