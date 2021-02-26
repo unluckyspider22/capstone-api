@@ -19,11 +19,12 @@ namespace ApplicationCore.Chain
         private readonly ITimeframeHandle _timeframeHandle;
         public ApplyPromotionHandler(IPromotionHandle promotionHandle, IConditionHandle conditionHandle, 
             IApplyPromotion applyPromotion,ITimeframeHandle timeframeHandle)
-        {
+        {     
             _promotionHandle = promotionHandle;
+            _timeframeHandle = timeframeHandle;
             _conditionHandle = conditionHandle;
             _applyPromotion = applyPromotion;
-            _timeframeHandle = timeframeHandle;
+            
         }
 
         public override void Handle(OrderResponseModel order)

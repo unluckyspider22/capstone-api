@@ -346,19 +346,19 @@ namespace ApplicationCore.Services
         {
             try
             {
-                var now = Common.GetCurrentDatetime();
+                //var now = Common.GetCurrentDatetime();
 
                 foreach (Promotion promotion in orderResponse.Promotions)
                 {
                     //Check promotion is active
                     if (!promotion.IsActive) throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.InActive_Promotion, description: AppConstant.ErrMessage.InActive_Promotion);
                     //Check promotion is time
-                    if (promotion.StartDate > now)
+                    if (promotion.StartDate <= orderResponse.OrderDetail.BookingDate)
                     {
                         throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.Invalid_Time, description: AppConstant.ErrMessage.Invalid_Time);
                     }
                     //Check promotion is expired
-                    if (promotion.EndDate < now)
+                    if (promotion.EndDate >= orderResponse.OrderDetail.BookingDate)
                     {
                         throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.Expire_Promotion, description: AppConstant.ErrMessage.Expire_Promotion);
                     }
