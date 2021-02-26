@@ -377,6 +377,33 @@ namespace ApplicationCore.Services
             return orderResponse;
         }
         #endregion
+        #region update promotion
+        public async Task<PromotionDto> UpdatePromotion(PromotionDto dto)
+        {
+            try
+            {
+                dto.UpdDate = DateTime.Now;
+                if (dto.EndDate == null)
+                {
+                    IPromotionRepository promotionRepo = new PromotionRepositoryImp();
+                    await promotionRepo.SetUnlimitedDate(_mapper.Map<Promotion>(dto));
+                }
+                var entity = _mapper.Map<Promotion>(dto);
+                _repository.Update(entity);
+                await _unitOfWork.SaveAsync();
+                return _mapper.Map<PromotionDto>(entity);
+            }
+            catch (Exception ex)
+            {
+                throw new ErrorObj(code: 500, message: ex.Message);
+            }
+
+
+        }
+        #endregion
+
+
+
 
     }
 }

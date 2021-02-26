@@ -2,6 +2,7 @@
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
 using Infrastructure.Models;
+using Infrastructure.Repository;
 using Infrastructure.Repository.Voucher;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -15,7 +16,7 @@ namespace PromotionEngineAPI.Worker
 {
     public interface IVoucherWorker
     {
-        public void InsertVouchers(VoucherGroupDto voucherDto);
+        public void InsertVouchers(VoucherGroupDto voucherDto, string promotionCode);
         public void DeleteVouchers(Guid voucherGroupId, Guid? promotionId);
     }
     public class VoucherWorker : IVoucherWorker
@@ -50,13 +51,13 @@ namespace PromotionEngineAPI.Worker
             };
 
             // Chạy luồng
-            Task.Run(() =>
+            Task.Run(async () =>
             {
                 if (!_cancellationToken.IsCancellationRequested)
                 {
                     _logger.LogInformation("DeleteVouchers is starting.");
                     // Gửi notify processing task
-                    notify.ProcessingVoucher(item: item);
+                    await notify.ProcessingVoucher(item: item);
                     _taskQueue.QueueBackgroundWorkItem(async token =>
                     {
                         try
@@ -81,14 +82,18 @@ namespace PromotionEngineAPI.Worker
             });
         }
 
-        public void InsertVouchers(VoucherGroupDto dto)
+        public void InsertVouchers(VoucherGroupDto dto, string promotionCode)
         {
             // Param để insert
             Guid voucherGroupId = dto.VoucherGroupId;
             Guid? promotionId = dto.PromotionId;
 
             // Tạo voucher
-            List<Voucher> vouchers = GenerateVoucher(dto);
+            if (!promotionCode.Trim().Equals(""))
+            {
+                promotionCode += "-";
+            }
+            List<Voucher> vouchers = GenerateVoucher(dto, promotionCode);
 
             // Task item để notify cho client
             var item = new VoucherNotiObj()
@@ -133,32 +138,32 @@ namespace PromotionEngineAPI.Worker
             });
         }
         #region generate voucher
-        private List<Voucher> GenerateVoucher(VoucherGroupDto dto)
+        private List<Voucher> GenerateVoucher(VoucherGroupDto dto, string promotionCode)
         {
             List<VoucherDto> voucherDto = new List<VoucherDto>();
             if (dto.VoucherType.Equals(AppConstant.EnvVar.VoucherType.BULK_CODE))
             {
-                voucherDto = GenerateBulkCodeVoucher(dto);
+                voucherDto = GenerateBulkCodeVoucher(dto, promotionCode);
             }
             else
             {
-                voucherDto = GenerateStandaloneVoucher(dto);
+                voucherDto = GenerateStandaloneVoucher(dto, promotionCode);
             }
             return _mapper.Map<List<Voucher>>(voucherDto);
         }
-        private List<VoucherDto> GenerateStandaloneVoucher(VoucherGroupDto dto)
+        private List<VoucherDto> GenerateStandaloneVoucher(VoucherGroupDto dto, string promotionCode)
         {
             List<VoucherDto> result = new List<VoucherDto>();
             VoucherDto voucher = new VoucherDto
             {
-                VoucherCode = dto.Prefix + dto.CustomCode + dto.Postfix,
+                VoucherCode = promotionCode + dto.Prefix + dto.CustomCode + dto.Postfix,
                 VoucherGroupId = dto.VoucherGroupId
             };
             result.Add(voucher);
             return result;
         }
 
-        private List<VoucherDto> GenerateBulkCodeVoucher(VoucherGroupDto dto)
+        private List<VoucherDto> GenerateBulkCodeVoucher(VoucherGroupDto dto, string promotionCode)
         {
             List<VoucherDto> result = new List<VoucherDto>();
             if (!dto.IsLimit)
@@ -167,7 +172,7 @@ namespace PromotionEngineAPI.Worker
                 {
                     VoucherDto voucher = new VoucherDto();
                     string randomVoucher = RandomString(dto.Charset, dto.CustomCharset, dto.CodeLength);
-                    voucher.VoucherCode = dto.Prefix + randomVoucher + dto.Postfix;
+                    voucher.VoucherCode = promotionCode + dto.Prefix + randomVoucher + dto.Postfix;
                     voucher.VoucherGroupId = dto.VoucherGroupId;
                     result.Add(voucher);
                 }
@@ -176,7 +181,7 @@ namespace PromotionEngineAPI.Worker
             {
                 VoucherDto voucher = new VoucherDto();
                 string randomVoucher = RandomString(dto.Charset, dto.CustomCharset, dto.CodeLength);
-                voucher.VoucherCode = dto.Prefix + randomVoucher + dto.Postfix;
+                voucher.VoucherCode = promotionCode + dto.Prefix + randomVoucher + dto.Postfix;
                 voucher.VoucherGroupId = dto.VoucherGroupId;
                 result.Add(voucher);
             }

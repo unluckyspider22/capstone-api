@@ -149,7 +149,8 @@ namespace Infrastructure.Helper
 
             public const string Invalid_TimeFrame = "Khuyến mãi không áp dụng vào thời gian này.";
             public const string Invalid_Operator = "Invalid Logic Operator";
-
+            
+            public const string Invalid_CustomerLevel = "Khuyến mãi không áp dụng cho loại khách hàng này";
         }
         public class Operator
         {

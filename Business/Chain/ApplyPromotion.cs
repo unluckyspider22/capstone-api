@@ -35,7 +35,7 @@ namespace ApplicationCore.Chain
                                 DiscountOrder(order, action, promotion);
                                 break;
                             case AppConstant.EnvVar.ActionType.Product:
-                                DiscountProduct(order, action, promotion);
+                                DiscountProduct(order, action);
                                 break;
                         }
                     }
@@ -138,37 +138,53 @@ namespace ApplicationCore.Chain
         #endregion
 
         #region Discount for item
-        private void DiscountProduct(OrderResponseModel order, Infrastructure.Models.Action action, Promotion promotion)
+        private void DiscountProduct(OrderResponseModel order, Infrastructure.Models.Action action)
         {
-            foreach (var product in order.OrderDetail.OrderDetailResponses)
+            if (!action.DiscountType.Equals(AppConstant.EnvVar.DiscountType.Bundle))
             {
-                if (action.ProductCode.Contains(product.ProductCode))
+                foreach (var product in order.OrderDetail.OrderDetailResponses)
                 {
-                    switch (action.DiscountType)
+                    if (action.ProductCode.Contains(product.ProductCode))
                     {
-                        case AppConstant.EnvVar.DiscountType.Amount:
-                            DiscountProductAmount(product, action);
-                            break;
-                        case AppConstant.EnvVar.DiscountType.Percentage:
-                            DiscountProductPercentage(product, action);
-                            break;
-                        case AppConstant.EnvVar.DiscountType.Unit:
-                            DiscountProductUnit(product, action);
-                            break;
-                        case AppConstant.EnvVar.DiscountType.Fixed:
-                            DiscountProductFixedPrice(product, action);
-                            break;
-                        case AppConstant.EnvVar.DiscountType.Ladder:
-                            DiscountProductLadderPrice(product, action);
-                            break;
-                        case AppConstant.EnvVar.DiscountType.Bundle:
-                            DiscountProductBundlePrice(product, action);
-                            break;
+                        switch (action.DiscountType)
+                        {
+                            case AppConstant.EnvVar.DiscountType.Amount:
+                                DiscountProductAmount(product, action);
+                                break;
+                            case AppConstant.EnvVar.DiscountType.Percentage:
+                                DiscountProductPercentage(product, action);
+                                break;
+                            case AppConstant.EnvVar.DiscountType.Unit:
+                                DiscountProductUnit(product, action);
+                                break;
+                            case AppConstant.EnvVar.DiscountType.Fixed:
+                                DiscountProductFixedPrice(product, action);
+                                break;
+                            case AppConstant.EnvVar.DiscountType.Ladder:
+                                DiscountProductLadderPrice(product, action);
+                                break;
+
+                        }
+                    }
+                    product.FinalAmount = product.TotalAmount - product.Discount;
+                }
+            }
+            else
+            {
+                var products = order.OrderDetail.OrderDetailResponses;
+                int countProductMatch = 0;
+                foreach (var product in products)
+                {
+                    if (action.ProductCode.Contains(product.ProductCode))
+                    {
+                        countProductMatch += (int)(product.Quantity > action.BundleQuantity ? action.BundleQuantity : product.Quantity);
                     }
                 }
-                product.FinalAmount = product.TotalAmount - product.Discount;
+                if (countProductMatch >= action.BundleQuantity)
+                {
+                    DiscountProductBundlePrice(products, action);
+                }
             }
-
         }
         private void DiscountProductAmount(OrderDetailResponseModel product, Infrastructure.Models.Action action)
         {
@@ -203,22 +219,35 @@ namespace ApplicationCore.Chain
             }
             SetDiscountProduct(product, action, discount);
         }
-        private void DiscountProductBundlePrice(OrderDetailResponseModel product, Infrastructure.Models.Action action)
+        private void DiscountProductBundlePrice(List<OrderDetailResponseModel> products, Infrastructure.Models.Action action)
         {
-            decimal discount = 0;
+            int bundleQuantity = (int)action.BundleQuantity;
+            int discountedProduct = 0;
             switch (action.BundleStrategy)
             {
                 case AppConstant.BundleStrategy.CHEAPEST:
-
+                    products = products.OrderBy(e => e.UnitPrice).ToList();
                     break;
                 case AppConstant.BundleStrategy.MOST_EXPENSIVE:
-
-                    break;
-                case AppConstant.BundleStrategy.DEFAULT:
-
+                    products = products.OrderByDescending(e => e.UnitPrice).ToList();
                     break;
             }
-            SetDiscountProduct(product, action, discount);
+            foreach (var product in products)
+            {
+                decimal discount = product.Discount;
+                if (action.ProductCode.Contains(product.ProductCode))
+                {
+                    discountedProduct = product.Quantity > bundleQuantity ? bundleQuantity : product.Quantity;
+                    discount += (decimal)(product.TotalAmount - discountedProduct * action.BundlePrice);
+
+                    bundleQuantity -= discountedProduct;
+                    SetDiscountProduct(product, action, discount);
+                }
+                if (bundleQuantity <= 0)
+                {
+                    break;
+                }
+            }
         }
         private void SetDiscountProduct(OrderDetailResponseModel product, Infrastructure.Models.Action action, decimal discount)
         {

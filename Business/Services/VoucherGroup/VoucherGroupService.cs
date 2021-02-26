@@ -302,5 +302,18 @@ namespace ApplicationCore.Services
         {
             return _mapper.Map<List<Voucher>>(vouchers);
         }
+
+        public async Task<string> GetPromotionCode(Guid promotionId)
+        {
+            try
+            {
+                IGenericRepository<Promotion> promotionRepo = _unitOfWork.PromotionRepository;
+                return (await promotionRepo.GetFirst(filter: x => x.PromotionId.Equals(promotionId))).PromotionCode;
+            }
+            catch (Exception e)
+            {
+                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+            }
+        }
     }
 }
