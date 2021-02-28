@@ -9,6 +9,6 @@ namespace ApplicationCore.Services
 {
     public interface IHolidayService : IBaseService<Holiday, HolidayDto>
     {
-       
+        public Task<List<Holiday>> GetHolidays(); 
     }
 }

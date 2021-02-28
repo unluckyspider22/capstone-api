@@ -34,7 +34,7 @@ namespace Infrastructure.Helper
             public const bool ISLIMIT = true;
 
             public const string FOR_WEEKEND = "1";
-            public const string FOR_HOLIDAY = "2";
+            public const string FOR_HOLIDAY = "1";
             public const string NO_FILTER = "0";
             public const string FOR_MEMBER = "1";
             public const string INCLUDE = "0";
@@ -137,7 +137,7 @@ namespace Infrastructure.Helper
             public const string Invalid_Gender = "Giới tính không phù hợp với khuyến mãi";
             public const string InActive_Promotion = "Khuyến mãi chưa được áp dụng";
             public const string Unmatch_Promotion = "Không có khuyến mãi phù hợp với voucher này";
-
+            public const string Invalid_Holiday = "Khuyến mãi không áp dụng vào ngày lễ.";
             public const string Invalid_SaleMode = "Khuyến mãi không dành cho loại đơn hàng này.";
             public const string Invalid_MinAmount = "Giá đơn hàng thấp hơn quy định.";
             public const string Invalid_Time = "Thời gian khuyến mãi không phù hợp";
