@@ -20,7 +20,8 @@ namespace ApplicationCore.Services
 
         public async Task<List<Holiday>> GetHolidays()
         {
-            return (await _repository.Get()).ToList();
+            var result = await _repository.Get();
+            return result.ToList();
         }
     }
 }

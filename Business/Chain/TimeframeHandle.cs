@@ -14,24 +14,19 @@ using ApplicationCore.Services;
 using Infrastructure.Repository;
 using Infrastructure.UnitOrWork;
 using AutoMapper;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace ApplicationCore.Chain
 {
     public interface ITimeframeHandle : IHandler<OrderResponseModel>
     {
-
+        void SetHolidays(List<Holiday> holidays);
     }
     public class TimeframeHandle : Handler<OrderResponseModel>, ITimeframeHandle
     {
-     
-    
-        private readonly IHolidayService _holidayService;
 
-        public TimeframeHandle(IHolidayService holidayService)
-        {
-            _holidayService = holidayService;
-        }
-
+        private List<Holiday> _listPublicHoliday;
         public override void Handle(OrderResponseModel order)
         {
             var promotions = order.Promotions;
@@ -39,27 +34,27 @@ namespace ApplicationCore.Chain
             {
                 //HandleExpiredDate(promotion, order);
                 if (!promotion.ForHoliday.Equals(AppConstant.EnvVar.FOR_HOLIDAY))
-                { HandleHoliday(promotion, order); }
+                {
+                    HandleHolidayAsync(order);
+                }
                 HandleDayOfWeek(promotion, order.OrderDetail.BookingDate.DayOfWeek);
                 HandleHour(promotion, order.OrderDetail.BookingDate.Hour);
             }
             base.Handle(order);
         }
-     
-        public void HandleHoliday(Promotion promotion, OrderResponseModel order)
-        { 
-                var listPublicHoliday = _holidayService.GetHolidays();
-                foreach (var holiday in listPublicHoliday)
-                {
-                if (order.OrderDetail.BookingDate.Day == holiday.Date.Day && order.OrderDetail.BookingDate.Month == holiday.Date.Month)
-                { 
-                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_Holiday); 
-                }
-                //    if (order.OrderDetail.BookingDate.Date.ToString("dd/MM/yyyy").Equals(holiday.Date.Date.ToString("dd/MM/yyyy")))
-                //{
-                //}
-            }
 
+        public void HandleHolidayAsync(OrderResponseModel order)
+        {
+            if (_listPublicHoliday != null && _listPublicHoliday.Count() > 0)
+            {
+                foreach (var holiday in _listPublicHoliday)
+                {
+                    if (order.OrderDetail.BookingDate.Day == holiday.Date.Day && order.OrderDetail.BookingDate.Month == holiday.Date.Month)
+                    {
+                        throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_Holiday);
+                    }
+                }
+            }
         }
         public void HandleDayOfWeek(Promotion promotion, DayOfWeek dayOfWeekStr)
         {
@@ -85,6 +80,11 @@ namespace ApplicationCore.Chain
             {
                 throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_HourFrame);
             }
+        }
+
+        public void SetHolidays(List<Holiday> holidays)
+        {
+            _listPublicHoliday = holidays;
         }
     }
 }

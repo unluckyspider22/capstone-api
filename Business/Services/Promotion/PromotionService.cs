@@ -22,10 +22,15 @@ namespace ApplicationCore.Services
     {
         private readonly IApplyPromotionHandler _applyPromotionHandler;
         private readonly IConditionRuleService _conditionRuleService;
-        public PromotionService(IUnitOfWork unitOfWork, IMapper mapper, IApplyPromotionHandler promotionHandle, IConditionRuleService conditionRuleService) : base(unitOfWork, mapper)
+        private readonly IHolidayService _holidayService;
+        private readonly ITimeframeHandle _timeframeHandle;
+
+        public PromotionService(IUnitOfWork unitOfWork, IMapper mapper, IApplyPromotionHandler promotionHandle, IConditionRuleService conditionRuleService, IHolidayService holidayService, ITimeframeHandle timeframeHandle) : base(unitOfWork, mapper)
         {
             _applyPromotionHandler = promotionHandle;
             _conditionRuleService = conditionRuleService;
+            _holidayService = holidayService;
+            _timeframeHandle = timeframeHandle;
         }
 
         protected override IGenericRepository<Promotion> _repository => _unitOfWork.PromotionRepository;
@@ -346,8 +351,8 @@ namespace ApplicationCore.Services
         {
             try
             {
-                //var now = Common.GetCurrentDatetime();
-
+                var listPublicHoliday = await _holidayService.GetHolidays();
+                _timeframeHandle.SetHolidays(listPublicHoliday);
                 foreach (Promotion promotion in orderResponse.Promotions)
                 {
                     //Check promotion is active
