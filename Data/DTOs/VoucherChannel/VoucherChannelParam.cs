@@ -7,6 +7,8 @@ namespace Infrastructure.DTOs.VoucherChannel
 {
     public class VoucherChannelParam
     {
-        
+        public Guid PromotionId { get; set; }
+        public string ChannelCode { get; set; }
+        public int Quantity { get; set; } = 1;
     }
 }

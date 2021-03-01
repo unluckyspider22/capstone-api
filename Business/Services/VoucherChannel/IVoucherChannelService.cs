@@ -1,4 +1,5 @@
 ﻿using Infrastructure.DTOs;
+using Infrastructure.DTOs.VoucherChannel;
 using Infrastructure.Models;
 using System;
 using System.Collections.Generic;
@@ -9,5 +10,6 @@ namespace ApplicationCore.Services
 {
    public interface IVoucherChannelService : IBaseService<VoucherChannel, VoucherChannelDto>
     {
+        
     }
 }

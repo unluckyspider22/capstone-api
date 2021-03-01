@@ -25,5 +25,7 @@ namespace ApplicationCore.Services
         public Task<List<VoucherDto>> CreateVoucherBulk(List<VoucherDto> vouchers);
         public Task<List<Voucher>> MapVoucher(List<VoucherDto> vouchers);
         public Task<String> GetPromotionCode(Guid promotionId);
+
+        public Task UpdateRedempedQuantity(VoucherGroup voucherGroup, int RedempedQuantity);
     }
 }

@@ -55,14 +55,6 @@ namespace PromotionEngineAPI.Controllers
             }
             return Ok(result);
         }
-
-        [HttpGet]
-        [Route("get-voucher-channel")]
-        public async Task<IActionResult> GetVoucherChannel([FromBody] VoucherChannelParam request)
-        {
-
-            return Ok();
-        }
         // GET: api/Promotions
         [HttpGet]
         // api/Promotions?pageIndex=...&pageSize=...
