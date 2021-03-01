@@ -220,22 +220,26 @@ namespace ApplicationCore.Services
                     membershipActionEntity.PromotionTierId = updateParam.PromotionTierId;
                     membershipActionRepo.Update(membershipActionEntity);
                 }
-                else
-                {
-                    throw new ErrorObj(code: 400, message: "Action or Membership action is not null", description: "Invalid param");
-                }
-                await _unitOfWork.SaveAsync();
+                //else
+                //{
+                //    throw new ErrorObj(code: 400, message: "Action or Membership action is not null", description: "Invalid param");
+                //}
+                //await _unitOfWork.SaveAsync();
                 // update condition rule
-                IGenericRepository<ConditionRule> conditionRepo = _unitOfWork.ConditionRuleRepository;
-                var conditionRuleEntity = _mapper.Map<ConditionRule>(updateParam.ConditionRule);
-                conditionRuleEntity.UpdDate = DateTime.Now;
-                conditionRuleEntity.InsDate = null;
-                conditionRepo.Update(conditionRuleEntity);
-                await _unitOfWork.SaveAsync();
-                // Update condition group
-                await DeleteOldGroups(conditionRuleEntity: conditionRuleEntity);
-                await _unitOfWork.SaveAsync();
-                InsertConditionGroup(conditionGroups: updateParam.ConditionGroups, conditionRuleEntity: conditionRuleEntity);
+                if (!updateParam.ConditionRule.ConditionRuleId.Equals(Guid.Empty))
+                {
+                    IGenericRepository<ConditionRule> conditionRepo = _unitOfWork.ConditionRuleRepository;
+                    var conditionRuleEntity = _mapper.Map<ConditionRule>(updateParam.ConditionRule);
+                    conditionRuleEntity.UpdDate = DateTime.Now;
+                    conditionRuleEntity.InsDate = null;
+                    conditionRepo.Update(conditionRuleEntity);
+                    //await _unitOfWork.SaveAsync();
+                    // Update condition group
+                    await DeleteOldGroups(conditionRuleEntity: conditionRuleEntity);
+                    //await _unitOfWork.SaveAsync();
+                    InsertConditionGroup(conditionGroups: updateParam.ConditionGroups, conditionRuleEntity: conditionRuleEntity);
+                }
+
 
                 await _unitOfWork.SaveAsync();
                 return updateParam;
