@@ -56,27 +56,16 @@ namespace ApplicationCore.Chain
                 }
             }
         }
-        public void HandleDayOfWeek(Promotion promotion, DayOfWeek dayOfWeekStr)
-        {
-            int dayOfWeekNum = 0;
-            switch (dayOfWeekStr.ToString())
-            {
-                case "Monday": dayOfWeekNum = 1; break;
-                case "Tuesday": dayOfWeekNum = 2; break;
-                case "Wednesday": dayOfWeekNum = 4; break;
-                case "Thursday": dayOfWeekNum = 8; break;
-                case "Friday": dayOfWeekNum = 16; break;
-                case "Saturday": dayOfWeekNum = 32; break;
-                case "Sunday": dayOfWeekNum = 64; break;
-            }
-            if (!Common.CompareBinaryForDay(dayOfWeekNum, promotion.DayFilter))
+        public void HandleDayOfWeek(Promotion promotion, DayOfWeek dayOfWeek)
+        {                   
+            if (!Common.CompareBinary(((int)(Math.Pow(2, (int)dayOfWeek))).ToString(), promotion.DayFilter))
             {
                 throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_DayInWeek);
             }
         }
         public void HandleHour(Promotion promotion, int hourOfDay)
         {
-            if (!Common.CompareBinaryForHour(hourOfDay, promotion.HourFilter))
+            if (!Common.CompareBinary(((int)Math.Pow(2, hourOfDay)).ToString(), promotion.HourFilter))
             {
                 throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_HourFrame);
             }
