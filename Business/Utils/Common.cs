@@ -44,6 +44,7 @@ namespace ApplicationCore.Utils
             int input_Decimal = Int32.Parse(input);
             int compareString_Decimal = Int32.Parse(compareString);
             return (input_Decimal & compareString_Decimal) == input_Decimal;
-        }
+        }      
+        
     }
 }

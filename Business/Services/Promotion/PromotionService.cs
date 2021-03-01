@@ -22,10 +22,15 @@ namespace ApplicationCore.Services
     {
         private readonly IApplyPromotionHandler _applyPromotionHandler;
         private readonly IConditionRuleService _conditionRuleService;
-        public PromotionService(IUnitOfWork unitOfWork, IMapper mapper, IApplyPromotionHandler promotionHandle, IConditionRuleService conditionRuleService) : base(unitOfWork, mapper)
+        private readonly IHolidayService _holidayService;
+        private readonly ITimeframeHandle _timeframeHandle;
+
+        public PromotionService(IUnitOfWork unitOfWork, IMapper mapper, IApplyPromotionHandler promotionHandle, IConditionRuleService conditionRuleService, IHolidayService holidayService, ITimeframeHandle timeframeHandle) : base(unitOfWork, mapper)
         {
             _applyPromotionHandler = promotionHandle;
             _conditionRuleService = conditionRuleService;
+            _holidayService = holidayService;
+            _timeframeHandle = timeframeHandle;
         }
 
         protected override IGenericRepository<Promotion> _repository => _unitOfWork.PromotionRepository;
@@ -346,19 +351,19 @@ namespace ApplicationCore.Services
         {
             try
             {
-                var now = Common.GetCurrentDatetime();
-
+                var listPublicHoliday = await _holidayService.GetHolidays();
+                _timeframeHandle.SetHolidays(listPublicHoliday);
                 foreach (Promotion promotion in orderResponse.Promotions)
                 {
                     //Check promotion is active
                     if (!promotion.IsActive) throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.InActive_Promotion, description: AppConstant.ErrMessage.InActive_Promotion);
-                    //Check promotion is time
-                    if (promotion.StartDate > now)
+                    //Check promotion is time 
+                    if (promotion.StartDate >= orderResponse.OrderDetail.BookingDate)
                     {
-                        throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.Invalid_Time, description: AppConstant.ErrMessage.Invalid_Time);
+                        throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.Invalid_Time, description: AppConstant.ErrMessage.Invalid_Early);
                     }
                     //Check promotion is expired
-                    if (promotion.EndDate < now)
+                    if (promotion.EndDate <= orderResponse.OrderDetail.BookingDate)
                     {
                         throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.Expire_Promotion, description: AppConstant.ErrMessage.Expire_Promotion);
                     }

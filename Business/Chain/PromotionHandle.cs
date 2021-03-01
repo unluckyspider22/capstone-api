@@ -31,7 +31,7 @@ namespace ApplicationCore.Chain
                 HandleSalesMode(promotion, order);
                 HandlePayment(promotion, order);
                 HandleGender(promotion, order);
-                HandleHoliday(promotion, order);
+                //HandleHoliday(promotion, order);
             }
             base.Handle(order);
         }
@@ -85,25 +85,25 @@ namespace ApplicationCore.Chain
         }
         #endregion
         #region Handle Holiday
-        private void HandleHoliday(Promotion promotion, OrderResponseModel order)
-        {
-            if (promotion.ForHoliday.Equals(AppConstant.EnvVar.FOR_WEEKEND))
-            {
-                CheckTimeframe(promotion, order, isWeekend: true);
-            }
-            if (promotion.ForHoliday.Equals(AppConstant.EnvVar.FOR_HOLIDAY))
-            {
-                CheckTimeframe(promotion, order, isHoliday: true);
-            }
-            if (!promotion.DayFilter.Equals(AppConstant.EnvVar.NO_FILTER))
-            {
-                _timeframeHandle.Handle(order);
-            }
-            if (!promotion.HourFilter.Equals(AppConstant.EnvVar.NO_FILTER))
-            {
-                _timeframeHandle.Handle(order);
-            }
-        }
+        //private void HandleHoliday(Promotion promotion, OrderResponseModel order)
+        //{
+        //    if (promotion.ForHoliday.Equals(AppConstant.EnvVar.FOR_WEEKEND))
+        //    {
+        //        CheckTimeframe(promotion, order, isWeekend: true);
+        //    }
+        //    if (promotion.ForHoliday.Equals(AppConstant.EnvVar.FOR_HOLIDAY))
+        //    {
+        //        CheckTimeframe(promotion, order, isHoliday: true);
+        //    }
+        //    if (!promotion.DayFilter.Equals(AppConstant.EnvVar.NO_FILTER))
+        //    {
+        //        _timeframeHandle.Handle(order);
+        //    }
+        //    if (!promotion.HourFilter.Equals(AppConstant.EnvVar.NO_FILTER))
+        //    {
+        //        _timeframeHandle.Handle(order);
+        //    }
+        //}
         #endregion
         #region Handle Gender
         private void HandleGender(Promotion promotion, OrderResponseModel order)
