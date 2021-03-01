@@ -360,7 +360,7 @@ namespace ApplicationCore.Services
                     //Check promotion is time 
                     if (promotion.StartDate >= orderResponse.OrderDetail.BookingDate)
                     {
-                        throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.Invalid_Time, description: AppConstant.ErrMessage.Invalid_Time);
+                        throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.Invalid_Time, description: AppConstant.ErrMessage.Invalid_Early);
                     }
                     //Check promotion is expired
                     if (promotion.EndDate <= orderResponse.OrderDetail.BookingDate)

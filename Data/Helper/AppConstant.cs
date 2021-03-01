@@ -135,12 +135,13 @@ namespace Infrastructure.Helper
             public const string Expire_Promotion = "Khuyến mãi tạm dừng.";
             public const string Exclusive_Promotion = "Khuyến mãi không dùng chung với các khuyến mãi khác";
             public const string Invalid_Gender = "Giới tính không phù hợp với khuyến mãi";
-            public const string InActive_Promotion = "Khuyến mãi chưa được áp dụng";
+            public const string InActive_Promotion = "Khuyến mãi chưa được kích hoạt";
             public const string Unmatch_Promotion = "Không có khuyến mãi phù hợp với voucher này";
             public const string Invalid_Holiday = "Khuyến mãi không áp dụng vào ngày lễ.";
             public const string Invalid_SaleMode = "Khuyến mãi không dành cho loại đơn hàng này.";
             public const string Invalid_MinAmount = "Giá đơn hàng thấp hơn quy định.";
             public const string Invalid_Time = "Thời gian khuyến mãi không phù hợp";
+            public const string Invalid_Early = "Thời gian khuyễn mãi vẫn chưa bắt đầu";
             public const string Invalid_HourFrame = "Khung giờ khuyến mãi không phù hợp";
             public const string Invalid_DayInWeek = "Ngày trong tuần của khuyến mãi không phù hợp";
             public const string Invalid_PaymentType = "Loại hình thanh toán không phù hợp.";
