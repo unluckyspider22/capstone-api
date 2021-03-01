@@ -139,10 +139,10 @@ namespace PromotionEngineAPI.Controllers
                 dto.VoucherGroupId = Guid.NewGuid();
                 await _service.CreateAsync(dto);
                 var promotionCode = "";
-                if (dto.PromotionId != null)
-                {
-                    promotionCode = await _service.GetPromotionCode((Guid)dto.PromotionId);
-                }
+                //if (dto.PromotionId != null)
+                //{
+                //    promotionCode = await _service.GetPromotionCode((Guid)dto.PromotionId);
+                //}
                 _workerService.InsertVouchers(voucherDto: dto, promotionCode: promotionCode);
                 return Ok(dto);
             }

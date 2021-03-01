@@ -89,10 +89,10 @@ namespace PromotionEngineAPI.Worker
             Guid? promotionId = dto.PromotionId;
 
             // Tạo voucher
-            if (!promotionCode.Trim().Equals(""))
-            {
-                promotionCode += "-";
-            }
+            //if (!promotionCode.Trim().Equals(""))
+            //{
+            //    promotionCode += "-";
+            //}
             List<Voucher> vouchers = GenerateVoucher(dto, promotionCode);
 
             // Task item để notify cho client
@@ -115,7 +115,6 @@ namespace PromotionEngineAPI.Worker
                     notify.ProcessingVoucher(item: item);
                     _taskQueue.QueueBackgroundWorkItem(async token =>
                     {
-
                         try
                         {
                             // Insert vouchers 

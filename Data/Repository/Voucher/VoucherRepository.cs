@@ -28,8 +28,9 @@ namespace Infrastructure.Repository.Voucher
         {
             await using (var transaction = ctx.Database.BeginTransaction())
             {
-                ctx.BulkInsert(vouchers);
+                ctx.Voucher.AddRange(vouchers);
                 transaction.Commit();
+                ctx.SaveChanges();
             }
             return vouchers;
         }
