@@ -19,6 +19,8 @@ namespace Infrastructure.DTOs
         [StringLength(1)]
         public string ActionType { get; set; }
         [StringLength(1)]
+        public string DiscountType { get; set; }
+        [StringLength(1)]
         public string PromotionLevel { get; set; }
         [StringLength(2048)]
         public string ImgUrl { get; set; }
@@ -50,7 +52,7 @@ namespace Infrastructure.DTOs
         [StringLength(1)]
         public string Status { get; set; }
         public bool IsActive { get; set; }
-        public string DiscountType { get; set; }
+
         public virtual ICollection<PromotionStoreMappingDto> PromotionStoreMapping { get; set; }
     }
 }

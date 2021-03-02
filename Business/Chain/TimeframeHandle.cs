@@ -49,7 +49,7 @@ namespace ApplicationCore.Chain
             {
                 foreach (var holiday in _listPublicHoliday)
                 {
-                    if (order.OrderDetail.BookingDate.Day == holiday.Date.Day && order.OrderDetail.BookingDate.Month == holiday.Date.Month)
+                    if (order.OrderDetail.BookingDate.Day == ((DateTime)holiday.Date).Day && order.OrderDetail.BookingDate.Month ==((DateTime) holiday.Date).Month)
                     {
                         throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_Holiday);
                     }

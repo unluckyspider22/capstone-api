@@ -84,15 +84,23 @@ namespace PromotionEngineAPI.Controllers
 
 
         }
-  
+
         // GET: api/Promotions/count
         [HttpGet]
         [Route("countSearch")]
         public async Task<IActionResult> CountPromotion([FromQuery] SearchPagingRequestParam param, [FromQuery] Guid BrandId)
         {
-            return Ok(await _promotionService.CountAsync(el => el.DelFlg.Equals(AppConstant.DelFlg.UNHIDE)
-            && el.BrandId.Equals(BrandId)
-            && el.PromotionName.ToLower().Contains(param.SearchContent.ToLower())));
+            try
+            {
+                return Ok(await _promotionService.CountAsync(el => !el.DelFlg
+           && el.BrandId.Equals(BrandId)
+           && el.PromotionName.ToLower().Contains(param.SearchContent.ToLower())));
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+
         }
 
         // GET: api/Promotions
@@ -101,17 +109,22 @@ namespace PromotionEngineAPI.Controllers
         // api/Promotions?SearchContent=...?pageIndex=...&pageSize=...
         public async Task<IActionResult> SearchPromotion([FromQuery] SearchPagingRequestParam param, [FromQuery] Guid BrandId)
         {
-            var result = await _promotionService.GetAsync(
+            try
+            {
+                var result = await _promotionService.GetAsync(
                 pageIndex: param.PageIndex,
                 pageSize: param.PageSize,
                 filter: el => !el.DelFlg
                 && el.PromotionName.ToLower().Contains(param.SearchContent.ToLower())
                 && el.BrandId.Equals(BrandId));
-            if (result == null)
-            {
-                return NotFound();
+                return Ok(result);
             }
-            return Ok(result);
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+
+
         }
 
         // GET: api/Promotions/count
@@ -119,14 +132,22 @@ namespace PromotionEngineAPI.Controllers
         [Route("count")]
         public async Task<IActionResult> CountSearchResultPromotion([FromQuery] string status, [FromQuery] Guid brandId)
         {
-            if (status != null && !status.Equals(AppConstant.Status.ALL))
+            try
             {
+                if (status != null && !status.Equals(AppConstant.Status.ALL))
+                {
+                    return Ok(await _promotionService.CountAsync(el => !el.DelFlg
+                    && el.BrandId.Equals(brandId)
+                    && el.Status.Equals(status)));
+                }
                 return Ok(await _promotionService.CountAsync(el => !el.DelFlg
-                && el.BrandId.Equals(brandId)
-                && el.Status.Equals(status)));
+                && el.BrandId.Equals(brandId)));
             }
-            return Ok(await _promotionService.CountAsync(el => !el.DelFlg
-            && el.BrandId.Equals(brandId)));
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+
         }
 
         // GET: api/Promotions/5
@@ -195,16 +216,24 @@ namespace PromotionEngineAPI.Controllers
         {
             if (id == null)
             {
-                return BadRequest();
+                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
             }
-            var result = await _promotionService.DeleteAsync(id);
-            if (result == false)
+            try
             {
-                return NotFound();
+                var result = await _promotionService.DeleteAsync(id);
+                if (result == false)
+                {
+                    return NotFound();
+                }
+                return Ok();
             }
-            return Ok();
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+
         }
-        
+
         Expression<Func<Promotion, bool>> HandlePromotionFilter(String status, Guid BrandId)
         {
             Expression<Func<Promotion, bool>> filterParam;
