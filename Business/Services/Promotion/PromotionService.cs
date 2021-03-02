@@ -4,6 +4,8 @@ using ApplicationCore.Request;
 using ApplicationCore.Utils;
 using AutoMapper;
 using Infrastructure.DTOs;
+using Infrastructure.DTOs.Voucher;
+using Infrastructure.DTOs.VoucherChannel;
 using Infrastructure.Helper;
 using Infrastructure.Models;
 using Infrastructure.Repository;
@@ -410,8 +412,6 @@ namespace ApplicationCore.Services
 
         }
         #endregion
-
-
 
 
     }

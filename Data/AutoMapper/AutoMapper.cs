@@ -1,6 +1,7 @@
 ﻿using ApplicationCore.Models;
 using AutoMapper;
 using Infrastructure.DTOs;
+using Infrastructure.DTOs.Voucher;
 using Infrastructure.Models;
 
 namespace Infrastructure.AutoMapper
@@ -97,6 +98,11 @@ namespace Infrastructure.AutoMapper
             // MembershipActionUpdateParam
             CreateMap<MembershipAction, MembershipActionUpdateParam>();
             CreateMap<MembershipActionUpdateParam, MembershipAction>();
+
+            // PromotionInfomation
+            CreateMap<PromotionInfomation, Promotion>();
+            CreateMap<Promotion, PromotionInfomation>();
+
         }
     }
 }

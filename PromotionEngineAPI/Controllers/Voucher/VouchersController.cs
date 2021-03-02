@@ -95,7 +95,7 @@ namespace PromotionEngineAPI.Controllers
         {
             try
             {
-                return Ok(await _service.activeAllVoucherInGroup(dto));
+                return Ok(await _service.ActiveAllVoucherInGroup(dto));
             }
             catch (ErrorObj e)
             {

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ApplicationCore.Services;
 
 using Infrastructure.DTOs;
+using Infrastructure.DTOs.VoucherChannel;
 using Infrastructure.Helper;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Http;
@@ -32,8 +33,7 @@ namespace PromotionEngineAPI.Controllers
                 pageIndex: param.PageIndex,
                 pageSize: param.PageSize,
                 filter: el => !el.DelFlg && el.BrandId.Equals(BrandId),
-                orderBy: el => el.OrderByDescending(b => b.InsDate)
-                );
+                orderBy: el => el.OrderByDescending(b => b.InsDate));
 
             if (result == null)
             {
@@ -117,7 +117,54 @@ namespace PromotionEngineAPI.Controllers
             }
             return Ok();
         }
+        [HttpGet]
+        [Route("{channelCode}/vouchers/{promotionId}")]
+        public async Task<IActionResult> GetVoucherForChannel(Guid promotionId, string channelCode, [FromBody] VoucherChannelParam param)
+        {
+            try
+            {
+                if (channelCode != param.ChannelCode)
+                {
+                    return NotFound();
+                }
+                if (promotionId != param.PromotionId)
+                {
+                    return NotFound();
+                }
+                var result = await _service.GetVouchersForChannel(param);
+                return Ok(result);
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+           
+        }
 
-        
+        [HttpGet]
+        [Route("{channelCode}/brands/{BrandCode}/promotions")]
+        public async Task<IActionResult> GetPromotionForChannel(string channelCode, string BrandCode, [FromBody] VoucherChannelParam param)
+        {
+            try
+            {
+                if (!channelCode.Equals(param.ChannelCode))
+                {
+                    return NotFound();
+                }
+                if (!BrandCode.Equals(param.BrandCode))
+                {
+                    return NotFound();
+                }
+                var result = await _service.GetPromotionsForChannel(param);
+                return Ok(result);
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+
+        }
+
+
     }
 }

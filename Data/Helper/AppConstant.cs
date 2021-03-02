@@ -31,6 +31,7 @@ namespace Infrastructure.Helper
             public const int DUPLICATE = 2;
             public const string DELETED = "1";
             public const string UNLIMIT = "0";
+            public const string CONNECTOR = "-";
             public const bool ISLIMIT = true;
 
             public const string FOR_WEEKEND = "1";
@@ -39,6 +40,7 @@ namespace Infrastructure.Helper
             public const string FOR_MEMBER = "1";
             public const string INCLUDE = "0";
             public const string EXCLUDE = "1";
+            public const string ApplyForAllStore = "Khuyến mãi áp dụng tại tất cả cửa hàng toàn quốc";
 
             public struct ActionType
             {
@@ -154,6 +156,8 @@ namespace Infrastructure.Helper
             public const string Invalid_Operator = "Invalid Logic Operator";
             
             public const string Invalid_CustomerLevel = "Khuyến mãi không áp dụng cho loại khách hàng này";
+            public const string Invalid_VoucherQuantity = "Khuyến mãi không có đủ số lượng Voucher yêu cầu, số lượng còn lại ";
+            public const string Voucher_OutOfStock = "Voucher đã được phát hết";
         }
         public class Operator
         {

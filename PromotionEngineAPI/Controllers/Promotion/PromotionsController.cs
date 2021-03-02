@@ -12,6 +12,7 @@ using ApplicationCore.Request;
 using System.Collections.Generic;
 using ApplicationCore.Models;
 using System.Net;
+using Infrastructure.DTOs.VoucherChannel;
 
 namespace PromotionEngineAPI.Controllers
 {
@@ -22,13 +23,19 @@ namespace PromotionEngineAPI.Controllers
         private readonly IPromotionService _promotionService;
         private readonly IVoucherService _voucherService;
         private readonly IPromotionStoreMappingService _promotionStoreMappingService;
+        private readonly IChannelService _channelService;
 
 
-        public PromotionsController(IPromotionService service, IPromotionStoreMappingService promotionStoreMappingService, IVoucherService voucherService, IConditionRuleService conditionRuleService)
+        public PromotionsController(IPromotionService service,
+            IPromotionStoreMappingService promotionStoreMappingService,
+            IVoucherService voucherService,
+
+            IChannelService channelService)
         {
             _promotionService = service;
             _promotionStoreMappingService = promotionStoreMappingService;
             _voucherService = voucherService;
+            _channelService = channelService;
         }
 
         [HttpPost]
@@ -54,7 +61,6 @@ namespace PromotionEngineAPI.Controllers
             }
             return Ok(result);
         }
-
         // GET: api/Promotions
         [HttpGet]
         // api/Promotions?pageIndex=...&pageSize=...
@@ -198,9 +204,7 @@ namespace PromotionEngineAPI.Controllers
             }
             return Ok();
         }
-
-
-
+        
         Expression<Func<Promotion, bool>> HandlePromotionFilter(String status, Guid BrandId)
         {
             Expression<Func<Promotion, bool>> filterParam;

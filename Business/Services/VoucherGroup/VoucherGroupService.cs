@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace ApplicationCore.Services
@@ -314,6 +315,24 @@ namespace ApplicationCore.Services
             {
                 throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
             }
+        }
+
+        public async Task UpdateRedempedQuantity(VoucherGroup voucherGroup, int RedempedQuantity)
+        {
+            try
+            {
+                if (voucherGroup != null)
+                {
+                    voucherGroup.RedempedQuantity += RedempedQuantity;
+                    voucherGroup.UpdDate = DateTime.Now;
+                    _repository.Update(voucherGroup);
+                    await _unitOfWork.SaveAsync();
+                }
+            } catch(Exception e)
+            {
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
+            }
+            
         }
     }
 }

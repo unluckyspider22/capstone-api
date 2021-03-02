@@ -1,6 +1,8 @@
 ﻿
 using ApplicationCore.Request;
 using Infrastructure.DTOs;
+using Infrastructure.DTOs.Voucher;
+using Infrastructure.DTOs.VoucherChannel;
 using Infrastructure.Models;
 using System;
 using System.Collections.Generic;
@@ -16,5 +18,6 @@ namespace ApplicationCore.Services
         Task<bool> DeletePromotionTier(DeleteTierRequestParam deleteTierRequestParam);
         Task<PromotionTierUpdateParam> UpdatePromotionTier(PromotionTierUpdateParam updateParam);
         Task<PromotionDto> UpdatePromotion(PromotionDto dto);
+
     }
 }
