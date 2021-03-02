@@ -8,6 +8,7 @@ using Infrastructure.Models;
 using Infrastructure.Repository;
 using Infrastructure.UnitOrWork;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -35,6 +36,43 @@ namespace ApplicationCore.Services
 
         protected override IGenericRepository<Channel> _repository => _unitOfWork.ChannelRepository;
 
+        public async Task<List<PromotionInfomation>> GetPromotionsForChannel(VoucherChannelParam channelParam)
+        {
+            var result = new List<PromotionInfomation>();
+            try
+            {
+                var promotions = (await _promotionService.GetAsync(filter: el =>
+                el.IsActive
+                && el.Status.Equals(AppConstant.EnvVar.PromotionStatus.PUBLISH)
+                && !el.DelFlg,
+                includeProperties:
+                "VoucherChannel.Channel," +
+                "Brand")).Data; ;
+
+                promotions = promotions.Where(w =>
+                w.VoucherChannel.Select(vc =>
+                    vc.Channel).Any(a =>
+                        a.ChannelCode.Equals(channelParam.ChannelCode)
+                        && a.Brand.BrandCode.Equals(channelParam.BrandCode)
+                        && !a.DelFlg)).ToList();
+                foreach (var promotion in promotions)
+                {
+                    var promotionInfomation = _mapper.Map<PromotionInfomation>(promotion);
+
+                    result.Add(promotionInfomation);
+                }
+                return result;
+            }
+            catch (ErrorObj er)
+            {
+                throw er;
+            }
+            catch (Exception e)
+            {
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
+            }
+        }
+
         public async Task<VoucherForChannelResponse> GetVouchersForChannel(VoucherChannelParam channelParam)
         {
             VoucherForChannelResponse result = new VoucherForChannelResponse();
@@ -44,7 +82,8 @@ namespace ApplicationCore.Services
                     .GetFirst(el =>
                     el.PromotionId.Equals(channelParam.PromotionId),
                     includeProperties: "PromotionStoreMapping.Store," +
-                    "VoucherGroup");
+                    "VoucherGroup," +
+                    "VoucherChannel.Channel");
 
                 if (promotion != null)
                 {
@@ -68,7 +107,11 @@ namespace ApplicationCore.Services
                     #endregion
                     var voucherGroup = promotion.VoucherGroup;
                     result.PromotionData.VoucherName = voucherGroup.VoucherName;
-                    var vouchers = await _voucherService.GetVouchersForChannel(voucherGroup, channelParam);
+                    //Lấy voucherchannel để update khi lấy voucher
+                    var voucherChannel = promotion.VoucherChannel
+                          .FirstOrDefault(w => w.Channel.ChannelCode.Equals(channelParam.ChannelCode));
+                    //Lấy danh sách voucher và đánh dấu đã được lấy bởi channel nào
+                    var vouchers = await _voucherService.GetVouchersForChannel(voucherChannel, voucherGroup, channelParam);
                     if (vouchers != null && vouchers.Count() > 0)
                     {
                         //Lấy danh sách voucher

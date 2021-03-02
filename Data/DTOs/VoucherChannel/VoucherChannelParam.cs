@@ -9,6 +9,8 @@ namespace Infrastructure.DTOs.VoucherChannel
     {
         public Guid PromotionId { get; set; }
         public string ChannelCode { get; set; }
+        public string BrandCode { get; set; }
         public int Quantity { get; set; } = 1;
+
     }
 }

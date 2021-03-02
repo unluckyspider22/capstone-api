@@ -13,6 +13,6 @@ namespace ApplicationCore.Services
     public interface IChannelService : IBaseService<Channel, ChannelDto>
     {
         public Task<VoucherForChannelResponse> GetVouchersForChannel(VoucherChannelParam channelParam);
-        public Task<VoucherForChannelResponse> GetPromotionsForChannel(VoucherChannelParam channelParam);
+        public Task<List<PromotionInfomation>> GetPromotionsForChannel(VoucherChannelParam channelParam);
     }
 }

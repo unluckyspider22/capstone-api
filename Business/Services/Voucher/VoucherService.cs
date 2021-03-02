@@ -102,7 +102,7 @@ namespace ApplicationCore.Services
 
         }
 
-        public async Task<List<Voucher>> GetVouchersForChannel(VoucherGroup voucherGroup, VoucherChannelParam channelParam)
+        public async Task<List<Voucher>> GetVouchersForChannel(VoucherChannel voucherChannel,VoucherGroup voucherGroup, VoucherChannelParam channelParam)
         {
 
             int remainVoucher = (int)(voucherGroup.Quantity - voucherGroup.RedempedQuantity);
@@ -131,6 +131,7 @@ namespace ApplicationCore.Services
                     var now = DateTime.Now;
                     voucher.RedempedDate = now;
                     voucher.UpdDate = now;
+                    voucher.VoucherChannel = voucherChannel;
                     _repository.Update(voucher);
                 }
                 await _unitOfWork.SaveAsync();

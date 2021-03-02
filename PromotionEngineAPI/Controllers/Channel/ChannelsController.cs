@@ -118,11 +118,15 @@ namespace PromotionEngineAPI.Controllers
             return Ok();
         }
         [HttpGet]
-        [Route("vouchers/{promotionId}")]
-        public async Task<IActionResult> GetVoucherForChannel(Guid promotionId, [FromBody] VoucherChannelParam param)
+        [Route("{channelCode}/vouchers/{promotionId}")]
+        public async Task<IActionResult> GetVoucherForChannel(Guid promotionId, string channelCode, [FromBody] VoucherChannelParam param)
         {
             try
             {
+                if (channelCode != param.ChannelCode)
+                {
+                    return NotFound();
+                }
                 if (promotionId != param.PromotionId)
                 {
                     return NotFound();
@@ -138,12 +142,20 @@ namespace PromotionEngineAPI.Controllers
         }
 
         [HttpGet]
-        [Route("promotions")]
-        public async Task<IActionResult> GetPromotionForChannel([FromBody] VoucherChannelParam param)
+        [Route("{channelCode}/brands/{BrandCode}/promotions")]
+        public async Task<IActionResult> GetPromotionForChannel(string channelCode, string BrandCode, [FromBody] VoucherChannelParam param)
         {
             try
             {
-                var result = await _service.GetVouchersForChannel(param);
+                if (!channelCode.Equals(param.ChannelCode))
+                {
+                    return NotFound();
+                }
+                if (!BrandCode.Equals(param.BrandCode))
+                {
+                    return NotFound();
+                }
+                var result = await _service.GetPromotionsForChannel(param);
                 return Ok(result);
             }
             catch (ErrorObj e)
@@ -152,6 +164,7 @@ namespace PromotionEngineAPI.Controllers
             }
 
         }
+
 
     }
 }

@@ -33,5 +33,4 @@ namespace Infrastructure.DTOs.Voucher
         public string DayFilter { get; set; }
         public string HourFilter { get; set; }
     }
-
 }
