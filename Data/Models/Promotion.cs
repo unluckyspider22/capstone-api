@@ -39,6 +39,7 @@ namespace Infrastructure.Models
         public bool DelFlg { get; set; }
         public DateTime? InsDate { get; set; }
         public DateTime? UpdDate { get; set; }
+        public string DiscountType { get; set; }
 
         public virtual Brand Brand { get; set; }
         public virtual VoucherGroup VoucherGroup { get; set; }

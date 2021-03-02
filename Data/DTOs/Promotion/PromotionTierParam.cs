@@ -18,6 +18,7 @@ namespace Infrastructure.DTOs
         public ActionRequestParam Action { get; set; }
         [Required]
         public MembershipActionRequestParam MembershipAction { get; set; }
+        public string Summary { get; set; }
     }
 
     public class ActionRequestParam

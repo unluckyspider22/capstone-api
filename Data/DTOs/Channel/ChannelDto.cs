@@ -11,5 +11,6 @@ namespace Infrastructure.DTOs
         public Guid? BrandId { get; set; }
         public string ChannelName { get; set; }
         public string ChannelCode { get; set; }
+        public decimal? Group { get; set; }
     }
 }

@@ -50,6 +50,7 @@ namespace Infrastructure.DTOs
         [StringLength(1)]
         public string Status { get; set; }
         public bool IsActive { get; set; }
+        public string DiscountType { get; set; }
         public virtual ICollection<PromotionStoreMappingDto> PromotionStoreMapping { get; set; }
     }
 }

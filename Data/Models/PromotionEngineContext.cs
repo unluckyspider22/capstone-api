@@ -30,7 +30,7 @@ namespace Infrastructure.Models
         public virtual DbSet<Promotion> Promotion { get; set; }
         public virtual DbSet<PromotionStoreMapping> PromotionStoreMapping { get; set; }
         public virtual DbSet<PromotionTier> PromotionTier { get; set; }
-        public virtual DbSet<Role> Role { get; set; }
+        public virtual DbSet<RoleEntity> Role { get; set; }
         public virtual DbSet<Store> Store { get; set; }
         public virtual DbSet<Voucher> Voucher { get; set; }
         public virtual DbSet<VoucherChannel> VoucherChannel { get; set; }
@@ -40,14 +40,8 @@ namespace Infrastructure.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Server=tcp:promotionengine.database.windows.net,1433;" +
-                    "Initial Catalog=PromotionEngine;" +
-                    "Persist Security Info=False;" +
-                    "User ID=adm;Password=Abcd1234;" +
-                    "MultipleActiveResultSets=True;" +
-                    "Encrypt=True;" +
-                    "TrustServerCertificate=False;" +
-                    "Connection Timeout=600;", opts => opts.CommandTimeout(600));
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+                optionsBuilder.UseSqlServer("Server=tcp:promotionengine.database.windows.net,1433;Initial Catalog=PromotionEngine;Persist Security Info=False;User ID=adm;Password=Abcd1234;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
             }
         }
 
@@ -173,6 +167,10 @@ namespace Infrastructure.Models
 
             modelBuilder.Entity<Brand>(entity =>
             {
+                entity.HasIndex(e => e.BrandCode)
+                    .HasName("Brand_UN")
+                    .IsUnique();
+
                 entity.HasIndex(e => e.Username)
                     .HasName("UNIQUE_Brand")
                     .IsUnique();
@@ -229,6 +227,8 @@ namespace Infrastructure.Models
 
                 entity.Property(e => e.ChannelName).HasMaxLength(50);
 
+                entity.Property(e => e.Group).HasColumnType("numeric(6, 0)");
+
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
@@ -258,6 +258,10 @@ namespace Infrastructure.Models
                     .IsUnicode(false)
                     .IsFixedLength();
 
+                entity.Property(e => e.Summary)
+                    .HasMaxLength(4000)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
@@ -281,7 +285,7 @@ namespace Infrastructure.Models
 
                 entity.Property(e => e.RuleName)
                     .IsRequired()
-                    .HasMaxLength(30);
+                    .HasMaxLength(50);
 
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
@@ -360,7 +364,7 @@ namespace Infrastructure.Models
 
                 entity.Property(e => e.DiscountType)
                     .IsRequired()
-                    .HasMaxLength(1)
+                    .HasMaxLength(2)
                     .IsUnicode(false)
                     .IsFixedLength();
 
@@ -529,10 +533,14 @@ namespace Infrastructure.Models
                     .IsFixedLength();
 
                 entity.Property(e => e.DayFilter)
-                    .HasMaxLength(3)
+                    .HasMaxLength(10)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Description).HasMaxLength(200);
+                entity.Property(e => e.Description).HasMaxLength(4000);
+
+                entity.Property(e => e.DiscountType)
+                    .HasMaxLength(1)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.EndDate).HasColumnType("datetime");
 
@@ -559,7 +567,7 @@ namespace Infrastructure.Models
                     .IsFixedLength();
 
                 entity.Property(e => e.HourFilter)
-                    .HasMaxLength(3)
+                    .HasMaxLength(10)
                     .IsUnicode(false);
 
                 entity.Property(e => e.ImgUrl)
@@ -653,6 +661,10 @@ namespace Infrastructure.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.Property(e => e.Summary)
+                    .HasMaxLength(4000)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
@@ -668,7 +680,7 @@ namespace Infrastructure.Models
                     .HasConstraintName("FK_PromotionTier_Promotion");
             });
 
-            modelBuilder.Entity<Role>(entity =>
+            modelBuilder.Entity<RoleEntity>(entity =>
             {
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
@@ -686,6 +698,8 @@ namespace Infrastructure.Models
             modelBuilder.Entity<Store>(entity =>
             {
                 entity.Property(e => e.StoreId).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.Group).HasColumnType("numeric(6, 0)");
 
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
@@ -777,8 +791,9 @@ namespace Infrastructure.Models
             modelBuilder.Entity<VoucherGroup>(entity =>
             {
                 entity.HasIndex(e => e.PromotionId)
-                    .HasName("VoucherGroup_UN")
-                    .IsUnique();
+                    .HasName("IX_UNIQUE_FILTERED")
+                    .IsUnique()
+                    .HasFilter("([PromotionId] IS NOT NULL)");
 
                 entity.Property(e => e.VoucherGroupId).HasDefaultValueSql("(newid())");
 

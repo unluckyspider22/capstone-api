@@ -14,6 +14,7 @@ namespace Infrastructure.DTOs
         public ActionUpdateParam Action { get; set; }
         public MembershipActionUpdateParam MembershipAction { get; set; }
         public Guid PromotionTierId { get; set; }
+        public string Summary { get; set; }
     }
 
     public class ActionUpdateParam

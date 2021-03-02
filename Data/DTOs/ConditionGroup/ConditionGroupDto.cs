@@ -13,6 +13,7 @@ namespace Infrastructure.DTOs
         public decimal GroupNo { get; set; }
         [StringLength(1)]
         public string NextOperator { get; set; }
+        public string Summary { get; set; }
         public ICollection<MembershipConditionDto> MembershipCondition { get; set; }
         public ICollection<OrderConditionDto> OrderCondition { get; set; }
         public ICollection<ProductConditionDto> ProductCondition { get; set; }

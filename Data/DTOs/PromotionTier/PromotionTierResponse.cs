@@ -13,6 +13,7 @@ namespace Infrastructure.DTOs
         public Guid? ActionId { get; set; }
         public Guid? PromotionId { get; set; }
         public Guid? MembershipActionId { get; set; }
+        public string Summary { get; set; }
 
         public ConditionRuleResponse ConditionRule { get; set; }
         public virtual Models.Action Action { get; set; }

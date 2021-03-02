@@ -11,5 +11,6 @@ namespace Infrastructure.DTOs
         public Guid? BrandId { get; set; }
         public string StoreCode { get; set; }
         public string StoreName { get; set; }
+        public decimal? Group { get; set; }
     }
 }

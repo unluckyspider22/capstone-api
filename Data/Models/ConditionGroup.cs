@@ -18,6 +18,7 @@ namespace Infrastructure.Models
         public string NextOperator { get; set; }
         public DateTime InsDate { get; set; }
         public DateTime UpdDate { get; set; }
+        public string Summary { get; set; }
 
         public virtual ConditionRule ConditionRule { get; set; }
         public virtual ICollection<MembershipCondition> MembershipCondition { get; set; }

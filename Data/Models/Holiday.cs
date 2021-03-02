@@ -7,7 +7,7 @@ namespace Infrastructure.Models
     {
         public Guid HolidayId { get; set; }
         public string HolidayName { get; set; }
-        public DateTime Date { get; set; }
+        public DateTime? Date { get; set; }
         public string Rank { get; set; }
         public bool DelFlg { get; set; }
         public DateTime? InsDate { get; set; }
