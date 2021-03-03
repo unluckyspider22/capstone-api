@@ -1,4 +1,5 @@
 ﻿
+using ApplicationCore.Request;
 using ApplicationCore.Services;
 
 using Infrastructure.DTOs;
@@ -96,6 +97,22 @@ namespace PromotionEngineAPI.Controllers
             try
             {
                 return Ok(await _service.ActiveAllVoucherInGroup(dto));
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+
+        }
+
+        // PUT: api/Vouchers/active
+        [HttpPut]
+        [Route("update-voucher-applied")]
+        public async Task<IActionResult> UpdateVoucherApplied([FromBody] OrderResponseModel order)
+        {
+            try
+            {
+                return Ok(await _service.UpdateVoucherApplied(order));
             }
             catch (ErrorObj e)
             {

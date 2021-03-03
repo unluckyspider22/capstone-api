@@ -334,5 +334,14 @@ namespace ApplicationCore.Services
             }
             
         }
+
+        public async Task UpdateVoucherGroupForApplied(VoucherGroup voucherGroup)
+        {
+            if(voucherGroup != null)
+            {         
+                _repository.Update(voucherGroup);
+                await _unitOfWork.SaveAsync();
+            }
+        }
     }
 }
