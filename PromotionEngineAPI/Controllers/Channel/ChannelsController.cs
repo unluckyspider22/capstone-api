@@ -9,6 +9,7 @@ using Infrastructure.DTOs;
 using Infrastructure.DTOs.VoucherChannel;
 using Infrastructure.Helper;
 using Infrastructure.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 

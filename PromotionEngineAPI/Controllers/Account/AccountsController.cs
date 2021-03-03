@@ -41,9 +41,6 @@ namespace PromotionEngineAPI.Controllers
             {
                 return StatusCode(statusCode: e.Code, e);
             }
-
-
-
         }
 
         // GET: api/Accounts/count
@@ -121,6 +118,5 @@ namespace PromotionEngineAPI.Controllers
             }
             return Ok();
         }
-
     }
 }

@@ -31,8 +31,9 @@ namespace ApplicationCore.Services
         {
             var result = await _repository.GetFirst(
                 el => el.Username.Equals(username)
-                && !el.DelFlg, 
-                includeProperties: "Brand"
+                && !el.DelFlg
+                && el.IsActive, 
+                includeProperties: "Brand,Role"
                 );
 
             return result;
