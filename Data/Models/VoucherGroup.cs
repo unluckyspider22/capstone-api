@@ -8,7 +8,6 @@ namespace Infrastructure.Models
         public VoucherGroup()
         {
             Voucher = new HashSet<Voucher>();
-            VoucherChannel = new HashSet<VoucherChannel>();
         }
 
         public Guid VoucherGroupId { get; set; }
@@ -31,6 +30,5 @@ namespace Infrastructure.Models
         public virtual Brand Brand { get; set; }
         public virtual Promotion Promotion { get; set; }
         public virtual ICollection<Voucher> Voucher { get; set; }
-        public virtual ICollection<VoucherChannel> VoucherChannel { get; set; }
     }
 }

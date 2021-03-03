@@ -41,7 +41,7 @@ namespace Infrastructure.UnitOrWork
         //Voucher
         IGenericRepository<Voucher> VoucherRepository { get; }
         //VoucherChannel
-        IGenericRepository<VoucherChannel> VoucherChannelRepository { get; }
+        IGenericRepository<PromotionChannelMapping> VoucherChannelRepository { get; }
         //VoucherGroup
         IGenericRepository<VoucherGroup> VoucherGroupRepository { get; }
         //Condition group

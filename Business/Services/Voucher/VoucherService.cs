@@ -25,31 +25,31 @@ namespace ApplicationCore.Services
 
         protected override IGenericRepository<Voucher> _repository => _unitOfWork.VoucherRepository;
 
-        public async Task<int> ActiveAllVoucherInGroup(VoucherGroupDto Dto)
-        {
-            try
-            {
-                int result = 0;
-                var listVoucher = await _repository.Get(filter: el => el.IsActive.Equals("0") || !el.IsActive
-                && el.VoucherGroupId.Equals(Dto.VoucherGroupId));
-                foreach (Voucher voucher in listVoucher.ToList())
-                {
-                    voucher.UpdDate = DateTime.Now;
-                    voucher.IsActive = true;
-                    _repository.Update(voucher);
-                    await _unitOfWork.SaveAsync();
-                    result++;
-                }
-                return result;
-            }
-            catch (Exception e)
-            {
+        //public async Task<int> ActiveAllVoucherInGroup(VoucherGroupDto Dto)
+        //{
+        //    try
+        //    {
+        //        int result = 0;
+        //        var listVoucher = await _repository.Get(filter: el => el.IsActive.Equals("0") || !el.IsActive
+        //        && el.VoucherGroupId.Equals(Dto.VoucherGroupId));
+        //        foreach (Voucher voucher in listVoucher.ToList())
+        //        {
+        //            voucher.UpdDate = DateTime.Now;
+        //            voucher.IsActive = true;
+        //            _repository.Update(voucher);
+        //            await _unitOfWork.SaveAsync();
+        //            result++;
+        //        }
+        //        return result;
+        //    }
+        //    catch (Exception e)
+        //    {
 
-                Debug.WriteLine("\n\nError at activeAllVoucherInGroup: \n" + e.Message);
-                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.", description: "Internal Server Error");
-            }
+        //        Debug.WriteLine("\n\nError at activeAllVoucherInGroup: \n" + e.Message);
+        //        throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.", description: "Internal Server Error");
+        //    }
 
-        }
+        //}
 
         public async Task<List<Promotion>> CheckVoucher(OrderResponseModel order)
         {
@@ -64,8 +64,7 @@ namespace ApplicationCore.Services
                 foreach (VoucherResponseModel voucherModel in vouchers)
                 {
                     // throw new ErrorObj(code: 400, message:"voucherCode: " + voucherModel.VoucherCode + ", promotionCode: " + voucherModel.PromotionCode, description: AppConstant.ErrMessage.Invalid_VoucherCode);
-                    var voucher = await _repository.Get(filter: el => el.IsActive
-                    && el.VoucherCode.Equals(voucherModel.VoucherCode)
+                    var voucher = await _repository.Get(filter: el => el.VoucherCode.Equals(voucherModel.VoucherCode)
                     && el.VoucherGroup.Promotion.PromotionCode.Equals(voucherModel.PromotionCode)
                     && !el.IsUsed,
                     includeProperties:
@@ -102,7 +101,7 @@ namespace ApplicationCore.Services
 
         }
 
-        public async Task<List<Voucher>> GetVouchersForChannel(VoucherChannel voucherChannel,VoucherGroup voucherGroup, VoucherChannelParam channelParam)
+        public async Task<List<Voucher>> GetVouchersForChannel(PromotionChannelMapping voucherChannel,VoucherGroup voucherGroup, VoucherChannelParam channelParam)
         {
 
             int remainVoucher = (int)(voucherGroup.Quantity - voucherGroup.RedempedQuantity);
@@ -131,7 +130,7 @@ namespace ApplicationCore.Services
                     var now = DateTime.Now;
                     voucher.RedempedDate = now;
                     voucher.UpdDate = now;
-                    voucher.VoucherChannel = voucherChannel;
+                    voucher.ChannelId = voucherChannel.ChannelId;
                     _repository.Update(voucher);
                 }
                 await _unitOfWork.SaveAsync();

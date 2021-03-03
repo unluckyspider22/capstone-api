@@ -19,4 +19,11 @@ namespace Infrastructure.DTOs
         public List<ChannelOfPromotion> Channels { get; set; }
         public decimal? Group { get; set; }
     }
+
+    public class UpdateChannelOfPromotion
+    {
+        public List<Guid> ListChannelId { get; set; }
+        public Guid PromotionId { get; set; }
+        public Guid BrandId { get; set; }
+    }
 }

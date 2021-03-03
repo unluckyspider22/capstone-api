@@ -62,8 +62,8 @@ namespace Infrastructure.AutoMapper
             CreateMap<Voucher, VoucherDto>();
             CreateMap<VoucherDto, Voucher>();
             //VoucherChannel
-            CreateMap<VoucherChannel, VoucherChannelDto>();
-            CreateMap<VoucherChannelDto, VoucherChannel>();
+            CreateMap<PromotionChannelMapping, VoucherChannelDto>();
+            CreateMap<VoucherChannelDto, PromotionChannelMapping>();
             //VoucherGroup
             CreateMap<VoucherGroup, VoucherGroupDto>();
             CreateMap<VoucherGroupDto, VoucherGroup>();

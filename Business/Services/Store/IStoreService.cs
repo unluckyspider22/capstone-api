@@ -11,5 +11,6 @@ namespace ApplicationCore.Services
 
     {
         public Task<List<GroupStoreOfPromotion>> GetStoreOfPromotion(Guid promotionId, Guid brandId);
+        public Task<List<GroupStoreOfPromotion>> UpdateStoreOfPromotion(UpdateStoreOfPromotion dto);
     }
 }

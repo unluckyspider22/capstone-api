@@ -159,8 +159,9 @@ namespace ApplicationCore.Services
                     {
                         flag = false;
                         voucherInGroup = voucherGroup.Voucher.ElementAt(order);
-                        if (voucherInGroup.IsActive.Equals(AppConstant.ACTIVE)
-                            && voucherInGroup.IsRedemped.Equals(AppConstant.UNREDEMPED)) flag = true;
+                        if (
+                          //voucherInGroup.IsActive.Equals(AppConstant.ACTIVE)  && 
+                          voucherInGroup.IsRedemped.Equals(AppConstant.UNREDEMPED)) flag = true;
                         order++;
                     } while (flag != true);
                     //nếu lấy được voucher thì cập nhật lại IsRedemped là 1 (đã được phát đi)

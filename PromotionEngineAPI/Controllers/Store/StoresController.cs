@@ -143,6 +143,24 @@ namespace PromotionEngineAPI.Controllers
                 return StatusCode(statusCode: e.Code, e);
             }
         }
+
+        [HttpPut]
+        [Route("promotion/{promotionId}")]
+        public async Task<IActionResult> UpdateStoreOfPromotion([FromRoute] Guid promotionId, [FromBody] UpdateStoreOfPromotion dto)
+        {
+            if (promotionId.Equals(Guid.Empty) || !promotionId.Equals(dto.PromotionId))
+            {
+                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+            }
+            try
+            {
+                return Ok(await _service.UpdateStoreOfPromotion(dto: dto));
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
     }
 }
 

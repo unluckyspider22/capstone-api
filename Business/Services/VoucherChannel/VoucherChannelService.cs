@@ -12,14 +12,14 @@ using System.Threading.Tasks;
 
 namespace ApplicationCore.Services
 {
-    public class VoucherChannelService : BaseService<VoucherChannel, VoucherChannelDto>, IVoucherChannelService
+    public class VoucherChannelService : BaseService<PromotionChannelMapping, VoucherChannelDto>, IVoucherChannelService
     {
         public VoucherChannelService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
         {
 
         }
 
-        protected override IGenericRepository<VoucherChannel> _repository => _unitOfWork.VoucherChannelRepository;
+        protected override IGenericRepository<PromotionChannelMapping> _repository => _unitOfWork.VoucherChannelRepository;
 
       
     }
