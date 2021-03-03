@@ -50,7 +50,7 @@ namespace ApplicationCore.Services
                 "Brand")).Data; ;
 
                 promotions = promotions.Where(w =>
-                w.VoucherChannel.Select(vc =>
+                w.PromotionChannelMapping.Select(vc =>
                     vc.Channel).Any(a =>
                         a.ChannelCode.Equals(channelParam.ChannelCode)
                         && a.Brand.BrandCode.Equals(channelParam.BrandCode)
@@ -108,7 +108,7 @@ namespace ApplicationCore.Services
                     var voucherGroup = promotion.VoucherGroup;
                     result.PromotionData.VoucherName = voucherGroup.VoucherName;
                     //Lấy voucherchannel để update khi lấy voucher
-                    var voucherChannel = promotion.VoucherChannel
+                    var voucherChannel = promotion.PromotionChannelMapping
                           .FirstOrDefault(w => w.Channel.ChannelCode.Equals(channelParam.ChannelCode));
                     //Lấy danh sách voucher và đánh dấu đã được lấy bởi channel nào
                     var vouchers = await _voucherService.GetVouchersForChannel(voucherChannel, voucherGroup, channelParam);
@@ -135,5 +135,77 @@ namespace ApplicationCore.Services
                 throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e2.Message);
             }
         }
+
+        #region lấy channel cho promotion
+        public async Task<List<GroupChannelOfPromotion>> GetChannelOfPromotion(Guid promotionId, Guid brandId)
+        {
+            IGenericRepository<PromotionChannelMapping> mappRepo = _unitOfWork.VoucherChannelRepository;
+            // Lấy danh sách channel của cửa hàng
+            var brandChannel = (await _repository.Get(filter: el => el.BrandId.Equals(brandId) && !el.DelFlg)).ToList();
+            // Lấy danh sách channel của promotion
+            var promoChannel = (await mappRepo.Get(filter: el => el.PromotionId.Equals(promotionId), includeProperties: "Channel")).ToList();
+            // Map data cho reponse
+            var mappResult = _mapper.Map<List<ChannelOfPromotion>>(brandChannel);
+            foreach (var channel in mappResult)
+            {
+                var strs = promoChannel.Where(s => s.ChannelId.Equals(channel.ChannelId));
+
+                if (strs.Count() > 0)
+                {
+                    channel.IsCheck = true;
+                }
+            }
+            // Group các store
+            var result = new List<GroupChannelOfPromotion>();
+            var groups = mappResult.GroupBy(el => el.Group).Select(el => el.Distinct()).ToList();
+            foreach (var group in groups)
+            {
+
+                var listChannel = group.ToList();
+                var groupChannel = new GroupChannelOfPromotion
+                {
+                    Channels = listChannel,
+                    Group = listChannel.First().Group
+                };
+                result.Add(groupChannel);
+            }
+            return result;
+        }
+
+        public async Task<List<GroupChannelOfPromotion>> UpdateChannelOfPromotion(UpdateChannelOfPromotion dto)
+        {
+            try
+            {
+                IGenericRepository<PromotionChannelMapping> mappRepo = _unitOfWork.VoucherChannelRepository;
+
+                // Xóa data trong bảng channel mapping
+                mappRepo.Delete(id: Guid.Empty, filter: el => el.PromotionId.Equals(dto.PromotionId));
+
+                // Insert data mới vào bảng store mapping
+                var channels = dto.ListChannelId;
+                foreach (var channel in channels)
+                {
+                    PromotionChannelMapping obj = new PromotionChannelMapping
+                    {
+                        VoucherChannelId = Guid.NewGuid(),
+                        PromotionId = dto.PromotionId,
+                        ChannelId = channel,
+                        InsDate = DateTime.Now,
+                        UpdDate = DateTime.Now
+                    };
+                    mappRepo.Add(obj);
+                }
+
+                await _unitOfWork.SaveAsync();
+                var result = await GetChannelOfPromotion(brandId: dto.BrandId, promotionId: dto.PromotionId);
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
+            }
+        }
+        #endregion
     }
 }

@@ -12,6 +12,7 @@ namespace Infrastructure.DTOs
         public decimal GroupNo { get; set; }
         public string NextOperator { get; set; }
         public List<Object> Conditions { get; set; }
+        public string Summary { get; set; }
     }
 
     public class ConditionRuleResponse

@@ -62,8 +62,8 @@ namespace Infrastructure.AutoMapper
             CreateMap<Voucher, VoucherDto>();
             CreateMap<VoucherDto, Voucher>();
             //VoucherChannel
-            CreateMap<VoucherChannel, VoucherChannelDto>();
-            CreateMap<VoucherChannelDto, VoucherChannel>();
+            CreateMap<PromotionChannelMapping, VoucherChannelDto>();
+            CreateMap<VoucherChannelDto, PromotionChannelMapping>();
             //VoucherGroup
             CreateMap<VoucherGroup, VoucherGroupDto>();
             CreateMap<VoucherGroupDto, VoucherGroup>();
@@ -103,6 +103,13 @@ namespace Infrastructure.AutoMapper
             CreateMap<PromotionInfomation, Promotion>();
             CreateMap<Promotion, PromotionInfomation>();
 
+            // Store of promotion
+            CreateMap<Store, StoreOfPromotion>();
+            CreateMap<StoreOfPromotion, Store>();
+
+            // Channel of promotion
+            CreateMap<Channel, ChannelOfPromotion>();
+            CreateMap<ChannelOfPromotion, Channel>();
         }
     }
 }

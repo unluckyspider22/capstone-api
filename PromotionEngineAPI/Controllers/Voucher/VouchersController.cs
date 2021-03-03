@@ -96,7 +96,8 @@ namespace PromotionEngineAPI.Controllers
         {
             try
             {
-                return Ok(await _service.ActiveAllVoucherInGroup(dto));
+                //await _service.ActiveAllVoucherInGroup(dto)
+                return Ok();
             }
             catch (ErrorObj e)
             {

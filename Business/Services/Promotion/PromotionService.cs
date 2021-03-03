@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -84,6 +85,9 @@ namespace ApplicationCore.Services
                     var actionEntity = _mapper.Map<Infrastructure.Models.Action>(param.Action);
                     actionEntity.ActionId = Guid.NewGuid();
                     actionEntity.PromotionTierId = promotionTier.PromotionTierId;
+                    actionEntity.ActionType = actionEntity.ActionType.Trim();
+                    actionEntity.DiscountType = actionEntity.DiscountType.Trim();
+                    promotionTier.Summary = CreateSummaryAction(actionEntity);
                     promotionTier.ActionId = actionEntity.ActionId;
                     promotionTierRepo.Add(promotionTier);
                     actionRepo.Add(actionEntity);
@@ -97,6 +101,9 @@ namespace ApplicationCore.Services
                     var membershipAction = _mapper.Map<MembershipAction>(param.MembershipAction);
                     membershipAction.MembershipActionId = Guid.NewGuid();
                     membershipAction.PromotionTierId = promotionTier.PromotionTierId;
+                    membershipAction.ActionType = membershipAction.ActionType.Trim();
+                    membershipAction.DiscountType = membershipAction.DiscountType.Trim();
+                    promotionTier.Summary = CreateSummaryMembershipAction(membershipAction);
                     promotionTier.MembershipActionId = membershipAction.MembershipActionId;
                     promotionTierRepo.Add(promotionTier);
                     membershipActionRepo.Add(membershipAction);
@@ -186,7 +193,8 @@ namespace ApplicationCore.Services
                         PromotionId = tier.PromotionId,
                         PromotionTierId = tier.PromotionTierId,
                         ConditionRuleId = tier.ConditionRuleId,
-                        ConditionRule = await _conditionRuleService.ReorderResult(tier.ConditionRule)
+                        ConditionRule = await _conditionRuleService.ReorderResult(tier.ConditionRule),
+                        Summary = tier.Summary,
                     };
                     result.Add(responseParam);
                 }
@@ -203,6 +211,7 @@ namespace ApplicationCore.Services
 
             try
             {
+                IGenericRepository<PromotionTier> promotionTierRepo = _unitOfWork.PromotionTierRepository;
                 // update action
                 if (!updateParam.Action.ActionId.Equals(Guid.Empty))
                 {
@@ -212,6 +221,10 @@ namespace ApplicationCore.Services
                     actionEntity.InsDate = null;
                     actionEntity.PromotionTierId = updateParam.PromotionTierId;
                     actionRepo.Update(actionEntity);
+                    var tier = await promotionTierRepo.GetFirst(filter: el => el.ActionId.Equals(actionEntity.ActionId));
+                    tier.Summary = CreateSummaryAction(actionEntity);
+                    tier.UpdDate = DateTime.Now;
+                    promotionTierRepo.Update(tier);
                 }
                 else if (!updateParam.MembershipAction.MembershipActionId.Equals(Guid.Empty))
                 {
@@ -221,6 +234,10 @@ namespace ApplicationCore.Services
                     membershipActionEntity.InsDate = null;
                     membershipActionEntity.PromotionTierId = updateParam.PromotionTierId;
                     membershipActionRepo.Update(membershipActionEntity);
+                    var tier = await promotionTierRepo.GetFirst(filter: el => el.MembershipActionId.Equals(membershipActionEntity.MembershipActionId));
+                    tier.Summary = CreateSummaryMembershipAction(membershipActionEntity);
+                    tier.UpdDate = DateTime.Now;
+                    promotionTierRepo.Update(tier);
                 }
                 //else
                 //{
@@ -295,9 +312,11 @@ namespace ApplicationCore.Services
                     GroupNo = group.GroupNo,
                     ConditionRuleId = conditionRuleEntity.ConditionRuleId,
                     NextOperator = group.NextOperator,
+                    Summary = "",
                     InsDate = DateTime.Now,
                     UpdDate = DateTime.Now,
                 };
+                conditionGroupEntity.Summary = CreateSummary(group);
                 conditionGroupRepo.Add(conditionGroupEntity);
                 group.ConditionGroupId = conditionGroupEntity.ConditionGroupId;
                 // Create product condition
@@ -412,7 +431,464 @@ namespace ApplicationCore.Services
 
         }
         #endregion
+        #region create summary for condition group
+        private List<Object> ConvertConditionList(ConditionGroupDto group)
+        {
+            var totalCondition = 0;
+            var productCond = false;
+            var orderCond = false;
+            var membershipCond = false;
 
+            if (group.ProductCondition != null && group.ProductCondition.Count > 0)
+            {
+                totalCondition += group.ProductCondition.Count;
+                productCond = true;
+            }
+            if (group.OrderCondition != null && group.OrderCondition.Count > 0)
+            {
+                totalCondition += group.OrderCondition.Count;
+                orderCond = true;
+            }
+            if (group.MembershipCondition != null && group.MembershipCondition.Count > 0)
+            {
+                totalCondition += group.MembershipCondition.Count;
+                membershipCond = true;
+            }
+            Object[] conditions = new Object[totalCondition];
+            if (productCond)
+            {
+                foreach (var productCondition in group.ProductCondition)
+                {
+                    conditions[productCondition.IndexGroup] = productCondition;
+                    //conditions.Insert(productCondition.IndexGroup, productCondition);
+                }
+            }
+            if (orderCond)
+            {
+                foreach (var orderCondition in group.OrderCondition)
+                {
+                    conditions[orderCondition.IndexGroup] = orderCondition;
+                    //conditions.Insert(orderCondition.IndexGroup, orderCondition);
+                }
+            }
+            if (membershipCond)
+            {
+                foreach (var membershipCondition in group.MembershipCondition)
+                {
+                    conditions[membershipCondition.IndexGroup] = membershipCondition;
+                    //conditions.Insert(membershipCondition.IndexGroup, membershipCondition);
+                }
+            }
+            return conditions.ToList();
+        }
+        private string CreateSummary(ConditionGroupDto group)
+        {
+            var result = "";
+            CultureInfo cul = CultureInfo.GetCultureInfo("vi-VN");
+            var conditions = ConvertConditionList(group);
+            for (int i = 0; i < conditions.Count; i++)
+            {
+                var condition = conditions[i];
+                if (condition.GetType() == typeof(ProductConditionDto))
+                {
+                    var value = (ProductConditionDto)condition;
+                    var productResult = "";
+                    if (value.ProductConditionType.Equals("0"))
+                    {
+                        if (result.Equals(""))
+                        {
+                            productResult = "- Include ";
+                        }
+                        else
+                        {
+                            productResult = "include ";
+                        }
+                    }
+                    else
+                    {
+                        if (result == "")
+                        {
+                            productResult = "- Exclude ";
+                        }
+                        else
+                        {
+                            productResult = "exclude ";
+                        }
+                    }
+
+                    if (value.ProductConditionType.Equals("0"))
+                    {
+                        switch (value.QuantityOperator)
+                        {
+                            case "1":
+                                {
+                                    productResult += "more than ";
+                                    break;
+                                }
+                            case "2":
+                                {
+                                    productResult += "more than or equal ";
+                                    break;
+                                }
+                            case "3":
+                                {
+                                    productResult += "less than ";
+                                    break;
+                                }
+                            case "4":
+                                {
+                                    productResult += "less than or equal ";
+                                    break;
+                                }
+                        }
+                    }
+                    if (value.ProductConditionType.Equals("0"))
+                    {
+                        productResult += value.ProductQuantity + " ";
+                    }
+                    productResult += value.ProductName;
+                    if (i < conditions.Count - 1)
+                    {
+                        if (value.NextOperator.Equals("1"))
+                        {
+                            productResult += " or ";
+                        }
+                        else
+                        {
+                            productResult += " and ";
+                        }
+                    }
+
+                    result += productResult;
+                }
+                if (condition.GetType() == typeof(OrderConditionDto))
+                {
+                    var value = (OrderConditionDto)condition;
+                    var orderResult = "order has ";
+                    if (result.Equals(""))
+                    {
+                        orderResult = "- Order has ";
+                    }
+                    switch (value.QuantityOperator)
+                    {
+                        case "1":
+                            {
+                                orderResult += "more than ";
+                                break;
+                            }
+                        case "2":
+                            {
+                                orderResult += "more than or equal ";
+                                break;
+                            }
+                        case "3":
+                            {
+                                orderResult += "less than ";
+                                break;
+                            }
+                        case "4":
+                            {
+                                orderResult += "less than or equal ";
+                                break;
+                            }
+                        case "5":
+                            {
+                                orderResult += "equal ";
+                                break;
+                            }
+                    }
+                    orderResult += value.Quantity + " item(s) and total ";
+                    switch (value.AmountOperator)
+                    {
+                        case "1":
+                            {
+                                orderResult += "more than ";
+                                break;
+                            }
+                        case "2":
+                            {
+                                orderResult += "more than or equal ";
+                                break;
+                            }
+                        case "3":
+                            {
+                                orderResult += "less than ";
+                                break;
+                            }
+                        case "4":
+                            {
+                                orderResult += "less than or equal ";
+                                break;
+                            }
+                        case "5":
+                            {
+                                orderResult += "equal ";
+                                break;
+                            }
+                    }
+                    orderResult += double.Parse(value.Amount.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
+                    if (i < conditions.Count - 1)
+                    {
+                        if (value.NextOperator.Equals("1"))
+                        {
+                            orderResult += " or ";
+                        }
+                        else
+                        {
+                            orderResult += " and ";
+                        }
+                    }
+
+                    result += orderResult;
+                }
+                if (condition.GetType() == typeof(MembershipConditionDto))
+                {
+                    var value = (MembershipConditionDto)condition;
+                    var membershipResult = "membership level are:  ";
+                    if (result.Equals(""))
+                    {
+                        membershipResult = "- Membership level are:  ";
+                    }
+                    var list = "";
+                    var levels = value.MembershipLevel.Split("|");
+                    foreach (var level in levels)
+                    {
+                        if (list.Equals(""))
+                        {
+                            list += level;
+                        }
+                        else
+                        {
+                            list += ", " + level;
+                        }
+                    }
+                    membershipResult += list;
+                    if (i < conditions.Count - 1)
+                    {
+                        if (value.NextOperator.Equals("1"))
+                        {
+                            membershipResult += " or ";
+                        }
+                        else
+                        {
+                            membershipResult += " and ";
+                        }
+                    }
+
+                    result += membershipResult;
+                }
+            }
+
+
+            return result;
+        }
+        #endregion
+        #region create summary for action
+        private string CreateSummaryAction(Infrastructure.Models.Action entity)
+        {
+            var result = "";
+            var actionType = entity.ActionType;
+            var discountType = entity.DiscountType;
+            CultureInfo cul = CultureInfo.GetCultureInfo("vi-VN");
+            switch (actionType)
+            {
+                case "1":
+                    {
+
+                        switch (discountType)
+                        {
+                            case "1":
+                                {
+                                    result += "Discount ";
+                                    result += double.Parse(entity.DiscountAmount.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
+                                    if (entity.MinPriceAfter > 0)
+                                    {
+                                        result +=
+                                          ", minimum residual price " +
+                                           double.Parse(entity.MinPriceAfter.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
+
+
+                                    }
+                                    result += " for product";
+                                    break;
+                                }
+                            case "2":
+                                {
+                                    result += "Discount ";
+                                    result += entity.DiscountPercentage + "%";
+                                    if (entity.MaxAmount > 0)
+                                    {
+                                        result += ", maximum ";
+                                        result +=
+                                            double.Parse(entity.MaxAmount.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
+
+                                    }
+                                    result += " for product";
+                                    break;
+                                }
+                            case "3":
+                                {
+                                    result += "Free ";
+                                    result += entity.DiscountQuantity + " unit(s) ";
+                                    result += "of product";
+                                    break;
+                                }
+
+                            case "5":
+                                {
+                                    result += "Fixed ";
+                                    result +=
+                                        double.Parse(entity.FixedPrice.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
+
+                                    result += " for product";
+                                    break;
+                                }
+                            case "6":
+                                {
+                                    result += "Buy from the ";
+                                    result += ToOrdinal((long)entity.OrderLadderProduct);
+
+                                    result += " product at the price of ";
+                                    result +=
+                                        double.Parse(entity.LadderPrice.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
+                                    break;
+                                }
+                            case "7":
+                                {
+                                    result += "Buy ";
+                                    result += entity.BundleQuantity + " product(s) for ";
+                                    result +=
+                                        double.Parse(entity.BundlePrice.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
+                                    break;
+                                }
+                        }
+                        break;
+                    }
+                case "2":
+                    {
+
+                        switch (discountType)
+                        {
+                            case "1":
+                                {
+                                    result += "Discount ";
+                                    result +=
+                                         double.Parse(entity.DiscountAmount.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
+
+                                    if (entity.MinPriceAfter > 0)
+                                    {
+                                        result +=
+                                          ", minimum residual price " +
+                                           double.Parse(entity.MinPriceAfter.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
+
+
+                                    }
+
+                                    result += " for order";
+                                    break;
+                                }
+                            case "2":
+                                {
+                                    result += "Discount ";
+                                    result += entity.DiscountPercentage + "%";
+                                    if (entity.MaxAmount > 0)
+                                    {
+                                        result += ", maximum ";
+                                        result +=
+                                             double.Parse(entity.MaxAmount.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
+
+                                    }
+                                    result += " for order";
+                                    break;
+                                }
+                            case "4":
+                                {
+                                    result += "Discount ";
+                                    if (entity.DiscountAmount != 0)
+                                    {
+                                        result +=
+                                             double.Parse(entity.DiscountAmount.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
+
+                                    }
+                                    else
+                                    {
+                                        result += entity.DiscountPercentage + "% ";
+                                        if (entity.MaxAmount > 0)
+                                        {
+                                            result += ", maximum ";
+                                            result +=
+                                                double.Parse(entity.MaxAmount.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
+
+                                        }
+                                    }
+                                    result += " for shipping of order";
+
+                                    break;
+                                }
+                        }
+                        break;
+                    }
+            }
+            return result;
+        }
+
+        private string CreateSummaryMembershipAction(MembershipAction entity)
+        {
+            var result = "";
+            var actionType = entity.ActionType;
+            var discountType = entity.DiscountType;
+            switch (actionType)
+            {
+                case "3":
+                    {
+
+                        switch (discountType)
+                        {
+                            case "8":
+                                {
+                                    result += "Gift ";
+                                    result += entity.GiftQuantity;
+                                    result += " " + entity.GiftName + "(s)";
+                                    break;
+                                }
+                            case "9":
+                                {
+                                    result += "Gift a voucher code: ";
+                                    result += entity.GiftVoucherCode;
+                                    break;
+                                }
+                        }
+                        return result;
+                    }
+                case "4":
+                    {
+                        result += "Bonus point: ";
+                        result += entity.BonusPoint + " point(s)";
+                        return result;
+                    }
+            }
+            return result;
+        }
+
+        private string ToOrdinal(long number)
+        {
+            if (number < 0) return number.ToString();
+            long rem = number % 100;
+            if (rem >= 11 && rem <= 13) return number + "th";
+
+            switch (number % 10)
+            {
+                case 1:
+                    return number + "st";
+                case 2:
+                    return number + "nd";
+                case 3:
+                    return number + "rd";
+                default:
+                    return number + "th";
+            }
+        }
+        #endregion
 
     }
 }

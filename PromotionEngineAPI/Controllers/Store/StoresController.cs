@@ -67,7 +67,7 @@ namespace PromotionEngineAPI.Controllers
         public async Task<IActionResult> GetStore([FromRoute] Guid id)
         {
             try
-            {             
+            {
                 return Ok(await _service.GetByIdAsync(id));
             }
             catch (ErrorObj e)
@@ -123,8 +123,43 @@ namespace PromotionEngineAPI.Controllers
             {
                 return StatusCode(statusCode: e.Code, e);
             }
+        }
 
+        [HttpGet]
+        [Route("promotion/{promotionId}")]
+        public async Task<IActionResult> GetStoreOfPromotion([FromRoute] Guid promotionId, [FromQuery] Guid brandId)
+        {
+            if (promotionId.Equals(Guid.Empty) || brandId.Equals(Guid.Empty))
+            {
+                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+            }
+            try
+            {
 
+                return Ok(await _service.GetStoreOfPromotion(promotionId: promotionId, brandId: brandId));
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
+
+        [HttpPut]
+        [Route("promotion/{promotionId}")]
+        public async Task<IActionResult> UpdateStoreOfPromotion([FromRoute] Guid promotionId, [FromBody] UpdateStoreOfPromotion dto)
+        {
+            if (promotionId.Equals(Guid.Empty) || !promotionId.Equals(dto.PromotionId))
+            {
+                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+            }
+            try
+            {
+                return Ok(await _service.UpdateStoreOfPromotion(dto: dto));
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
         }
     }
 }
