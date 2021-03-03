@@ -30,7 +30,7 @@ namespace Infrastructure.Models
         public virtual DbSet<Promotion> Promotion { get; set; }
         public virtual DbSet<PromotionStoreMapping> PromotionStoreMapping { get; set; }
         public virtual DbSet<PromotionTier> PromotionTier { get; set; }
-        public virtual DbSet<RoleEntity> Role { get; set; }
+        public virtual DbSet<Role> Role { get; set; }
         public virtual DbSet<Store> Store { get; set; }
         public virtual DbSet<Voucher> Voucher { get; set; }
         public virtual DbSet<VoucherChannel> VoucherChannel { get; set; }
@@ -539,7 +539,7 @@ namespace Infrastructure.Models
                 entity.Property(e => e.Description).HasMaxLength(4000);
 
                 entity.Property(e => e.DiscountType)
-                    .HasMaxLength(1)
+                    .HasMaxLength(2)
                     .IsUnicode(false);
 
                 entity.Property(e => e.EndDate).HasColumnType("datetime");
@@ -680,7 +680,7 @@ namespace Infrastructure.Models
                     .HasConstraintName("FK_PromotionTier_Promotion");
             });
 
-            modelBuilder.Entity<RoleEntity>(entity =>
+            modelBuilder.Entity<Role>(entity =>
             {
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")

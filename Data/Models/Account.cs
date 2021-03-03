@@ -16,8 +16,9 @@ namespace Infrastructure.Models
         public DateTime? InsDate { get; set; }
         public DateTime? UpdDate { get; set; }
         public string ImgUrl { get; set; }
+        public bool? IsActive { get; set; }
 
-        public virtual RoleEntity Role { get; set; }
+        public virtual Role Role { get; set; }
         public virtual Brand Brand { get; set; }
     }
 }

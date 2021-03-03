@@ -10,6 +10,6 @@ namespace ApplicationCore.Services
     public interface IStoreService : IBaseService<Store, StoreDto>
 
     {
-      
+        public Task<List<GroupStoreOfPromotion>> GetStoreOfPromotion(Guid promotionId, Guid brandId);
     }
 }

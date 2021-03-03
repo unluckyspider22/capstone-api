@@ -97,6 +97,7 @@ namespace ApplicationCore.Services
                 {
                     ConditionRuleId = param.ConditionRuleId,
                     ConditionGroupId = group.ConditionGroupId,
+                    Summary = group.Summary,
                     GroupNo = group.GroupNo,
                     NextOperator = group.NextOperator,
                     Conditions = new List<object>(),

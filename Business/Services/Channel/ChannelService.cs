@@ -135,5 +135,42 @@ namespace ApplicationCore.Services
                 throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e2.Message);
             }
         }
+
+        #region lấy channel cho promotion
+        public async Task<List<GroupChannelOfPromotion>> GetChannelOfPromotion(Guid promotionId, Guid brandId)
+        {
+            IGenericRepository<VoucherChannel> mappRepo = _unitOfWork.VoucherChannelRepository;
+            // Lấy danh sách channel của cửa hàng
+            var brandChannel = (await _repository.Get(filter: el => el.BrandId.Equals(brandId) && !el.DelFlg)).ToList();
+            // Lấy danh sách channel của promotion
+            var promoChannel = (await mappRepo.Get(filter: el => el.PromotionId.Equals(promotionId), includeProperties: "Channel")).ToList();
+            // Map data cho reponse
+            var mappResult = _mapper.Map<List<ChannelOfPromotion>>(brandChannel);
+            foreach (var channel in mappResult)
+            {
+                var strs = promoChannel.Where(s => s.ChannelId.Equals(channel.ChannelId));
+
+                if (strs.Count() > 0)
+                {
+                    channel.IsCheck = true;
+                }
+            }
+            // Group các store
+            var result = new List<GroupChannelOfPromotion>();
+            var groups = mappResult.GroupBy(el => el.Group).Select(el => el.Distinct()).ToList();
+            foreach (var group in groups)
+            {
+
+                var listChannel = group.ToList();
+                var groupChannel = new GroupChannelOfPromotion
+                {
+                    Channels = listChannel,
+                    Group = listChannel.First().Group
+                };
+                result.Add(groupChannel);
+            }
+            return result;
+        }
+        #endregion
     }
 }

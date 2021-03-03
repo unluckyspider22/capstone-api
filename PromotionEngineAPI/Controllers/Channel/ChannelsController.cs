@@ -165,6 +165,24 @@ namespace PromotionEngineAPI.Controllers
 
         }
 
+        [HttpGet]
+        [Route("promotion/{promotionId}")]
+        public async Task<IActionResult> GetChannelOfPromotion([FromRoute] Guid promotionId, [FromQuery] Guid brandId)
+        {
+            if (promotionId.Equals(Guid.Empty) || brandId.Equals(Guid.Empty))
+            {
+                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+            }
+            try
+            {
+
+                return Ok(await _service.GetChannelOfPromotion(promotionId: promotionId, brandId: brandId));
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
 
     }
 }

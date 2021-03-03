@@ -14,5 +14,7 @@ namespace ApplicationCore.Services
     {
         public Task<VoucherForChannelResponse> GetVouchersForChannel(VoucherChannelParam channelParam);
         public Task<List<PromotionInfomation>> GetPromotionsForChannel(VoucherChannelParam channelParam);
+
+        public Task<List<GroupChannelOfPromotion>> GetChannelOfPromotion(Guid promotionId, Guid brandId);
     }
 }

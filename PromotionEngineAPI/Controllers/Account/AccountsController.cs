@@ -27,18 +27,23 @@ namespace PromotionEngineAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAccount([FromQuery] PagingRequestParam param)
         {
-            var result = await _service.GetAsync(
-                pageIndex: param.PageIndex,
-                pageSize: param.PageSize,
-                filter: el => !el.DelFlg,
-                orderBy: el => el.OrderByDescending(b => b.InsDate)
-                );
-
-            if (result == null)
+            try
             {
-                return NotFound();
+                var result = await _service.GetAsync(
+                               pageIndex: param.PageIndex,
+                               pageSize: param.PageSize,
+                               filter: el => !el.DelFlg,
+                               orderBy: el => el.OrderByDescending(b => b.InsDate)
+                               );
+                return Ok(result);
             }
-            return Ok(result);
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+
+
+
         }
 
         // GET: api/Accounts/count
@@ -51,7 +56,7 @@ namespace PromotionEngineAPI.Controllers
 
         //GET: api/Accounts/5
         [HttpGet("{username}")]
-        public async Task<IActionResult> GetAccount([FromRoute]string username)
+        public async Task<IActionResult> GetAccount([FromRoute] string username)
         {
             var result = await _service.GetByUsernameAsync(username);
             if (result == null)
@@ -63,23 +68,24 @@ namespace PromotionEngineAPI.Controllers
 
         // PUT: api/Accounts/5
         [HttpPut("{username}")]
-        public async Task<IActionResult> PutAccount([FromRoute]string username, [FromBody] AccountDto dto)
+        public async Task<IActionResult> PutAccount([FromRoute] string username, [FromBody] AccountDto dto)
         {
+
             if (!username.Equals(dto.Username))
             {
-                return BadRequest();
+                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
             }
-
-            dto.UpdDate = DateTime.Now;
-
-            var result = await _service.UpdateAsync(dto);
-
-            if (result == null)
+            try
             {
-                return NotFound();
-            }
+                dto.UpdDate = DateTime.Now;
 
-            return Ok(result);
+                var result = await _service.UpdateAsync(dto);
+                return Ok(result);
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
 
         }
 
@@ -87,19 +93,22 @@ namespace PromotionEngineAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> PostAccount([FromBody] AccountDto dto)
         {
-            var result = await _service.CreateAsync(dto);
-
-            if (result == null)
+            try
             {
-                return NotFound();
+                dto.IsActive = false;
+                var result = await _service.CreateAsync(dto);
+                return Ok(result);
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
             }
 
-            return Ok(result);
         }
 
         // DELETE: api/Accounts/5
         [HttpDelete]
-        public async Task<IActionResult> DeleteAccount([FromQuery]string username)
+        public async Task<IActionResult> DeleteAccount([FromQuery] string username)
         {
             if (username == null)
             {
