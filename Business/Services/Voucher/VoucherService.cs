@@ -148,12 +148,15 @@ namespace ApplicationCore.Services
                 foreach (var voucherParam in order.Vouchers) {
                     
                     foreach (var promotion in order.Promotions) {
-                        if (voucherParam.PromotionCode.Equals(promotion.PromotionCode)) { 
+                        if (voucherParam.PromotionCode.Equals(promotion.PromotionCode)) {
                             var voucherGroup = (await _voucherGroupService.
-                                GetAsync(filter: el => el.PromotionId.Equals(promotion.PromotionId),includeProperties: "Voucher")).Data.First();                            
-                            if(voucherGroup.Voucher.Select(el => el.VoucherCode.Equals(voucherParam.VoucherCode)).Distinct().Count() 
-                                < voucherGroup.Voucher.Select(el => el.VoucherCode.Equals(voucherParam.VoucherCode)).Count()){
-                                throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.Duplicate_VoucherCode, 
+                                GetAsync(filter: el => el.PromotionId.Equals(promotion.PromotionId),includeProperties: "Voucher")).Data.First();
+                            
+
+                            if (voucherGroup.Voucher.Where(el => el.VoucherCode.Equals(voucherParam.VoucherCode)).Distinct().Count()
+                            < voucherGroup.Voucher.Where(w => w.VoucherCode.Equals(voucherParam.VoucherCode)).Count())
+                            {
+                                throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.Duplicate_VoucherCode,
                                     description: AppConstant.ErrMessage.Duplicate_VoucherCode);
                             }
                             var vouchers = voucherGroup.Voucher.Where(w => w.VoucherCode.Equals(voucherParam.VoucherCode)).First();
@@ -165,6 +168,8 @@ namespace ApplicationCore.Services
                                 await UpdateVoucherGroup(voucherGroup);
                                 await UpdateVoucher(vouchers, order);
                             }
+                            result.Add(vouchers);
+                            return result;
                         }
 
 
@@ -186,13 +191,13 @@ namespace ApplicationCore.Services
             if (order.Customer != null) {
                 var memInfor = order.Customer;
                 MembershipDto membership = new MembershipDto();
-                membership.MembershipId = new Guid();
+                membership.MembershipId = Guid.NewGuid();
                 membership.InsDate = DateTime.Now;
                 membership.Fullname = memInfor.CustomerName;
                 membership.Email = memInfor.CustomerEmail;
-                membership.PhoneNumber = memInfor.CustomerPhoneNo;
-                voucher.MembershipId = membership.MembershipId;
-                await _membershipService.CreateAsync(membership);
+                membership.PhoneNumber = memInfor.CustomerPhoneNo;              
+                var result = await _membershipService.CreateAsync(membership);
+                voucher.MembershipId = result.MembershipId;
             }
             _repository.Update(voucher);
             await _unitOfWork.SaveAsync();
