@@ -16,6 +16,8 @@ namespace ApplicationCore.Services
         public Task<List<Promotion>> CheckVoucher(OrderResponseModel order);
 
         public Task<List<Voucher>> GetVouchersForChannel(PromotionChannelMapping voucherChannel, VoucherGroup voucherGroup, VoucherChannelParam channelParam);
+
+        public Task<List<Voucher>> UpdateVoucherApplied(OrderResponseModel order);
     }
 
 }
