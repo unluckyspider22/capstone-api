@@ -74,7 +74,7 @@ namespace PromotionEngineAPI.Controllers
               pageSize: param.PageSize,
               orderBy: el => el.OrderByDescending(b => b.InsDate),
               filter: HandlePromotionFilter(status, BrandId),
-              includeProperties: "PromotionStoreMapping,PromotionTier,VoucherChannel,VoucherGroup"));
+              includeProperties: "PromotionStoreMapping,PromotionTier,PromotionChannelMapping,VoucherGroup"));
 
             }
             catch (ErrorObj e)
@@ -157,7 +157,7 @@ namespace PromotionEngineAPI.Controllers
             try
             {
                 return Ok(await _promotionService.GetFirst(filter: el => el.PromotionId.Equals(id) && !el.DelFlg,
-                    includeProperties: "VoucherGroup,VoucherChannel,PromotionStoreMapping"));
+                    includeProperties: "VoucherGroup,PromotionChannelMapping,PromotionStoreMapping"));
             }
             catch (ErrorObj e)
             {

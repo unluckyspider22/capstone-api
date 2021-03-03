@@ -33,8 +33,8 @@ namespace PromotionEngineAPI.Controllers
                                pageIndex: param.PageIndex,
                                pageSize: param.PageSize,
                                filter: el => !el.DelFlg,
-                               orderBy: el => el.OrderByDescending(b => b.InsDate)
-                               );
+                               orderBy: el => el.OrderByDescending(b => b.InsDate),
+                               includeProperties: "Brand");
                 return Ok(result);
             }
             catch (ErrorObj e)
