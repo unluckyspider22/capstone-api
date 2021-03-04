@@ -47,8 +47,8 @@ namespace ApplicationCore.Chain
         {
             order.Discount ??= 0;
             order.DiscountOrderDetail ??= 0;
-            order.TotalAmount ??= 0;
-            order.FinalAmount ??= 0;
+            order.TotalAmount = order.OrderDetail.Amount;
+            order.FinalAmount = order.TotalAmount - order.Discount;
         }
     }
 }

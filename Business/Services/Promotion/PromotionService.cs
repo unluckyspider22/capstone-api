@@ -381,7 +381,7 @@ namespace ApplicationCore.Services
                 foreach (Promotion promotion in orderResponse.Promotions)
                 {
                     //Check promotion is active
-                    if (!promotion.IsActive) throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.InActive_Promotion, description: AppConstant.ErrMessage.InActive_Promotion);
+                    if (!promotion.Status.Equals(AppConstant.EnvVar.PromotionStatus.PUBLISH)) throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.InActive_Promotion, description: AppConstant.ErrMessage.InActive_Promotion);
                     //Check promotion is time 
                     if (promotion.StartDate >= orderResponse.OrderDetail.BookingDate)
                     {

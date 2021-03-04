@@ -22,7 +22,9 @@ namespace ApplicationCore.Chain
             foreach (var promotion in promotions)
             {
                 //Lấy những Tier có ID đc thỏa hết các điều kiện
-                var promotionTiers = promotion.PromotionTier.Where(el => el.PromotionTierId.Equals(order.PromotionTierIds.FirstOrDefault(w => w.Equals(el.PromotionTierId)))).ToList();
+                var promotionTiers = promotion.PromotionTier.Where(el =>
+                    el.PromotionTierId.Equals(order.PromotionTierIds.FirstOrDefault(w =>
+                        w.Equals(el.PromotionTierId)))).ToList();
 
                 var actions = FilterAction(promotionTiers.Select(el => el.Action).ToList());
                 if (actions.Count() > 0)
@@ -102,7 +104,7 @@ namespace ApplicationCore.Chain
             {
                 order.OrderAction = new List<OrderActionModel>();
             }
-            var promotionCodes = string.IsNullOrEmpty(promotion.PromotionCode) ? promotion.PromotionCode : "," + promotion.PromotionCode;
+            var promotionCodes = string.IsNullOrEmpty(promotion.PromotionCode) ? promotion.PromotionCode : promotion.PromotionCode;
 
             var voucherCode = promotion.VoucherGroup.Voucher
                 .Where(el =>
@@ -134,9 +136,7 @@ namespace ApplicationCore.Chain
                 return el;
             }).ToList();
         }
-
         #endregion
-
         #region Discount for item
         private void DiscountProduct(OrderResponseModel order, Infrastructure.Models.Action action)
         {
@@ -267,8 +267,8 @@ namespace ApplicationCore.Chain
         {
             order.TotalAmount = order.OrderDetail.Amount;
             order.DiscountOrderDetail = order.OrderDetail.OrderDetailResponses.Sum(s => s.Discount);
-            order.Discount = (decimal)order.OrderDetail.OrderDetailResponses.Sum(s => s.DiscountFromOrder)
-                + (decimal)order.DiscountOrderDetail;
+            order.Discount = Math.Ceiling((decimal)order.OrderDetail.OrderDetailResponses.Sum(s => s.DiscountFromOrder)
+                + (decimal)order.DiscountOrderDetail);
             order.FinalAmount = Math.Ceiling((decimal)(order.TotalAmount - order.Discount));
         }
     }

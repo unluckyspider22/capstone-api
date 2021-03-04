@@ -60,14 +60,14 @@ namespace ApplicationCore.Chain
         {                   
             if (!Common.CompareBinary(((int)(Math.Pow(2, (int)dayOfWeek))).ToString(), promotion.DayFilter))
             {
-                throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_DayInWeek);
+                throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_DayInWeek );
             }
         }
         public void HandleHour(Promotion promotion, int hourOfDay)
         {
             if (!Common.CompareBinary(((int)Math.Pow(2, hourOfDay)).ToString(), promotion.HourFilter))
             {
-                throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_HourFrame);
+                throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_HourFrame + " | hourOfDay: " + hourOfDay);
             }
         }
 
