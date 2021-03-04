@@ -37,8 +37,6 @@ namespace ApplicationCore.Services
         }
 
         protected override IGenericRepository<Promotion> _repository => _unitOfWork.PromotionRepository;
-
-
         #region CRUD promotion tier
         public async Task<PromotionTierParam> CreatePromotionTier(PromotionTierParam param)
         {
@@ -369,8 +367,6 @@ namespace ApplicationCore.Services
 
         }
         #endregion
-
-
         #region check voucher
         public async Task<OrderResponseModel> HandlePromotion(OrderResponseModel orderResponse)
         {
@@ -889,6 +885,99 @@ namespace ApplicationCore.Services
             }
         }
         #endregion
+        #region statistic
+        public async Task<PromotionStatusDto> CountPromotionStatus(Guid brandId)
+        {
+            if (brandId.Equals(Guid.Empty))
+            {
+                throw new ErrorObj(code: 400, message: AppConstant.StatisticMessage.BRAND_ID_INVALID, description: "Internal Server Error");
+            }
+            try
+            {
+                var result = new PromotionStatusDto()
+                {
+                    Total = await _repository.CountAsync(filter: o => o.BrandId.Equals(brandId)
+                                && !o.DelFlg),
+                    Draft = await _repository.CountAsync(filter: o => o.BrandId.Equals(brandId)
+                                && o.Status.Equals(AppConstant.EnvVar.PromotionStatus.DRAFT)
+                                && !o.DelFlg),
+                    Publish = await _repository.CountAsync(filter: o => o.BrandId.Equals(brandId)
+                                && o.Status.Equals(AppConstant.EnvVar.PromotionStatus.PUBLISH)
+                                && !o.DelFlg),
+                    Unpublish = await _repository.CountAsync(filter: o => o.BrandId.Equals(brandId)
+                                && o.Status.Equals(AppConstant.EnvVar.PromotionStatus.UNPUBLISH)
+                                && !o.DelFlg),
+                    Expired = await _repository.CountAsync(filter: o => o.BrandId.Equals(brandId)
+                                && o.Status.Equals(AppConstant.EnvVar.PromotionStatus.EXPIRED)
+                                && !o.DelFlg)
+                };
 
+                return result;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.StackTrace);
+                throw new ErrorObj(code: 500, message: AppConstant.StatisticMessage.PROMO_COUNT_ERR, description: "Internal Server Error");
+            }
+
+        }
+
+        public async Task<DistributionStat> DistributionStatistic(Guid promotionId)
+        {
+            IGenericRepository<PromotionStoreMapping> storeMappRepo = _unitOfWork.PromotionStoreMappingRepository;
+            IGenericRepository<PromotionChannelMapping> channelMappRepo = _unitOfWork.VoucherChannelRepository;
+            IGenericRepository<Voucher> voucherRepo = _unitOfWork.VoucherRepository;
+
+            var voucherGroupId = (await _repository.GetFirst(filter: o => o.PromotionId.Equals(promotionId),
+                includeProperties: "VoucherGroup"))
+                .VoucherGroup
+                .VoucherGroupId;
+
+            var result = new DistributionStat()
+            {
+                ChannelStat = new List<ChannelVoucherStat>(),
+                StoreStat = new List<StoreVoucherStat>()
+            };
+
+            var storeMapp = (await storeMappRepo.Get(filter: o => o.PromotionId.Equals(promotionId),
+                includeProperties: "Store"))
+                .ToList();
+
+            foreach (var mapp in storeMapp)
+            {
+                var store = mapp.Store;
+
+                var storeStat = new StoreVoucherStat()
+                {
+                    StoreId = store.StoreId,
+                    StoreName = store.StoreName,
+                    RedempVoucherCount = await voucherRepo.CountAsync(filter: o => o.StoreId.Equals(store.StoreId) && o.IsRedemped
+                    && o.VoucherGroupId.Equals(voucherGroupId)),
+                };
+                result.StoreStat.Add(storeStat);
+            }
+
+
+            var channelMapp = (await channelMappRepo.Get(filter: o => o.PromotionId.Equals(promotionId),
+                includeProperties: "Channel"))
+                .ToList();
+            foreach (var mapp in channelMapp)
+            {
+                var channel = mapp.Channel;
+
+                var channelStat = new ChannelVoucherStat()
+                {
+                    ChannelId = channel.ChannelId,
+                    ChannelName = channel.ChannelName,
+                    RedempVoucherCount = await voucherRepo.CountAsync(filter: o => o.StoreId.Equals(channel.ChannelId) && o.IsRedemped
+                    && o.VoucherGroupId.Equals(voucherGroupId)),
+                };
+                result.ChannelStat.Add(channelStat);
+            }
+
+
+            return result;
+        }
+        #endregion
     }
 }
