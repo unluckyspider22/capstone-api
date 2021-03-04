@@ -27,5 +27,7 @@ namespace ApplicationCore.Services
         public Task<String> GetPromotionCode(Guid promotionId);
 
         public Task UpdateRedempedQuantity(VoucherGroup voucherGroup, int RedempedQuantity);
+
+        public Task UpdateVoucherGroupForApplied(VoucherGroup voucherGroup);
     }
 }

@@ -28,12 +28,12 @@ namespace Infrastructure.Models
         public virtual DbSet<OrderCondition> OrderCondition { get; set; }
         public virtual DbSet<ProductCondition> ProductCondition { get; set; }
         public virtual DbSet<Promotion> Promotion { get; set; }
+        public virtual DbSet<PromotionChannelMapping> PromotionChannelMapping { get; set; }
         public virtual DbSet<PromotionStoreMapping> PromotionStoreMapping { get; set; }
         public virtual DbSet<PromotionTier> PromotionTier { get; set; }
-        public virtual DbSet<Role> Role { get; set; }
+        public virtual DbSet<RoleEntity> Role { get; set; }
         public virtual DbSet<Store> Store { get; set; }
         public virtual DbSet<Voucher> Voucher { get; set; }
-        public virtual DbSet<VoucherChannel> VoucherChannel { get; set; }
         public virtual DbSet<VoucherGroup> VoucherGroup { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -626,6 +626,32 @@ namespace Infrastructure.Models
                     .HasConstraintName("FK_Promotion_Brand");
             });
 
+            modelBuilder.Entity<PromotionChannelMapping>(entity =>
+            {
+                entity.HasKey(e => e.VoucherChannelId)
+                    .HasName("PK_VoucherChannel");
+
+                entity.Property(e => e.VoucherChannelId).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.InsDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.UpdDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.HasOne(d => d.Channel)
+                    .WithMany(p => p.PromotionChannelMapping)
+                    .HasForeignKey(d => d.ChannelId)
+                    .HasConstraintName("FK_VoucherChannel_Channel");
+
+                entity.HasOne(d => d.Promotion)
+                    .WithMany(p => p.PromotionChannelMapping)
+                    .HasForeignKey(d => d.PromotionId)
+                    .HasConstraintName("FK_VoucherChannel_Promotion");
+            });
+
             modelBuilder.Entity<PromotionStoreMapping>(entity =>
             {
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
@@ -680,7 +706,7 @@ namespace Infrastructure.Models
                     .HasConstraintName("FK_PromotionTier_Promotion");
             });
 
-            modelBuilder.Entity<Role>(entity =>
+            modelBuilder.Entity<RoleEntity>(entity =>
             {
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
@@ -744,48 +770,20 @@ namespace Infrastructure.Models
 
                 entity.Property(e => e.UsedDate).HasColumnType("datetime");
 
+                entity.HasOne(d => d.Channel)
+                    .WithMany(p => p.Voucher)
+                    .HasForeignKey(d => d.ChannelId)
+                    .HasConstraintName("FK_Voucher_Channel");
+
                 entity.HasOne(d => d.Membership)
                     .WithMany(p => p.Voucher)
                     .HasForeignKey(d => d.MembershipId)
                     .HasConstraintName("FK_Voucher_Membership");
 
-                entity.HasOne(d => d.VoucherChannel)
-                    .WithMany(p => p.Voucher)
-                    .HasForeignKey(d => d.VoucherChannelId)
-                    .HasConstraintName("FK_Voucher_VoucherChannel1");
-
                 entity.HasOne(d => d.VoucherGroup)
                     .WithMany(p => p.Voucher)
                     .HasForeignKey(d => d.VoucherGroupId)
                     .HasConstraintName("FK_Voucher_VoucherGroup");
-            });
-
-            modelBuilder.Entity<VoucherChannel>(entity =>
-            {
-                entity.Property(e => e.VoucherChannelId).HasDefaultValueSql("(newid())");
-
-                entity.Property(e => e.InsDate)
-                    .HasColumnType("datetime")
-                    .HasDefaultValueSql("(getdate())");
-
-                entity.Property(e => e.UpdDate)
-                    .HasColumnType("datetime")
-                    .HasDefaultValueSql("(getdate())");
-
-                entity.HasOne(d => d.Channel)
-                    .WithMany(p => p.VoucherChannel)
-                    .HasForeignKey(d => d.ChannelId)
-                    .HasConstraintName("FK_VoucherChannel_Channel");
-
-                entity.HasOne(d => d.Promotion)
-                    .WithMany(p => p.VoucherChannel)
-                    .HasForeignKey(d => d.PromotionId)
-                    .HasConstraintName("FK_VoucherChannel_Promotion");
-
-                entity.HasOne(d => d.VoucherGroup)
-                    .WithMany(p => p.VoucherChannel)
-                    .HasForeignKey(d => d.VoucherGroupId)
-                    .HasConstraintName("FK_VoucherChannel_VoucherGroup");
             });
 
             modelBuilder.Entity<VoucherGroup>(entity =>

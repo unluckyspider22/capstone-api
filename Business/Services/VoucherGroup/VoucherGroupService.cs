@@ -159,8 +159,9 @@ namespace ApplicationCore.Services
                     {
                         flag = false;
                         voucherInGroup = voucherGroup.Voucher.ElementAt(order);
-                        if (voucherInGroup.IsActive.Equals(AppConstant.ACTIVE)
-                            && voucherInGroup.IsRedemped.Equals(AppConstant.UNREDEMPED)) flag = true;
+                        if (
+                          //voucherInGroup.IsActive.Equals(AppConstant.ACTIVE)  && 
+                          voucherInGroup.IsRedemped.Equals(AppConstant.UNREDEMPED)) flag = true;
                         order++;
                     } while (flag != true);
                     //nếu lấy được voucher thì cập nhật lại IsRedemped là 1 (đã được phát đi)
@@ -333,6 +334,15 @@ namespace ApplicationCore.Services
                 throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
             
+        }
+
+        public async Task UpdateVoucherGroupForApplied(VoucherGroup voucherGroup)
+        {
+            if(voucherGroup != null)
+            {         
+                _repository.Update(voucherGroup);
+                await _unitOfWork.SaveAsync();
+            }
         }
     }
 }

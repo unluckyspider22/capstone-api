@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ApplicationCore.Services
 {
-   public interface IVoucherChannelService : IBaseService<VoucherChannel, VoucherChannelDto>
+   public interface IVoucherChannelService : IBaseService<PromotionChannelMapping, VoucherChannelDto>
     {
         
     }

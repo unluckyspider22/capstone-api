@@ -18,38 +18,41 @@ namespace ApplicationCore.Services
 {
     public class VoucherService : BaseService<Voucher, VoucherDto>, IVoucherService
     {
-        public VoucherService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
+        IVoucherGroupService _voucherGroupService;
+        IMembershipService _membershipService;
+        public VoucherService(IUnitOfWork unitOfWork, IMapper mapper,IVoucherGroupService voucherGroupService,IMembershipService membershipService) : base(unitOfWork, mapper)
         {
-
+            _voucherGroupService = voucherGroupService;
+            _membershipService = membershipService;
         }
 
         protected override IGenericRepository<Voucher> _repository => _unitOfWork.VoucherRepository;
 
-        public async Task<int> ActiveAllVoucherInGroup(VoucherGroupDto Dto)
-        {
-            try
-            {
-                int result = 0;
-                var listVoucher = await _repository.Get(filter: el => el.IsActive.Equals("0") || !el.IsActive
-                && el.VoucherGroupId.Equals(Dto.VoucherGroupId));
-                foreach (Voucher voucher in listVoucher.ToList())
-                {
-                    voucher.UpdDate = DateTime.Now;
-                    voucher.IsActive = true;
-                    _repository.Update(voucher);
-                    await _unitOfWork.SaveAsync();
-                    result++;
-                }
-                return result;
-            }
-            catch (Exception e)
-            {
+        //public async Task<int> ActiveAllVoucherInGroup(VoucherGroupDto Dto)
+        //{
+        //    try
+        //    {
+        //        int result = 0;
+        //        var listVoucher = await _repository.Get(filter: el => el.IsActive.Equals("0") || !el.IsActive
+        //        && el.VoucherGroupId.Equals(Dto.VoucherGroupId));
+        //        foreach (Voucher voucher in listVoucher.ToList())
+        //        {
+        //            voucher.UpdDate = DateTime.Now;
+        //            voucher.IsActive = true;
+        //            _repository.Update(voucher);
+        //            await _unitOfWork.SaveAsync();
+        //            result++;
+        //        }
+        //        return result;
+        //    }
+        //    catch (Exception e)
+        //    {
 
-                Debug.WriteLine("\n\nError at activeAllVoucherInGroup: \n" + e.Message);
-                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.", description: "Internal Server Error");
-            }
+        //        Debug.WriteLine("\n\nError at activeAllVoucherInGroup: \n" + e.Message);
+        //        throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.", description: "Internal Server Error");
+        //    }
 
-        }
+        //}
 
         public async Task<List<Promotion>> CheckVoucher(OrderResponseModel order)
         {
@@ -64,8 +67,7 @@ namespace ApplicationCore.Services
                 foreach (VoucherResponseModel voucherModel in vouchers)
                 {
                     // throw new ErrorObj(code: 400, message:"voucherCode: " + voucherModel.VoucherCode + ", promotionCode: " + voucherModel.PromotionCode, description: AppConstant.ErrMessage.Invalid_VoucherCode);
-                    var voucher = await _repository.Get(filter: el => el.IsActive
-                    && el.VoucherCode.Equals(voucherModel.VoucherCode)
+                    var voucher = await _repository.Get(filter: el => el.VoucherCode.Equals(voucherModel.VoucherCode)
                     && el.VoucherGroup.Promotion.PromotionCode.Equals(voucherModel.PromotionCode)
                     && !el.IsUsed,
                     includeProperties:
@@ -102,7 +104,7 @@ namespace ApplicationCore.Services
 
         }
 
-        public async Task<List<Voucher>> GetVouchersForChannel(VoucherChannel voucherChannel,VoucherGroup voucherGroup, VoucherChannelParam channelParam)
+        public async Task<List<Voucher>> GetVouchersForChannel(PromotionChannelMapping voucherChannel,VoucherGroup voucherGroup, VoucherChannelParam channelParam)
         {
 
             int remainVoucher = (int)(voucherGroup.Quantity - voucherGroup.RedempedQuantity);
@@ -131,12 +133,74 @@ namespace ApplicationCore.Services
                     var now = DateTime.Now;
                     voucher.RedempedDate = now;
                     voucher.UpdDate = now;
-                    voucher.VoucherChannel = voucherChannel;
+                    voucher.ChannelId = voucherChannel.ChannelId;
                     _repository.Update(voucher);
                 }
                 await _unitOfWork.SaveAsync();
             }
             return vouchers.ToList();
+        }
+
+        public async Task<List<Voucher>> UpdateVoucherApplied(OrderResponseModel order)
+        {
+            List<Voucher> result = new List<Voucher>();
+            if (order != null) {
+                foreach (var voucherParam in order.Vouchers) {
+                    
+                    foreach (var promotion in order.Promotions) {
+                        if (voucherParam.PromotionCode.Equals(promotion.PromotionCode)) {
+                            var voucherGroup = (await _voucherGroupService.
+                                GetAsync(filter: el => el.PromotionId.Equals(promotion.PromotionId),includeProperties: "Voucher")).Data.First();
+                            
+
+                            if (voucherGroup.Voucher.Where(el => el.VoucherCode.Equals(voucherParam.VoucherCode)).Distinct().Count()
+                            < voucherGroup.Voucher.Where(w => w.VoucherCode.Equals(voucherParam.VoucherCode)).Count())
+                            {
+                                throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.Duplicate_VoucherCode,
+                                    description: AppConstant.ErrMessage.Duplicate_VoucherCode);
+                            }
+                            var vouchers = voucherGroup.Voucher.Where(w => w.VoucherCode.Equals(voucherParam.VoucherCode)).First();
+                            if (voucherGroup.VoucherType.Equals(AppConstant.EnvVar.VoucherType.STANDALONE_CODE))
+                            {
+                                await UpdateVoucherGroup(voucherGroup);
+                            }
+                            else {
+                                await UpdateVoucherGroup(voucherGroup);
+                                await UpdateVoucher(vouchers, order);
+                            }
+                            result.Add(vouchers);
+                            return result;
+                        }
+
+
+                    }
+                }
+            }
+            return null;
+        }
+        private async Task UpdateVoucherGroup(VoucherGroup voucherGroup) {
+            voucherGroup.UpdDate = DateTime.Now;
+            voucherGroup.UsedQuantity += 1;
+            await _voucherGroupService.UpdateVoucherGroupForApplied(voucherGroup);
+        }
+        private async Task UpdateVoucher(Voucher voucher,OrderResponseModel order)
+        {
+            voucher.UpdDate = DateTime.Now;
+            voucher.UsedDate = DateTime.Now;
+            voucher.IsUsed = AppConstant.EnvVar.Voucher.USED;
+            if (order.Customer != null) {
+                var memInfor = order.Customer;
+                MembershipDto membership = new MembershipDto();
+                membership.MembershipId = Guid.NewGuid();
+                membership.InsDate = DateTime.Now;
+                membership.Fullname = memInfor.CustomerName;
+                membership.Email = memInfor.CustomerEmail;
+                membership.PhoneNumber = memInfor.CustomerPhoneNo;              
+                var result = await _membershipService.CreateAsync(membership);
+                voucher.MembershipId = result.MembershipId;
+            }
+            _repository.Update(voucher);
+            await _unitOfWork.SaveAsync();
         }
     }
 }

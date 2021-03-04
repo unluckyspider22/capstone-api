@@ -16,5 +16,6 @@ namespace ApplicationCore.Services
         public Task<List<PromotionInfomation>> GetPromotionsForChannel(VoucherChannelParam channelParam);
 
         public Task<List<GroupChannelOfPromotion>> GetChannelOfPromotion(Guid promotionId, Guid brandId);
+        public Task<List<GroupChannelOfPromotion>> UpdateChannelOfPromotion(UpdateChannelOfPromotion dto);
     }
 }

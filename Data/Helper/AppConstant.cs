@@ -17,6 +17,7 @@ namespace Infrastructure.Helper
         public const string ACTIVE = "1";
         public const string UNREDEMPED = "0";
         public const string UNUSED = "0";
+        public const string USED = "1";
         public struct Status
         {
             public const string ALL = "0";
@@ -91,6 +92,11 @@ namespace Infrastructure.Helper
             {
                 public const string BULK_CODE = "1";
                 public const string STANDALONE_CODE = "2";
+            }
+            public struct Voucher
+            {
+                public const bool USED = true;
+                public const bool UNUSED = false;
             }
             public struct PromotionType
             {

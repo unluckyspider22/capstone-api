@@ -7,7 +7,8 @@ namespace Infrastructure.Models
     {
         public Channel()
         {
-            VoucherChannel = new HashSet<VoucherChannel>();
+            PromotionChannelMapping = new HashSet<PromotionChannelMapping>();
+            Voucher = new HashSet<Voucher>();
         }
 
         public Guid ChannelId { get; set; }
@@ -20,6 +21,7 @@ namespace Infrastructure.Models
         public decimal? Group { get; set; }
 
         public virtual Brand Brand { get; set; }
-        public virtual ICollection<VoucherChannel> VoucherChannel { get; set; }
+        public virtual ICollection<PromotionChannelMapping> PromotionChannelMapping { get; set; }
+        public virtual ICollection<Voucher> Voucher { get; set; }
     }
 }

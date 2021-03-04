@@ -62,7 +62,7 @@ namespace Infrastructure.UnitOrWork
 
 
         //VoucherChannel
-        public IGenericRepository<VoucherChannel> VoucherChannelRepository { get; set; }
+        public IGenericRepository<PromotionChannelMapping> VoucherChannelRepository { get; set; }
 
 
         //VoucherGroup
@@ -110,7 +110,7 @@ namespace Infrastructure.UnitOrWork
             //Voucher
             VoucherRepository = new GenericRepository<Voucher>(_context);
             //VoucherChannel
-            VoucherChannelRepository = new GenericRepository<VoucherChannel>(_context);
+            VoucherChannelRepository = new GenericRepository<PromotionChannelMapping>(_context);
             //VoucherGroup
             VoucherGroupRepository = new GenericRepository<VoucherGroup>(_context);
             // Condition Group

@@ -19,4 +19,11 @@ namespace Infrastructure.DTOs
         public List<StoreOfPromotion> Stores { get; set; }
         public decimal? Group { get; set; }
     }
+
+    public class UpdateStoreOfPromotion
+    {
+        public List<Guid> ListStoreId { get; set; }
+        public Guid PromotionId { get; set; }
+        public Guid BrandId { get; set; }
+    }
 }

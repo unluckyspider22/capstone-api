@@ -27,7 +27,7 @@ namespace PromotionEngineAPI.Controllers
         // api/VoucherChannels?pageIndex=...&pageSize=...
         public async Task<IActionResult> GetVoucherChannel([FromQuery] PagingRequestParam param)
         {
-            var result = await _service.GetAsync(pageIndex: param.PageIndex, pageSize: param.PageSize, filter: el => !el.DelFlg);
+            var result = await _service.GetAsync(pageIndex: param.PageIndex, pageSize: param.PageSize);
             if (result == null)
             {
                 return NotFound();
@@ -40,7 +40,7 @@ namespace PromotionEngineAPI.Controllers
         [Route("count")]
         public async Task<IActionResult> CountVoucherChannel()
         {
-            return Ok(await _service.CountAsync(el => !el.DelFlg));
+            return Ok(await _service.CountAsync());
         }
 
         // GET: api/VoucherChannels/5
