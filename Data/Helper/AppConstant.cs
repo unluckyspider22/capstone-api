@@ -97,6 +97,8 @@ namespace Infrastructure.Helper
             {
                 public const bool USED = true;
                 public const bool UNUSED = false;
+                public const bool REDEEMPED = true;
+                public const bool UNREDEEM = false;
             }
             public struct PromotionType
             {

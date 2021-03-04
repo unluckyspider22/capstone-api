@@ -18,6 +18,8 @@ namespace ApplicationCore.Services
         public Task<List<Voucher>> GetVouchersForChannel(PromotionChannelMapping voucherChannel, VoucherGroup voucherGroup, VoucherChannelParam channelParam);
 
         public Task<List<Voucher>> UpdateVoucherApplied(OrderResponseModel order);
+
+        public Task UpdateVoucherRedeemed(Voucher voucher);
     }
 
 }

@@ -202,6 +202,12 @@ namespace ApplicationCore.Services
             _repository.Update(voucher);
             await _unitOfWork.SaveAsync();
         }
+
+        public async Task UpdateVoucherRedeemed(Voucher voucher)
+        {
+             _repository.Update(voucher);
+            await _unitOfWork.SaveAsync();       
+        }
     }
 }
 
