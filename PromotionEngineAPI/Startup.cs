@@ -54,12 +54,10 @@ namespace PromotionEngineAPI
                     options.SaveToken = true;
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
+                        
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
                         ValidateIssuerSigningKey = true,
-                        ValidIssuer = Configuration["AppSettings:Issuer"],
-                        ValidAudience = Configuration["AppSettings:Issuer"],
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["AppSettings:SecretKey"]))
                     };
                 });
@@ -164,6 +162,7 @@ namespace PromotionEngineAPI
                 app.UseDeveloperExceptionPage();
             }
             app.UseAuthentication();
+            app.UseAuthorization();
             app.UseHttpsRedirection();
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.

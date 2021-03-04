@@ -1,6 +1,7 @@
 ﻿using Infrastructure.DTOs;
 using Infrastructure.DTOs.Account;
 using Infrastructure.Helper;
+using Infrastructure.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -42,7 +43,7 @@ namespace ApplicationCore.Services
                     {
                         BrandCode = account.Brand.BrandCode,
                         BrandId = account.Brand.BrandId,
-                        Token = GenerateJSONWebToken(userInfo)
+                        Token = GenerateJSONWebToken(account)
                     };
 
                     status = (int)HttpStatusCode.OK;
@@ -59,23 +60,38 @@ namespace ApplicationCore.Services
             }
             return result;
         }
-        private string GenerateJSONWebToken(UserModel userInfo)
+        private string GenerateJSONWebToken(Account account)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["AppSettings:SecretKey"]));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            var securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_config["AppSettings:SecretKey"]));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
             var claims = new[]
             {
-                    new Claim(JwtRegisteredClaimNames.Sub, userInfo.UserName),
-                    new Claim("Role", userInfo.Role.ToString())
+                    new Claim(ClaimTypes.Name, account.Username),
+                    new Claim(ClaimTypes.Role, account.Role.Name)
             };
 
-            var token = new JwtSecurityToken(_config["AppSettings:Issuer"],
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Name, account.Username),
+                    new Claim(ClaimTypes.Role, account.Role.Name)
+                }),
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = credentials
+            };
+            var tok = tokenHandler.CreateToken(tokenDescriptor);
+            var toke = tokenHandler.WriteToken(tok);
+
+            /*var token = new JwtSecurityToken(_config["AppSettings:Issuer"],
               _config["AppSettings:Issuer"],
               claims,
               expires: DateTime.Now.AddMinutes(120),
-              signingCredentials: credentials);
+              signingCredentials: credentials);*/
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            /*return new JwtSecurityTokenHandler().WriteToken(token);*/
+            return toke;
         }
 
 

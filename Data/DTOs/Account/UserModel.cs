@@ -14,6 +14,6 @@ namespace Infrastructure.DTOs
         [Required]
         public string Password { get; set; }
 
-        public int? Role { get; set; }
+        public string RoleName { get; set; }
     }
 }
