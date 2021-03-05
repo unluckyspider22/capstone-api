@@ -97,14 +97,9 @@ namespace PromotionEngineAPI.Controllers
         {
             try
             {
-                var result = await _service.GetVoucherForCustomer(dto);
-                if(result != null)
-                {
-                    dto.RedempedQuantity += 1;
-                    dto.UpdDate = DateTime.Now; 
-                    await _voucherGroupService.UpdateAsync(dto);
-                }
-                return Ok();
+                 
+             
+                return Ok(await _service.GetVoucherForCustomer(dto));
             }
             catch (ErrorObj e)
             {

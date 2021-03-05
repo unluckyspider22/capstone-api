@@ -27,7 +27,7 @@ namespace ApplicationCore.Services
         }
 
         protected override IGenericRepository<Voucher> _repository => _unitOfWork.VoucherRepository;
-
+        protected IGenericRepository<VoucherGroup> _voucherGroupRepos => _unitOfWork.VoucherGroupRepository;
         public async Task<List<Promotion>> CheckVoucher(OrderResponseModel order)
         {
             try
@@ -194,8 +194,8 @@ namespace ApplicationCore.Services
             {
                 if (voucherGroupDto != null)
                 {
-                    var entity = _mapper.Map<VoucherGroup>(voucherGroupDto);
-                    var vouchers = await _repository.Get(filter: el => el.VoucherGroupId.Equals(entity.VoucherGroupId)
+                    //var entity = _mapper.Map<VoucherGroup>(voucherGroupDto);
+                    var vouchers = await _repository.Get(filter: el => el.VoucherGroupId.Equals(voucherGroupDto.VoucherGroupId)
                     && el.IsRedemped == AppConstant.EnvVar.Voucher.UNREDEEM, includeProperties: "VoucherGroup.Promotion");
                     var voucher = vouchers.ToList().First();
                     voucher.IsRedemped = AppConstant.EnvVar.Voucher.REDEEMPED;
@@ -203,6 +203,11 @@ namespace ApplicationCore.Services
                     _repository.Update(voucher);
                     await _unitOfWork.SaveAsync();
                     //await UpdateVoucherGroupAfterRedeemed(entity);
+                    var entity = voucher.VoucherGroup;
+                    entity.RedempedQuantity += 1;
+                    entity.UpdDate = DateTime.Now;
+                    _voucherGroupRepos.Update(entity);
+                    await _unitOfWork.SaveAsync();
                     var promoCode = voucher.VoucherGroup.Promotion.PromotionCode;
                     var description = voucher.VoucherGroup.Promotion.Description;               
                     return new VoucherParamResponse(voucherGroupId: entity.VoucherGroupId, voucherGroupName: entity.VoucherName,
@@ -216,10 +221,7 @@ namespace ApplicationCore.Services
                 throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
         }
-        public async Task UpdateVoucherGroupAfterRedeemed(VoucherGroupDto voucherGroupDto) {
-            var entity = _mapper.Map<VoucherGroup>(voucherGroupDto);
-            await _voucherGroupService.UpdateRedempedQuantity(entity, 1);
-        }
+        
     }
 }
 
