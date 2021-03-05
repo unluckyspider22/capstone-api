@@ -17,10 +17,9 @@ namespace ApplicationCore.Services
 {
     public class VoucherGroupService : BaseService<VoucherGroup, VoucherGroupDto>, IVoucherGroupService
     {
-        IVoucherService _voucherService;
-        public VoucherGroupService(IUnitOfWork unitOfWork, IMapper mapper,IVoucherService voucherService) : base(unitOfWork, mapper)
+        public VoucherGroupService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
         {
-            _voucherService = voucherService;
+            
         }
 
         protected override IGenericRepository<VoucherGroup> _repository => _unitOfWork.VoucherGroupRepository;
@@ -106,16 +105,15 @@ namespace ApplicationCore.Services
             return result;
         }
 
-        public async Task<IEnumerable<VoucherParamResponse>> GetVoucherForGame(int PageIndex = 0, int PageSize = 0, 
+        public async Task<IEnumerable<VoucherGroup>> GetVoucherGroupForGame(int PageIndex = 0, int PageSize = 0, 
             string BrandCode = null, string StoreCode = null)
         {
             try
             {              
-                 var listVoucherGroup = await _repository.Get(pageIndex: PageIndex, pageSize: PageSize, includeProperties: "Voucher,Promotion"
+                 var listVoucherGroup = await _repository.Get(pageIndex: PageIndex, pageSize: PageSize
                     , filter: (el => !el.DelFlg
                     && el.VoucherType.Equals(AppConstant.EnvVar.VoucherType.BULK_CODE)
                      && el.IsActive
-                     && el.UsedQuantity < el.Quantity
                      && el.RedempedQuantity < el.Quantity
                      && !el.Promotion.PromotionType.Equals(AppConstant.EnvVar.PromotionType.PROMOTION)
                      && el.Promotion.IsActive
@@ -126,54 +124,9 @@ namespace ApplicationCore.Services
                          //điều kiện tùy chọn để lấy voucher cho game (Brand)
                          && el.Promotion.Brand.BrandCode.Equals(BrandCode)
                     //điều kiện tùy chọn để lấy voucher cho game (Store)
-                    && el.Promotion.PromotionStoreMapping.Any(x => x.Store.StoreCode.Equals(StoreCode))
-                    )
-                                        );
-                List<VoucherParamResponse> result = new List<VoucherParamResponse>();
-                foreach (VoucherGroup voucherGroup in listVoucherGroup.ToList())
-                {
-                    
-                    var voucherInGroup = voucherGroup.Voucher.Where(s => s.IsUsed == AppConstant.EnvVar.Voucher.UNUSED 
-                    && s.IsRedemped == AppConstant.EnvVar.Voucher.UNREDEEM).First();
-                    //int order = 0;
-                    //Voucher voucherInGroup = voucherGroup.Voucher.ElementAt(0);
-                    ////Debug.WriteLine("\n" + "voucherrrrr  " + voucherInGroup.VoucherCode.ToString());
-                    //// đến khi gặp được voucher thỏa điều kiện là isActive/isUsed/isRedemped/DelFlg
-
-                    //bool flag;
-                    //do
-                    //{
-                    //    flag = false;
-                    //    voucherInGroup = voucherGroup.Voucher.ElementAt(order);
-                    //    if (
-                    //      //voucherInGroup.IsActive.Equals(AppConstant.ACTIVE)  && 
-                    //      voucherInGroup.IsRedemped.Equals(AppConstant.UNREDEMPED)) flag = true;
-                    //    order++;
-                    //} while (flag != true);
-                    //nếu lấy được voucher thì cập nhật lại IsRedemped là 1 (đã được phát đi)
-                    voucherInGroup.IsRedemped = AppConstant.EnvVar.Voucher.REDEEMPED;
-                    voucherInGroup.RedempedDate = DateTime.Now;
-                    voucherInGroup.UpdDate = DateTime.Now;
-                    //_repositoryVoucher.Update(voucherInGroup);
-                    //await _unitOfWork.SaveAsync();
-                    await _voucherService.UpdateVoucherRedeemed(voucherInGroup);
-                    //cập nhập lại số lượng đã redeemped trên Voucher Group
-                    voucherGroup.UpdDate = DateTime.Now;
-                    voucherGroup.RedempedQuantity = voucherGroup.RedempedQuantity + 1;
-                    _repository.Update(voucherGroup);
-                    await _unitOfWork.SaveAsync();
-                    Debug.WriteLine("\n" + "voucherrrrr  " + voucherGroup.Voucher.Count);
-                    //thêm voucher vào list result, list này để cho game
-                    VoucherParamResponse uiuiu = new VoucherParamResponse(
-                             voucherGroupId: voucherGroup.VoucherGroupId,
-                             voucherGroupName: voucherGroup.VoucherName,
-                             voucherId: voucherInGroup.VoucherId,
-                             //voucherInGroup.VoucherId,
-                             code:voucherGroup.Promotion.PromotionCode + voucherInGroup.VoucherCode);
-                    result.Add(uiuiu);
-                    //voucherInGroup.VoucherCode));
-                }
-                return result;
+                    && el.Promotion.PromotionStoreMapping.Any(x => x.Store.StoreCode.Equals(StoreCode))));
+                
+                return listVoucherGroup;
             }
             catch (Exception e)
             {
@@ -318,6 +271,7 @@ namespace ApplicationCore.Services
                 }
             } catch(Exception e)
             {
+                Debug.WriteLine("aaaa " + e.Message);
                 throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
             
@@ -325,11 +279,20 @@ namespace ApplicationCore.Services
 
         public async Task UpdateVoucherGroupForApplied(VoucherGroup voucherGroup)
         {
-            if(voucherGroup != null)
-            {         
-                _repository.Update(voucherGroup);
-                await _unitOfWork.SaveAsync();
+            try
+            {
+                if (voucherGroup != null)
+                {
+                    _repository.Update(voucherGroup);
+                    await _unitOfWork.SaveAsync();
+                }
             }
+            catch (Exception e)
+            {
+
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
+            }
+            
         }
     }
 }

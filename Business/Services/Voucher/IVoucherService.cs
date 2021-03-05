@@ -11,7 +11,7 @@ namespace ApplicationCore.Services
 {
     public interface IVoucherService : IBaseService<Voucher, VoucherDto>
     {
-        //public Task<int> ActiveAllVoucherInGroup(VoucherGroupDto Dto);
+        
 
         public Task<List<Promotion>> CheckVoucher(OrderResponseModel order);
 
@@ -19,7 +19,8 @@ namespace ApplicationCore.Services
 
         public Task<List<Voucher>> UpdateVoucherApplied(OrderResponseModel order);
 
-        public Task UpdateVoucherRedeemed(Voucher voucher);
+        public Task<VoucherParamResponse> GetVoucherForCustomer(VoucherGroupDto voucherGroupDto);
+
     }
 
 }
