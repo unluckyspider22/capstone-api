@@ -111,7 +111,8 @@ namespace Infrastructure.Helper
             {
                 public const string DRAFT = "1";
                 public const string PUBLISH = "2";
-                public const string EXPIRED = "3";
+                public const string UNPUBLISH = "3";
+                public const string EXPIRED = "4";
             }
 
             public struct Exclusive
@@ -202,5 +203,13 @@ namespace Infrastructure.Helper
                 public const string DELETE_VOUCHERS = "DELETE_VOUCHERS";
             }
         }
+
+        #region Statistic error message
+        public struct StatisticMessage
+        {
+            public const string PROMO_COUNT_ERR = "Promotion statistic error, please try again.";
+            public const string BRAND_ID_INVALID = "Brand invalid, please try again.";
+        }
+        #endregion
     }
 }

@@ -8,6 +8,7 @@ namespace Infrastructure.Models
         public Store()
         {
             PromotionStoreMapping = new HashSet<PromotionStoreMapping>();
+            Voucher = new HashSet<Voucher>();
         }
 
         public Guid StoreId { get; set; }
@@ -21,5 +22,6 @@ namespace Infrastructure.Models
 
         public virtual Brand Brand { get; set; }
         public virtual ICollection<PromotionStoreMapping> PromotionStoreMapping { get; set; }
+        public virtual ICollection<Voucher> Voucher { get; set; }
     }
 }

@@ -19,5 +19,7 @@ namespace ApplicationCore.Services
         Task<PromotionTierUpdateParam> UpdatePromotionTier(PromotionTierUpdateParam updateParam);
         Task<PromotionDto> UpdatePromotion(PromotionDto dto);
 
+        Task<PromotionStatusDto> CountPromotionStatus(Guid brandId);
+        Task<DistributionStat> DistributionStatistic(Guid promotionId);
     }
 }

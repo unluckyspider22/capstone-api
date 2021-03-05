@@ -780,6 +780,11 @@ namespace Infrastructure.Models
                     .HasForeignKey(d => d.MembershipId)
                     .HasConstraintName("FK_Voucher_Membership");
 
+                entity.HasOne(d => d.Store)
+                    .WithMany(p => p.Voucher)
+                    .HasForeignKey(d => d.StoreId)
+                    .HasConstraintName("FK_Voucher_Store");
+
                 entity.HasOne(d => d.VoucherGroup)
                     .WithMany(p => p.Voucher)
                     .HasForeignKey(d => d.VoucherGroupId)
