@@ -14,15 +14,30 @@ namespace Infrastructure.DTOs
         public int Expired { get; set; } = 0;
     }
 
-    public class DistributionStat {
-        public List<ChannelVoucherStat> ChannelStat { get; set; }
-        public List<StoreVoucherStat> StoreStat { get; set; }
+    public class DistributionStat
+    {
+        public List<GroupChannel> ChannelStat { get; set; }
+        public List<GroupStore> StoreStat { get; set; }
     }
+
+    public class GroupChannel
+    {
+        public int GroupNo { get; set; }
+        public List<ChannelVoucherStat> Channels { get; set; }
+    }
+
+    public class GroupStore
+    {
+        public int GroupNo { get; set; }
+        public List<StoreVoucherStat> Stores { get; set; }
+    }
+
     public class ChannelVoucherStat
     {
         public Guid ChannelId { get; set; }
         public string ChannelName { get; set; }
         public int RedempVoucherCount { get; set; } = 0;
+        public int GroupNo { get; set; }
     }
 
     public class StoreVoucherStat
@@ -30,5 +45,6 @@ namespace Infrastructure.DTOs
         public Guid StoreId { get; set; }
         public string StoreName { get; set; }
         public int RedempVoucherCount { get; set; } = 0;
+        public int GroupNo { get; set; }
     }
 }

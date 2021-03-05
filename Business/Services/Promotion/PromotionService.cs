@@ -924,59 +924,90 @@ namespace ApplicationCore.Services
 
         public async Task<DistributionStat> DistributionStatistic(Guid promotionId)
         {
-            IGenericRepository<PromotionStoreMapping> storeMappRepo = _unitOfWork.PromotionStoreMappingRepository;
-            IGenericRepository<PromotionChannelMapping> channelMappRepo = _unitOfWork.VoucherChannelRepository;
-            IGenericRepository<Voucher> voucherRepo = _unitOfWork.VoucherRepository;
 
-            var voucherGroupId = (await _repository.GetFirst(filter: o => o.PromotionId.Equals(promotionId),
-                includeProperties: "VoucherGroup"))
-                .VoucherGroup
-                .VoucherGroupId;
-
-            var result = new DistributionStat()
+            try
             {
-                ChannelStat = new List<ChannelVoucherStat>(),
-                StoreStat = new List<StoreVoucherStat>()
-            };
+                IGenericRepository<PromotionStoreMapping> storeMappRepo = _unitOfWork.PromotionStoreMappingRepository;
+                IGenericRepository<PromotionChannelMapping> channelMappRepo = _unitOfWork.VoucherChannelRepository;
+                IGenericRepository<Store> storeRepo = _unitOfWork.StoreRepository;
+                IGenericRepository<Channel> channelRepo = _unitOfWork.ChannelRepository;
+                IGenericRepository<Voucher> voucherRepo = _unitOfWork.VoucherRepository;
 
-            var storeMapp = (await storeMappRepo.Get(filter: o => o.PromotionId.Equals(promotionId),
-                includeProperties: "Store"))
-                .ToList();
+                var voucherGroupId = (await _repository.GetFirst(filter: o => o.PromotionId.Equals(promotionId),
+                    includeProperties: "VoucherGroup"))
+                    .VoucherGroup
+                    .VoucherGroupId;
 
-            foreach (var mapp in storeMapp)
-            {
-                var store = mapp.Store;
-
-                var storeStat = new StoreVoucherStat()
+                var result = new DistributionStat()
                 {
-                    StoreId = store.StoreId,
-                    StoreName = store.StoreName,
-                    RedempVoucherCount = await voucherRepo.CountAsync(filter: o => o.StoreId.Equals(store.StoreId) && o.IsRedemped
-                    && o.VoucherGroupId.Equals(voucherGroupId)),
+                    ChannelStat = new List<GroupChannel>(),
+                    StoreStat = new List<GroupStore>(),
                 };
-                result.StoreStat.Add(storeStat);
+
+                var storeMapp = (await storeRepo.Get(filter: o => !o.DelFlg)).ToList();
+                var storeStatList = new List<StoreVoucherStat>();
+                foreach (var store in storeMapp)
+                {
+                    var storeStat = new StoreVoucherStat()
+                    {
+                        StoreId = store.StoreId,
+                        StoreName = store.StoreName,
+                        RedempVoucherCount = await voucherRepo.CountAsync(filter: o => o.StoreId.Equals(store.StoreId) && o.IsRedemped
+                        && o.VoucherGroupId.Equals(voucherGroupId)),
+                        GroupNo = (int)store.Group,
+                    };
+                    storeStatList.Add(storeStat);
+                }
+
+                var storeGroups = storeStatList.GroupBy(o => o.GroupNo).Select(o => o.Distinct()).ToList();
+                foreach (var group in storeGroups)
+                {
+                    var listStore = group.ToList();
+                    var groupStore = new GroupStore()
+                    {
+                        GroupNo = listStore.First().GroupNo,
+                        Stores = listStore
+                    };
+                    result.StoreStat.Add(groupStore);
+                }
+
+
+                var channelMapp = (await channelRepo.Get(filter: o => !o.DelFlg)).ToList();
+                var channelStatList = new List<ChannelVoucherStat>();
+                foreach (var channel in channelMapp)
+                {
+                    var channelStat = new ChannelVoucherStat()
+                    {
+                        ChannelId = channel.ChannelId,
+                        ChannelName = channel.ChannelName,
+                        RedempVoucherCount = await voucherRepo.CountAsync(filter: o => o.StoreId.Equals(channel.ChannelId) && o.IsRedemped
+                        && o.VoucherGroupId.Equals(voucherGroupId)),
+                        GroupNo = (int)channel.Group,
+                    };
+                    channelStatList.Add(channelStat);
+                }
+
+                var channelGroups = channelStatList.GroupBy(o => o.GroupNo).Select(o => o.Distinct()).ToList();
+                foreach (var group in channelGroups)
+                {
+                    var listChannel = group.ToList();
+                    var groupChannel = new GroupChannel()
+                    {
+                        GroupNo = listChannel.First().GroupNo,
+                        Channels = listChannel
+                    };
+                    result.ChannelStat.Add(groupChannel);
+                }
+
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.StackTrace);
+                throw new ErrorObj(code: 500, message: "Oops, something went wrong. Try again", description: "Internal Server Error");
             }
 
-
-            var channelMapp = (await channelMappRepo.Get(filter: o => o.PromotionId.Equals(promotionId),
-                includeProperties: "Channel"))
-                .ToList();
-            foreach (var mapp in channelMapp)
-            {
-                var channel = mapp.Channel;
-
-                var channelStat = new ChannelVoucherStat()
-                {
-                    ChannelId = channel.ChannelId,
-                    ChannelName = channel.ChannelName,
-                    RedempVoucherCount = await voucherRepo.CountAsync(filter: o => o.StoreId.Equals(channel.ChannelId) && o.IsRedemped
-                    && o.VoucherGroupId.Equals(voucherGroupId)),
-                };
-                result.ChannelStat.Add(channelStat);
-            }
-
-
-            return result;
         }
         #endregion
     }
