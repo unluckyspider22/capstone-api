@@ -10,7 +10,7 @@ namespace ApplicationCore.Services
 {
     public interface ILoginService
     {
-        public Task<LoginResponse> BrandLogin(UserModel user);
+        public Task<LoginResponse> Login(UserModel user);
 
     }
 }

@@ -1,4 +1,5 @@
-﻿using Infrastructure.DTOs;
+﻿using ApplicationCore.Utils;
+using Infrastructure.DTOs;
 using Infrastructure.DTOs.Account;
 using Infrastructure.Helper;
 using Infrastructure.Models;
@@ -10,6 +11,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -27,38 +29,47 @@ namespace ApplicationCore.Services
             _config = configuration;
         }
 
-        public async Task<LoginResponse> BrandLogin(UserModel userInfo)
+        public async Task<LoginResponse> Login(UserModel userInfo)
         {
-            LoginResponse result = null;
-            var account = await _accountService.GetByUsernameAsync(userInfo.UserName);
-            if (account != null)
+            try
             {
-                result = new LoginResponse();
-                string message;
-                int status;
-
-                if (account.Password == userInfo.Password)
+                LoginResponse result = null;
+                var account = await _accountService.GetByUsernameAsync(userInfo.UserName);
+                if (account != null)
                 {
-                    var user = new UserInfo
+                    result = new LoginResponse();
+                    string message;
+                    int status;
+                    account.Password = Common.DecodeFromBase64(account.Password);
+
+                    if (account.Password == userInfo.Password)
                     {
-                        BrandCode = account.Brand.BrandCode,
-                        BrandId = account.Brand.BrandId,
-                        Token = GenerateJSONWebToken(account)
-                    };
+                        var token = GenerateJSONWebToken(account);
+                        var user = new UserInfo
+                        {
+                            BrandCode = account.Brand.BrandCode,
+                            BrandId = account.Brand.BrandId,
+                            Token = token
+                        };
 
-                    status = (int)HttpStatusCode.OK;
-                    message = AppConstant.ErrMessage.Login_Success;
-                    result.Data = user;
+                        status = (int)HttpStatusCode.OK;
+                        message = AppConstant.ErrMessage.Login_Success;
+                        result.Data = user;
+                    }
+                    else
+                    {
+                        status = (int)HttpStatusCode.Unauthorized;
+                        message = AppConstant.ErrMessage.Login_Fail;
+                    }
+                    result.Message = message;
+                    result.Status = status;
                 }
-                else
-                {
-                    status = (int)HttpStatusCode.Unauthorized;
-                    message = AppConstant.ErrMessage.Login_Fail;
-                }
-                result.Message = message;
-                result.Status = status;
+                return result;
+            } catch(ErrorObj e)
+            {
+                throw e;
             }
-            return result;
+            
         }
         private string GenerateJSONWebToken(Account account)
         {
@@ -73,17 +84,12 @@ namespace ApplicationCore.Services
             var tokenHandler = new JwtSecurityTokenHandler();
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, account.Username),
-                    new Claim(ClaimTypes.Role, account.Role.Name)
-                }),
+                Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = credentials
             };
-            var tok = tokenHandler.CreateToken(tokenDescriptor);
-            var toke = tokenHandler.WriteToken(tok);
-
+            var securityToken = tokenHandler.CreateToken(tokenDescriptor);
+            var token = tokenHandler.WriteToken(securityToken);
             /*var token = new JwtSecurityToken(_config["AppSettings:Issuer"],
               _config["AppSettings:Issuer"],
               claims,
@@ -91,9 +97,8 @@ namespace ApplicationCore.Services
               signingCredentials: credentials);*/
 
             /*return new JwtSecurityTokenHandler().WriteToken(token);*/
-            return toke;
+            return token;
         }
-
-
+        
     }
 }

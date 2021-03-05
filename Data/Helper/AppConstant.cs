@@ -42,7 +42,8 @@ namespace Infrastructure.Helper
             public const string INCLUDE = "0";
             public const string EXCLUDE = "1";
             public const string ApplyForAllStore = "Khuyến mãi áp dụng tại tất cả cửa hàng toàn quốc";
-
+            public const int BrandId = 1;
+            public const int AdminId = 2;
             public struct ActionType
             {
                 public const string Product = "1";

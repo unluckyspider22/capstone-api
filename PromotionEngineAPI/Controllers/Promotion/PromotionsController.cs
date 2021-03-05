@@ -65,7 +65,6 @@ namespace PromotionEngineAPI.Controllers
 
         // GET: api/Promotions
         [HttpGet]
-        [Authorize(Roles = "Admin")]
         // api/Promotions?pageIndex=...&pageSize=...
         public async Task<IActionResult> GetPromotion([FromQuery] PagingRequestParam param, [FromQuery] Guid BrandId, [FromQuery] string status)
         {

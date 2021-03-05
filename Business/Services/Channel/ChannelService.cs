@@ -46,7 +46,6 @@ namespace ApplicationCore.Services
                 && el.Status.Equals(AppConstant.EnvVar.PromotionStatus.PUBLISH)
                 && !el.DelFlg,
                 includeProperties:
-                "VoucherChannel.Channel," +
                 "Brand")).Data; ;
 
                 promotions = promotions.Where(w =>

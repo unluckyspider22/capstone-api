@@ -30,15 +30,19 @@ namespace PromotionEngineAPI.Controllers
         public async Task<IActionResult> Login([FromBody]UserModel login)
         {
             var response = Unauthorized();
-            var user = await _loginService.BrandLogin(login);
-
-            if (user != null)
+            try
             {
-                return Ok(user);
+                var user = await _loginService.Login(login);
+                if (user != null)
+                {
+                    return Ok(user);
+                }
+                return response;
             }
-            return response;
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
         }
-
-
     }
 }

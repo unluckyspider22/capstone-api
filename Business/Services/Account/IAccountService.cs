@@ -12,5 +12,6 @@ namespace ApplicationCore.Services
         Task<Account> GetByUsernameAsync(string username);
         Task<bool> DeleteUsernameAsync(string username);
         Task<bool> HideUsernameAsync(string username, string value);
+
     }
 }
