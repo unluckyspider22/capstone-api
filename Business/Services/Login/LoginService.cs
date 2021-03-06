@@ -34,7 +34,7 @@ namespace ApplicationCore.Services
             try
             {
                 LoginResponse result = null;
-                var account = await _accountService.GetByUsernameAsync(userInfo.UserName);
+                var account = await _accountService.GetByUsernameAsync(userInfo.Username);
                 if (account != null)
                 {
                     result = new LoginResponse();
@@ -49,7 +49,8 @@ namespace ApplicationCore.Services
                         {
                             BrandCode = account.Brand.BrandCode,
                             BrandId = account.Brand.BrandId,
-                            Token = token
+                            Token = token,
+                            RoleName = account.Role.Name                            
                         };
 
                         status = (int)HttpStatusCode.OK;
