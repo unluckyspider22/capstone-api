@@ -42,7 +42,8 @@ namespace Infrastructure.Helper
             public const string INCLUDE = "0";
             public const string EXCLUDE = "1";
             public const string ApplyForAllStore = "Khuyến mãi áp dụng tại tất cả cửa hàng toàn quốc";
-
+            public const int BrandId = 1;
+            public const int AdminId = 2;
             public struct ActionType
             {
                 public const string Product = "1";
@@ -167,6 +168,8 @@ namespace Infrastructure.Helper
             public const string Invalid_CustomerLevel = "Khuyến mãi không áp dụng cho loại khách hàng này";
             public const string Invalid_VoucherQuantity = "Khuyến mãi không có đủ số lượng Voucher yêu cầu, số lượng còn lại ";
             public const string Voucher_OutOfStock = "Voucher đã được phát hết";
+            public const string Login_Success = "Success";
+            public const string Login_Fail = "Unauthorized";
         }
         public class Operator
         {

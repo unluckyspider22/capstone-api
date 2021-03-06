@@ -10,6 +10,9 @@ using ApplicationCore.Services;
 
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
+using ApplicationCore.Utils;
+using System.Text;
+using System.Security.Cryptography;
 
 namespace PromotionEngineAPI.Controllers
 {
@@ -41,9 +44,6 @@ namespace PromotionEngineAPI.Controllers
             {
                 return StatusCode(statusCode: e.Code, e);
             }
-
-
-
         }
 
         // GET: api/Accounts/count
@@ -91,11 +91,23 @@ namespace PromotionEngineAPI.Controllers
 
         // POST: api/Accounts
         [HttpPost]
-        public async Task<IActionResult> PostAccount([FromBody] AccountDto dto)
+        [Route("register")]
+        public async Task<IActionResult> RegisterAccount([FromBody] AccountDto dto)
         {
             try
             {
+                DateTime now = Common.GetCurrentDatetime();
+                dto.InsDate = now;
+                dto.UpdDate = now;
+                dto.RoleId = AppConstant.EnvVar.BrandId;
+                dto.Password = Common.EncodePasswordToBase64(dto.Password);
                 dto.IsActive = false;
+                dto.Brand.InsDate = now;
+                dto.Brand.UpdDate = now;
+                if (string.IsNullOrEmpty(dto.Brand.Username))
+                {
+                    dto.Brand.Username = dto.Username;
+                }
                 var result = await _service.CreateAsync(dto);
                 return Ok(result);
             }
@@ -103,8 +115,8 @@ namespace PromotionEngineAPI.Controllers
             {
                 return StatusCode(statusCode: e.Code, e);
             }
-
         }
+
 
         // DELETE: api/Accounts/5
         [HttpDelete]
@@ -122,5 +134,41 @@ namespace PromotionEngineAPI.Controllers
             return Ok();
         }
 
+        [HttpPost]
+        [Route("checkEmailExisting")]
+        public async Task<IActionResult> CheckEmailExisting([FromBody] AccountDto user)
+        {
+            bool isExisting = false;
+            var account = await _service.GetFirst(filter: el => el.Email == user.Email);
+            if (account != null)
+            {
+                isExisting = true;
+            }
+            return Ok(isExisting);
+        }
+        [HttpPost]
+        [Route("checkUserExisting")]
+        public async Task<IActionResult> CheckUserExisting([FromBody] AccountDto user)
+        {
+            bool isExisting = false;
+            var account = await _service.GetFirst(filter: el => el.Username == user.Username);
+            if (account != null)
+            {
+                isExisting = true;
+            }
+            return Ok(isExisting);
+        }
+        [HttpPost]
+        [Route("checkPhoneExisting")]
+        public async Task<IActionResult> CheckPhoneExisting([FromBody] AccountDto user)
+        {
+            bool isExisting = false;
+            var account = await _service.GetFirst(filter: el => el.PhoneNumber == user.PhoneNumber);
+            if (account != null)
+            {
+                isExisting = true;
+            }
+            return Ok(isExisting);
+        }
     }
 }

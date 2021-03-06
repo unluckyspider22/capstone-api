@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using ApplicationCore.Models;
 using System.Net;
 using Infrastructure.DTOs.VoucherChannel;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PromotionEngineAPI.Controllers
 {
@@ -61,6 +62,7 @@ namespace PromotionEngineAPI.Controllers
             }
             return Ok(result);
         }
+
         // GET: api/Promotions
         [HttpGet]
         // api/Promotions?pageIndex=...&pageSize=...

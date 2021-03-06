@@ -9,6 +9,7 @@ using Infrastructure.DTOs;
 using Infrastructure.DTOs.VoucherChannel;
 using Infrastructure.Helper;
 using Infrastructure.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -118,6 +119,7 @@ namespace PromotionEngineAPI.Controllers
             return Ok();
         }
         [HttpGet]
+
         [Route("{channelCode}/vouchers/{promotionId}")]
         public async Task<IActionResult> GetVoucherForChannel(Guid promotionId, string channelCode, [FromBody] VoucherChannelParam param)
         {
@@ -142,6 +144,7 @@ namespace PromotionEngineAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         [Route("{channelCode}/brands/{BrandCode}/promotions")]
         public async Task<IActionResult> GetPromotionForChannel(string channelCode, string BrandCode, [FromBody] VoucherChannelParam param)
         {

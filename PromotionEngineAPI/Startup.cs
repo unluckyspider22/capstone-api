@@ -3,15 +3,18 @@ using ApplicationCore.Services;
 using AutoMapper;
 using Infrastructure.Models;
 using Infrastructure.UnitOrWork;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using PromotionEngineAPI.Hubs;
 using PromotionEngineAPI.Worker;
 using System;
+using System.Text;
 
 namespace PromotionEngineAPI
 {
@@ -40,6 +43,24 @@ namespace PromotionEngineAPI
                       .WithOrigins("https://blue-forest-070876000.azurestaticapps.net");
                 });
             });
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+                .AddJwtBearer(options =>
+                {
+                    options.RequireHttpsMetadata = false;
+                    options.SaveToken = true;
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["AppSettings:SecretKey"]))
+                    };
+                });
             services.AddControllers();
             // add config swagger
             services.AddSwaggerGen(c =>
@@ -100,6 +121,8 @@ namespace PromotionEngineAPI
             services.AddScoped<IVoucherChannelService, VoucherChannelService>();
             //VoucherGroup
             services.AddScoped<IVoucherGroupService, VoucherGroupService>();
+            //LoginService
+            services.AddScoped<ILoginService, LoginService>();
 
             ChainOfResponsibilityServices(services);
 
@@ -138,7 +161,8 @@ namespace PromotionEngineAPI
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.UseHttpsRedirection();
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
