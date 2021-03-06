@@ -46,6 +46,12 @@ namespace Infrastructure.UnitOrWork
         IGenericRepository<VoucherGroup> VoucherGroupRepository { get; }
         //Condition group
         IGenericRepository<ConditionGroup> ConditionGroupRepository { get; }
+        IGenericRepository<ProductCategory> ProductCategoryRepository { get; }
+        IGenericRepository<Product> ProductRepository { get; }
+        IGenericRepository<MemberLevel> MemberLevelRepository { get; }
+
+        IGenericRepository<Device> DeviceRepository { get; }
+
 
         Task<int> SaveAsync();
     }

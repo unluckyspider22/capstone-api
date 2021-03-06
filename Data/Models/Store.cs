@@ -7,6 +7,7 @@ namespace Infrastructure.Models
     {
         public Store()
         {
+            Device = new HashSet<Device>();
             PromotionStoreMapping = new HashSet<PromotionStoreMapping>();
             Voucher = new HashSet<Voucher>();
         }
@@ -21,6 +22,7 @@ namespace Infrastructure.Models
         public decimal? Group { get; set; }
 
         public virtual Brand Brand { get; set; }
+        public virtual ICollection<Device> Device { get; set; }
         public virtual ICollection<PromotionStoreMapping> PromotionStoreMapping { get; set; }
         public virtual ICollection<Voucher> Voucher { get; set; }
     }

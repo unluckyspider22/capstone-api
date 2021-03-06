@@ -108,6 +108,8 @@ namespace ApplicationCore.Services
             {
                 //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at UpdateAsync: \n" + e.Message);
+                Debug.WriteLine("\n\nError at UpdateAsync: \n" + e.InnerException);
+                Debug.WriteLine("\n\nError at UpdateAsync: \n" + e.StackTrace);
                 throw new ErrorObj(code: 500, message: e.Message);
             }
         }

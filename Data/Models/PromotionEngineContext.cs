@@ -21,11 +21,15 @@ namespace Infrastructure.Models
         public virtual DbSet<Channel> Channel { get; set; }
         public virtual DbSet<ConditionGroup> ConditionGroup { get; set; }
         public virtual DbSet<ConditionRule> ConditionRule { get; set; }
+        public virtual DbSet<Device> Device { get; set; }
         public virtual DbSet<Holiday> Holiday { get; set; }
+        public virtual DbSet<MemberLevel> MemberLevel { get; set; }
         public virtual DbSet<Membership> Membership { get; set; }
         public virtual DbSet<MembershipAction> MembershipAction { get; set; }
         public virtual DbSet<MembershipCondition> MembershipCondition { get; set; }
         public virtual DbSet<OrderCondition> OrderCondition { get; set; }
+        public virtual DbSet<Product> Product { get; set; }
+        public virtual DbSet<ProductCategory> ProductCategory { get; set; }
         public virtual DbSet<ProductCondition> ProductCondition { get; set; }
         public virtual DbSet<Promotion> Promotion { get; set; }
         public virtual DbSet<PromotionChannelMapping> PromotionChannelMapping { get; set; }
@@ -298,6 +302,33 @@ namespace Infrastructure.Models
                     .HasConstraintName("FK_ConditionRule_Brand");
             });
 
+            modelBuilder.Entity<Device>(entity =>
+            {
+                entity.Property(e => e.DeviceId).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.Imei)
+                    .IsRequired()
+                    .HasColumnName("IMEI")
+                    .HasMaxLength(15)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.InsDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.Name).HasMaxLength(50);
+
+                entity.Property(e => e.UpdDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.HasOne(d => d.Store)
+                    .WithMany(p => p.Device)
+                    .HasForeignKey(d => d.StoreId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Device_Store");
+            });
+
             modelBuilder.Entity<Holiday>(entity =>
             {
                 entity.Property(e => e.HolidayId).HasDefaultValueSql("(newid())");
@@ -317,6 +348,29 @@ namespace Infrastructure.Models
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
+            });
+
+            modelBuilder.Entity<MemberLevel>(entity =>
+            {
+                entity.Property(e => e.MemberLevelId).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.InsDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.UpdDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.HasOne(d => d.Brand)
+                    .WithMany(p => p.MemberLevel)
+                    .HasForeignKey(d => d.BrandId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_MemberLevel_Brand");
             });
 
             modelBuilder.Entity<Membership>(entity =>
@@ -460,6 +514,64 @@ namespace Infrastructure.Models
                     .HasForeignKey(d => d.ConditionGroupId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_OrderCondition_ConditionGroup1");
+            });
+
+            modelBuilder.Entity<Product>(entity =>
+            {
+                entity.Property(e => e.ProductId).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.CateId)
+                    .HasMaxLength(30)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Code)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.InsDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.Name).HasMaxLength(80);
+
+                entity.Property(e => e.UpdDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.HasOne(d => d.ProductCate)
+                    .WithMany(p => p.Product)
+                    .HasForeignKey(d => d.ProductCateId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Product_ProductCategory");
+            });
+
+            modelBuilder.Entity<ProductCategory>(entity =>
+            {
+                entity.HasKey(e => e.ProductCateId);
+
+                entity.Property(e => e.ProductCateId).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.CateId)
+                    .IsRequired()
+                    .HasMaxLength(30)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.InsDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.Name).HasMaxLength(50);
+
+                entity.Property(e => e.UpdDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.HasOne(d => d.Brand)
+                    .WithMany(p => p.ProductCategory)
+                    .HasForeignKey(d => d.BrandId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ProductCategory_Brand");
             });
 
             modelBuilder.Entity<ProductCondition>(entity =>

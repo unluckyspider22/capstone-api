@@ -71,6 +71,12 @@ namespace Infrastructure.UnitOrWork
         //Condition Group
         public IGenericRepository<ConditionGroup> ConditionGroupRepository { get; set; }
 
+        public IGenericRepository<ProductCategory> ProductCategoryRepository { get; set; }
+        public IGenericRepository<Product> ProductRepository { get; set; }
+        public IGenericRepository<MemberLevel> MemberLevelRepository { get; set; }
+
+        public IGenericRepository<Device> DeviceRepository { get; set; }
+
 
 
         private void initRepository()
@@ -115,6 +121,10 @@ namespace Infrastructure.UnitOrWork
             VoucherGroupRepository = new GenericRepository<VoucherGroup>(_context);
             // Condition Group
             ConditionGroupRepository = new GenericRepository<ConditionGroup>(_context);
+            ProductRepository = new GenericRepository<Product>(_context);
+            ProductCategoryRepository = new GenericRepository<ProductCategory>(_context);
+            MemberLevelRepository = new GenericRepository<MemberLevel>(_context);
+            DeviceRepository = new GenericRepository<Device>(_context);
         }
         public void Dispose()
         {

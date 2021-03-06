@@ -54,7 +54,7 @@ namespace PromotionEngineAPI
                     options.SaveToken = true;
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
-                        
+
                         ValidateIssuer = false,
                         ValidateAudience = false,
                         ValidateIssuerSigningKey = true,
@@ -121,6 +121,11 @@ namespace PromotionEngineAPI
             services.AddScoped<IVoucherChannelService, VoucherChannelService>();
             //VoucherGroup
             services.AddScoped<IVoucherGroupService, VoucherGroupService>();
+            services.AddScoped<IDeviceService, DeviceService>();
+            services.AddScoped<IProductCateService, ProductCategoryService>();
+            services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<IMemberLevelService, MemberLevelService>();
+
             //LoginService
             services.AddScoped<ILoginService, LoginService>();
 

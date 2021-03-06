@@ -110,6 +110,19 @@ namespace Infrastructure.AutoMapper
             // Channel of promotion
             CreateMap<Channel, ChannelOfPromotion>();
             CreateMap<ChannelOfPromotion, Channel>();
+
+            CreateMap<ProductCategory, ProductCategoryDto>();
+            CreateMap<ProductCategoryDto, ProductCategory>();
+
+            CreateMap<Product, ProductDto>();
+            CreateMap<ProductDto, Product>();
+
+            CreateMap<Device, DeviceDto>();
+            CreateMap<DeviceDto, Device>();
+
+            CreateMap<MemberLevel, MemberLevelDto>();
+            CreateMap<MemberLevelDto, MemberLevel>();
+
         }
     }
 }

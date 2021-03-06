@@ -9,6 +9,8 @@ namespace Infrastructure.Models
         {
             Channel = new HashSet<Channel>();
             ConditionRule = new HashSet<ConditionRule>();
+            MemberLevel = new HashSet<MemberLevel>();
+            ProductCategory = new HashSet<ProductCategory>();
             Promotion = new HashSet<Promotion>();
             Store = new HashSet<Store>();
             VoucherGroup = new HashSet<VoucherGroup>();
@@ -30,6 +32,8 @@ namespace Infrastructure.Models
         public virtual Account UsernameNavigation { get; set; }
         public virtual ICollection<Channel> Channel { get; set; }
         public virtual ICollection<ConditionRule> ConditionRule { get; set; }
+        public virtual ICollection<MemberLevel> MemberLevel { get; set; }
+        public virtual ICollection<ProductCategory> ProductCategory { get; set; }
         public virtual ICollection<Promotion> Promotion { get; set; }
         public virtual ICollection<Store> Store { get; set; }
         public virtual ICollection<VoucherGroup> VoucherGroup { get; set; }
