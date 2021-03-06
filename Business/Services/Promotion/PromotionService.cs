@@ -922,7 +922,7 @@ namespace ApplicationCore.Services
 
         }
 
-        public async Task<DistributionStat> DistributionStatistic(Guid promotionId)
+        public async Task<DistributionStat> DistributionStatistic(Guid promotionId, Guid brandId)
         {
 
             try
@@ -933,10 +933,15 @@ namespace ApplicationCore.Services
                 IGenericRepository<Channel> channelRepo = _unitOfWork.ChannelRepository;
                 IGenericRepository<Voucher> voucherRepo = _unitOfWork.VoucherRepository;
 
-                var voucherGroupId = (await _repository.GetFirst(filter: o => o.PromotionId.Equals(promotionId),
+                var voucherGroup = (await _repository.GetFirst(filter: o => o.PromotionId.Equals(promotionId)
+                && o.BrandId.Equals(brandId),
                     includeProperties: "VoucherGroup"))
-                    .VoucherGroup
-                    .VoucherGroupId;
+                    .VoucherGroup;
+                var voucherGroupId = Guid.Empty;
+                if (voucherGroup != null)
+                {
+                    voucherGroupId = voucherGroup.VoucherGroupId;
+                }
 
                 var result = new DistributionStat()
                 {
@@ -944,7 +949,7 @@ namespace ApplicationCore.Services
                     StoreStat = new List<GroupStore>(),
                 };
 
-                var storeMapp = (await storeRepo.Get(filter: o => !o.DelFlg)).ToList();
+                var storeMapp = (await storeRepo.Get(filter: o => !o.DelFlg && o.BrandId.Equals(brandId))).ToList();
                 var storeStatList = new List<StoreVoucherStat>();
                 foreach (var store in storeMapp)
                 {
@@ -972,7 +977,7 @@ namespace ApplicationCore.Services
                 }
 
 
-                var channelMapp = (await channelRepo.Get(filter: o => !o.DelFlg)).ToList();
+                var channelMapp = (await channelRepo.Get(filter: o => !o.DelFlg && o.BrandId.Equals(brandId))).ToList();
                 var channelStatList = new List<ChannelVoucherStat>();
                 foreach (var channel in channelMapp)
                 {

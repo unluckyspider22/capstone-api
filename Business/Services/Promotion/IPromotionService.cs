@@ -20,6 +20,6 @@ namespace ApplicationCore.Services
         Task<PromotionDto> UpdatePromotion(PromotionDto dto);
 
         Task<PromotionStatusDto> CountPromotionStatus(Guid brandId);
-        Task<DistributionStat> DistributionStatistic(Guid promotionId);
+        Task<DistributionStat> DistributionStatistic(Guid promotionId, Guid brandId);
     }
 }

@@ -36,13 +36,13 @@ namespace PromotionEngineAPI.Controllers.Statistic
         }
 
         [HttpGet]
-        [Route("promotion/distribution/{promotionId}")]
-        public async Task<IActionResult> DistributionCount([FromRoute] Guid promotionId)
+        [Route("promotion/distribution")]
+        public async Task<IActionResult> DistributionCount([FromQuery] Guid promotionId, [FromQuery] Guid brandId)
         {
 
             try
             {
-                return Ok(await _promotionService.DistributionStatistic(promotionId: promotionId));
+                return Ok(await _promotionService.DistributionStatistic(promotionId: promotionId, brandId: brandId));
             }
             catch (ErrorObj e)
             {
