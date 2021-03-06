@@ -18,10 +18,11 @@ namespace PromotionEngineAPI.Controllers
     public class VouchersController : ControllerBase
     {
         private readonly IVoucherService _service;
-
-        public VouchersController(IVoucherService service)
+        private readonly IVoucherGroupService _voucherGroupService;
+        public VouchersController(IVoucherService service, IVoucherGroupService voucherGroupService)
         {
             _service = service;
+            _voucherGroupService = voucherGroupService;
         }
 
         // GET: api/Vouchers
@@ -89,15 +90,16 @@ namespace PromotionEngineAPI.Controllers
             }
 
         }
-        // PUT: api/Vouchers/active
-        [HttpPut]
-        [Route("active")]
-        public async Task<IActionResult> ActiveVoucher([FromBody] VoucherGroupDto dto)
+        // PUT: api/Vouchers/get-voucher-cus
+        [HttpPost]
+        [Route("get-voucher-cus")]
+        public async Task<IActionResult> GetVoucherForCustomer([FromBody] VoucherGroupDto dto)
         {
             try
             {
-                //await _service.ActiveAllVoucherInGroup(dto)
-                return Ok();
+                 
+             
+                return Ok(await _service.GetVoucherForCustomer(dto));
             }
             catch (ErrorObj e)
             {

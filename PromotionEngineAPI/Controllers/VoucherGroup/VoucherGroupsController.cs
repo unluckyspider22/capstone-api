@@ -74,7 +74,7 @@ namespace PromotionEngineAPI.Controllers
             {
                 if (StoreCode == null || BrandCode == null)
                     return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
-                return Ok(await _service.GetVoucherForGame(PageIndex: param.PageIndex, PageSize: param.PageSize, StoreCode: StoreCode, BrandCode: BrandCode)); ;
+                return Ok(await _service.GetVoucherGroupForGame(PageIndex: param.PageIndex, PageSize: param.PageSize, StoreCode: StoreCode, BrandCode: BrandCode)); ;
             }
             catch (ErrorObj e)
             {
