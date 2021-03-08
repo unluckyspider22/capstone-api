@@ -11,5 +11,7 @@ namespace ApplicationCore.Services
     {
         public Task<bool> CheckExistin(string code, string cateId, Guid productCateId);
         public Task<ProductDto> Update(ProductDto dto);
+
+        public Task<List<BrandProductDto>> GetBrandProduct(Guid brandId);
     }
 }

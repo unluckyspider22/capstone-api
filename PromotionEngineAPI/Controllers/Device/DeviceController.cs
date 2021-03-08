@@ -51,6 +51,21 @@ namespace PromotionEngineAPI.Controllers
             }
 
         }
+        [HttpGet]
+        [Route("brand/{brandId}")]
+        public async Task<IActionResult> GetBrandDevice([FromRoute] Guid brandId)
+        {
+            try
+            {
+                var result = await _service.GetBrandDevice(brandId: brandId);
+                return Ok(result);
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+
+        }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetDevice([FromRoute] Guid id)

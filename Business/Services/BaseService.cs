@@ -38,7 +38,8 @@ namespace ApplicationCore.Services
             catch (Exception e)
             {
                 //chạy bằng debug mode để xem log
-                Debug.WriteLine("\n\nError at CreateAsync: \n" + e.Message);
+                Debug.WriteLine("\n\nError at CreateAsync: \n" + e.InnerException);
+                Debug.WriteLine("\n\nError at CreateAsync: \n" + e.StackTrace);
                 throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
             }
         }

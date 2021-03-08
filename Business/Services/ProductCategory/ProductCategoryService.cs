@@ -42,6 +42,10 @@ namespace ApplicationCore.Services
                     {
                         entity.Name = dto.Name;
                     }
+                    if (updParam.DelFlg != null)
+                    {
+                        entity.DelFlg = dto.DelFlg;
+                    }
                     _repository.Update(entity);
                     await _unitOfWork.SaveAsync();
                     return _mapper.Map<ProductCategoryDto>(entity);

@@ -25,6 +25,40 @@ namespace ApplicationCore.Services
             return isExist;
         }
 
+        public async Task<List<BrandDeviceDto>> GetBrandDevice(Guid brandId)
+        {
+            var result = new List<BrandDeviceDto>();
+            IGenericRepository<Store> storeRepo = _unitOfWork.StoreRepository;
+            var stores = await storeRepo.Get(filter: o => o.BrandId.Equals(brandId) && !o.DelFlg, includeProperties: "Device");
+            if (stores != null)
+            {
+                foreach (var store in stores)
+                {
+                    var devices = store.Device.ToList();
+                    if (devices != null && devices.Count > 0)
+                    {
+                        foreach (var device in devices)
+                        {
+                            var dto = new BrandDeviceDto()
+                            {
+                                DeviceId = device.DeviceId,
+                                Imei = device.Imei,
+                                Name = device.Name,
+                                Group = store.Group,
+                                StoreCode = store.StoreCode,
+                                StoreId = store.StoreId,
+                                StoreName = store.StoreName,
+                            };
+                            result.Add(dto);
+                        }
+                    }
+
+
+                }
+            }
+            return result;
+        }
+
         public async Task<DeviceDto> Update(DeviceDto dto)
         {
             try
@@ -45,7 +79,8 @@ namespace ApplicationCore.Services
                     _repository.Update(entity);
                     await _unitOfWork.SaveAsync();
                     return _mapper.Map<DeviceDto>(entity);
-                } else
+                }
+                else
                 {
                     throw new ErrorObj(code: 500, message: "Device not found");
                 }

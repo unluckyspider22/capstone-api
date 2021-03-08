@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers.Product
 {
-    [Route("api/[controller]")]
+    [Route("api/product")]
     [ApiController]
     public class ProductController : ControllerBase
     {
@@ -27,6 +27,22 @@ namespace PromotionEngineAPI.Controllers.Product
             {
                 var result = await _service.GetAsync(pageIndex: param.PageIndex, pageSize: param.PageSize,
                     filter: o => o.ProductCateId.Equals(productCateId) && !o.DelFlg);
+                return Ok(result);
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+
+        }
+
+        [HttpGet]
+        [Route("brand/{brandId}")]
+        public async Task<IActionResult> GetBrandProduct([FromRoute]Guid brandId)
+        {
+            try
+            {
+                var result = await _service.GetBrandProduct(brandId: brandId);
                 return Ok(result);
             }
             catch (ErrorObj e)
