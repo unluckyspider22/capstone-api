@@ -53,6 +53,22 @@ namespace PromotionEngineAPI.Controllers.Product
         }
 
         [HttpGet]
+        [Route("brand/all/{brandId}")]
+        public async Task<IActionResult> GetAllBrandProduct([FromRoute] Guid brandId)
+        {
+            try
+            {
+                var result = await _service.GetAllBrandProduct(brandId: brandId);
+                return Ok(result);
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+
+        }
+
+        [HttpGet]
         [Route("count")]
         public async Task<IActionResult> CountProduct()
         {
