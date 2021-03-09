@@ -17,6 +17,6 @@ namespace Infrastructure.Models
         public virtual ConditionRule ConditionRule { get; set; }
         public virtual Promotion Promotion { get; set; }
         public virtual Action Action { get; set; }
-        public virtual MembershipAction MembershipAction { get; set; }
+        public virtual PostAction PostAction { get; set; }
     }
 }

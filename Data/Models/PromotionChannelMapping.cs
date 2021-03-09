@@ -5,7 +5,7 @@ namespace Infrastructure.Models
 {
     public partial class PromotionChannelMapping
     {
-        public Guid VoucherChannelId { get; set; }
+        public Guid PromotionChannelId { get; set; }
         public Guid? PromotionId { get; set; }
         public Guid? ChannelId { get; set; }
         public DateTime? InsDate { get; set; }

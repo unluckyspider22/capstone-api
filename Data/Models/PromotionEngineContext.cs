@@ -27,9 +27,8 @@ namespace Infrastructure.Models
         public virtual DbSet<MemberLevel> MemberLevel { get; set; }
         public virtual DbSet<MemberLevelMapping> MemberLevelMapping { get; set; }
         public virtual DbSet<Membership> Membership { get; set; }
-        public virtual DbSet<MembershipAction> MembershipAction { get; set; }
-        public virtual DbSet<MembershipCondition> MembershipCondition { get; set; }
         public virtual DbSet<OrderCondition> OrderCondition { get; set; }
+        public virtual DbSet<PostAction> PostAction { get; set; }
         public virtual DbSet<Product> Product { get; set; }
         public virtual DbSet<ProductCategory> ProductCategory { get; set; }
         public virtual DbSet<ProductCondition> ProductCondition { get; set; }
@@ -146,21 +145,6 @@ namespace Infrastructure.Models
 
                 entity.Property(e => e.OrderLadderProduct).HasColumnType("decimal(2, 0)");
 
-                entity.Property(e => e.ParentCode)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.ProductCode)
-                    .IsRequired()
-                    .HasMaxLength(200)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.ProductType)
-                    .IsRequired()
-                    .HasMaxLength(1)
-                    .IsUnicode(false)
-                    .IsFixedLength();
-
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
@@ -246,6 +230,10 @@ namespace Infrastructure.Models
             modelBuilder.Entity<Channel>(entity =>
             {
                 entity.Property(e => e.ChannelId).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.AccessToken)
+                    .HasMaxLength(60)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.ChannelCode)
                     .HasMaxLength(20)
@@ -441,82 +429,6 @@ namespace Infrastructure.Models
                     .HasDefaultValueSql("(getdate())");
             });
 
-            modelBuilder.Entity<MembershipAction>(entity =>
-            {
-                entity.HasIndex(e => e.PromotionTierId)
-                    .HasName("IX_MembershipAction")
-                    .IsUnique();
-
-                entity.Property(e => e.MembershipActionId).HasDefaultValueSql("(newid())");
-
-                entity.Property(e => e.ActionType)
-                    .IsRequired()
-                    .HasMaxLength(1)
-                    .IsUnicode(false)
-                    .IsFixedLength();
-
-                entity.Property(e => e.BonusPoint).HasColumnType("decimal(10, 2)");
-
-                entity.Property(e => e.DiscountType)
-                    .IsRequired()
-                    .HasMaxLength(2)
-                    .IsUnicode(false)
-                    .IsFixedLength();
-
-                entity.Property(e => e.GiftName).HasMaxLength(50);
-
-                entity.Property(e => e.GiftProductCode)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.GiftQuantity).HasColumnType("decimal(6, 0)");
-
-                entity.Property(e => e.GiftVoucherCode)
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.InsDate)
-                    .HasColumnType("datetime")
-                    .HasDefaultValueSql("(getdate())");
-
-                entity.Property(e => e.UpdDate)
-                    .HasColumnType("datetime")
-                    .HasDefaultValueSql("(getdate())");
-
-                entity.HasOne(d => d.PromotionTier)
-                    .WithOne(p => p.MembershipAction)
-                    .HasForeignKey<MembershipAction>(d => d.PromotionTierId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("MembershipAction_FK");
-            });
-
-            modelBuilder.Entity<MembershipCondition>(entity =>
-            {
-                entity.Property(e => e.MembershipConditionId).HasDefaultValueSql("(newid())");
-
-                entity.Property(e => e.InsDate)
-                    .HasColumnType("datetime")
-                    .HasDefaultValueSql("(getdate())");
-
-                entity.Property(e => e.MembershipLevel).HasMaxLength(50);
-
-                entity.Property(e => e.NextOperator)
-                    .IsRequired()
-                    .HasMaxLength(1)
-                    .IsUnicode(false)
-                    .IsFixedLength();
-
-                entity.Property(e => e.UpdDate)
-                    .HasColumnType("datetime")
-                    .HasDefaultValueSql("(getdate())");
-
-                entity.HasOne(d => d.ConditionGroup)
-                    .WithMany(p => p.MembershipCondition)
-                    .HasForeignKey(d => d.ConditionGroupId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_MembershipCondition_ConditionGroup");
-            });
-
             modelBuilder.Entity<OrderCondition>(entity =>
             {
                 entity.Property(e => e.OrderConditionId).HasDefaultValueSql("(newid())");
@@ -555,6 +467,55 @@ namespace Infrastructure.Models
                     .HasForeignKey(d => d.ConditionGroupId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_OrderCondition_ConditionGroup1");
+            });
+
+            modelBuilder.Entity<PostAction>(entity =>
+            {
+                entity.HasIndex(e => e.PromotionTierId)
+                    .HasName("IX_MembershipAction")
+                    .IsUnique();
+
+                entity.Property(e => e.PostActionId).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.ActionType)
+                    .IsRequired()
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .IsFixedLength();
+
+                entity.Property(e => e.BonusPoint).HasColumnType("decimal(10, 2)");
+
+                entity.Property(e => e.DiscountType)
+                    .IsRequired()
+                    .HasMaxLength(2)
+                    .IsUnicode(false)
+                    .IsFixedLength();
+
+                entity.Property(e => e.GiftName).HasMaxLength(50);
+
+                entity.Property(e => e.GiftProductCode)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.GiftQuantity).HasColumnType("decimal(6, 0)");
+
+                entity.Property(e => e.GiftVoucherCode)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.InsDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.UpdDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.HasOne(d => d.PromotionTier)
+                    .WithOne(p => p.PostAction)
+                    .HasForeignKey<PostAction>(d => d.PromotionTierId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("MembershipAction_FK");
             });
 
             modelBuilder.Entity<Product>(entity =>
@@ -629,30 +590,13 @@ namespace Infrastructure.Models
                     .IsUnicode(false)
                     .IsFixedLength();
 
-                entity.Property(e => e.ParentCode).HasMaxLength(50);
-
-                entity.Property(e => e.ProductCode)
-                    .IsRequired()
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
                 entity.Property(e => e.ProductConditionType)
                     .IsRequired()
                     .HasMaxLength(1)
                     .IsUnicode(false)
                     .IsFixedLength();
 
-                entity.Property(e => e.ProductName)
-                    .IsRequired()
-                    .HasMaxLength(100);
-
                 entity.Property(e => e.ProductQuantity).HasColumnType("decimal(6, 0)");
-
-                entity.Property(e => e.ProductType)
-                    .IsRequired()
-                    .HasMaxLength(1)
-                    .IsUnicode(false)
-                    .IsFixedLength();
 
                 entity.Property(e => e.QuantityOperator)
                     .IsRequired()
@@ -781,10 +725,10 @@ namespace Infrastructure.Models
 
             modelBuilder.Entity<PromotionChannelMapping>(entity =>
             {
-                entity.HasKey(e => e.VoucherChannelId)
+                entity.HasKey(e => e.PromotionChannelId)
                     .HasName("PK_VoucherChannel");
 
-                entity.Property(e => e.VoucherChannelId).HasDefaultValueSql("(newid())");
+                entity.Property(e => e.PromotionChannelId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")

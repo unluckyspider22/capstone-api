@@ -14,9 +14,6 @@ namespace Infrastructure.Models
         public Guid PromotionTierId { get; set; }
         public string ActionType { get; set; }
         public string DiscountType { get; set; }
-        public string ProductType { get; set; }
-        public string ParentCode { get; set; }
-        public string ProductCode { get; set; }
         public decimal? DiscountQuantity { get; set; }
         public decimal? DiscountAmount { get; set; }
         public decimal? DiscountPercentage { get; set; }
@@ -29,7 +26,7 @@ namespace Infrastructure.Models
         public decimal? BundleQuantity { get; set; }
         public string BundleStrategy { get; set; }
         public bool DelFlg { get; set; }
-        public DateTime? InsDate { get; set; }
+        public DateTime InsDate { get; set; }
         public DateTime UpdDate { get; set; }
 
         public virtual PromotionTier PromotionTier { get; set; }

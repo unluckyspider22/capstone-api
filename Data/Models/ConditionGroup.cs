@@ -7,7 +7,6 @@ namespace Infrastructure.Models
     {
         public ConditionGroup()
         {
-            MembershipCondition = new HashSet<MembershipCondition>();
             OrderCondition = new HashSet<OrderCondition>();
             ProductCondition = new HashSet<ProductCondition>();
         }
@@ -21,7 +20,6 @@ namespace Infrastructure.Models
         public string Summary { get; set; }
 
         public virtual ConditionRule ConditionRule { get; set; }
-        public virtual ICollection<MembershipCondition> MembershipCondition { get; set; }
         public virtual ICollection<OrderCondition> OrderCondition { get; set; }
         public virtual ICollection<ProductCondition> ProductCondition { get; set; }
     }
