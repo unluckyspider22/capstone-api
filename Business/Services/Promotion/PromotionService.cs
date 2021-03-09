@@ -72,9 +72,18 @@ namespace ApplicationCore.Services
                 PromotionTier promotionTier = new PromotionTier
                 {
                     PromotionTierId = Guid.NewGuid(),
-                    PromotionId = param.PromotionId,
                     ConditionRuleId = conditionRuleEntity.ConditionRuleId,
+                    InsDate = DateTime.Now,
+                    UpdDate = DateTime.Now,
                 };
+                if (!param.PromotionId.Equals(Guid.Empty))
+                {
+                    promotionTier.PromotionId = param.PromotionId;
+                }
+                else
+                {
+                    promotionTier.PromotionId = null;
+                }
 
                 // Create action
                 if (param.Action.ActionType != null)
@@ -93,7 +102,8 @@ namespace ApplicationCore.Services
 
                     // Create action product mapping
                     IGenericRepository<ActionProductMapping> mapRepo = _unitOfWork.ActionProductMappingRepository;
-                    if (param.Action.ListProduct.Count > 0)
+                    if (param.Action.ActionType.Equals(AppConstant.EnvVar.ActionType.Product)
+                        && param.Action.ListProduct.Count > 0)
                     {
                         foreach (var product in param.Action.ListProduct)
                         {
@@ -102,38 +112,60 @@ namespace ApplicationCore.Services
                                 Id = Guid.NewGuid(),
                                 ActionId = actionEntity.ActionId,
                                 ProductId = product,
-                                //ProductId = Guid.Parse(product),
                                 InsDate = DateTime.Now,
                                 UpdDate = DateTime.Now,
                             };
                             mapRepo.Add(mappEntity);
                         }
-                        await _unitOfWork.SaveAsync();
+                        //await _unitOfWork.SaveAsync();
                     }
                     param.Action = _mapper.Map<ActionRequestParam>(actionEntity);
                 }
                 else
-                if (param.MembershipAction.ActionType != null)
+                if (param.PostAction.ActionType != null)
                 {
-/*                    // Create membership action
-                    IGenericRepository<PostAction> membershipActionRepo = _unitOfWork.MembershipActionRepository;
-                    var membershipAction = _mapper.Map<PostAction>(param.MembershipAction);
-                    membershipAction.MembershipActionId = Guid.NewGuid();
-                    membershipAction.PromotionTierId = promotionTier.PromotionTierId;
-                    membershipAction.ActionType = membershipAction.ActionType.Trim();
-                    membershipAction.DiscountType = membershipAction.DiscountType.Trim();
+                    // Create membership action
+                    IGenericRepository<PostAction> postActionRepo = _unitOfWork.PostActionRepository;
+
+                    var postAction = _mapper.Map<PostAction>(param.PostAction);
+                    postAction.PostActionId = Guid.NewGuid();
+                    postAction.PromotionTierId = promotionTier.PromotionTierId;
+                    postAction.ActionType = postAction.ActionType.Trim();
+                    postAction.DiscountType = postAction.DiscountType.Trim();
                     //promotionTier.Summary = CreateSummaryMembershipAction(membershipAction);
                     promotionTier.Summary = "";
-                    promotionTier.MembershipActionId = membershipAction.MembershipActionId;
+                    promotionTier.PostActionId = postAction.PostActionId;
+
                     promotionTierRepo.Add(promotionTier);
-                    membershipActionRepo.Add(membershipAction);
-                    param.MembershipAction = _mapper.Map<MembershipActionRequestParam>(membershipAction);*/
+                    postActionRepo.Add(postAction);
+
+                    // Create action product mapping
+                    IGenericRepository<PostActionProductMapping> mapRepo = _unitOfWork.PostActionProductMappingRepository;
+                    if (param.PostAction.ActionType.Equals(AppConstant.EnvVar.ActionType.Gift)
+                        && param.PostAction.DiscountType.Equals(AppConstant.EnvVar.DiscountType.GiftProduct)
+                        && param.PostAction.ListProduct.Count > 0)
+                    {
+                        foreach (var product in param.PostAction.ListProduct)
+                        {
+                            var mappEntity = new PostActionProductMapping()
+                            {
+                                Id = Guid.NewGuid(),
+                                PostActionId = postAction.PostActionId,
+                                ProductId = product,
+                                InsDate = DateTime.Now,
+                                UpdDate = DateTime.Now,
+                            };
+                            mapRepo.Add(mappEntity);
+                        }
+                        //await _unitOfWork.SaveAsync();
+                    }
+                    param.PostAction = _mapper.Map<PostActionRequestParam>(postAction);
                 }
                 else
                 {
                     throw new ErrorObj(code: 400, message: "Action or Membership action is not null", description: "Invalid param");
                 }
-                //await _unitOfWork.SaveAsync();
+                await _unitOfWork.SaveAsync();
                 return param;
             }
             catch (ErrorObj e)
@@ -160,7 +192,7 @@ namespace ApplicationCore.Services
                 }
                 else if (!param.MembershipActionId.Equals(Guid.Empty))
                 {
-                    IGenericRepository<PostAction> membershipActionRepo = _unitOfWork.MembershipActionRepository;
+                    IGenericRepository<PostAction> membershipActionRepo = _unitOfWork.PostActionRepository;
                     membershipActionRepo.Delete(param.MembershipActionId);
                 }
                 else
@@ -246,19 +278,19 @@ namespace ApplicationCore.Services
                     tier.UpdDate = DateTime.Now;
                     promotionTierRepo.Update(tier);
                 }
-               /* else if (!updateParam.MembershipAction.MembershipActionId.Equals(Guid.Empty))
-                {
-                    var membershipActionEntity = _mapper.Map<PostAction>(updateParam.MembershipAction);
-                    IGenericRepository<PostAction> membershipActionRepo = _unitOfWork.MembershipActionRepository;
-                    membershipActionEntity.UpdDate = DateTime.Now;
-                    membershipActionEntity.InsDate = null;
-                    membershipActionEntity.PromotionTierId = updateParam.PromotionTierId;
-                    membershipActionRepo.Update(membershipActionEntity);
-                    var tier = await promotionTierRepo.GetFirst(filter: el => el.MembershipActionId.Equals(membershipActionEntity.MembershipActionId));
-                    tier.Summary = CreateSummaryMembershipAction(membershipActionEntity);
-                    tier.UpdDate = DateTime.Now;
-                    promotionTierRepo.Update(tier);
-                }*/
+                /* else if (!updateParam.MembershipAction.MembershipActionId.Equals(Guid.Empty))
+                 {
+                     var membershipActionEntity = _mapper.Map<PostAction>(updateParam.MembershipAction);
+                     IGenericRepository<PostAction> membershipActionRepo = _unitOfWork.MembershipActionRepository;
+                     membershipActionEntity.UpdDate = DateTime.Now;
+                     membershipActionEntity.InsDate = null;
+                     membershipActionEntity.PromotionTierId = updateParam.PromotionTierId;
+                     membershipActionRepo.Update(membershipActionEntity);
+                     var tier = await promotionTierRepo.GetFirst(filter: el => el.MembershipActionId.Equals(membershipActionEntity.MembershipActionId));
+                     tier.Summary = CreateSummaryMembershipAction(membershipActionEntity);
+                     tier.UpdDate = DateTime.Now;
+                     promotionTierRepo.Update(tier);
+                 }*/
                 //else
                 //{
                 //    throw new ErrorObj(code: 400, message: "Action or Membership action is not null", description: "Invalid param");
@@ -850,44 +882,44 @@ namespace ApplicationCore.Services
             return result;
         }
 
-     /*   private string CreateSummaryMembershipAction(PostAction entity)
-        {
-            var result = "";
-            var actionType = entity.ActionType;
-            var discountType = entity.DiscountType;
-            switch (actionType)
-            {
-                case "3":
-                    {
+        /*   private string CreateSummaryMembershipAction(PostAction entity)
+           {
+               var result = "";
+               var actionType = entity.ActionType;
+               var discountType = entity.DiscountType;
+               switch (actionType)
+               {
+                   case "3":
+                       {
 
-                        switch (discountType)
-                        {
-                            case "8":
-                                {
-                                    result += "Gift ";
-                                    result += entity.GiftQuantity;
-                                    result += " " + entity.GiftName + "(s)";
-                                    break;
-                                }
-                            case "9":
-                                {
-                                    result += "Gift a voucher code: ";
-                                    result += entity.GiftVoucherCode;
-                                    break;
-                                }
-                        }
-                        return result;
-                    }
-                case "4":
-                    {
-                        result += "Bonus point: ";
-                        result += entity.BonusPoint + " point(s)";
-                        return result;
-                    }
-            }
-            return result;
-        }
-*/
+                           switch (discountType)
+                           {
+                               case "8":
+                                   {
+                                       result += "Gift ";
+                                       result += entity.GiftQuantity;
+                                       result += " " + entity.GiftName + "(s)";
+                                       break;
+                                   }
+                               case "9":
+                                   {
+                                       result += "Gift a voucher code: ";
+                                       result += entity.GiftVoucherCode;
+                                       break;
+                                   }
+                           }
+                           return result;
+                       }
+                   case "4":
+                       {
+                           result += "Bonus point: ";
+                           result += entity.BonusPoint + " point(s)";
+                           return result;
+                       }
+               }
+               return result;
+           }
+   */
         private string ToOrdinal(long number)
         {
             if (number < 0) return number.ToString();

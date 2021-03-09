@@ -32,7 +32,7 @@ namespace Infrastructure.UnitOrWork
         //Membership
         public IGenericRepository<Membership> MembershipRepository { get; set; }
         //MembershipAction
-        public IGenericRepository<PostAction> MembershipActionRepository { get; set; }
+        public IGenericRepository<PostAction> PostActionRepository { get; set; }
         //MembershipCondition
         public IGenericRepository<MembershipCondition> MembershipConditionRepository { get; set; }
         //OrderCondition
@@ -80,6 +80,7 @@ namespace Infrastructure.UnitOrWork
         public IGenericRepository<ActionProductMapping> ActionProductMappingRepository { get; set; }
 
         public IGenericRepository<MemberLevelMapping> MemberLevelMappingRepository { get; set; }
+        public IGenericRepository<PostActionProductMapping> PostActionProductMappingRepository { get; set; }
 
         private void initRepository()
         {
@@ -98,7 +99,7 @@ namespace Infrastructure.UnitOrWork
             //Membership
             MembershipRepository = new GenericRepository<Membership>(_context);
             //MembershipAction
-            MembershipActionRepository = new GenericRepository<PostAction>(_context);
+            PostActionRepository = new GenericRepository<PostAction>(_context);
             //MembershipCondition
             MembershipConditionRepository = new GenericRepository<MembershipCondition>(_context);
             //OrderCondition
@@ -129,6 +130,7 @@ namespace Infrastructure.UnitOrWork
             DeviceRepository = new GenericRepository<Device>(_context);
             ActionProductMappingRepository = new GenericRepository<ActionProductMapping>(_context);
             MemberLevelMappingRepository = new GenericRepository<MemberLevelMapping>(_context);
+            PostActionProductMappingRepository = new GenericRepository<PostActionProductMapping>(_context);
         }
         public void Dispose()
         {

@@ -21,7 +21,7 @@ namespace Infrastructure.UnitOrWork
         //Membership
         IGenericRepository<Membership> MembershipRepository { get; }
         //MembershipAction
-        IGenericRepository<PostAction> MembershipActionRepository { get; }
+        IGenericRepository<PostAction> PostActionRepository { get; }
         //MembershipCondition
         IGenericRepository<MembershipCondition> MembershipConditionRepository { get; }
         //OrderCondition
@@ -54,6 +54,7 @@ namespace Infrastructure.UnitOrWork
         IGenericRepository<ActionProductMapping> ActionProductMappingRepository { get; }
         IGenericRepository<MemberLevelMapping> MemberLevelMappingRepository { get; }
 
+        IGenericRepository<PostActionProductMapping> PostActionProductMappingRepository { get; }
 
         Task<int> SaveAsync();
     }

@@ -13,6 +13,6 @@ namespace ApplicationCore.Services
         {
         }
 
-        protected override IGenericRepository<PostAction> _repository => _unitOfWork.MembershipActionRepository;
+        protected override IGenericRepository<PostAction> _repository => _unitOfWork.PostActionRepository;
     }
 }

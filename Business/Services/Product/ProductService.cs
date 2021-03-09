@@ -35,7 +35,7 @@ namespace ApplicationCore.Services
             {
                 IGenericRepository<ProductCategory> cateRepo = _unitOfWork.ProductCategoryRepository;
                 var result = new List<BrandProductDto>();
-                var categories = (await cateRepo.Get(filter: o => o.BrandId.Equals(brandId) 
+                var categories = (await cateRepo.Get(filter: o => o.BrandId.Equals(brandId)
                 && !o.DelFlg, includeProperties: "Product")).ToList();
                 if (categories != null && categories.Count > 0)
                 {
@@ -126,25 +126,35 @@ namespace ApplicationCore.Services
                 if (entity != null)
                 {
                     entity.UpdDate = DateTime.Now;
-                    var updParam = _mapper.Map<Product>(dto);
-                    if (updParam.CateId != null)
+                    if (dto.CateId != null)
                     {
                         entity.CateId = dto.CateId;
                     }
-                    if (updParam.Name != null)
+                    if (dto.Name != null)
                     {
                         entity.Name = dto.Name;
                     }
-                    if (updParam.Code != null)
+                    if (dto.Code != null)
                     {
                         entity.Code = dto.Code;
                     }
-                    if (updParam.DelFlg != null)
+                    if (dto.DelFlg != null)
                     {
                         entity.DelFlg = dto.DelFlg;
                     }
+                    if (!dto.ProductCateId.Equals(Guid.Empty) && !dto.ProductCateId.Equals(entity.ProductCateId))
+                    {
+                        IGenericRepository<ProductCategory> cateRepo = _unitOfWork.ProductCategoryRepository;
+                        var oldCate = await cateRepo.GetFirst(filter: o => o.ProductCateId.Equals(entity.ProductCateId) && !o.DelFlg);
+                        oldCate.Product.Remove(entity);
+                        var newCate = await cateRepo.GetFirst(filter: o => o.ProductCateId.Equals(dto.ProductCateId) && !o.DelFlg);
+                        newCate.Product.Add(entity);
+                        entity.ProductCateId = dto.ProductCateId;
+                        entity.CateId = newCate.CateId;
+                    }
                     _repository.Update(entity);
                     await _unitOfWork.SaveAsync();
+
                     return _mapper.Map<ProductDto>(entity);
                 }
                 else

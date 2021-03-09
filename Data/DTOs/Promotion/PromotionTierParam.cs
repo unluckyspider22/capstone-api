@@ -8,7 +8,7 @@ namespace Infrastructure.DTOs
 {
     public class PromotionTierParam
     {
-        [Required]
+ 
         public Guid PromotionId { get; set; }
         [Required]
         public ConditionRequestParam ConditionRule { get; set; }
@@ -17,7 +17,7 @@ namespace Infrastructure.DTOs
         [Required]
         public ActionRequestParam Action { get; set; }
         [Required]
-        public MembershipActionRequestParam MembershipAction { get; set; }
+        public PostActionRequestParam PostAction { get; set; }
         public string Summary { get; set; }
     }
 
@@ -52,7 +52,7 @@ namespace Infrastructure.DTOs
         public List<Guid> ListProduct { get; set; }
     }
 
-    public class MembershipActionRequestParam
+    public class PostActionRequestParam
     {
         [StringLength(1)]
         public string ActionType { get; set; }
@@ -68,5 +68,6 @@ namespace Infrastructure.DTOs
         public string GiftVoucherCode { get; set; }
         [Range(0.00, 9999999999.00)]
         public decimal? BonusPoint { get; set; }
+        public List<Guid> ListProduct { get; set; }
     }
 }
