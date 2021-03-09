@@ -42,11 +42,10 @@ namespace ApplicationCore.Services
             try
             {
                 var promotions = (await _promotionService.GetAsync(filter: el =>
-                el.IsActive
-                && el.Status.Equals(AppConstant.EnvVar.PromotionStatus.PUBLISH)
+                el.Status.Equals(AppConstant.EnvVar.PromotionStatus.PUBLISH)
                 && !el.DelFlg,
                 includeProperties:
-                "Brand")).Data; ;
+                "Brand,PromotionChannelMapping.Channel")).Data; ;
 
                 promotions = promotions.Where(w =>
                 w.PromotionChannelMapping.Select(vc =>
