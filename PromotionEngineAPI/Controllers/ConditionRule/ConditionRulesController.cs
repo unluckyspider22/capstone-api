@@ -36,11 +36,11 @@ namespace PromotionEngineAPI.Controllers
         public async Task<IActionResult> GetConditionRule([FromQuery] PagingRequestParam param, Guid BrandId, bool available)
         {
             Expression<Func<ConditionRule, bool>> filter = el => !el.DelFlg && el.BrandId.Equals(BrandId);
-            string includedProperties = "ConditionGroup,ConditionGroup.ProductCondition,ConditionGroup.OrderCondition,ConditionGroup.MembershipCondition";
+            string includedProperties = "ConditionGroup,ConditionGroup.ProductCondition,ConditionGroup.OrderCondition";
             if (available != null && available)
             {
                 filter = el => !el.DelFlg && el.BrandId.Equals(BrandId) && (el.PromotionTier == null);
-                includedProperties = "ConditionGroup,ConditionGroup.ProductCondition,ConditionGroup.OrderCondition,ConditionGroup.MembershipCondition,PromotionTier";
+                includedProperties = "ConditionGroup,ConditionGroup.ProductCondition,ConditionGroup.OrderCondition,PromotionTier";
             }
             try
             {

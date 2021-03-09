@@ -195,10 +195,9 @@ namespace ApplicationCore.Services
                     orderBy: el => el.OrderBy(o => o.InsDate),
                     includeProperties: "ConditionRule," +
                     "ConditionRule.ConditionGroup," +
-                    "ConditionRule.ConditionGroup.MembershipCondition," +
                     "ConditionRule.ConditionGroup.OrderCondition," +
                     "ConditionRule.ConditionGroup.ProductCondition," +
-                    "MembershipAction," +
+                    "PostAction," +
                     "Action"))
                     .ToList();
                 // Reorder các condition trong group
