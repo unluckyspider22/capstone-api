@@ -144,7 +144,6 @@ namespace PromotionEngineAPI.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
         [Route("{channelCode}/brands/{BrandCode}/promotions")]
         public async Task<IActionResult> GetPromotionForChannel(string channelCode, string BrandCode, [FromBody] VoucherChannelParam param)
         {
