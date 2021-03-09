@@ -37,12 +37,12 @@ namespace PromotionEngineAPI.Controllers.Product
         }
 
         [HttpGet]
-        [Route("brand/{brandId}")]
-        public async Task<IActionResult> GetBrandProduct([FromRoute]Guid brandId)
+        [Route("brand")]
+        public async Task<IActionResult> GetBrandProduct([FromQuery] PagingRequestParam param, [FromQuery] Guid brandId)
         {
             try
             {
-                var result = await _service.GetBrandProduct(brandId: brandId);
+                var result = await _service.GetBrandProduct(PageIndex: param.PageIndex, PageSize: param.PageSize, brandId: brandId);
                 return Ok(result);
             }
             catch (ErrorObj e)

@@ -1,4 +1,5 @@
 ﻿using Infrastructure.DTOs;
+using Infrastructure.Helper;
 using Infrastructure.Models;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,6 @@ namespace ApplicationCore.Services
     {
         public Task<bool> CheckExistingDevice(string imei);
         public Task<DeviceDto> Update(DeviceDto dto);
-        public Task<List<BrandDeviceDto>> GetBrandDevice(Guid brandId);
+        public Task<GenericRespones<BrandDeviceDto>> GetBrandDevice(int PageSize, int PageIndex, Guid brandId);
     }
 }

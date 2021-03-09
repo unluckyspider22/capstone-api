@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Infrastructure.DTOs;
+using Infrastructure.Helper;
 using Infrastructure.Models;
 using Infrastructure.Repository;
 using Infrastructure.UnitOrWork;
@@ -25,11 +26,12 @@ namespace ApplicationCore.Services
             return isExist;
         }
 
-        public async Task<List<BrandDeviceDto>> GetBrandDevice(Guid brandId)
+        public async Task<GenericRespones<BrandDeviceDto>> GetBrandDevice(int PageSize, int PageIndex, Guid brandId)
         {
             var result = new List<BrandDeviceDto>();
             IGenericRepository<Store> storeRepo = _unitOfWork.StoreRepository;
-            var stores = await storeRepo.Get(filter: o => o.BrandId.Equals(brandId) && !o.DelFlg, includeProperties: "Device");
+            var stores = await storeRepo.Get(pageSize: PageSize, pageIndex: PageIndex,
+                filter: o => o.BrandId.Equals(brandId) && !o.DelFlg, includeProperties: "Device");
             if (stores != null)
             {
                 foreach (var store in stores)
@@ -56,7 +58,13 @@ namespace ApplicationCore.Services
 
                 }
             }
-            return result;
+
+
+            var totalItem = await _repository.CountAsync(filter: o => o.Store.BrandId.Equals(brandId) && !o.DelFlg);
+            MetaData metadata = new MetaData(pageIndex: PageIndex, pageSize: PageSize, totalItems: totalItem);
+
+            GenericRespones<BrandDeviceDto> response = new GenericRespones<BrandDeviceDto>(data: result.ToList(), metadata: metadata);
+            return response;
         }
 
         public async Task<DeviceDto> Update(DeviceDto dto)

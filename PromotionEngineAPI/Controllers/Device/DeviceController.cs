@@ -26,7 +26,7 @@ namespace PromotionEngineAPI.Controllers
         {
             try
             {
-                var result = await _service.GetAsync(pageIndex: param.PageIndex, pageSize: param.PageSize, 
+                var result = await _service.GetAsync(pageIndex: param.PageIndex, pageSize: param.PageSize,
                     filter: o => o.StoreId.Equals(storeId) && !o.DelFlg);
                 return Ok(result);
             }
@@ -52,12 +52,12 @@ namespace PromotionEngineAPI.Controllers
 
         }
         [HttpGet]
-        [Route("brand/{brandId}")]
-        public async Task<IActionResult> GetBrandDevice([FromRoute] Guid brandId)
+        [Route("brand")]
+        public async Task<IActionResult> GetBrandDevice([FromQuery] PagingRequestParam param, [FromQuery] Guid brandId)
         {
             try
             {
-                var result = await _service.GetBrandDevice(brandId: brandId);
+                var result = await _service.GetBrandDevice(PageSize: param.PageSize, PageIndex: param.PageIndex, brandId: brandId);
                 return Ok(result);
             }
             catch (ErrorObj e)

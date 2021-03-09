@@ -25,6 +25,26 @@ namespace ApplicationCore.Services
             return isExist;
         }
 
+        public async Task<List<ProductCategoryDto>> GetAll(Guid brandId)
+        {
+            try
+            {
+                var entity = await _repository.Get(filter: o => o.BrandId.Equals(brandId) && !o.DelFlg);
+                if (entity != null)
+                {
+                    return _mapper.Map<List<ProductCategoryDto>>(entity);
+                }
+                return new List<ProductCategoryDto>();
+
+            }
+            catch (Exception e)
+            {
+                //chạy bằng debug mode để xem log
+                Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.Message);
+                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+            }
+        }
+
         public async Task<ProductCategoryDto> Update(ProductCategoryDto dto)
         {
             try

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Infrastructure.DTOs;
+using Infrastructure.Helper;
 using Infrastructure.Models;
 using Infrastructure.Repository;
 using Infrastructure.UnitOrWork;
@@ -28,13 +29,14 @@ namespace ApplicationCore.Services
             return isExist;
         }
 
-        public async Task<List<BrandProductDto>> GetBrandProduct(Guid brandId)
+        public async Task<GenericRespones<BrandProductDto>> GetBrandProduct(int PageSize, int PageIndex, Guid brandId)
         {
             try
             {
                 IGenericRepository<ProductCategory> cateRepo = _unitOfWork.ProductCategoryRepository;
                 var result = new List<BrandProductDto>();
-                var categories = (await cateRepo.Get(filter: o => o.BrandId.Equals(brandId) && !o.DelFlg, includeProperties: "Product")).ToList();
+                var categories = (await cateRepo.Get(pageIndex: PageIndex, pageSize: PageSize, 
+                    filter: o => o.BrandId.Equals(brandId) && !o.DelFlg, includeProperties: "Product")).ToList();
                 if (categories != null && categories.Count > 0)
                 {
                     foreach (var cate in categories)
@@ -59,8 +61,11 @@ namespace ApplicationCore.Services
                         }
                     }
                 }
-
-                return result;
+                var list = result;
+                var totalItem = await _repository.CountAsync(filter: o => o.ProductCate.BrandId.Equals(brandId) && !o.DelFlg);
+                MetaData metadata = new MetaData(pageIndex: PageIndex, pageSize: PageSize, totalItems: totalItem);
+                GenericRespones<BrandProductDto> reponse = new GenericRespones<BrandProductDto>(data: list.ToList(), metadata: metadata);
+                return reponse;
             }
             catch (Exception e)
             {

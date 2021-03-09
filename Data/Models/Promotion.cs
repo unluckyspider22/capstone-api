@@ -7,9 +7,11 @@ namespace Infrastructure.Models
     {
         public Promotion()
         {
+            MemberLevelMapping = new HashSet<MemberLevelMapping>();
             PromotionChannelMapping = new HashSet<PromotionChannelMapping>();
             PromotionStoreMapping = new HashSet<PromotionStoreMapping>();
             PromotionTier = new HashSet<PromotionTier>();
+            Transaction = new HashSet<Transaction>();
         }
 
         public Guid PromotionId { get; set; }
@@ -43,8 +45,10 @@ namespace Infrastructure.Models
 
         public virtual Brand Brand { get; set; }
         public virtual VoucherGroup VoucherGroup { get; set; }
+        public virtual ICollection<MemberLevelMapping> MemberLevelMapping { get; set; }
         public virtual ICollection<PromotionChannelMapping> PromotionChannelMapping { get; set; }
         public virtual ICollection<PromotionStoreMapping> PromotionStoreMapping { get; set; }
         public virtual ICollection<PromotionTier> PromotionTier { get; set; }
+        public virtual ICollection<Transaction> Transaction { get; set; }
     }
 }

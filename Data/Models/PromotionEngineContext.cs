@@ -17,6 +17,7 @@ namespace Infrastructure.Models
 
         public virtual DbSet<Account> Account { get; set; }
         public virtual DbSet<Action> Action { get; set; }
+        public virtual DbSet<ActionProductMapping> ActionProductMapping { get; set; }
         public virtual DbSet<Brand> Brand { get; set; }
         public virtual DbSet<Channel> Channel { get; set; }
         public virtual DbSet<ConditionGroup> ConditionGroup { get; set; }
@@ -24,6 +25,7 @@ namespace Infrastructure.Models
         public virtual DbSet<Device> Device { get; set; }
         public virtual DbSet<Holiday> Holiday { get; set; }
         public virtual DbSet<MemberLevel> MemberLevel { get; set; }
+        public virtual DbSet<MemberLevelMapping> MemberLevelMapping { get; set; }
         public virtual DbSet<Membership> Membership { get; set; }
         public virtual DbSet<MembershipAction> MembershipAction { get; set; }
         public virtual DbSet<MembershipCondition> MembershipCondition { get; set; }
@@ -37,6 +39,7 @@ namespace Infrastructure.Models
         public virtual DbSet<PromotionTier> PromotionTier { get; set; }
         public virtual DbSet<RoleEntity> Role { get; set; }
         public virtual DbSet<Store> Store { get; set; }
+        public virtual DbSet<Transaction> Transaction { get; set; }
         public virtual DbSet<Voucher> Voucher { get; set; }
         public virtual DbSet<VoucherGroup> VoucherGroup { get; set; }
 
@@ -167,6 +170,25 @@ namespace Infrastructure.Models
                     .HasForeignKey<Action>(d => d.PromotionTierId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("Action_FK");
+            });
+
+            modelBuilder.Entity<ActionProductMapping>(entity =>
+            {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.InsDate).HasColumnType("datetime");
+
+                entity.Property(e => e.UpdDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.Action)
+                    .WithMany(p => p.ActionProductMapping)
+                    .HasForeignKey(d => d.ActionId)
+                    .HasConstraintName("FK_ActionProductMapping_Action");
+
+                entity.HasOne(d => d.Product)
+                    .WithMany(p => p.ActionProductMapping)
+                    .HasForeignKey(d => d.ProductId)
+                    .HasConstraintName("FK_ActionProductMapping_Product");
             });
 
             modelBuilder.Entity<Brand>(entity =>
@@ -371,6 +393,25 @@ namespace Infrastructure.Models
                     .HasForeignKey(d => d.BrandId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_MemberLevel_Brand");
+            });
+
+            modelBuilder.Entity<MemberLevelMapping>(entity =>
+            {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.InsDate).HasColumnType("datetime");
+
+                entity.Property(e => e.UpdDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.MemberLevel)
+                    .WithMany(p => p.MemberLevelMapping)
+                    .HasForeignKey(d => d.MemberLevelId)
+                    .HasConstraintName("FK_MemberLevelMapping_MemberLevel");
+
+                entity.HasOne(d => d.Promotion)
+                    .WithMany(p => p.MemberLevelMapping)
+                    .HasForeignKey(d => d.PromotionId)
+                    .HasConstraintName("FK_MemberLevelMapping_Promotion");
             });
 
             modelBuilder.Entity<Membership>(entity =>
@@ -857,6 +898,31 @@ namespace Infrastructure.Models
                     .WithMany(p => p.Store)
                     .HasForeignKey(d => d.BrandId)
                     .HasConstraintName("FK_Store_Brand");
+            });
+
+            modelBuilder.Entity<Transaction>(entity =>
+            {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.InsDate).HasColumnType("datetime");
+
+                entity.Property(e => e.TransactionJson)
+                    .IsRequired()
+                    .HasMaxLength(4000);
+
+                entity.Property(e => e.UpdDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.Brand)
+                    .WithMany(p => p.Transaction)
+                    .HasForeignKey(d => d.BrandId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Transaction_Brand");
+
+                entity.HasOne(d => d.Promotion)
+                    .WithMany(p => p.Transaction)
+                    .HasForeignKey(d => d.PromotionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Transaction_Promotion");
             });
 
             modelBuilder.Entity<Voucher>(entity =>

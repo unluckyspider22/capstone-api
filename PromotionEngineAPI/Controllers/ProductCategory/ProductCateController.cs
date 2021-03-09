@@ -35,6 +35,22 @@ namespace PromotionEngineAPI.Controllers.ProductCategory
                 return StatusCode(statusCode: e.Code, e);
             }
 
+        }   
+
+        [HttpGet]
+        [Route("all")]
+        public async Task<IActionResult> GetProductCategoryAll([FromQuery] Guid brandId)
+        {
+            try
+            {
+                var result = await _service.GetAll(brandId: brandId);
+                return Ok(result);
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+
         }
 
         [HttpGet]

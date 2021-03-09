@@ -5,6 +5,11 @@ namespace Infrastructure.Models
 {
     public partial class Product
     {
+        public Product()
+        {
+            ActionProductMapping = new HashSet<ActionProductMapping>();
+        }
+
         public Guid ProductId { get; set; }
         public Guid ProductCateId { get; set; }
         public string CateId { get; set; }
@@ -15,5 +20,6 @@ namespace Infrastructure.Models
         public DateTime UpdDate { get; set; }
 
         public virtual ProductCategory ProductCate { get; set; }
+        public virtual ICollection<ActionProductMapping> ActionProductMapping { get; set; }
     }
 }

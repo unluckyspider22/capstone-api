@@ -7,6 +7,7 @@ namespace Infrastructure.Models
     {
         public Guid ProductConditionId { get; set; }
         public Guid ConditionGroupId { get; set; }
+        public Guid? ProductId { get; set; }
         public int? IndexGroup { get; set; }
         public string ProductConditionType { get; set; }
         public string ProductType { get; set; }

@@ -5,6 +5,11 @@ namespace Infrastructure.Models
 {
     public partial class Action
     {
+        public Action()
+        {
+            ActionProductMapping = new HashSet<ActionProductMapping>();
+        }
+
         public Guid ActionId { get; set; }
         public Guid PromotionTierId { get; set; }
         public string ActionType { get; set; }
@@ -28,5 +33,6 @@ namespace Infrastructure.Models
         public DateTime UpdDate { get; set; }
 
         public virtual PromotionTier PromotionTier { get; set; }
+        public virtual ICollection<ActionProductMapping> ActionProductMapping { get; set; }
     }
 }
