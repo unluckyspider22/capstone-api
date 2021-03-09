@@ -37,14 +37,14 @@ namespace ApplicationCore.Chain
         private void HandleMinAmount(OrderConditionModel orderCondition, OrderResponseModel order)
         {
             /*throw new ErrorObj(code: 400, message:"Compare: "+ Common.Compare<decimal>(orderCondition.AmountOperator, order.OrderDetail.Amount, orderCondition.Amount));*/
-            if (!Common.Compare<decimal>(orderCondition.AmountOperator, order.OrderDetail.Amount, orderCondition.Amount))
+            if (!Common.Compare<decimal>(orderCondition.AmountOperator, order.CustomerOrderInfo.Amount, orderCondition.Amount))
             {
                 orderCondition.IsMatch = false;
             }
         }
         private void HandleMinQuantity(OrderConditionModel orderCondition, OrderResponseModel order)
         {
-            if (!Common.Compare<decimal>(orderCondition.QuantityOperator, order.OrderDetail.OrderDetailResponses.Count(), orderCondition.Quantity))
+            if (!Common.Compare<decimal>(orderCondition.QuantityOperator, order.CustomerOrderInfo.CartItems.Count(), orderCondition.Quantity))
             {
                 orderCondition.IsMatch = false;
             }

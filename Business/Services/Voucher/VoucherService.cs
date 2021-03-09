@@ -28,7 +28,7 @@ namespace ApplicationCore.Services
 
         protected override IGenericRepository<Voucher> _repository => _unitOfWork.VoucherRepository;
         protected IGenericRepository<VoucherGroup> _voucherGroupRepos => _unitOfWork.VoucherGroupRepository;
-        public async Task<List<Promotion>> CheckVoucher(OrderResponseModel order)
+        public async Task<List<Promotion>> CheckVoucher(CustomerOrderInfo order)
         {
             try
             {
@@ -38,20 +38,16 @@ namespace ApplicationCore.Services
                     throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.Duplicate_VoucherCode, description: AppConstant.ErrMessage.Duplicate_VoucherCode);
                 }
                 var promotions = new List<Promotion>();
-                foreach (VoucherResponseModel voucherModel in vouchers)
+                foreach (var voucherModel in vouchers)
                 {
-                    // throw new ErrorObj(code: 400, message:"voucherCode: " + voucherModel.VoucherCode + ", promotionCode: " + voucherModel.PromotionCode, description: AppConstant.ErrMessage.Invalid_VoucherCode);
                     var voucher = await _repository.Get(filter: el => el.VoucherCode.Equals(voucherModel.VoucherCode)
                     && el.VoucherGroup.Promotion.PromotionCode.Equals(voucherModel.PromotionCode)
                     && !el.IsUsed,
                     includeProperties:
-                    "VoucherGroup.Promotion.PromotionTier.Action," +
+                    "VoucherGroup.Promotion.PromotionTier.Action.ActionProductMapping.Product," +
                     "VoucherGroup.Promotion.PromotionTier.ConditionRule.ConditionGroup.OrderCondition," +
                     "VoucherGroup.Promotion.PromotionTier.ConditionRule.ConditionGroup.ProductCondition," +
-                    "VoucherGroup.Promotion.PromotionTier.ConditionRule.ConditionGroup.MembershipCondition," +
                     "VoucherGroup.Promotion.PromotionStoreMapping.Store");
-                    //  throw new ErrorObj(code: 400, message:"count: " +voucher.Count(), description: AppConstant.ErrMessage.Invalid_VoucherCode);
-
                     if (voucher.Count() > 1)
                     {
                         throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.Duplicate_VoucherCode, description: AppConstant.ErrMessage.Duplicate_VoucherCode);
@@ -122,9 +118,9 @@ namespace ApplicationCore.Services
                 List<Voucher> result = new List<Voucher>();
                 if (order != null)
                 {
-                    foreach (var voucherParam in order.Vouchers)
+                    foreach (var voucherParam in order.CustomerOrderInfo.Vouchers)
                     {
-                        foreach (var promotion in order.Promotions)
+                        /*foreach (var promotion in order.Promotions)
                         {
                             if (voucherParam.PromotionCode.Equals(promotion.PromotionCode))
                             {
@@ -149,7 +145,7 @@ namespace ApplicationCore.Services
                                 result.Add(vouchers);
                                 return result;
                             }
-                        }
+                        }*/
                     }
                 }
                 return result;

@@ -13,13 +13,14 @@ namespace ApplicationCore.Chain
 {
     public interface IConditionHandle : IHandler<OrderResponseModel>
     {
-
+        void SetPromotions(List<Promotion> promotions);
     }
     public class ConditionHandle : Handler<OrderResponseModel>, IConditionHandle
     {
         private readonly IOrderConditionHandle _orderConditionHandle;
         private readonly IProductConditionHandle _productConditionHandle;
         private readonly IMembershipConditionHandle _membershipConditionHandle;
+        private List<Promotion> _promotions;
         private readonly IMapper _mapper;
 
         public ConditionHandle(IOrderConditionHandle orderConditionHandle, IProductConditionHandle productConditionHandle, IMembershipConditionHandle membershipConditionHandle, IMapper mapper)
@@ -30,9 +31,13 @@ namespace ApplicationCore.Chain
             _mapper = mapper;
         }
 
+        public void SetPromotions(List<Promotion> promotions)
+        {
+            _promotions = promotions;
+        }
         public override void Handle(OrderResponseModel order)
         {
-            foreach (var promotion in order.Promotions)
+            foreach (var promotion in _promotions)
             {
                 int invalidPromotionDetails = 0;
                 foreach (var promotionTier in promotion.PromotionTier)
@@ -45,7 +50,15 @@ namespace ApplicationCore.Chain
                         invalidPromotionDetails++;
                         continue;
                     }
-                    order.PromotionTierIds.Add(promotionTier.PromotionTierId);
+                    Effect effect = new Effect
+                    {
+                        PromotionTierId = promotionTier.PromotionTierId
+                    };
+                    if(order.Effects == null)
+                    {
+                        order.Effects = new List<Effect>();
+                    }
+                    order.Effects.Add(effect);
                 }
                 if (invalidPromotionDetails == promotion.PromotionTier.Count && invalidPromotionDetails > 0)
                 {
@@ -131,13 +144,6 @@ namespace ApplicationCore.Chain
         {
             conditions = conditions.OrderBy(el => el.Index).ToList();
             bool result = conditions.First().IsMatch;
-
-            /*string str = "";
-            foreach (var con in conditions)
-            {
-                str += con.ToString() + " ";
-            }
-            throw new ErrorObj(code: 400, message: " str : " + str);*/
 
             foreach (var condition in conditions)
             {

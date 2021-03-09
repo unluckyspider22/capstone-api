@@ -11,62 +11,51 @@ namespace ApplicationCore.Request
     {
         public OrderResponseModel()
         {
-            Promotions = new List<Promotion>();
             Gift = new List<Gift>();
             Customer = new CustomerInfo();
-            PromotionTierIds = new List<Guid>();
-
         }
+        public List<Effect> Effects { get; set; }
 
-        public OrderInfoModel OrderDetail { get; set; }
-
-        public List<Promotion> Promotions { get; set; }
-
-        public List<VoucherResponseModel> Vouchers { get; set; }
-        public List<Gift> Gift { get; set; }
+        public CustomerOrderInfo CustomerOrderInfo { get; set; }
         public CustomerInfo Customer { get; set; }
+
+        public List<Gift> Gift { get; set; }
         public decimal? TotalAmount { get; set; }
         public decimal? Discount { get; set; }
         public decimal? DiscountOrderDetail { get; set; }
         public decimal? FinalAmount { get; set; }
-        public List<Guid> PromotionTierIds { get; set; }
-        public List<OrderActionModel> OrderAction { get; set; }
-    }
-    public class TestOperator
-    {
-        public int? Index { get; set; }
-        public bool IsMatch { get; set; }
-        public string NextOperator { get; set; }
 
-        public TestOperator(int index, bool isMatch, string nextOperator)
-        {
-            Index = index;
-            IsMatch = isMatch;
-            NextOperator = nextOperator;
-        }
+    }
+    public class Effect
+    {
+        public Guid PromotionId { get; set; }
+        public Guid PromotionTierId { get; set; }
+        public int TierIndex { get; set; }
+        public string ConditionRuleName { get; set; }
     }
 
-
-    public class OrderInfoModel
+    public class CustomerOrderInfo
     {
-        public OrderInfoModel()
+        public CustomerOrderInfo()
         {
-
-            OrderDetailResponses = new List<OrderDetailResponseModel>();
+            CartItems = new List<Item>();
         }
         public int? Id { get; set; }
-        public DateTime BookingDate { get; set; } = DateTime.Now;
+        public DateTime BookingDate { get; set; }
+
+        public Attribute Attributes { get; set; }
+        public List<Item> CartItems { get; set; }
+
+        public List<CouponCode> Vouchers { get; set; }
+        public decimal Amount { get; set; }
+        public decimal ShippingFee { get; set; }
+    }
+    public class Attribute
+    {
         public string SalesMode { get; set; }
         public string Note { get; set; }
         public string PaymentMethod { get; set; }
-
-        public decimal Amount { get; set; }
-
-        public StoreInfoModel StoreInfo { get; set; }
-
-        public List<OrderDetailResponseModel> OrderDetailResponses { get; set; }
-
-
+        public StoreInfo StoreInfo { get; set; }
     }
     public class Gift
     {
@@ -74,26 +63,23 @@ namespace ApplicationCore.Request
         public int Quantity { get; set; }
         public string ProductName { get; set; }
     }
-    public class VoucherResponseModel
+    public class CouponCode
     {
         public string PromotionCode { get; set; }
         public string VoucherCode { get; set; }
     }
-    public class StoreInfoModel
+    public class StoreInfo
     {
         public string StoreId { get; set; }
         public string StoreName { get; set; }
-        public Guid BrandId { get; set; }
-
+        public string BrandCode { get; set; }
         public string Applier { get; set; }
         public string IpAddress { get; set; }
     }
-    public class OrderDetailResponseModel
+    public class Item
     {
         public string ProductCode { get; set; }
         public string CategoryCode { get; set; }
-        public string Tag { get; set; }
-        public string ParentCode { get; set; }
         public string ProductName { get; set; }
         public decimal UnitPrice { get; set; }
         public int Quantity { get; set; }
@@ -101,24 +87,13 @@ namespace ApplicationCore.Request
         public decimal Discount { get; set; }
         public decimal DiscountFromOrder { get; set; }
         public decimal FinalAmount { get; set; }
-        public string PromotionCode { get; set; }
-
-    }
-    public class OrderActionModel
-    {
-        public Guid ActionId { get; set; }
-
-        public decimal DiscountAmount { get; set; }
-        public string PromotionCode { get; set; }
-        public string VoucherCode { get; set; }
-
     }
     public class CustomerInfo
     {
         public string CustomerName { get; set; }
         public string CustomerEmail { get; set; }
         public string CustomerPhoneNo { get; set; }
-        public string CustomerGender { get; set; }
+        public string CustomerGender { get; set; } = "3";
         public string CustomerLevel { get; set; }
     }
 }

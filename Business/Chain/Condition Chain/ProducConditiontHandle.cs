@@ -23,7 +23,7 @@ namespace ApplicationCore.Chain
         {
             if (_condition is ProductConditionModel)
             {
-                var products = order.OrderDetail.OrderDetailResponses;
+                var products = order.CustomerOrderInfo.CartItems;
                 HandleIncludeExclude((ProductConditionModel)_condition, products);
                 HandleQuantity((ProductConditionModel)_condition, products);
             }
@@ -37,7 +37,7 @@ namespace ApplicationCore.Chain
             _condition = condition;
         }
 
-        private void HandleIncludeExclude(ProductConditionModel productCondition, List<OrderDetailResponseModel> products)
+        private void HandleIncludeExclude(ProductConditionModel productCondition, List<Item> products)
         {
             productCondition.IsMatch = false;
             foreach (var product in products)
@@ -51,7 +51,7 @@ namespace ApplicationCore.Chain
                     }
                     else productCondition.IsMatch = isMatch;
                 }
-                else
+               /* else
                 {
                     if (product.ParentCode.Equals(productCondition.ParentCode)
                         && productCondition.ProductConditionType.Equals(AppConstant.EnvVar.EXCLUDE))
@@ -59,14 +59,14 @@ namespace ApplicationCore.Chain
                         productCondition.IsMatch = !isMatch;
                     }
                     else productCondition.IsMatch = isMatch;
-                }
+                }*/
                 if (productCondition.IsMatch)
                 {
                     break;
                 }
             }
         }
-        private void HandleQuantity(ProductConditionModel condition, List<OrderDetailResponseModel> products)
+        private void HandleQuantity(ProductConditionModel condition, List<Item> products)
         {
             if (condition.ProductQuantity > 0)
             {
