@@ -77,7 +77,9 @@ namespace Infrastructure.UnitOrWork
 
         public IGenericRepository<Device> DeviceRepository { get; set; }
 
+        public IGenericRepository<ActionProductMapping> ActionProductMappingRepository { get; set; }
 
+        public IGenericRepository<MemberLevelMapping> MemberLevelMappingRepository { get; set; }
 
         private void initRepository()
         {
@@ -125,6 +127,8 @@ namespace Infrastructure.UnitOrWork
             ProductCategoryRepository = new GenericRepository<ProductCategory>(_context);
             MemberLevelRepository = new GenericRepository<MemberLevel>(_context);
             DeviceRepository = new GenericRepository<Device>(_context);
+            ActionProductMappingRepository = new GenericRepository<ActionProductMapping>(_context);
+            MemberLevelMappingRepository = new GenericRepository<MemberLevelMapping>(_context);
         }
         public void Dispose()
         {

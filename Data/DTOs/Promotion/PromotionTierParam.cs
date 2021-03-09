@@ -27,12 +27,6 @@ namespace Infrastructure.DTOs
         public string ActionType { get; set; }
         [StringLength(1)]
         public string DiscountType { get; set; }
-        [StringLength(1)]
-        public string ProductType { get; set; }
-        [StringLength(50)]
-        public string ParentCode { get; set; }
-        [StringLength(200)]
-        public string ProductCode { get; set; }
         [Range(0, 999999)]
         public decimal? DiscountQuantity { get; set; }
         [Range(0, 9999999999)]
@@ -55,6 +49,7 @@ namespace Infrastructure.DTOs
         public decimal? BundleQuantity { get; set; }
         [StringLength(1)]
         public string BundleStrategy { get; set; }
+        public List<Guid> ListProduct { get; set; }
     }
 
     public class MembershipActionRequestParam

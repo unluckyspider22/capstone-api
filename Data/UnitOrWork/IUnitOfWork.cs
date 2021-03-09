@@ -51,6 +51,8 @@ namespace Infrastructure.UnitOrWork
         IGenericRepository<MemberLevel> MemberLevelRepository { get; }
 
         IGenericRepository<Device> DeviceRepository { get; }
+        IGenericRepository<ActionProductMapping> ActionProductMappingRepository { get; }
+        IGenericRepository<MemberLevelMapping> MemberLevelMappingRepository { get; }
 
 
         Task<int> SaveAsync();

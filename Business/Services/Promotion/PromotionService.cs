@@ -85,10 +85,31 @@ namespace ApplicationCore.Services
                     actionEntity.PromotionTierId = promotionTier.PromotionTierId;
                     actionEntity.ActionType = actionEntity.ActionType.Trim();
                     actionEntity.DiscountType = actionEntity.DiscountType.Trim();
-                    promotionTier.Summary = CreateSummaryAction(actionEntity);
+                    //promotionTier.Summary = CreateSummaryAction(actionEntity);
+                    promotionTier.Summary = "";
                     promotionTier.ActionId = actionEntity.ActionId;
                     promotionTierRepo.Add(promotionTier);
                     actionRepo.Add(actionEntity);
+
+                    // Create action product mapping
+                    IGenericRepository<ActionProductMapping> mapRepo = _unitOfWork.ActionProductMappingRepository;
+                    if (param.Action.ListProduct.Count > 0)
+                    {
+                        foreach (var product in param.Action.ListProduct)
+                        {
+                            var mappEntity = new ActionProductMapping()
+                            {
+                                Id = Guid.NewGuid(),
+                                ActionId = actionEntity.ActionId,
+                                ProductId = product,
+                                //ProductId = Guid.Parse(product),
+                                InsDate = DateTime.Now,
+                                UpdDate = DateTime.Now,
+                            };
+                            mapRepo.Add(mappEntity);
+                        }
+                        await _unitOfWork.SaveAsync();
+                    }
                     param.Action = _mapper.Map<ActionRequestParam>(actionEntity);
                 }
                 else
@@ -101,7 +122,8 @@ namespace ApplicationCore.Services
                     membershipAction.PromotionTierId = promotionTier.PromotionTierId;
                     membershipAction.ActionType = membershipAction.ActionType.Trim();
                     membershipAction.DiscountType = membershipAction.DiscountType.Trim();
-                    promotionTier.Summary = CreateSummaryMembershipAction(membershipAction);
+                    //promotionTier.Summary = CreateSummaryMembershipAction(membershipAction);
+                    promotionTier.Summary = "";
                     promotionTier.MembershipActionId = membershipAction.MembershipActionId;
                     promotionTierRepo.Add(promotionTier);
                     membershipActionRepo.Add(membershipAction);
@@ -111,7 +133,7 @@ namespace ApplicationCore.Services
                 {
                     throw new ErrorObj(code: 400, message: "Action or Membership action is not null", description: "Invalid param");
                 }
-                await _unitOfWork.SaveAsync();
+                //await _unitOfWork.SaveAsync();
                 return param;
             }
             catch (ErrorObj e)
@@ -121,6 +143,7 @@ namespace ApplicationCore.Services
             catch (Exception e)
             {
                 Debug.WriteLine(e.StackTrace);
+                Debug.WriteLine(e.InnerException);
                 throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.", description: "Internal Server Error");
             }
         }
@@ -349,20 +372,20 @@ namespace ApplicationCore.Services
                 }
 
                 //    // Create membership condition
-                if (group.MembershipCondition != null && group.MembershipCondition.Count > 0)
-                {
-                    foreach (var membershipCondition in group.MembershipCondition)
-                    {
-                        var membershipConditionEntity = _mapper.Map<MembershipCondition>(membershipCondition);
-                        membershipConditionEntity.ConditionGroupId = conditionGroupEntity.ConditionGroupId;
-                        membershipConditionEntity.MembershipConditionId = Guid.NewGuid();
-                        membershipConditionEntity.DelFlg = false;
-                        membershipConditionEntity.UpdDate = DateTime.Now;
-                        membershipConditionEntity.InsDate = DateTime.Now;
-                        membershipConditionRepo.Add(membershipConditionEntity);
-                        membershipCondition.MembershipConditionId = membershipConditionEntity.MembershipConditionId;
-                    }
-                }
+                //if (group.MembershipCondition != null && group.MembershipCondition.Count > 0)
+                //{
+                //    foreach (var membershipCondition in group.MembershipCondition)
+                //    {
+                //        var membershipConditionEntity = _mapper.Map<MembershipCondition>(membershipCondition);
+                //        membershipConditionEntity.ConditionGroupId = conditionGroupEntity.ConditionGroupId;
+                //        membershipConditionEntity.MembershipConditionId = Guid.NewGuid();
+                //        membershipConditionEntity.DelFlg = false;
+                //        membershipConditionEntity.UpdDate = DateTime.Now;
+                //        membershipConditionEntity.InsDate = DateTime.Now;
+                //        membershipConditionRepo.Add(membershipConditionEntity);
+                //        membershipCondition.MembershipConditionId = membershipConditionEntity.MembershipConditionId;
+                //    }
+                //}
             }
 
         }
@@ -433,7 +456,7 @@ namespace ApplicationCore.Services
             var totalCondition = 0;
             var productCond = false;
             var orderCond = false;
-            var membershipCond = false;
+            //var membershipCond = false;
 
             if (group.ProductCondition != null && group.ProductCondition.Count > 0)
             {
@@ -445,11 +468,11 @@ namespace ApplicationCore.Services
                 totalCondition += group.OrderCondition.Count;
                 orderCond = true;
             }
-            if (group.MembershipCondition != null && group.MembershipCondition.Count > 0)
-            {
-                totalCondition += group.MembershipCondition.Count;
-                membershipCond = true;
-            }
+            //if (group.MembershipCondition != null && group.MembershipCondition.Count > 0)
+            //{
+            //    totalCondition += group.MembershipCondition.Count;
+            //    membershipCond = true;
+            //}
             Object[] conditions = new Object[totalCondition];
             if (productCond)
             {
@@ -467,14 +490,14 @@ namespace ApplicationCore.Services
                     //conditions.Insert(orderCondition.IndexGroup, orderCondition);
                 }
             }
-            if (membershipCond)
-            {
-                foreach (var membershipCondition in group.MembershipCondition)
-                {
-                    conditions[membershipCondition.IndexGroup] = membershipCondition;
-                    //conditions.Insert(membershipCondition.IndexGroup, membershipCondition);
-                }
-            }
+            //if (membershipCond)
+            //{
+            //    foreach (var membershipCondition in group.MembershipCondition)
+            //    {
+            //        conditions[membershipCondition.IndexGroup] = membershipCondition;
+            //        //conditions.Insert(membershipCondition.IndexGroup, membershipCondition);
+            //    }
+            //}
             return conditions.ToList();
         }
         private string CreateSummary(ConditionGroupDto group)
@@ -542,7 +565,7 @@ namespace ApplicationCore.Services
                     {
                         productResult += value.ProductQuantity + " ";
                     }
-                    productResult += value.ProductName;
+                    //productResult += value.ProductName;
                     if (i < conditions.Count - 1)
                     {
                         if (value.NextOperator.Equals("1"))
