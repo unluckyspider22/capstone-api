@@ -29,13 +29,55 @@ namespace ApplicationCore.Services
             return isExist;
         }
 
+        public async Task<List<BrandProductDto>> GetAllBrandProduct(Guid brandId)
+        {
+            try
+            {
+                IGenericRepository<ProductCategory> cateRepo = _unitOfWork.ProductCategoryRepository;
+                var result = new List<BrandProductDto>();
+                var categories = (await cateRepo.Get(filter: o => o.BrandId.Equals(brandId) 
+                && !o.DelFlg, includeProperties: "Product")).ToList();
+                if (categories != null && categories.Count > 0)
+                {
+                    foreach (var cate in categories)
+                    {
+                        var products = cate.Product.ToList();
+                        if (products != null && products.Count > 0)
+                        {
+                            foreach (var product in products)
+                            {
+                                var dto = new BrandProductDto()
+                                {
+                                    CateId = cate.CateId,
+                                    CateName = cate.Name,
+                                    ProductCateId = cate.ProductCateId,
+                                    Code = product.Code,
+                                    ProductId = product.ProductId,
+                                    ProductName = product.Name
+
+                                };
+                                result.Add(dto);
+                            }
+                        }
+                    }
+                }
+                return result;
+            }
+            catch (Exception e)
+            {
+                //chạy bằng debug mode để xem log
+                Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.StackTrace);
+                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+            }
+        }
+
         public async Task<GenericRespones<BrandProductDto>> GetBrandProduct(int PageSize, int PageIndex, Guid brandId)
         {
             try
             {
                 IGenericRepository<ProductCategory> cateRepo = _unitOfWork.ProductCategoryRepository;
                 var result = new List<BrandProductDto>();
-                var categories = (await cateRepo.Get(pageIndex: PageIndex, pageSize: PageSize, 
+                var categories = (await cateRepo.Get(pageIndex: PageIndex, pageSize: PageSize,
                     filter: o => o.BrandId.Equals(brandId) && !o.DelFlg, includeProperties: "Product")).ToList();
                 if (categories != null && categories.Count > 0)
                 {
