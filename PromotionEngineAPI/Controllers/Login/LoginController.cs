@@ -27,12 +27,12 @@ namespace PromotionEngineAPI.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        public async Task<IActionResult> Login([FromBody]UserModel login)
+        public async Task<IActionResult> Login([FromBody]UserModel loginInfo)
         {
             var response = Unauthorized();
             try
             {
-                var user = await _loginService.Login(login);
+                var user = await _loginService.Login(loginInfo);
                 if (user != null)
                 {
                     return Ok(user);

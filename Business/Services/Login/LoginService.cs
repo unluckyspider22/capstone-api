@@ -40,8 +40,10 @@ namespace ApplicationCore.Services
                     result = new LoginResponse();
                     string message;
                     int status;
-                    account.Password = Common.DecodeFromBase64(account.Password);
-
+                    if(account.Role.RoleId != AppConstant.EnvVar.AdminId)
+                    {
+                        account.Password = Common.DecodeFromBase64(account.Password);
+                    }
                     if (account.Password == userInfo.Password)
                     {
                         var token = GenerateJSONWebToken(account);
