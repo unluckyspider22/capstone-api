@@ -5,6 +5,11 @@ namespace Infrastructure.Models
 {
     public partial class PostAction
     {
+        public PostAction()
+        {
+            PostActionProductMapping = new HashSet<PostActionProductMapping>();
+        }
+
         public Guid PostActionId { get; set; }
         public Guid PromotionTierId { get; set; }
         public string ActionType { get; set; }
@@ -19,5 +24,6 @@ namespace Infrastructure.Models
         public DateTime UpdDate { get; set; }
 
         public virtual PromotionTier PromotionTier { get; set; }
+        public virtual ICollection<PostActionProductMapping> PostActionProductMapping { get; set; }
     }
 }

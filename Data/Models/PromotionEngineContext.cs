@@ -29,6 +29,7 @@ namespace Infrastructure.Models
         public virtual DbSet<Membership> Membership { get; set; }
         public virtual DbSet<OrderCondition> OrderCondition { get; set; }
         public virtual DbSet<PostAction> PostAction { get; set; }
+        public virtual DbSet<PostActionProductMapping> PostActionProductMapping { get; set; }
         public virtual DbSet<Product> Product { get; set; }
         public virtual DbSet<ProductCategory> ProductCategory { get; set; }
         public virtual DbSet<ProductCondition> ProductCondition { get; set; }
@@ -516,6 +517,25 @@ namespace Infrastructure.Models
                     .HasForeignKey<PostAction>(d => d.PromotionTierId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("MembershipAction_FK");
+            });
+
+            modelBuilder.Entity<PostActionProductMapping>(entity =>
+            {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.InsDate).HasColumnType("datetime");
+
+                entity.Property(e => e.UpdDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.PostAction)
+                    .WithMany(p => p.PostActionProductMapping)
+                    .HasForeignKey(d => d.PostActionId)
+                    .HasConstraintName("FK_PostActionProductMapping_PostAction");
+
+                entity.HasOne(d => d.Product)
+                    .WithMany(p => p.PostActionProductMapping)
+                    .HasForeignKey(d => d.ProductId)
+                    .HasConstraintName("FK_PostActionProductMapping_Product");
             });
 
             modelBuilder.Entity<Product>(entity =>
