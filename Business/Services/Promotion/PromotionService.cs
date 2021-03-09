@@ -115,9 +115,9 @@ namespace ApplicationCore.Services
                 else
                 if (param.MembershipAction.ActionType != null)
                 {
-                    // Create membership action
-                    IGenericRepository<MembershipAction> membershipActionRepo = _unitOfWork.MembershipActionRepository;
-                    var membershipAction = _mapper.Map<MembershipAction>(param.MembershipAction);
+/*                    // Create membership action
+                    IGenericRepository<PostAction> membershipActionRepo = _unitOfWork.MembershipActionRepository;
+                    var membershipAction = _mapper.Map<PostAction>(param.MembershipAction);
                     membershipAction.MembershipActionId = Guid.NewGuid();
                     membershipAction.PromotionTierId = promotionTier.PromotionTierId;
                     membershipAction.ActionType = membershipAction.ActionType.Trim();
@@ -127,7 +127,7 @@ namespace ApplicationCore.Services
                     promotionTier.MembershipActionId = membershipAction.MembershipActionId;
                     promotionTierRepo.Add(promotionTier);
                     membershipActionRepo.Add(membershipAction);
-                    param.MembershipAction = _mapper.Map<MembershipActionRequestParam>(membershipAction);
+                    param.MembershipAction = _mapper.Map<MembershipActionRequestParam>(membershipAction);*/
                 }
                 else
                 {
@@ -160,7 +160,7 @@ namespace ApplicationCore.Services
                 }
                 else if (!param.MembershipActionId.Equals(Guid.Empty))
                 {
-                    IGenericRepository<MembershipAction> membershipActionRepo = _unitOfWork.MembershipActionRepository;
+                    IGenericRepository<PostAction> membershipActionRepo = _unitOfWork.MembershipActionRepository;
                     membershipActionRepo.Delete(param.MembershipActionId);
                 }
                 else
@@ -209,8 +209,8 @@ namespace ApplicationCore.Services
                     {
                         Action = tier.Action,
                         ActionId = tier.ActionId,
-                        MembershipAction = tier.MembershipAction,
-                        MembershipActionId = tier.MembershipActionId,
+                        PostAction = tier.PostAction,
+                        PostActionId = tier.PostActionId,
                         PromotionId = tier.PromotionId,
                         PromotionTierId = tier.PromotionTierId,
                         ConditionRuleId = tier.ConditionRuleId,
@@ -239,7 +239,7 @@ namespace ApplicationCore.Services
                     var actionEntity = _mapper.Map<Infrastructure.Models.Action>(updateParam.Action);
                     IGenericRepository<Infrastructure.Models.Action> actionRepo = _unitOfWork.ActionRepository;
                     actionEntity.UpdDate = DateTime.Now;
-                    actionEntity.InsDate = null;
+                    /*actionEntity.InsDate = null;*/
                     actionEntity.PromotionTierId = updateParam.PromotionTierId;
                     actionRepo.Update(actionEntity);
                     var tier = await promotionTierRepo.GetFirst(filter: el => el.ActionId.Equals(actionEntity.ActionId));
@@ -247,10 +247,10 @@ namespace ApplicationCore.Services
                     tier.UpdDate = DateTime.Now;
                     promotionTierRepo.Update(tier);
                 }
-                else if (!updateParam.MembershipAction.MembershipActionId.Equals(Guid.Empty))
+               /* else if (!updateParam.MembershipAction.MembershipActionId.Equals(Guid.Empty))
                 {
-                    var membershipActionEntity = _mapper.Map<MembershipAction>(updateParam.MembershipAction);
-                    IGenericRepository<MembershipAction> membershipActionRepo = _unitOfWork.MembershipActionRepository;
+                    var membershipActionEntity = _mapper.Map<PostAction>(updateParam.MembershipAction);
+                    IGenericRepository<PostAction> membershipActionRepo = _unitOfWork.MembershipActionRepository;
                     membershipActionEntity.UpdDate = DateTime.Now;
                     membershipActionEntity.InsDate = null;
                     membershipActionEntity.PromotionTierId = updateParam.PromotionTierId;
@@ -259,7 +259,7 @@ namespace ApplicationCore.Services
                     tier.Summary = CreateSummaryMembershipAction(membershipActionEntity);
                     tier.UpdDate = DateTime.Now;
                     promotionTierRepo.Update(tier);
-                }
+                }*/
                 //else
                 //{
                 //    throw new ErrorObj(code: 400, message: "Action or Membership action is not null", description: "Invalid param");
@@ -271,7 +271,7 @@ namespace ApplicationCore.Services
                     IGenericRepository<ConditionRule> conditionRepo = _unitOfWork.ConditionRuleRepository;
                     var conditionRuleEntity = _mapper.Map<ConditionRule>(updateParam.ConditionRule);
                     conditionRuleEntity.UpdDate = DateTime.Now;
-                    conditionRuleEntity.InsDate = null;
+                    /*conditionRuleEntity.InsDate = null;*/
                     conditionRepo.Update(conditionRuleEntity);
                     //await _unitOfWork.SaveAsync();
                     // Update condition group
@@ -400,7 +400,7 @@ namespace ApplicationCore.Services
                 foreach (Promotion promotion in orderResponse.Promotions)
                 {
                     //Check promotion is active
-                    if (!promotion.IsActive) throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.InActive_Promotion, description: AppConstant.ErrMessage.InActive_Promotion);
+                    if (!promotion.Status.Equals(AppConstant.EnvVar.PromotionStatus.PUBLISH)) throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.InActive_Promotion, description: AppConstant.ErrMessage.InActive_Promotion);
                     //Check promotion is time 
                     if (promotion.StartDate >= orderResponse.OrderDetail.BookingDate)
                     {
@@ -851,7 +851,7 @@ namespace ApplicationCore.Services
             return result;
         }
 
-        private string CreateSummaryMembershipAction(MembershipAction entity)
+     /*   private string CreateSummaryMembershipAction(PostAction entity)
         {
             var result = "";
             var actionType = entity.ActionType;
@@ -888,7 +888,7 @@ namespace ApplicationCore.Services
             }
             return result;
         }
-
+*/
         private string ToOrdinal(long number)
         {
             if (number < 0) return number.ToString();

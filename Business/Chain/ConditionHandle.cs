@@ -194,7 +194,7 @@ namespace ApplicationCore.Chain
                 entity.NextOperator = productCondition.NextOperator;
                 conditionModels.Add(entity);
             }
-            foreach (var membershipCondition in conditionGroup.MembershipCondition)
+            /*foreach (var membershipCondition in conditionGroup.MembershipCondition)
             {
                 var entity = _mapper.Map<MembershipConditionModel>(membershipCondition);
                 entity.Id = membershipCondition.MembershipConditionId;
@@ -202,7 +202,7 @@ namespace ApplicationCore.Chain
                 entity.NextOperator = membershipCondition.NextOperator;
                 conditionModels.Add(entity);
             }
-            conditionModels = conditionModels.OrderBy(el => el.Index).ToList();
+            conditionModels = conditionModels.OrderBy(el => el.Index).ToList();*/
             return conditionModels;
         }
         #endregion

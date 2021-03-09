@@ -10,9 +10,9 @@ namespace Infrastructure.DTOs
     {
         public ConditionRule conditionRule { get; set; }
         public Action action { get; set; }
-        public MembershipAction membershipAction { get; set; }
+        public PostAction membershipAction { get; set; }
 
-        public PromotionTierResponse(ConditionRule conditionRule, Action action, MembershipAction membershipAction)
+        public PromotionTierResponse(ConditionRule conditionRule, Action action, PostAction membershipAction)
         {
             this.conditionRule = conditionRule;
             this.action = action;

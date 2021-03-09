@@ -9,7 +9,7 @@ namespace Infrastructure.Models
         public Guid? ConditionRuleId { get; set; }
         public Guid? ActionId { get; set; }
         public Guid? PromotionId { get; set; }
-        public Guid? MembershipActionId { get; set; }
+        public Guid? PostActionId { get; set; }
         public DateTime? InsDate { get; set; }
         public DateTime? UpdDate { get; set; }
         public string Summary { get; set; }

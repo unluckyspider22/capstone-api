@@ -21,7 +21,7 @@ namespace Infrastructure.UnitOrWork
         //Membership
         IGenericRepository<Membership> MembershipRepository { get; }
         //MembershipAction
-        IGenericRepository<MembershipAction> MembershipActionRepository { get; }
+        IGenericRepository<PostAction> MembershipActionRepository { get; }
         //MembershipCondition
         IGenericRepository<MembershipCondition> MembershipConditionRepository { get; }
         //OrderCondition

@@ -185,7 +185,7 @@ namespace ApplicationCore.Services
                 {
                     PromotionChannelMapping obj = new PromotionChannelMapping
                     {
-                        VoucherChannelId = Guid.NewGuid(),
+                        PromotionChannelId = Guid.NewGuid(),
                         PromotionId = dto.PromotionId,
                         ChannelId = channel,
                         InsDate = DateTime.Now,

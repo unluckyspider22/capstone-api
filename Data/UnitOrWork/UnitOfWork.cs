@@ -32,7 +32,7 @@ namespace Infrastructure.UnitOrWork
         //Membership
         public IGenericRepository<Membership> MembershipRepository { get; set; }
         //MembershipAction
-        public IGenericRepository<MembershipAction> MembershipActionRepository { get; set; }
+        public IGenericRepository<PostAction> MembershipActionRepository { get; set; }
         //MembershipCondition
         public IGenericRepository<MembershipCondition> MembershipConditionRepository { get; set; }
         //OrderCondition
@@ -98,7 +98,7 @@ namespace Infrastructure.UnitOrWork
             //Membership
             MembershipRepository = new GenericRepository<Membership>(_context);
             //MembershipAction
-            MembershipActionRepository = new GenericRepository<MembershipAction>(_context);
+            MembershipActionRepository = new GenericRepository<PostAction>(_context);
             //MembershipCondition
             MembershipConditionRepository = new GenericRepository<MembershipCondition>(_context);
             //OrderCondition

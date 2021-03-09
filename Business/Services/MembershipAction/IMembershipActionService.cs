@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace ApplicationCore.Services
 {
-    public interface IMembershipActionService : IBaseService<MembershipAction, MembershipActionDto>
+    public interface IMembershipActionService : IBaseService<PostAction, MembershipActionDto>
     {
         
     }

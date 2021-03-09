@@ -38,7 +38,6 @@ namespace Infrastructure.Models
         public string HourFilter { get; set; }
         public string Rank { get; set; }
         public string Status { get; set; }
-        public bool IsActive { get; set; }
         public bool DelFlg { get; set; }
         public DateTime? InsDate { get; set; }
         public DateTime? UpdDate { get; set; }

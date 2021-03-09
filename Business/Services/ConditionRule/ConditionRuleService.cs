@@ -60,14 +60,14 @@ namespace ApplicationCore.Services
                             groupResponse.Conditions.Add(_mapper.Map<OrderConditionDto>(orderCondition));
                         }
                     }
-                    if (group.MembershipCondition != null && group.MembershipCondition.Count > 0)
+                    /*if (group.MembershipCondition != null && group.MembershipCondition.Count > 0)
                     {
                         var membershipConditions = group.MembershipCondition;
                         foreach (var membershipCondition in membershipConditions)
                         {
                             groupResponse.Conditions.Add(_mapper.Map<MembershipConditionDto>(membershipCondition));
                         }
-                    }
+                    }*/
                     groupResponse.Conditions = groupResponse.Conditions.OrderBy(
                         o => (o.GetType() == typeof(ProductConditionDto) ? ((ProductConditionDto)o).IndexGroup
                         : o.GetType() == typeof(OrderConditionDto) ? ((OrderConditionDto)o).IndexGroup
@@ -118,14 +118,14 @@ namespace ApplicationCore.Services
                         groupResponse.Conditions.Add(_mapper.Map<OrderConditionDto>(orderCondition));
                     }
                 }
-                if (group.MembershipCondition != null && group.MembershipCondition.Count > 0)
+                /*if (group.MembershipCondition != null && group.MembershipCondition.Count > 0)
                 {
                     var membershipConditions = group.MembershipCondition;
                     foreach (var membershipCondition in membershipConditions)
                     {
                         groupResponse.Conditions.Add(_mapper.Map<MembershipConditionDto>(membershipCondition));
                     }
-                }
+                }*/
                 groupResponse.Conditions = groupResponse.Conditions.OrderBy(
                     o => (o.GetType() == typeof(ProductConditionDto) ? ((ProductConditionDto)o).IndexGroup
                     : o.GetType() == typeof(OrderConditionDto) ? ((OrderConditionDto)o).IndexGroup

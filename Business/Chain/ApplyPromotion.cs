@@ -144,7 +144,7 @@ namespace ApplicationCore.Chain
             {
                 foreach (var product in order.OrderDetail.OrderDetailResponses)
                 {
-                    if (action.ProductCode.Contains(product.ProductCode))
+                   /* if (action.ProductCode.Contains(product.ProductCode))
                     {
                         switch (action.DiscountType)
                         {
@@ -165,7 +165,7 @@ namespace ApplicationCore.Chain
                                 break;
 
                         }
-                    }
+                    }*/
                     product.FinalAmount = product.TotalAmount - product.Discount;
                 }
             }
@@ -173,7 +173,7 @@ namespace ApplicationCore.Chain
             {
                 var products = order.OrderDetail.OrderDetailResponses;
                 int countProductMatch = 0;
-                foreach (var product in products)
+                /*foreach (var product in products)
                 {
                     if (action.ProductCode.Contains(product.ProductCode))
                     {
@@ -183,7 +183,7 @@ namespace ApplicationCore.Chain
                 if (countProductMatch >= action.BundleQuantity)
                 {
                     DiscountProductBundlePrice(products, action);
-                }
+                }*/
             }
         }
         private void DiscountProductAmount(OrderDetailResponseModel product, Infrastructure.Models.Action action)
@@ -235,7 +235,7 @@ namespace ApplicationCore.Chain
             foreach (var product in products)
             {
                 decimal discount = product.Discount;
-                if (action.ProductCode.Contains(product.ProductCode))
+               /* if (action.ProductCode.Contains(product.ProductCode))
                 {
                     discountedProduct = product.Quantity > bundleQuantity ? bundleQuantity : product.Quantity;
                     discount += (decimal)(product.TotalAmount - discountedProduct * action.BundlePrice);
@@ -246,7 +246,7 @@ namespace ApplicationCore.Chain
                 if (bundleQuantity <= 0)
                 {
                     break;
-                }
+                }*/
             }
         }
         private void SetDiscountProduct(OrderDetailResponseModel product, Infrastructure.Models.Action action, decimal discount)
