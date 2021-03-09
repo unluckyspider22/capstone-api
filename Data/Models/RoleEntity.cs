@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace Infrastructure.Models
 {
@@ -10,7 +9,7 @@ namespace Infrastructure.Models
         {
             Account = new HashSet<Account>();
         }
-        [Key]
+
         public int RoleId { get; set; }
         public string Name { get; set; }
         public bool DelFlg { get; set; }

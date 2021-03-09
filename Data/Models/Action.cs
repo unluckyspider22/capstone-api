@@ -26,7 +26,7 @@ namespace Infrastructure.Models
         public decimal? BundleQuantity { get; set; }
         public string BundleStrategy { get; set; }
         public bool DelFlg { get; set; }
-        public DateTime InsDate { get; set; }
+        public DateTime? InsDate { get; set; }
         public DateTime UpdDate { get; set; }
 
         public virtual PromotionTier PromotionTier { get; set; }

@@ -15,7 +15,7 @@ namespace Infrastructure.Models
         public string GiftVoucherCode { get; set; }
         public decimal? BonusPoint { get; set; }
         public bool DelFlg { get; set; }
-        public DateTime InsDate { get; set; }
+        public DateTime? InsDate { get; set; }
         public DateTime UpdDate { get; set; }
 
         public virtual PromotionTier PromotionTier { get; set; }

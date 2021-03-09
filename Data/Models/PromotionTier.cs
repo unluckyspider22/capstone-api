@@ -13,6 +13,7 @@ namespace Infrastructure.Models
         public DateTime? InsDate { get; set; }
         public DateTime? UpdDate { get; set; }
         public string Summary { get; set; }
+        public int? TierIndex { get; set; }
 
         public virtual ConditionRule ConditionRule { get; set; }
         public virtual Promotion Promotion { get; set; }
