@@ -30,6 +30,8 @@ namespace ApplicationCore.Request
         public Guid PromotionTierId { get; set; }
         public int TierIndex { get; set; }
         public string ConditionRuleName { get; set; }
+        public string EffectType { get; set; }
+        public Object Prop { get; set; }
     }
 
     public class CustomerOrderInfo

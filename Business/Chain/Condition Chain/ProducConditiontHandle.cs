@@ -42,7 +42,7 @@ namespace ApplicationCore.Chain
             productCondition.IsMatch = false;
             foreach (var product in products)
             {
-                bool isMatch = product.ProductCode.Equals(productCondition.ProductCode);
+                bool isMatch = productCondition.Products.Any(a => a.Code == product.ProductCode);
                 if (productCondition.ProductConditionType.Equals(AppConstant.EnvVar.EXCLUDE))
                 {
                     productCondition.IsMatch = !isMatch;

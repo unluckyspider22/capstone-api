@@ -173,15 +173,28 @@ namespace Infrastructure.Helper
             public const string Invalid_Operator = "Invalid Logic Operator";
 
             public const string Invalid_CustomerLevel = "Khuyến mãi không áp dụng cho loại khách hàng này";
+            public const string Invalid_Effect = "Khuyến mãi không ảnh hưởng";
+            public const string Invalid_ProductCondition = "Điều kiện sản phẩm không hợp lệ, xin hãy kiểm tra lại điều kiện lúc tạo";
+            public const string Invalid_ProductAction = "Hành động khuyến mãi không hợp lệ, xin hãy kiểm tra lại hành động lúc tạo";
             public const string Invalid_VoucherQuantity = "Khuyến mãi không có đủ số lượng Voucher yêu cầu, số lượng còn lại ";
             public const string Voucher_OutOfStock = "Voucher đã được phát hết";
             public const string Login_Success = "Success";
             public const string Login_Fail = "Unauthorized";
         }
 
-        public class ChatbotMessage
+        public class EffectMessage
         {
-            public const string Welcome = "Chào bạn! Mình là chat bot";
+            //Khi tier thỏa hết điều kiện
+            public const string AcceptCoupon = "acceptCoupon";
+            //Chỉ có 1 set discount => action có discount lớn nhất tùy vào Discount Type
+            public const string SetDiscount = "setDiscount";
+            //Chỉ có 1 set shipping fee => action có discount lớn nhất tùy vào Discount Type
+            public const string SetShippingFee = "setShippingFee";
+            //Chỉ có 1 lần add điểm => action có discount lớn nhất tùy vào Discount Type
+            public const string AddPoint = "addPoint";
+            
+            public const string AddGift = "addGift";
+
         }
         public class Operator
         {

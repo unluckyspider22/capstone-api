@@ -46,7 +46,7 @@ namespace ApplicationCore.Services
                     includeProperties:
                     "VoucherGroup.Promotion.PromotionTier.Action.ActionProductMapping.Product," +
                     "VoucherGroup.Promotion.PromotionTier.ConditionRule.ConditionGroup.OrderCondition," +
-                    "VoucherGroup.Promotion.PromotionTier.ConditionRule.ConditionGroup.ProductCondition," +
+                    "VoucherGroup.Promotion.PromotionTier.ConditionRule.ConditionGroup.ProductCondition.ProductConditionMapping.Product," +
                     "VoucherGroup.Promotion.PromotionStoreMapping.Store");
                     if (voucher.Count() > 1)
                     {

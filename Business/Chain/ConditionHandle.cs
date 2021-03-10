@@ -52,9 +52,14 @@ namespace ApplicationCore.Chain
                     }
                     Effect effect = new Effect
                     {
-                        PromotionTierId = promotionTier.PromotionTierId
+                        PromotionId = promotion.PromotionId,
+                        PromotionTierId = promotionTier.PromotionTierId,
+                        ConditionRuleName = promotionTier.ConditionRule.RuleName,
+                        TierIndex = (int)promotionTier.TierIndex,
+                        EffectType = AppConstant.EffectMessage.AcceptCoupon,
+                        Prop = new { value = promotionTier.ConditionRule.RuleName }
                     };
-                    if(order.Effects == null)
+                    if (order.Effects == null)
                     {
                         order.Effects = new List<Effect>();
                     }
@@ -195,10 +200,24 @@ namespace ApplicationCore.Chain
             foreach (var productCondition in conditionGroup.ProductCondition)
             {
                 var entity = _mapper.Map<ProductConditionModel>(productCondition);
-                entity.Id = productCondition.ProductConditionId;
-                entity.Index = productCondition.IndexGroup;
-                entity.NextOperator = productCondition.NextOperator;
-                conditionModels.Add(entity);
+                if (productCondition.ProductConditionMapping.Count > 0)
+                {
+                    entity.Id = productCondition.ProductConditionId;
+                    entity.Index = productCondition.IndexGroup;
+                    entity.NextOperator = productCondition.NextOperator;
+                    if (productCondition.ProductConditionMapping != null)
+                    {
+                        entity.Products = productCondition.ProductConditionMapping.Select(el =>
+                        el.Product
+                        ).ToList();
+                    }
+                    conditionModels.Add(entity);
+                }
+                else
+                {
+                    throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: AppConstant.ErrMessage.Invalid_ProductCondition);
+                }
+
             }
             /*foreach (var membershipCondition in conditionGroup.MembershipCondition)
             {

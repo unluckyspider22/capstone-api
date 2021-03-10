@@ -27,58 +27,69 @@ namespace ApplicationCore.Chain
             foreach (var promotion in _promotions)
             {
                 //Lấy những Tier có ID đc thỏa hết các điều kiện
-                var promotionTiers = promotion.PromotionTier.Where(el => el.PromotionTierId.Equals(order.Effects.FirstOrDefault(w => w.Equals(el.PromotionTierId)))).ToList();
+                var promotionTiers =
+                    promotion.PromotionTier.Where(el =>
+                        order.Effects.Any(a => a.PromotionTierId == el.PromotionTierId)
+                ).ToList();
 
-                var actions = FilterAction(promotionTiers.Select(el => el.Action).ToList());
-                if (actions.Count() > 0)
+                var action = FilterAction(promotionTiers.Select(el => el.Action).ToList(), promotion);
+                if (action != null)
                 {
-                    foreach (var action in actions)
+
+                    switch (action.ActionType)
                     {
-                        switch (action.ActionType)
-                        {
-                            case AppConstant.EnvVar.ActionType.Order:
-                                DiscountOrder(order, action, promotion);
-                                break;
-                            case AppConstant.EnvVar.ActionType.Product:
-                                DiscountProduct(order, action);
-                                break;
-                        }
+                        case AppConstant.EnvVar.ActionType.Order:
+                            DiscountOrder(order, action, promotion);
+                            break;
+                        case AppConstant.EnvVar.ActionType.Product:
+                            DiscountProduct(order, action);
+                            break;
+                        case AppConstant.EnvVar.ActionType.Gift:
+                            DiscountProduct(order, action);
+                            break;
+                        case AppConstant.EnvVar.ActionType.BonusPoint:
+                            DiscountProduct(order, action);
+                            break;
+
                     }
                 }
                 SetFinalAmountApply(order);
             }
         }
-        private List<Infrastructure.Models.Action> FilterAction(List<Infrastructure.Models.Action> actions)
+        private Infrastructure.Models.Action FilterAction(List<Infrastructure.Models.Action> actions, Promotion promotion)
         {
-            var result = new List<Infrastructure.Models.Action>();
+            Infrastructure.Models.Action result = null;
             if (actions.Count() > 0 && actions.Count() == 1)
             {
-                return actions;
+                return result;
             }
             else
             {
-                if (actions.Where(el => el.DiscountType.Equals(AppConstant.EnvVar.DiscountType.Amount)).Count() > 1
-                    || actions.Where(el => el.DiscountType.Equals(AppConstant.EnvVar.DiscountType.Percentage)).Count() > 1
-                    || actions.Where(el => el.DiscountType.Equals(AppConstant.EnvVar.DiscountType.Shipping)).Count() > 1)
+                switch (promotion.DiscountType)
                 {
-                    var actionAmount = actions
+                    case AppConstant.EnvVar.DiscountType.Amount:
+                        result = actions
                         .Where(w =>
-                        w.DiscountAmount > 0
-                        && w.DiscountAmount == actions.Max(m => m.DiscountAmount))
+                            w.DiscountType == AppConstant.EnvVar.DiscountType.Amount
+                            && w.DiscountAmount > 0
+                            && w.DiscountAmount == actions.Max(m => m.DiscountAmount))
                         .SingleOrDefault();
-                    if (actionAmount != null)
-                    {
-                        result.Add(actionAmount);
-                    }
-                    var actionPercent = actions.Where(w =>
-                    w.DiscountPercentage > 0 && w.DiscountPercentage == actions.Max(m => m.DiscountPercentage)).SingleOrDefault();
-
-                    if (actionPercent != null)
-                    {
-                        result.Add(actionPercent);
-                    }
+                        break;
+                    case AppConstant.EnvVar.DiscountType.Percentage:
+                        result = actions.Where(w =>
+                                w.DiscountType == AppConstant.EnvVar.DiscountType.Percentage &&
+                                w.DiscountPercentage > 0 &&
+                                w.DiscountPercentage == actions.Max(m => m.DiscountPercentage))
+                        .SingleOrDefault();
+                        break;
+                    case AppConstant.EnvVar.DiscountType.Shipping:
+                        result = actions.Where(w =>
+                                w.DiscountType == AppConstant.EnvVar.DiscountType.Shipping &&
+                                w.DiscountPercentage > 0 &&
+                                w.DiscountPercentage == actions.Max(m => m.DiscountPercentage))
+                        .SingleOrDefault();
+                        break;
                 }
-                else return actions;
             }
             return result;
         }
@@ -107,21 +118,19 @@ namespace ApplicationCore.Chain
             {
                 order.Effects = new List<Effect>();
             }
-            var promotionCodes = string.IsNullOrEmpty(promotion.PromotionCode) ? promotion.PromotionCode : "," + promotion.PromotionCode;
-
-            var voucherCode = promotion.VoucherGroup.Voucher
-                .Where(el =>
-                el.VoucherCode.Equals(order.CustomerOrderInfo.Vouchers
-                .Select(s => s.VoucherCode)
-                .FirstOrDefault(f => el.VoucherCode.Equals(f))))
-                .First().VoucherCode;
-
             order.Effects.Add(new
                 Effect
             {
                 PromotionId = promotion.PromotionId,
                 PromotionTierId = action.PromotionTier.PromotionTierId,
-                ConditionRuleName = action.PromotionTier.ConditionRule.RuleName
+                ConditionRuleName = action.PromotionTier.ConditionRule.RuleName,
+                TierIndex = (int)action.PromotionTier.TierIndex,
+                EffectType = AppConstant.EffectMessage.SetDiscount,
+                Prop = new
+                {
+                    name = action.PromotionTier.Summary,
+                    value = discount
+                }
             });
 
         }
@@ -132,7 +141,7 @@ namespace ApplicationCore.Chain
             order.CustomerOrderInfo.CartItems = order.CustomerOrderInfo.CartItems.Select(el =>
             {
                 var finalAmount = el.TotalAmount - (el.DiscountFromOrder + el.Discount);
-                el.DiscountFromOrder += (finalAmount - el.DiscountFromOrder) * discountPercent;
+                el.DiscountFromOrder += Math.Round((finalAmount - el.DiscountFromOrder) * discountPercent, 2);
                 el.FinalAmount = finalAmount;
                 return el;
             }).ToList();

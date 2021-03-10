@@ -49,6 +49,7 @@ namespace ApplicationCore.Chain
             _promotionHandle.Handle(order);
             #endregion
             #region Apply action
+            _applyPromotion.SetPromotions(_promotions);
             _applyPromotion.Apply(order);
             #endregion
             /*base.Handle(order);*/
