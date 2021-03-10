@@ -88,17 +88,20 @@ namespace ApplicationCore.Services
                         {
                             foreach (var product in products)
                             {
-                                var dto = new BrandProductDto()
+                                if (!product.DelFlg)
                                 {
-                                    CateId = cate.CateId,
-                                    CateName = cate.Name,
-                                    ProductCateId = cate.ProductCateId,
-                                    Code = product.Code,
-                                    ProductId = product.ProductId,
-                                    ProductName = product.Name
+                                    var dto = new BrandProductDto()
+                                    {
+                                        CateId = cate.CateId,
+                                        CateName = cate.Name,
+                                        ProductCateId = cate.ProductCateId,
+                                        Code = product.Code,
+                                        ProductId = product.ProductId,
+                                        ProductName = product.Name
 
-                                };
-                                result.Add(dto);
+                                    };
+                                    result.Add(dto);
+                                }
                             }
                         }
                     }

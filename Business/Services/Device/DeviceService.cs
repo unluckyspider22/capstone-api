@@ -41,17 +41,19 @@ namespace ApplicationCore.Services
                     {
                         foreach (var device in devices)
                         {
-                            var dto = new BrandDeviceDto()
-                            {
-                                DeviceId = device.DeviceId,
-                                Imei = device.Imei,
-                                Name = device.Name,
-                                Group = store.Group,
-                                StoreCode = store.StoreCode,
-                                StoreId = store.StoreId,
-                                StoreName = store.StoreName,
-                            };
-                            result.Add(dto);
+                            if (!device.DelFlg) {
+                                var dto = new BrandDeviceDto()
+                                {
+                                    DeviceId = device.DeviceId,
+                                    Imei = device.Imei,
+                                    Name = device.Name,
+                                    Group = store.Group,
+                                    StoreCode = store.StoreCode,
+                                    StoreId = store.StoreId,
+                                    StoreName = store.StoreName,
+                                };
+                                result.Add(dto);
+                            }
                         }
                     }
 
