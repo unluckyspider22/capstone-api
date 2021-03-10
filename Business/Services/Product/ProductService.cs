@@ -77,32 +77,35 @@ namespace ApplicationCore.Services
             {
                 IGenericRepository<ProductCategory> cateRepo = _unitOfWork.ProductCategoryRepository;
                 var result = new List<BrandProductDto>();
-                var categories = (await cateRepo.Get(pageIndex: PageIndex, pageSize: PageSize,
-                    filter: o => o.BrandId.Equals(brandId) && !o.DelFlg, includeProperties: "Product")).ToList();
-                if (categories != null && categories.Count > 0)
+                //var categories = (await cateRepo.Get(pageIndex: PageIndex, pageSize: PageSize,
+                //    filter: o => o.BrandId.Equals(brandId) && !o.DelFlg, includeProperties: "Product")).ToList();
+                //if (categories != null && categories.Count > 0)
+                //{
+                //    foreach (var cate in categories)
+                //    {
+                //        var products = cate.Product.ToList();
+ 
+                //    }
+                //}
+                var products = (await _repository.Get(pageIndex: PageIndex, pageSize: PageSize,
+                    filter: o => !o.DelFlg && o.ProductCate.BrandId.Equals(brandId),includeProperties: "ProductCate")).ToList();
+                if (products != null && products.Count > 0)
                 {
-                    foreach (var cate in categories)
+                    foreach (var product in products)
                     {
-                        var products = cate.Product.ToList();
-                        if (products != null && products.Count > 0)
+                        if (!product.DelFlg)
                         {
-                            foreach (var product in products)
+                            var dto = new BrandProductDto()
                             {
-                                if (!product.DelFlg)
-                                {
-                                    var dto = new BrandProductDto()
-                                    {
-                                        CateId = cate.CateId,
-                                        CateName = cate.Name,
-                                        ProductCateId = cate.ProductCateId,
-                                        Code = product.Code,
-                                        ProductId = product.ProductId,
-                                        ProductName = product.Name
+                                CateId = product.ProductCate.CateId,
+                                CateName = product.ProductCate.Name,
+                                ProductCateId = product.ProductCate.ProductCateId,
+                                Code = product.Code,
+                                ProductId = product.ProductId,
+                                ProductName = product.Name
 
-                                    };
-                                    result.Add(dto);
-                                }
-                            }
+                            };
+                            result.Add(dto);
                         }
                     }
                 }
