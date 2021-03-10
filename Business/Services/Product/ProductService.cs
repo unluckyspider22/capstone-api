@@ -29,13 +29,55 @@ namespace ApplicationCore.Services
             return isExist;
         }
 
+        public async Task<List<BrandProductDto>> GetAllBrandProduct(Guid brandId)
+        {
+            try
+            {
+                IGenericRepository<ProductCategory> cateRepo = _unitOfWork.ProductCategoryRepository;
+                var result = new List<BrandProductDto>();
+                var categories = (await cateRepo.Get(filter: o => o.BrandId.Equals(brandId)
+                && !o.DelFlg, includeProperties: "Product")).ToList();
+                if (categories != null && categories.Count > 0)
+                {
+                    foreach (var cate in categories)
+                    {
+                        var products = cate.Product.ToList();
+                        if (products != null && products.Count > 0)
+                        {
+                            foreach (var product in products)
+                            {
+                                var dto = new BrandProductDto()
+                                {
+                                    CateId = cate.CateId,
+                                    CateName = cate.Name,
+                                    ProductCateId = cate.ProductCateId,
+                                    Code = product.Code,
+                                    ProductId = product.ProductId,
+                                    ProductName = product.Name
+
+                                };
+                                result.Add(dto);
+                            }
+                        }
+                    }
+                }
+                return result;
+            }
+            catch (Exception e)
+            {
+                //chạy bằng debug mode để xem log
+                Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.StackTrace);
+                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+            }
+        }
+
         public async Task<GenericRespones<BrandProductDto>> GetBrandProduct(int PageSize, int PageIndex, Guid brandId)
         {
             try
             {
                 IGenericRepository<ProductCategory> cateRepo = _unitOfWork.ProductCategoryRepository;
                 var result = new List<BrandProductDto>();
-                var categories = (await cateRepo.Get(pageIndex: PageIndex, pageSize: PageSize, 
+                var categories = (await cateRepo.Get(pageIndex: PageIndex, pageSize: PageSize,
                     filter: o => o.BrandId.Equals(brandId) && !o.DelFlg, includeProperties: "Product")).ToList();
                 if (categories != null && categories.Count > 0)
                 {
@@ -84,25 +126,35 @@ namespace ApplicationCore.Services
                 if (entity != null)
                 {
                     entity.UpdDate = DateTime.Now;
-                    var updParam = _mapper.Map<Product>(dto);
-                    if (updParam.CateId != null)
+                    if (dto.CateId != null)
                     {
                         entity.CateId = dto.CateId;
                     }
-                    if (updParam.Name != null)
+                    if (dto.Name != null)
                     {
                         entity.Name = dto.Name;
                     }
-                    if (updParam.Code != null)
+                    if (dto.Code != null)
                     {
                         entity.Code = dto.Code;
                     }
-                    if (updParam.DelFlg != null)
+                    if (dto.DelFlg != null)
                     {
                         entity.DelFlg = dto.DelFlg;
                     }
+                    if (!dto.ProductCateId.Equals(Guid.Empty) && !dto.ProductCateId.Equals(entity.ProductCateId))
+                    {
+                        IGenericRepository<ProductCategory> cateRepo = _unitOfWork.ProductCategoryRepository;
+                        var oldCate = await cateRepo.GetFirst(filter: o => o.ProductCateId.Equals(entity.ProductCateId) && !o.DelFlg);
+                        oldCate.Product.Remove(entity);
+                        var newCate = await cateRepo.GetFirst(filter: o => o.ProductCateId.Equals(dto.ProductCateId) && !o.DelFlg);
+                        newCate.Product.Add(entity);
+                        entity.ProductCateId = dto.ProductCateId;
+                        entity.CateId = newCate.CateId;
+                    }
                     _repository.Update(entity);
                     await _unitOfWork.SaveAsync();
+
                     return _mapper.Map<ProductDto>(entity);
                 }
                 else

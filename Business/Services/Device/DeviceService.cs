@@ -75,14 +75,26 @@ namespace ApplicationCore.Services
                 if (entity != null)
                 {
                     entity.UpdDate = DateTime.Now;
-                    var updParam = _mapper.Map<Device>(dto);
-                    if (updParam.Imei != null)
+                    //var updParam = _mapper.Map<Device>(dto);
+                    if (dto.Imei != null)
                     {
                         entity.Imei = dto.Imei;
                     }
-                    if (updParam.Name != null)
+                    if (dto.Name != null)
                     {
                         entity.Name = dto.Name;
+                    }
+                    if (dto.DelFlg != null)
+                    {
+                        entity.DelFlg = dto.DelFlg;
+                    }
+                    if (!dto.StoreId.Equals(Guid.Empty) && !dto.StoreId.Equals(entity.StoreId))
+                    {
+                        IGenericRepository<Store> storeRepo = _unitOfWork.StoreRepository;
+                        var oldStore = await storeRepo.GetFirst(filter: o => o.StoreId.Equals(entity.StoreId) && !o.DelFlg);
+                        oldStore.Device.Remove(entity);
+                        var newStore = await storeRepo.GetFirst(filter: o => o.StoreId.Equals(dto.StoreId) && !o.DelFlg);
+                        entity.StoreId = dto.StoreId;
                     }
                     _repository.Update(entity);
                     await _unitOfWork.SaveAsync();

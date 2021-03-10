@@ -14,5 +14,6 @@ namespace ApplicationCore.Services
         public Task<ProductDto> Update(ProductDto dto);
 
         public Task<GenericRespones<BrandProductDto>> GetBrandProduct(int PageSize, int PageIndex, Guid brandId);
+        public Task<List<BrandProductDto>> GetAllBrandProduct(Guid brandId);
     }
 }

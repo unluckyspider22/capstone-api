@@ -77,8 +77,8 @@ namespace Infrastructure.AutoMapper
             CreateMap<Models.Action, ActionRequestParam>();
             CreateMap<ActionRequestParam, Models.Action>();
             //Membership request param
-            CreateMap<PostAction, MembershipActionRequestParam>();
-            CreateMap<MembershipActionRequestParam, PostAction>();
+            CreateMap<PostAction, PostActionRequestParam>();
+            CreateMap<PostActionRequestParam, PostAction>();
             //OrderConditionModel
             CreateMap<OrderCondition, OrderConditionModel>();
             CreateMap<OrderConditionModel, OrderCondition>();

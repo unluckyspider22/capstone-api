@@ -50,6 +50,8 @@ namespace Infrastructure.Helper
             {
                 public const string Product = "1";
                 public const string Order = "2";
+                public const string Gift = "3";
+                public const string BonusPoint = "4";
             }
 
             public struct DiscountType
@@ -61,6 +63,9 @@ namespace Infrastructure.Helper
                 public const string Fixed = "5";
                 public const string Ladder = "6";
                 public const string Bundle = "7";
+                public const string GiftProduct = "8";
+                public const string GiftVoucher = "9";
+                public const string BonusPoint = "10";
             }
             public struct CharsetType
             {

@@ -292,6 +292,24 @@ namespace PromotionEngineAPI.Controllers
                 return StatusCode(statusCode: e.Code, e);
             }
         }
+        [HttpPost]
+        [Route("create-tier")]
+        public async Task<IActionResult> CreatePromotionTier([FromBody] PromotionTierParam promotionTierParam)
+        {
+            //if (!promotionId.Equals(promotionTierParam.PromotionId))
+            //{
+            //    return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+            //}
+            try
+            {
+                return Ok(await _promotionService.CreatePromotionTier(promotionTierParam: promotionTierParam));
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
+
 
         [HttpDelete]
         [Route("{promotionId}/delete-tier")]
