@@ -22,7 +22,7 @@ namespace ApplicationCore.Chain
         {
             if (_condition is MembershipConditionModel)
             {
-                var customer = order.Customer;
+                var customer = order.CustomerOrderInfo.Customer;
                 HandleMembershipLevel((MembershipConditionModel)_condition, customer);
             }
             else
@@ -31,7 +31,7 @@ namespace ApplicationCore.Chain
             }
         }
 
-        public void HandleMembershipLevel(MembershipConditionModel membershipCondition, CustomerInfo customer)
+        public void HandleMembershipLevel(MembershipConditionModel membershipCondition, Customer customer)
         {
             if (!string.IsNullOrEmpty(customer.CustomerLevel))
             {

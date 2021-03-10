@@ -8,11 +8,9 @@ namespace ApplicationCore.Models
     public class ProductConditionModel : ConditionModel
     {
         public string ProductConditionType { get; set; }
-        public string ProductType { get; set; }
+        public Guid ProductId { get; set; }
         public string ProductCode { get; set; }
-        public string ProductName { get; set; }
         public decimal ProductQuantity { get; set; }
         public string QuantityOperator { get; set; }
-        public string ParentCode { get; set; }
     }
 }

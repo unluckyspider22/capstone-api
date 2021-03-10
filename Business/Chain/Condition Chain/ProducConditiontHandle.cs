@@ -43,23 +43,11 @@ namespace ApplicationCore.Chain
             foreach (var product in products)
             {
                 bool isMatch = product.ProductCode.Equals(productCondition.ProductCode);
-                if (productCondition.ProductType.Equals(AppConstant.EnvVar.ProductType.SINGLE_PRODUCT))
+                if (productCondition.ProductConditionType.Equals(AppConstant.EnvVar.EXCLUDE))
                 {
-                    if (productCondition.ProductConditionType.Equals(AppConstant.EnvVar.EXCLUDE))
-                    {
-                        productCondition.IsMatch = !isMatch;
-                    }
-                    else productCondition.IsMatch = isMatch;
+                    productCondition.IsMatch = !isMatch;
                 }
-               /* else
-                {
-                    if (product.ParentCode.Equals(productCondition.ParentCode)
-                        && productCondition.ProductConditionType.Equals(AppConstant.EnvVar.EXCLUDE))
-                    {
-                        productCondition.IsMatch = !isMatch;
-                    }
-                    else productCondition.IsMatch = isMatch;
-                }*/
+                else productCondition.IsMatch = isMatch;
                 if (productCondition.IsMatch)
                 {
                     break;

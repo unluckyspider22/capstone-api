@@ -12,12 +12,10 @@ namespace ApplicationCore.Request
         public OrderResponseModel()
         {
             Gift = new List<Gift>();
-            Customer = new CustomerInfo();
         }
         public List<Effect> Effects { get; set; }
 
         public CustomerOrderInfo CustomerOrderInfo { get; set; }
-        public CustomerInfo Customer { get; set; }
 
         public List<Gift> Gift { get; set; }
         public decimal? TotalAmount { get; set; }
@@ -39,6 +37,7 @@ namespace ApplicationCore.Request
         public CustomerOrderInfo()
         {
             CartItems = new List<Item>();
+            Customer = new Customer();
         }
         public int? Id { get; set; }
         public DateTime BookingDate { get; set; }
@@ -49,6 +48,8 @@ namespace ApplicationCore.Request
         public List<CouponCode> Vouchers { get; set; }
         public decimal Amount { get; set; }
         public decimal ShippingFee { get; set; }
+        public Customer Customer { get; set; }
+
     }
     public class Attribute
     {
@@ -88,7 +89,7 @@ namespace ApplicationCore.Request
         public decimal DiscountFromOrder { get; set; }
         public decimal FinalAmount { get; set; }
     }
-    public class CustomerInfo
+    public class Customer
     {
         public string CustomerName { get; set; }
         public string CustomerEmail { get; set; }

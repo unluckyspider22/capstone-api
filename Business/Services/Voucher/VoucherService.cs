@@ -20,12 +20,12 @@ namespace ApplicationCore.Services
     {
         IVoucherGroupService _voucherGroupService;
         IMembershipService _membershipService;
+
         public VoucherService(IUnitOfWork unitOfWork, IMapper mapper, IVoucherGroupService voucherGroupService, IMembershipService membershipService) : base(unitOfWork, mapper)
         {
             _voucherGroupService = voucherGroupService;
             _membershipService = membershipService;
         }
-
         protected override IGenericRepository<Voucher> _repository => _unitOfWork.VoucherRepository;
         protected IGenericRepository<VoucherGroup> _voucherGroupRepos => _unitOfWork.VoucherGroupRepository;
         public async Task<List<Promotion>> CheckVoucher(CustomerOrderInfo order)
@@ -73,7 +73,7 @@ namespace ApplicationCore.Services
 
 
         }
-
+        #region Lấy voucher cho channel
         public async Task<List<Voucher>> GetVouchersForChannel(PromotionChannelMapping voucherChannel, VoucherGroup voucherGroup, VoucherChannelParam channelParam)
         {
 
@@ -110,17 +110,57 @@ namespace ApplicationCore.Services
             }
             return vouchers.ToList();
         }
-
-        public async Task<List<Voucher>> UpdateVoucherApplied(OrderResponseModel order)
+        #endregion
+        #region Lấy voucher cho customer
+        public async Task<VoucherParamResponse> GetVoucherForCustomer(VoucherGroupDto voucherGroupDto)
         {
             try
             {
-                List<Voucher> result = new List<Voucher>();
+                if (voucherGroupDto != null)
+                {
+                    //var entity = _mapper.Map<VoucherGroup>(voucherGroupDto);
+                    var vouchers = await _repository.Get(filter: el => el.VoucherGroupId.Equals(voucherGroupDto.VoucherGroupId)
+                    && el.IsRedemped == AppConstant.EnvVar.Voucher.UNREDEEM, includeProperties: "VoucherGroup.Promotion");
+                    var voucher = vouchers.ToList().First();
+                    voucher.IsRedemped = AppConstant.EnvVar.Voucher.REDEEMPED;
+                    voucher.RedempedDate = DateTime.Now;
+                    _repository.Update(voucher);
+                    await _unitOfWork.SaveAsync();
+                    //await UpdateVoucherGroupAfterRedeemed(entity);
+                    var entity = voucher.VoucherGroup;
+                    entity.RedempedQuantity += 1;
+                    entity.UpdDate = DateTime.Now;
+                    _voucherGroupRepos.Update(entity);
+                    await _unitOfWork.SaveAsync();
+                    var promoCode = voucher.VoucherGroup.Promotion.PromotionCode;
+                    var description = voucher.VoucherGroup.Promotion.Description;
+                    return new VoucherParamResponse(voucherGroupId: entity.VoucherGroupId, voucherGroupName: entity.VoucherName,
+                        voucherId: voucher.VoucherId, code: promoCode + "-" + voucher.VoucherCode, description: description);
+                }
+                throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: null);
+            }
+            catch (Exception e)
+            {
+
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
+            }
+        }
+
+        #endregion
+        #region Update voucher đã applied
+        public async Task<List<Voucher>> UpdateVoucherApplied(CustomerOrderInfo order)
+        {
+
+            try
+            {
+                List<Voucher> result = null;
                 if (order != null)
                 {
-                    foreach (var voucherParam in order.CustomerOrderInfo.Vouchers)
+                    var promotions = await CheckVoucher(order);
+                    result = new List<Voucher>();
+                    foreach (var voucherParam in order.Vouchers)
                     {
-                        /*foreach (var promotion in order.Promotions)
+                        foreach (var promotion in promotions)
                         {
                             if (voucherParam.PromotionCode.Equals(promotion.PromotionCode))
                             {
@@ -145,17 +185,16 @@ namespace ApplicationCore.Services
                                 result.Add(vouchers);
                                 return result;
                             }
-                        }*/
+                        }
                     }
                 }
                 return result;
             }
             catch (Exception e)
             {
-
                 throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
-            
+
         }
         private async Task UpdateVoucherGroupAfterApplied(VoucherGroup voucherGroup)
         {
@@ -163,7 +202,7 @@ namespace ApplicationCore.Services
             voucherGroup.UsedQuantity += 1;
             await _voucherGroupService.UpdateVoucherGroupForApplied(voucherGroup);
         }
-        private async Task UpdateVoucherAfterApplied(Voucher voucher, OrderResponseModel order)
+        private async Task UpdateVoucherAfterApplied(Voucher voucher, CustomerOrderInfo order)
         {
             voucher.UpdDate = DateTime.Now;
             voucher.UsedDate = DateTime.Now;
@@ -181,43 +220,9 @@ namespace ApplicationCore.Services
                 voucher.MembershipId = result.MembershipId;
             }
             _repository.Update(voucher);
-            await _unitOfWork.SaveAsync(); 
+            await _unitOfWork.SaveAsync();
         }
-
-        public async Task<VoucherParamResponse> GetVoucherForCustomer(VoucherGroupDto voucherGroupDto)
-        {    
-            try
-            {
-                if (voucherGroupDto != null)
-                {
-                    //var entity = _mapper.Map<VoucherGroup>(voucherGroupDto);
-                    var vouchers = await _repository.Get(filter: el => el.VoucherGroupId.Equals(voucherGroupDto.VoucherGroupId)
-                    && el.IsRedemped == AppConstant.EnvVar.Voucher.UNREDEEM, includeProperties: "VoucherGroup.Promotion");
-                    var voucher = vouchers.ToList().First();
-                    voucher.IsRedemped = AppConstant.EnvVar.Voucher.REDEEMPED;
-                    voucher.RedempedDate = DateTime.Now;
-                    _repository.Update(voucher);
-                    await _unitOfWork.SaveAsync();
-                    //await UpdateVoucherGroupAfterRedeemed(entity);
-                    var entity = voucher.VoucherGroup;
-                    entity.RedempedQuantity += 1;
-                    entity.UpdDate = DateTime.Now;
-                    _voucherGroupRepos.Update(entity);
-                    await _unitOfWork.SaveAsync();
-                    var promoCode = voucher.VoucherGroup.Promotion.PromotionCode;
-                    var description = voucher.VoucherGroup.Promotion.Description;               
-                    return new VoucherParamResponse(voucherGroupId: entity.VoucherGroupId, voucherGroupName: entity.VoucherName,
-                        voucherId: voucher.VoucherId, code: promoCode + "-" + voucher.VoucherCode, description: description);
-                }
-                throw new ErrorObj(code: (int)HttpStatusCode.BadRequest,message: null);
-            }
-            catch (Exception e)
-            {
-                
-                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
-            }
-        }
-        
+        #endregion
     }
 }
 
