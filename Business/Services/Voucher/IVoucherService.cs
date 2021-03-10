@@ -11,16 +11,13 @@ namespace ApplicationCore.Services
 {
     public interface IVoucherService : IBaseService<Voucher, VoucherDto>
     {
-        
-
-        public Task<List<Promotion>> CheckVoucher(OrderResponseModel order);
+        public Task<List<Promotion>> CheckVoucher(CustomerOrderInfo order);
 
         public Task<List<Voucher>> GetVouchersForChannel(PromotionChannelMapping voucherChannel, VoucherGroup voucherGroup, VoucherChannelParam channelParam);
 
-        public Task<List<Voucher>> UpdateVoucherApplied(OrderResponseModel order);
+        public Task<List<Voucher>> UpdateVoucherApplied(CustomerOrderInfo order);
 
         public Task<VoucherParamResponse> GetVoucherForCustomer(VoucherGroupDto voucherGroupDto);
-
     }
 
 }

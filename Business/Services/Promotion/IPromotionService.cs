@@ -21,5 +21,7 @@ namespace ApplicationCore.Services
 
         Task<PromotionStatusDto> CountPromotionStatus(Guid brandId);
         Task<DistributionStat> DistributionStatistic(Guid promotionId, Guid brandId);
+
+        void SetPromotions(List<Promotion> promotions);
     }
 }

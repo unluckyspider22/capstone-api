@@ -24,35 +24,33 @@ namespace PromotionEngineAPI.Controllers
         private readonly IPromotionService _promotionService;
         private readonly IVoucherService _voucherService;
         private readonly IPromotionStoreMappingService _promotionStoreMappingService;
-        private readonly IChannelService _channelService;
 
 
-        public PromotionsController(IPromotionService service,
+        public PromotionsController(IPromotionService promotionService,
             IPromotionStoreMappingService promotionStoreMappingService,
-            IVoucherService voucherService,
-
-            IChannelService channelService)
+            IVoucherService voucherService)
         {
-            _promotionService = service;
+            _promotionService = promotionService;
             _promotionStoreMappingService = promotionStoreMappingService;
             _voucherService = voucherService;
-            _channelService = channelService;
         }
 
         [HttpPost]
         [Route("check-voucher")]
-        public async Task<IActionResult> CheckVoucher([FromBody] OrderResponseModel responseModel)
+        public async Task<IActionResult> CheckVoucher([FromBody] CustomerOrderInfo orderInfo)
         {
             //Lấy promotion bởi voucher code
-            var result = responseModel;
+            OrderResponseModel responseModel = new OrderResponseModel();
             try
             {
-                var promotions = await _voucherService.CheckVoucher(responseModel);
+                var promotions = await _voucherService.CheckVoucher(orderInfo);
                 if (promotions != null && promotions.Count() > 0)
                 {
-                    responseModel.Promotions = promotions;
+                    responseModel.CustomerOrderInfo = orderInfo;
+
+                    _promotionService.SetPromotions(promotions);
                     //Check promotion
-                    result = await _promotionService.HandlePromotion(responseModel);
+                    responseModel = await _promotionService.HandlePromotion(responseModel);
                 }
                 else throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Unmatch_Promotion);
             }
@@ -60,7 +58,7 @@ namespace PromotionEngineAPI.Controllers
             {
                 return StatusCode(statusCode: e.Code, e);
             }
-            return Ok(result);
+            return Ok(responseModel);
         }
 
         // GET: api/Promotions

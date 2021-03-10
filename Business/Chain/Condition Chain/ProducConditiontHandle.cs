@@ -23,7 +23,7 @@ namespace ApplicationCore.Chain
         {
             if (_condition is ProductConditionModel)
             {
-                var products = order.OrderDetail.OrderDetailResponses;
+                var products = order.CustomerOrderInfo.CartItems;
                 HandleIncludeExclude((ProductConditionModel)_condition, products);
                 HandleQuantity((ProductConditionModel)_condition, products);
             }
@@ -37,36 +37,24 @@ namespace ApplicationCore.Chain
             _condition = condition;
         }
 
-        private void HandleIncludeExclude(ProductConditionModel productCondition, List<OrderDetailResponseModel> products)
+        private void HandleIncludeExclude(ProductConditionModel productCondition, List<Item> products)
         {
             productCondition.IsMatch = false;
             foreach (var product in products)
             {
-                bool isMatch = product.ProductCode.Equals(productCondition.ProductCode);
-                if (productCondition.ProductType.Equals(AppConstant.EnvVar.ProductType.SINGLE_PRODUCT))
+                bool isMatch = productCondition.Products.Any(a => a.Code == product.ProductCode);
+                if (productCondition.ProductConditionType.Equals(AppConstant.EnvVar.EXCLUDE))
                 {
-                    if (productCondition.ProductConditionType.Equals(AppConstant.EnvVar.EXCLUDE))
-                    {
-                        productCondition.IsMatch = !isMatch;
-                    }
-                    else productCondition.IsMatch = isMatch;
+                    productCondition.IsMatch = !isMatch;
                 }
-                else
-                {
-                    if (product.ParentCode.Equals(productCondition.ParentCode)
-                        && productCondition.ProductConditionType.Equals(AppConstant.EnvVar.EXCLUDE))
-                    {
-                        productCondition.IsMatch = !isMatch;
-                    }
-                    else productCondition.IsMatch = isMatch;
-                }
+                else productCondition.IsMatch = isMatch;
                 if (productCondition.IsMatch)
                 {
                     break;
                 }
             }
         }
-        private void HandleQuantity(ProductConditionModel condition, List<OrderDetailResponseModel> products)
+        private void HandleQuantity(ProductConditionModel condition, List<Item> products)
         {
             if (condition.ProductQuantity > 0)
             {

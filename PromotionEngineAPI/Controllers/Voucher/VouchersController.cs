@@ -111,7 +111,7 @@ namespace PromotionEngineAPI.Controllers
         // PUT: api/Vouchers/active
         [HttpPut]
         [Route("update-voucher-applied")]
-        public async Task<IActionResult> UpdateVoucherApplied([FromBody] OrderResponseModel order)
+        public async Task<IActionResult> UpdateVoucherApplied([FromBody] CustomerOrderInfo order)
         {
             try
             {

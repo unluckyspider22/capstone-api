@@ -33,6 +33,7 @@ namespace Infrastructure.Models
         public virtual DbSet<Product> Product { get; set; }
         public virtual DbSet<ProductCategory> ProductCategory { get; set; }
         public virtual DbSet<ProductCondition> ProductCondition { get; set; }
+        public virtual DbSet<ProductConditionMapping> ProductConditionMapping { get; set; }
         public virtual DbSet<Promotion> Promotion { get; set; }
         public virtual DbSet<PromotionChannelMapping> PromotionChannelMapping { get; set; }
         public virtual DbSet<PromotionStoreMapping> PromotionStoreMapping { get; set; }
@@ -633,6 +634,25 @@ namespace Infrastructure.Models
                     .HasForeignKey(d => d.ConditionGroupId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ProductCondition_ConditionGroup");
+            });
+
+            modelBuilder.Entity<ProductConditionMapping>(entity =>
+            {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.InsDate).HasColumnType("datetime");
+
+                entity.Property(e => e.UpdTime).HasColumnType("datetime");
+
+                entity.HasOne(d => d.ProductCondition)
+                    .WithMany(p => p.ProductConditionMapping)
+                    .HasForeignKey(d => d.ProductConditionId)
+                    .HasConstraintName("FK_ProductConditionMapping_ProductCondition");
+
+                entity.HasOne(d => d.Product)
+                    .WithMany(p => p.ProductConditionMapping)
+                    .HasForeignKey(d => d.ProductId)
+                    .HasConstraintName("FK_ProductConditionMapping_Product");
             });
 
             modelBuilder.Entity<Promotion>(entity =>

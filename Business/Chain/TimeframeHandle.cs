@@ -22,23 +22,29 @@ namespace ApplicationCore.Chain
     public interface ITimeframeHandle : IHandler<OrderResponseModel>
     {
         void SetHolidays(List<Holiday> holidays);
+        void SetPromotions(List<Promotion> promotions);
+
     }
     public class TimeframeHandle : Handler<OrderResponseModel>, ITimeframeHandle
     {
 
+        private List<Promotion> _promotions;
         private List<Holiday> _listPublicHoliday;
+        public void SetPromotions(List<Promotion> promotions)
+        {
+            _promotions = promotions;
+        }
         public override void Handle(OrderResponseModel order)
         {
-            var promotions = order.Promotions;
-            foreach (Promotion promotion in promotions)
+            foreach (var promotion in _promotions)
             {
                 //HandleExpiredDate(promotion, order);
                 if (!promotion.ForHoliday.Equals(AppConstant.EnvVar.FOR_HOLIDAY))
                 {
                     HandleHolidayAsync(order);
                 }
-                HandleDayOfWeek(promotion, order.OrderDetail.BookingDate.DayOfWeek);
-                HandleHour(promotion, order.OrderDetail.BookingDate.Hour);
+                HandleDayOfWeek(promotion, order.CustomerOrderInfo.BookingDate.DayOfWeek);
+                HandleHour(promotion, order.CustomerOrderInfo.BookingDate.Hour);
             }
             base.Handle(order);
         }
@@ -49,7 +55,7 @@ namespace ApplicationCore.Chain
             {
                 foreach (var holiday in _listPublicHoliday)
                 {
-                    if (order.OrderDetail.BookingDate.Day == ((DateTime)holiday.Date).Day && order.OrderDetail.BookingDate.Month ==((DateTime) holiday.Date).Month)
+                    if (order.CustomerOrderInfo.BookingDate.Day == ((DateTime)holiday.Date).Day && order.CustomerOrderInfo.BookingDate.Month == ((DateTime)holiday.Date).Month)
                     {
                         throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_Holiday);
                     }
@@ -57,7 +63,7 @@ namespace ApplicationCore.Chain
             }
         }
         public void HandleDayOfWeek(Promotion promotion, DayOfWeek dayOfWeek)
-        {                   
+        {
             if (!Common.CompareBinary(((int)(Math.Pow(2, (int)dayOfWeek))).ToString(), promotion.DayFilter))
             {
                 throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_DayInWeek);
