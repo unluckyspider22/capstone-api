@@ -111,7 +111,7 @@ namespace Infrastructure.Helper
             public struct PromotionType
             {
                 public const string DISCOUNT = "1";
-                public const string PROMOTION = "2";
+                public const string AUTO_PROMOTION = "2";
                 public const string GIFT = "3";
                 public const string BONUS_POINT = "4";
             }
@@ -168,6 +168,7 @@ namespace Infrastructure.Helper
             public const string Quantity_Product = "Sản phẩm yêu cầu thấp hơn quy định.";
             public const string NotMatchCondition = "Đơn hàng không thỏa mãn các điều kiện của khuyến mãi.";
             public const string Invalid_Store = "Đơn hàng không áp dụng tại cửa hàng này.";
+            public const string Duplicate_Promotion = "Khuyến mãi không áp dụng cho các voucher thuộc cùng một chương trình khuyến mãi.";
 
             public const string Invalid_TimeFrame = "Khuyến mãi không áp dụng vào thời gian này.";
             public const string Invalid_Operator = "Invalid Logic Operator";
@@ -186,6 +187,8 @@ namespace Infrastructure.Helper
         {
             //Khi tier thỏa hết điều kiện
             public const string AcceptCoupon = "acceptCoupon";
+            //Auto apply promotion
+            public const string AutoPromotion = "autoPromotion";
             //Chỉ có 1 set discount => action có discount lớn nhất tùy vào Discount Type
             public const string SetDiscount = "setDiscount";
             //Chỉ có 1 set shipping fee => action có discount lớn nhất tùy vào Discount Type

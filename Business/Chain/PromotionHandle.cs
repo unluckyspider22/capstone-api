@@ -15,6 +15,13 @@ namespace ApplicationCore.Chain
     }
     public class PromotionHandle : Handler<OrderResponseModel>, IPromotionHandle
     {
+        private readonly ITimeframeHandle _timeframeHandle;
+
+        public PromotionHandle(ITimeframeHandle timeframeHandle)
+        {
+            _timeframeHandle = timeframeHandle;
+        }
+
         private List<Promotion> _promotions;
 
         public void SetPromotions(List<Promotion> promotions)
@@ -23,35 +30,73 @@ namespace ApplicationCore.Chain
         }
         public override void Handle(OrderResponseModel order)
         {
-            HandleExclusive();
-            foreach (Promotion promotion in _promotions)
+            HandleExclusive(order.CustomerOrderInfo);
+            //Trường hợp auto apply
+            if (order.CustomerOrderInfo.Vouchers == null || order.CustomerOrderInfo.Vouchers.Count == 0)
             {
-                HandleStore(promotion, order);
-                HandleSalesMode(promotion, order);
-                HandlePayment(promotion, order);
-                HandleGender(promotion, order);
+                var acceptPromotions = new List<Promotion>();
+                int invalidPromotions = 0;
+                foreach (var promotion in _promotions)
+                {
+                    try
+                    {
+                        HandleStore(promotion, order);
+                        HandleSalesMode(promotion, order);
+                        HandlePayment(promotion, order);
+                        HandleGender(promotion, order);
+                        acceptPromotions.Add(promotion);
+                    }
+                    catch (ErrorObj e)
+                    {
+                        invalidPromotions++;
+                        if (invalidPromotions == _promotions.Count())
+                        {
+                            throw e;
+                        }
+                    }
+                }
+                if (acceptPromotions.Count > 0)
+                {
+                    _promotions = acceptPromotions;
+                }
             }
+            //Trường hợp dùng voucher
+            else
+            {
+                foreach (var promotion in _promotions)
+                {
+
+                    HandleStore(promotion, order);
+                    HandleSalesMode(promotion, order);
+                    HandlePayment(promotion, order);
+                    HandleGender(promotion, order);
+                }
+            }
+            _timeframeHandle.SetPromotions(_promotions);
             base.Handle(order);
         }
         #region Handle Exclusive
-        private void HandleExclusive()
+        private void HandleExclusive(CustomerOrderInfo orderInfo)
         {
-
-            if (_promotions.Any(w => w.Exclusive.Equals(AppConstant.EnvVar.Exclusive.GlobalExclusive)) && _promotions.Count() > 1)
+            //Nếu như có voucher mới handle Exclusive, còn auto apply thì không check mà trả về cho user chọn
+            if (orderInfo.Vouchers != null && orderInfo.Vouchers.Count() > 0)
             {
-                throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Exclusive_Promotion);
-            }
-            if (_promotions.Where(w => w.Exclusive.Equals(AppConstant.EnvVar.Exclusive.ClassExclusiveOrder)).Count() > 1)
-            {
-                throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Exclusive_Promotion);
-            }
-            if (_promotions.Where(w => w.Exclusive.Equals(AppConstant.EnvVar.Exclusive.ClassExclusiveProduct)).Count() > 1)
-            {
-                throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Exclusive_Promotion);
-            }
-            if (_promotions.Where(w => w.Exclusive.Equals(AppConstant.EnvVar.Exclusive.ClassExclusiveShipping)).Count() > 1)
-            {
-                throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Exclusive_Promotion);
+                if (_promotions.Any(w => w.Exclusive.Equals(AppConstant.EnvVar.Exclusive.GlobalExclusive)) && _promotions.Count() > 1)
+                {
+                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Exclusive_Promotion);
+                }
+                if (_promotions.Where(w => w.Exclusive.Equals(AppConstant.EnvVar.Exclusive.ClassExclusiveOrder)).Count() > 1)
+                {
+                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Exclusive_Promotion);
+                }
+                if (_promotions.Where(w => w.Exclusive.Equals(AppConstant.EnvVar.Exclusive.ClassExclusiveProduct)).Count() > 1)
+                {
+                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Exclusive_Promotion);
+                }
+                if (_promotions.Where(w => w.Exclusive.Equals(AppConstant.EnvVar.Exclusive.ClassExclusiveShipping)).Count() > 1)
+                {
+                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Exclusive_Promotion);
+                }
             }
         }
         #endregion

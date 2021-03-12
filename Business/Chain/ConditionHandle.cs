@@ -14,6 +14,7 @@ namespace ApplicationCore.Chain
     public interface IConditionHandle : IHandler<OrderResponseModel>
     {
         void SetPromotions(List<Promotion> promotions);
+        public List<Promotion> GetPromotions();
     }
     public class ConditionHandle : Handler<OrderResponseModel>, IConditionHandle
     {
@@ -23,7 +24,10 @@ namespace ApplicationCore.Chain
         private List<Promotion> _promotions;
         private readonly IMapper _mapper;
 
-        public ConditionHandle(IOrderConditionHandle orderConditionHandle, IProductConditionHandle productConditionHandle, IMembershipConditionHandle membershipConditionHandle, IMapper mapper)
+        public ConditionHandle(IOrderConditionHandle orderConditionHandle,
+            IProductConditionHandle productConditionHandle,
+            IMembershipConditionHandle membershipConditionHandle,
+            IMapper mapper)
         {
             _orderConditionHandle = orderConditionHandle;
             _productConditionHandle = productConditionHandle;
@@ -31,46 +35,100 @@ namespace ApplicationCore.Chain
             _mapper = mapper;
         }
 
+        public List<Promotion> GetPromotions()
+        {
+            return _promotions;
+        }
         public void SetPromotions(List<Promotion> promotions)
         {
             _promotions = promotions;
         }
         public override void Handle(OrderResponseModel order)
         {
-            foreach (var promotion in _promotions)
+
+            #region Trường hợp có voucher
+            if (order.CustomerOrderInfo.Vouchers == null || order.CustomerOrderInfo.Vouchers.Count == 0)
             {
-                int invalidPromotionDetails = 0;
-                foreach (var promotionTier in promotion.PromotionTier)
+                var acceptPromotions = new List<Promotion>();
+                int invalidPromotions = 0;
+                try
                 {
-                    #region Handle Condition
-                    var handle = HandleConditionGroup(promotionTier, order);
-                    #endregion
-                    if (handle > 0)
+                    foreach (var promotion in _promotions)
                     {
-                        invalidPromotionDetails++;
-                        continue;
+                        HandlePromotionCondition(promotion, order);
+
+                        acceptPromotions.Add(promotion);
                     }
-                    Effect effect = new Effect
-                    {
-                        PromotionId = promotion.PromotionId,
-                        PromotionTierId = promotionTier.PromotionTierId,
-                        ConditionRuleName = promotionTier.ConditionRule.RuleName,
-                        TierIndex = (int)promotionTier.TierIndex,
-                        EffectType = AppConstant.EffectMessage.AcceptCoupon,
-                        Prop = new { value = promotionTier.ConditionRule.RuleName }
-                    };
-                    if (order.Effects == null)
-                    {
-                        order.Effects = new List<Effect>();
-                    }
-                    order.Effects.Add(effect);
                 }
-                if (invalidPromotionDetails == promotion.PromotionTier.Count && invalidPromotionDetails > 0)
+                catch (ErrorObj e)
                 {
-                    throw new ErrorObj((int)HttpStatusCode.BadRequest, AppConstant.ErrMessage.NotMatchCondition);
+                    invalidPromotions++;
+                    if (invalidPromotions == _promotions.Count && invalidPromotions > 0)
+                    {
+                        throw e;
+                    }
+                }
+                _promotions = acceptPromotions;
+            }
+            #endregion
+            else
+            {
+                foreach (var promotion in _promotions)
+                {
+                    HandlePromotionCondition(promotion, order);
                 }
             }
             base.Handle(order);
+        }
+        public void HandlePromotionCondition(Promotion promotion, OrderResponseModel order)
+        {
+            int invalidPromotionDetails = 0;
+            foreach (var promotionTier in promotion.PromotionTier)
+            {
+                #region Handle Condition
+                var handle = HandleConditionGroup(promotionTier, order);
+                #endregion
+                if (handle > 0)
+                {
+                    invalidPromotionDetails++;
+                    continue;
+                }
+                #region add tier effect
+                string effectType;
+                if (order.CustomerOrderInfo.Vouchers.Count() == 0)
+                {
+                    effectType = AppConstant.EffectMessage.AutoPromotion;
+                }
+                else
+                {
+                    effectType = AppConstant.EffectMessage.AcceptCoupon;
+                }
+                Effect effect = new Effect
+                {
+                    PromotionId = promotion.PromotionId,
+                    PromotionTierId = promotionTier.PromotionTierId,
+                    ConditionRuleName = promotionTier.ConditionRule.RuleName,
+                    TierIndex = (int)promotionTier.TierIndex,
+                    EffectType = effectType,
+                    Prop = new
+                    {
+                        promotionName = promotion.PromotionName,
+                        ruleName = promotionTier.ConditionRule.RuleName
+                    }
+                };
+                if (order.Effects == null)
+                {
+                    order.Effects = new List<Effect>();
+                }
+                order.Effects.Add(effect);
+                #endregion
+            }
+            if (invalidPromotionDetails == promotion.PromotionTier.Count && invalidPromotionDetails > 0)
+            {
+                throw new ErrorObj((int)HttpStatusCode.BadRequest, AppConstant.ErrMessage.NotMatchCondition);
+            }
+
+
         }
         private int HandleConditionGroup(PromotionTier promotionTier, OrderResponseModel order)
         {

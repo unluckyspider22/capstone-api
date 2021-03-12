@@ -115,7 +115,7 @@ namespace ApplicationCore.Services
                     && el.VoucherType.Equals(AppConstant.EnvVar.VoucherType.BULK_CODE)
                      && el.IsActive
                      && el.RedempedQuantity < el.Quantity
-                     && !el.Promotion.PromotionType.Equals(AppConstant.EnvVar.PromotionType.PROMOTION)
+                     && !el.Promotion.PromotionType.Equals(AppConstant.EnvVar.PromotionType.AUTO_PROMOTION)
                      && el.Promotion.Status.Equals(AppConstant.EnvVar.PromotionStatus.PUBLISH)
                      && !el.Promotion.DelFlg
                          && el.Promotion.StartDate.Value.CompareTo(DateTime.Now) <= 0

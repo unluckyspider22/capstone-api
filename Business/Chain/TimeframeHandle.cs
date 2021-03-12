@@ -27,6 +27,12 @@ namespace ApplicationCore.Chain
     }
     public class TimeframeHandle : Handler<OrderResponseModel>, ITimeframeHandle
     {
+        private readonly IConditionHandle _conditionHandle;
+
+        public TimeframeHandle(IConditionHandle conditionHandle)
+        {
+            _conditionHandle = conditionHandle;
+        }
 
         private List<Promotion> _promotions;
         private List<Holiday> _listPublicHoliday;
@@ -36,16 +42,52 @@ namespace ApplicationCore.Chain
         }
         public override void Handle(OrderResponseModel order)
         {
-            foreach (var promotion in _promotions)
+
+            //Trường hợp auto apply
+            if (order.CustomerOrderInfo.Vouchers == null || order.CustomerOrderInfo.Vouchers.Count == 0)
             {
-                //HandleExpiredDate(promotion, order);
-                if (!promotion.ForHoliday.Equals(AppConstant.EnvVar.FOR_HOLIDAY))
+                var acceptPromotions = new List<Promotion>();
+                int invalidPromotions = 0;
+                foreach (var promotion in _promotions)
                 {
-                    HandleHolidayAsync(order);
+                    try
+                    {
+                        if (!promotion.ForHoliday.Equals(AppConstant.EnvVar.FOR_HOLIDAY))
+                        {
+                            HandleHolidayAsync(order);
+                        }
+                        HandleDayOfWeek(promotion, order.CustomerOrderInfo.BookingDate.DayOfWeek);
+                        HandleHour(promotion, order.CustomerOrderInfo.BookingDate.Hour);
+
+                        acceptPromotions.Add(promotion);
+                    }
+                    catch (ErrorObj e)
+                    {
+                        invalidPromotions++;
+                        if (invalidPromotions == _promotions.Count && invalidPromotions > 0)
+                        {
+                            throw e;
+                        }
+                    }
                 }
-                HandleDayOfWeek(promotion, order.CustomerOrderInfo.BookingDate.DayOfWeek);
-                HandleHour(promotion, order.CustomerOrderInfo.BookingDate.Hour);
+                if (acceptPromotions.Count > 0)
+                {
+                    _promotions = acceptPromotions;
+                }
             }
+            else
+            {
+                foreach (var promotion in _promotions)
+                {
+                    if (!promotion.ForHoliday.Equals(AppConstant.EnvVar.FOR_HOLIDAY))
+                    {
+                        HandleHolidayAsync(order);
+                    }
+                    HandleDayOfWeek(promotion, order.CustomerOrderInfo.BookingDate.DayOfWeek);
+                    HandleHour(promotion, order.CustomerOrderInfo.BookingDate.Hour);
+                }
+            }
+            _conditionHandle.SetPromotions(_promotions);
             base.Handle(order);
         }
 

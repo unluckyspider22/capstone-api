@@ -28,6 +28,8 @@ namespace ApplicationCore.Services
         }
         protected override IGenericRepository<Voucher> _repository => _unitOfWork.VoucherRepository;
         protected IGenericRepository<VoucherGroup> _voucherGroupRepos => _unitOfWork.VoucherGroupRepository;
+
+
         public async Task<List<Promotion>> CheckVoucher(CustomerOrderInfo order)
         {
             try
@@ -35,29 +37,36 @@ namespace ApplicationCore.Services
                 var vouchers = order.Vouchers;
                 if (vouchers.Select(el => new { el.VoucherCode, el.PromotionCode }).Distinct().Count() < vouchers.Select(el => new { el.VoucherCode, el.PromotionCode }).Count())
                 {
-                    throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.Duplicate_VoucherCode, description: AppConstant.ErrMessage.Duplicate_VoucherCode);
+                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Duplicate_VoucherCode, description: AppConstant.ErrMessage.Duplicate_VoucherCode);
                 }
                 var promotions = new List<Promotion>();
                 foreach (var voucherModel in vouchers)
                 {
-                    var voucher = await _repository.Get(filter: el => el.VoucherCode.Equals(voucherModel.VoucherCode)
+                    var voucher = await _repository.Get(filter: el =>
+                    el.VoucherCode.Equals(voucherModel.VoucherCode)
+                    && el.VoucherGroup.Promotion.Brand.BrandCode.Equals(order.Attributes.StoreInfo.BrandCode)
                     && el.VoucherGroup.Promotion.PromotionCode.Equals(voucherModel.PromotionCode)
                     && !el.IsUsed,
                     includeProperties:
                     "VoucherGroup.Promotion.PromotionTier.Action.ActionProductMapping.Product," +
                     "VoucherGroup.Promotion.PromotionTier.ConditionRule.ConditionGroup.OrderCondition," +
                     "VoucherGroup.Promotion.PromotionTier.ConditionRule.ConditionGroup.ProductCondition.ProductConditionMapping.Product," +
-                    "VoucherGroup.Promotion.PromotionStoreMapping.Store");
+                    "VoucherGroup.Promotion.PromotionStoreMapping.Store," +
+                    "VoucherGroup.Promotion.Brand");
                     if (voucher.Count() > 1)
                     {
-                        throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.Duplicate_VoucherCode, description: AppConstant.ErrMessage.Duplicate_VoucherCode);
+                        throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Duplicate_VoucherCode, description: AppConstant.ErrMessage.Duplicate_VoucherCode);
                     }
                     if (voucher.Count() == 0)
                     {
-                        throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.Invalid_VoucherCode, description: AppConstant.ErrMessage.Invalid_VoucherCode);
+                        throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_VoucherCode, description: AppConstant.ErrMessage.Invalid_VoucherCode);
                     }
                     var promotion = voucher.First().VoucherGroup.Promotion;
                     promotions.Add(promotion);
+                }
+                if (promotions.Select(s => s.PromotionId).Distinct().Count() < promotions.Select(s => s.PromotionId).Count())
+                {
+                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Duplicate_Promotion);
                 }
                 return promotions;
             }
@@ -169,7 +178,7 @@ namespace ApplicationCore.Services
                                 if (voucherGroup.Voucher.Where(el => el.VoucherCode.Equals(voucherParam.VoucherCode)).Distinct().Count()
                                 < voucherGroup.Voucher.Where(w => w.VoucherCode.Equals(voucherParam.VoucherCode)).Count())
                                 {
-                                    throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.Duplicate_VoucherCode,
+                                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Duplicate_VoucherCode,
                                         description: AppConstant.ErrMessage.Duplicate_VoucherCode);
                                 }
                                 var vouchers = voucherGroup.Voucher.Where(w => w.VoucherCode.Equals(voucherParam.VoucherCode)).First();

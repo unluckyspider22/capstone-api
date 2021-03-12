@@ -23,5 +23,8 @@ namespace ApplicationCore.Services
         Task<DistributionStat> DistributionStatistic(Guid promotionId, Guid brandId);
 
         void SetPromotions(List<Promotion> promotions);
+        Task<List<Promotion>> GetAutoPromotions(CustomerOrderInfo orderInfo, Guid promotionId);
+        List<Promotion> GetPromotions();
+
     }
 }

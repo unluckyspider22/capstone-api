@@ -11,7 +11,7 @@ namespace ApplicationCore.Chain
     public interface IApplyPromotionHandler : IHandler<OrderResponseModel>
     {
         void SetPromotions(List<Promotion> promotions);
-
+        List<Promotion> GetPromotions();
     }
     public class ApplyPromotionHandler : Handler<OrderResponseModel>, IApplyPromotionHandler
     {
@@ -34,23 +34,38 @@ namespace ApplicationCore.Chain
         {
             _promotions = promotions;
         }
+        public List<Promotion> GetPromotions()
+        {
+            return _promotions;
+        }
         public override void Handle(OrderResponseModel order)
         {
             #region Check condition
             Setorder(order);
-            //Thứ tự là:
             //ApplyHandle => PromotionHandle => TimeframeHandle(nếu có) => ConditionHandle
 
             _promotionHandle.SetNext(_timeframeHandle).SetNext(_conditionHandle);
             _promotionHandle.SetPromotions(_promotions);
-            _timeframeHandle.SetPromotions(_promotions);
-            _conditionHandle.SetPromotions(_promotions);
 
             _promotionHandle.Handle(order);
+
             #endregion
             #region Apply action
+            _promotions = _conditionHandle.GetPromotions();
             _applyPromotion.SetPromotions(_promotions);
-            _applyPromotion.Apply(order);
+            if (_promotions.Count == 1)
+            {
+                _applyPromotion.Apply(order);
+                return;
+            }
+            else
+            {
+                if (order.CustomerOrderInfo.Vouchers != null && order.CustomerOrderInfo.Vouchers.Count > 0)
+                {
+                    _applyPromotion.Apply(order);
+                }
+            }
+
             #endregion
             /*base.Handle(order);*/
         }

@@ -1,22 +1,19 @@
 ﻿
 using ApplicationCore.Chain;
 using ApplicationCore.Request;
-using ApplicationCore.Utils;
 using AutoMapper;
 using Infrastructure.DTOs;
-using Infrastructure.DTOs.Voucher;
-using Infrastructure.DTOs.VoucherChannel;
 using Infrastructure.Helper;
 using Infrastructure.Models;
 using Infrastructure.Repository;
 using Infrastructure.UnitOrWork;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace ApplicationCore.Services
@@ -42,6 +39,10 @@ namespace ApplicationCore.Services
         public void SetPromotions(List<Promotion> promotions)
         {
             _promotions = promotions;
+        }
+        public List<Promotion> GetPromotions()
+        {
+            return _promotions;
         }
         #region CRUD promotion tier
         public async Task<PromotionTierParam> CreatePromotionTier(PromotionTierParam param)
@@ -169,7 +170,7 @@ namespace ApplicationCore.Services
                 }
                 else
                 {
-                    throw new ErrorObj(code: 400, message: "Action or Membership action is not null", description: "Invalid param");
+                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: "Action or Membership action is not null", description: "Invalid param");
                 }
                 await _unitOfWork.SaveAsync();
                 return param;
@@ -203,7 +204,7 @@ namespace ApplicationCore.Services
                 }
                 else
                 {
-                    throw new ErrorObj(code: 400, message: "Action or Membership action is not null", description: "Invalid param");
+                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: "Action or Membership action is not null", description: "Invalid param");
                 }
                 // Delete promotion tier
                 IGenericRepository<PromotionTier> tierRepo = _unitOfWork.PromotionTierRepository;
@@ -299,7 +300,7 @@ namespace ApplicationCore.Services
                  }*/
                 //else
                 //{
-                //    throw new ErrorObj(code: 400, message: "Action or Membership action is not null", description: "Invalid param");
+                //    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: "Action or Membership action is not null", description: "Invalid param");
                 //}
                 //await _unitOfWork.SaveAsync();
                 // update condition rule
@@ -430,40 +431,29 @@ namespace ApplicationCore.Services
         #region check voucher
         public async Task<OrderResponseModel> HandlePromotion(OrderResponseModel orderResponse)
         {
-            try
+            var listPublicHoliday = await _holidayService.GetHolidays();
+            _timeframeHandle.SetHolidays(listPublicHoliday);
+            foreach (var promotion in _promotions)
             {
-                var listPublicHoliday = await _holidayService.GetHolidays();
-                _timeframeHandle.SetHolidays(listPublicHoliday);
-                foreach (var promotion in _promotions)
+                //Check promotion is active
+                if (!promotion.Status.Equals(AppConstant.EnvVar.PromotionStatus.PUBLISH))
                 {
-                    //Check promotion is active
-                    if (!promotion.Status.Equals(AppConstant.EnvVar.PromotionStatus.PUBLISH))
-                    {
-                        throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.InActive_Promotion, description: AppConstant.ErrMessage.InActive_Promotion);
-                    }
-                    //Check promotion is time 
-                    if (promotion.StartDate >= orderResponse.CustomerOrderInfo.BookingDate)
-                    {
-                        throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.Invalid_Time, description: AppConstant.ErrMessage.Invalid_Early);
-                    }
-                    //Check promotion is expired
-                    if (promotion.EndDate <= orderResponse.CustomerOrderInfo.BookingDate)
-                    {
-                        throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.Expire_Promotion, description: AppConstant.ErrMessage.Expire_Promotion);
-                    }
+                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.InActive_Promotion, description: AppConstant.ErrMessage.InActive_Promotion);
                 }
-                _applyPromotionHandler.SetPromotions(_promotions);
-                _applyPromotionHandler.Handle(orderResponse);
-
+                //Check promotion is time 
+                if (promotion.StartDate >= orderResponse.CustomerOrderInfo.BookingDate)
+                {
+                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_Time, description: AppConstant.ErrMessage.Invalid_Early);
+                }
+                //Check promotion is expired
+                if (promotion.EndDate <= orderResponse.CustomerOrderInfo.BookingDate)
+                {
+                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Expire_Promotion, description: AppConstant.ErrMessage.Expire_Promotion);
+                }
             }
-            catch (ErrorObj e)
-            {
-                throw new ErrorObj(code: 400, message: e.Message);
-            }
-            catch (Exception ex)
-            {
-                throw new ErrorObj(code: 500, message: ex.Message);
-            }
+            _applyPromotionHandler.SetPromotions(_promotions);
+            _applyPromotionHandler.Handle(orderResponse);
+            _promotions = _applyPromotionHandler.GetPromotions();
             return orderResponse;
         }
         #endregion
@@ -954,7 +944,7 @@ namespace ApplicationCore.Services
         {
             if (brandId.Equals(Guid.Empty))
             {
-                throw new ErrorObj(code: 400, message: AppConstant.StatisticMessage.BRAND_ID_INVALID, description: "Internal Server Error");
+                throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.StatisticMessage.BRAND_ID_INVALID, description: "Internal Server Error");
             }
             try
             {
@@ -1080,7 +1070,30 @@ namespace ApplicationCore.Services
         }
 
 
+
+
         #endregion
+        public async Task<List<Promotion>> GetAutoPromotions(CustomerOrderInfo orderInfo, Guid promotionId)
+        {
+            var promotions = await _repository.Get(filter: el =>
+                    el.PromotionType.Equals(AppConstant.EnvVar.PromotionType.AUTO_PROMOTION)
+                    && (promotionId != Guid.Empty ? el.PromotionId == promotionId : true)
+                    && el.Brand.BrandCode.Equals(orderInfo.Attributes.StoreInfo.BrandCode)
+                    && el.StartDate <= orderInfo.BookingDate
+                    && (el.EndDate != null ? (el.EndDate >= orderInfo.BookingDate) : true)
+                    && el.Status.Equals(AppConstant.EnvVar.PromotionStatus.PUBLISH)
+                    && !el.DelFlg,
+                        includeProperties:
+                        "PromotionTier.Action.ActionProductMapping.Product," +
+                        "PromotionTier.PostAction.PostActionProductMapping.Product," +
+                        "PromotionTier.ConditionRule.ConditionGroup.OrderCondition," +
+                        "PromotionTier.ConditionRule.ConditionGroup.ProductCondition.ProductConditionMapping.Product," +
+                        "PromotionStoreMapping.Store," +
+                        "Brand"
+                    );
+            return promotions.ToList();
+        }
+
 
     }
 }
