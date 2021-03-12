@@ -51,6 +51,8 @@ namespace PromotionEngineAPI.Controllers
                     _promotionService.SetPromotions(promotions);
                     //Check promotion
                     responseModel = await _promotionService.HandlePromotion(responseModel);
+
+
                 }
                 else throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Unmatch_Promotion);
             }
@@ -59,6 +61,38 @@ namespace PromotionEngineAPI.Controllers
                 return StatusCode(statusCode: e.Code, e);
             }
             return Ok(responseModel);
+        }
+        [HttpPost]
+        [Route("check-auto-promotion")]
+        public async Task<IActionResult> CheckAutoPromotion([FromBody] CustomerOrderInfo orderInfo,[FromQuery] Guid promotionId)
+        {
+            //Lấy promotion bởi voucher code
+            OrderResponseModel prepareModel = new OrderResponseModel();
+            try
+            {
+                var promotions = await _promotionService.GetAutoPromotions(orderInfo, promotionId);
+                if (promotions != null && promotions.Count() > 0)
+                {
+                    prepareModel.CustomerOrderInfo = orderInfo;
+                    _promotionService.SetPromotions(promotions);
+                    //Check promotion
+                    prepareModel = await _promotionService.HandlePromotion(prepareModel);
+
+                  /*  promotions = _promotionService.GetPromotions();
+
+                    if (promotions.Count > 1)
+                    {
+                        return Ok(promotions);
+                    }*/
+
+                }
+                else return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, orderInfo);
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+            return Ok(prepareModel);
         }
 
         // GET: api/Promotions

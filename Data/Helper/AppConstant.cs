@@ -111,7 +111,7 @@ namespace Infrastructure.Helper
             public struct PromotionType
             {
                 public const string DISCOUNT = "1";
-                public const string PROMOTION = "2";
+                public const string AUTO_PROMOTION = "2";
                 public const string GIFT = "3";
                 public const string BONUS_POINT = "4";
             }
@@ -186,6 +186,8 @@ namespace Infrastructure.Helper
         {
             //Khi tier thỏa hết điều kiện
             public const string AcceptCoupon = "acceptCoupon";
+            //Auto apply promotion
+            public const string AutoPromotion = "autoPromotion";
             //Chỉ có 1 set discount => action có discount lớn nhất tùy vào Discount Type
             public const string SetDiscount = "setDiscount";
             //Chỉ có 1 set shipping fee => action có discount lớn nhất tùy vào Discount Type

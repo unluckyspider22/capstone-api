@@ -28,6 +28,8 @@ namespace ApplicationCore.Services
         }
         protected override IGenericRepository<Voucher> _repository => _unitOfWork.VoucherRepository;
         protected IGenericRepository<VoucherGroup> _voucherGroupRepos => _unitOfWork.VoucherGroupRepository;
+
+
         public async Task<List<Promotion>> CheckVoucher(CustomerOrderInfo order)
         {
             try
@@ -40,14 +42,17 @@ namespace ApplicationCore.Services
                 var promotions = new List<Promotion>();
                 foreach (var voucherModel in vouchers)
                 {
-                    var voucher = await _repository.Get(filter: el => el.VoucherCode.Equals(voucherModel.VoucherCode)
+                    var voucher = await _repository.Get(filter: el =>
+                    el.VoucherCode.Equals(voucherModel.VoucherCode)
+                    && el.VoucherGroup.Promotion.Brand.BrandCode.Equals(order.Attributes.StoreInfo.BrandCode)
                     && el.VoucherGroup.Promotion.PromotionCode.Equals(voucherModel.PromotionCode)
                     && !el.IsUsed,
                     includeProperties:
                     "VoucherGroup.Promotion.PromotionTier.Action.ActionProductMapping.Product," +
                     "VoucherGroup.Promotion.PromotionTier.ConditionRule.ConditionGroup.OrderCondition," +
                     "VoucherGroup.Promotion.PromotionTier.ConditionRule.ConditionGroup.ProductCondition.ProductConditionMapping.Product," +
-                    "VoucherGroup.Promotion.PromotionStoreMapping.Store");
+                    "VoucherGroup.Promotion.PromotionStoreMapping.Store," +
+                    "VoucherGroup.Promotion.Brand");
                     if (voucher.Count() > 1)
                     {
                         throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.Duplicate_VoucherCode, description: AppConstant.ErrMessage.Duplicate_VoucherCode);

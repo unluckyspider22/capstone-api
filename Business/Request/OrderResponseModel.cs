@@ -14,7 +14,6 @@ namespace ApplicationCore.Request
             Gift = new List<Gift>();
         }
         public List<Effect> Effects { get; set; }
-
         public CustomerOrderInfo CustomerOrderInfo { get; set; }
 
         public List<Gift> Gift { get; set; }

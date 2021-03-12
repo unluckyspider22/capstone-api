@@ -44,8 +44,16 @@ namespace ApplicationCore.Chain
                         case AppConstant.EnvVar.ActionType.Product:
                             DiscountProduct(order, action);
                             break;
+
+                    }
+                }
+                var postAction = FilterPostAction(promotionTiers.Select(el => el.PostAction).ToList());
+                if (postAction != null)
+                {
+                    switch (postAction.ActionType)
+                    {
                         case AppConstant.EnvVar.ActionType.Gift:
-                            DiscountProduct(order, action);
+                            AddGift(order, postAction, promotion);
                             break;
                         case AppConstant.EnvVar.ActionType.BonusPoint:
                             DiscountProduct(order, action);
@@ -53,15 +61,31 @@ namespace ApplicationCore.Chain
 
                     }
                 }
+
                 SetFinalAmountApply(order);
             }
+        }
+        private PostAction FilterPostAction(List<PostAction> postActions)
+        {
+            PostAction result = null;
+            if (postActions.Count() > 0 && postActions.Count() == 1)
+            {
+                return postActions.First();
+            }
+            else
+            {
+                result = postActions.Where(w =>
+                    w.PromotionTier.TierIndex == postActions.Max(m => m.PromotionTier.TierIndex))
+                    .SingleOrDefault();
+            }
+            return result;
         }
         private Infrastructure.Models.Action FilterAction(List<Infrastructure.Models.Action> actions, Promotion promotion)
         {
             Infrastructure.Models.Action result = null;
             if (actions.Count() > 0 && actions.Count() == 1)
             {
-                return result;
+                return actions.First();
             }
             else
             {
@@ -85,8 +109,8 @@ namespace ApplicationCore.Chain
                     case AppConstant.EnvVar.DiscountType.Shipping:
                         result = actions.Where(w =>
                                 w.DiscountType == AppConstant.EnvVar.DiscountType.Shipping &&
-                                w.DiscountPercentage > 0 &&
-                                w.DiscountPercentage == actions.Max(m => m.DiscountPercentage))
+                                w.DiscountAmount > 0 &&
+                                w.DiscountAmount == actions.Max(m => m.DiscountAmount))
                         .SingleOrDefault();
                         break;
                 }
@@ -100,38 +124,97 @@ namespace ApplicationCore.Chain
             var final = (decimal)order.CustomerOrderInfo.Amount - (order.CustomerOrderInfo.CartItems.Sum(s => s.Discount)
                 + order.CustomerOrderInfo.CartItems.Sum(s => s.DiscountFromOrder));
 
-            if (action.DiscountType.Equals(AppConstant.EnvVar.DiscountType.Percentage))
+            var effectType = "";
+            switch (action.DiscountType)
             {
-                discount = (decimal)final * (decimal)action.DiscountPercentage / 100;
-                discount = discount > (decimal)action.MaxAmount ? (decimal)action.MaxAmount : discount;
+                case AppConstant.EnvVar.DiscountType.Percentage:
+                    discount = (decimal)final * (decimal)action.DiscountPercentage / 100;
+                    discount = discount > (decimal)action.MaxAmount ? (decimal)action.MaxAmount : discount;
+                    effectType = AppConstant.EffectMessage.SetDiscount;
+                    discount = discount > (decimal)final ? (decimal)final : discount;
+                    SetDiscountFromOrder(order, discount, final, promotion);
+                    break;
+                case AppConstant.EnvVar.DiscountType.Amount:
+                    discount = (decimal)action.DiscountAmount;
+                    effectType = AppConstant.EffectMessage.SetDiscount;
 
+                    discount = discount > (decimal)final ? (decimal)final : discount;
+                    SetDiscountFromOrder(order, discount, final, promotion);
+                    break;
+                case AppConstant.EnvVar.DiscountType.Shipping:
+                    discount = (decimal)action.DiscountAmount;
+                    effectType = AppConstant.EffectMessage.SetShippingFee;
+                    order.CustomerOrderInfo.ShippingFee -= discount;
+                    order.CustomerOrderInfo.ShippingFee = order.CustomerOrderInfo.ShippingFee > 0 ? order.CustomerOrderInfo.ShippingFee : 0;
+                    break;
             }
-            else if (action.DiscountType.Equals(AppConstant.EnvVar.DiscountType.Amount))
+            SetEffect(order, promotion, discount, effectType, action: action);
+        }
+        public void AddGift(OrderResponseModel order, PostAction postAction, Promotion promotion)
+        {
+            string effectType = AppConstant.EffectMessage.AddGift;
+            if (order.Gift == null)
             {
-                discount = (decimal)action.DiscountAmount;
+                order.Gift = new List<Gift>();
             }
-            discount = discount > (decimal)final ? (decimal)final : discount;
-            /*throw new ErrorObj(code: 400, message: "discount: " + discount + ", final: " + final);*/
-            SetDiscountFromOrder(order, discount, final, promotion);
-
+            var gifts = postAction.PostActionProductMapping.Select(el => el.Product);
+            foreach (var gift in gifts)
+            {
+                order.Gift.Add(new Gift
+                {
+                    ProductCode = gift.Code,
+                    ProductName = gift.Name
+                });
+            }
+            SetEffect(order, promotion, 0, effectType, postAction: postAction);
+        }
+        public void SetEffect(OrderResponseModel order, Promotion promotion, decimal discount, string effectType, Infrastructure.Models.Action action = null, PostAction postAction = null)
+        {
             if (order.Effects == null)
             {
                 order.Effects = new List<Effect>();
             }
-            order.Effects.Add(new
-                Effect
+            if (action != null)
             {
-                PromotionId = promotion.PromotionId,
-                PromotionTierId = action.PromotionTier.PromotionTierId,
-                ConditionRuleName = action.PromotionTier.ConditionRule.RuleName,
-                TierIndex = (int)action.PromotionTier.TierIndex,
-                EffectType = AppConstant.EffectMessage.SetDiscount,
-                Prop = new
+                order.Effects.Add(new
+                Effect
                 {
-                    name = action.PromotionTier.Summary,
-                    value = discount
-                }
-            });
+                    PromotionId = promotion.PromotionId,
+                    PromotionTierId = action.PromotionTierId,
+                    ConditionRuleName = action.PromotionTier.ConditionRule.RuleName,
+                    TierIndex = (int)action.PromotionTier.TierIndex,
+                    EffectType = effectType,
+                    Prop = new
+                    {
+                        name = action.PromotionTier.Summary,
+                        value = discount
+                    }
+                });
+            }
+            if (postAction != null)
+            {
+                order.Effects.Add(new Effect
+                {
+                    PromotionId = promotion.PromotionId,
+                    PromotionTierId = postAction.PromotionTierId,
+                    ConditionRuleName = postAction.PromotionTier.ConditionRule.RuleName,
+                    TierIndex = (int)postAction.PromotionTier.TierIndex,
+                    EffectType = effectType,
+                    Prop = new
+                    {
+                        gifts = postAction.PostActionProductMapping.Select(s =>
+                        {
+                            string listProduct = "";
+                            listProduct += s.Product.Name;
+                            return listProduct;
+                        })
+                    }
+                });
+            }
+            if (order.Effects.Count() == 0)
+            {
+                order.Effects = null;
+            }
 
         }
         private void SetDiscountFromOrder(OrderResponseModel order, decimal discount, decimal final, Promotion promotion)
@@ -280,7 +363,7 @@ namespace ApplicationCore.Chain
         #endregion
         private void SetFinalAmountApply(OrderResponseModel order)
         {
-            order.TotalAmount = order.CustomerOrderInfo.Amount;
+            order.TotalAmount = order.CustomerOrderInfo.Amount + order.CustomerOrderInfo.ShippingFee;
             order.DiscountOrderDetail = order.CustomerOrderInfo.CartItems.Sum(s => s.Discount);
             order.Discount = (decimal)order.CustomerOrderInfo.CartItems.Sum(s => s.DiscountFromOrder)
                 + (decimal)order.DiscountOrderDetail;
