@@ -37,7 +37,7 @@ namespace ApplicationCore.Services
                 var vouchers = order.Vouchers;
                 if (vouchers.Select(el => new { el.VoucherCode, el.PromotionCode }).Distinct().Count() < vouchers.Select(el => new { el.VoucherCode, el.PromotionCode }).Count())
                 {
-                    throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.Duplicate_VoucherCode, description: AppConstant.ErrMessage.Duplicate_VoucherCode);
+                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Duplicate_VoucherCode, description: AppConstant.ErrMessage.Duplicate_VoucherCode);
                 }
                 var promotions = new List<Promotion>();
                 foreach (var voucherModel in vouchers)
@@ -55,14 +55,18 @@ namespace ApplicationCore.Services
                     "VoucherGroup.Promotion.Brand");
                     if (voucher.Count() > 1)
                     {
-                        throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.Duplicate_VoucherCode, description: AppConstant.ErrMessage.Duplicate_VoucherCode);
+                        throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Duplicate_VoucherCode, description: AppConstant.ErrMessage.Duplicate_VoucherCode);
                     }
                     if (voucher.Count() == 0)
                     {
-                        throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.Invalid_VoucherCode, description: AppConstant.ErrMessage.Invalid_VoucherCode);
+                        throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_VoucherCode, description: AppConstant.ErrMessage.Invalid_VoucherCode);
                     }
                     var promotion = voucher.First().VoucherGroup.Promotion;
                     promotions.Add(promotion);
+                }
+                if (promotions.Select(s => s.PromotionId).Distinct().Count() < promotions.Select(s => s.PromotionId).Count())
+                {
+                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Duplicate_Promotion);
                 }
                 return promotions;
             }
@@ -174,7 +178,7 @@ namespace ApplicationCore.Services
                                 if (voucherGroup.Voucher.Where(el => el.VoucherCode.Equals(voucherParam.VoucherCode)).Distinct().Count()
                                 < voucherGroup.Voucher.Where(w => w.VoucherCode.Equals(voucherParam.VoucherCode)).Count())
                                 {
-                                    throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.Duplicate_VoucherCode,
+                                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Duplicate_VoucherCode,
                                         description: AppConstant.ErrMessage.Duplicate_VoucherCode);
                                 }
                                 var vouchers = voucherGroup.Voucher.Where(w => w.VoucherCode.Equals(voucherParam.VoucherCode)).First();

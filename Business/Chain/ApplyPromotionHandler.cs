@@ -52,10 +52,18 @@ namespace ApplicationCore.Chain
             #endregion
             #region Apply action
             _promotions = _conditionHandle.GetPromotions();
+            _applyPromotion.SetPromotions(_promotions);
             if (_promotions.Count == 1)
             {
-                _applyPromotion.SetPromotions(_promotions);
                 _applyPromotion.Apply(order);
+                return;
+            }
+            else
+            {
+                if (order.CustomerOrderInfo.Vouchers != null && order.CustomerOrderInfo.Vouchers.Count > 0)
+                {
+                    _applyPromotion.Apply(order);
+                }
             }
 
             #endregion

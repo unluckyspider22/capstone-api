@@ -24,6 +24,7 @@ namespace ApplicationCore.Chain
         }
         public void Apply(OrderResponseModel order)
         {
+            order.TotalAmount = order.CustomerOrderInfo.Amount + order.CustomerOrderInfo.ShippingFee;
             foreach (var promotion in _promotions)
             {
                 //Lấy những Tier có ID đc thỏa hết các điều kiện
@@ -32,10 +33,9 @@ namespace ApplicationCore.Chain
                         order.Effects.Any(a => a.PromotionTierId == el.PromotionTierId)
                 ).ToList();
 
-                var action = FilterAction(promotionTiers.Select(el => el.Action).ToList(), promotion);
+                var action = FilterAction(promotionTiers.Select(el => el.Action).Where(w => w != null).ToList(), promotion);
                 if (action != null)
                 {
-
                     switch (action.ActionType)
                     {
                         case AppConstant.EnvVar.ActionType.Order:
@@ -47,7 +47,7 @@ namespace ApplicationCore.Chain
 
                     }
                 }
-                var postAction = FilterPostAction(promotionTiers.Select(el => el.PostAction).ToList());
+                var postAction = FilterPostAction(promotionTiers.Select(el => el.PostAction).Where(w => w != null).ToList());
                 if (postAction != null)
                 {
                     switch (postAction.ActionType)
@@ -223,7 +223,7 @@ namespace ApplicationCore.Chain
 
             order.CustomerOrderInfo.CartItems = order.CustomerOrderInfo.CartItems.Select(el =>
             {
-                var finalAmount = el.TotalAmount - (el.DiscountFromOrder + el.Discount);
+                var finalAmount = el.TotalAmount - el.Discount;
                 el.DiscountFromOrder += Math.Round((finalAmount - el.DiscountFromOrder) * discountPercent, 2);
                 el.FinalAmount = finalAmount;
                 return el;
@@ -363,7 +363,6 @@ namespace ApplicationCore.Chain
         #endregion
         private void SetFinalAmountApply(OrderResponseModel order)
         {
-            order.TotalAmount = order.CustomerOrderInfo.Amount + order.CustomerOrderInfo.ShippingFee;
             order.DiscountOrderDetail = order.CustomerOrderInfo.CartItems.Sum(s => s.Discount);
             order.Discount = (decimal)order.CustomerOrderInfo.CartItems.Sum(s => s.DiscountFromOrder)
                 + (decimal)order.DiscountOrderDetail;
