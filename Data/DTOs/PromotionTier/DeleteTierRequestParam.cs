@@ -11,7 +11,7 @@ namespace Infrastructure.DTOs
     {
         public Guid PromotionId { get; set; }
         public Guid PromotionTierId { get; set; }
-        public Guid ActionId { get; set; }
-        public Guid MembershipActionId { get; set; }
+        //public Guid ActionId { get; set; }
+        //public Guid PostActionId { get; set; }
     }
 }

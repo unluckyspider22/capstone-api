@@ -8,20 +8,93 @@ using System.Threading.Tasks;
 using System.Linq;
 using System.Linq.Expressions;
 using System;
+using System.Diagnostics;
 
 namespace ApplicationCore.Services
 {
     public class ConditionRuleService : BaseService<ConditionRule, ConditionRuleDto>, IConditionRuleService
     {
-        public ConditionRuleService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
+        private readonly IActionService _actionService;
+        private readonly IPostActionService _postActionService;
+        public ConditionRuleService(IUnitOfWork unitOfWork, IMapper mapper, IActionService actionService, IPostActionService postActionService) : base(unitOfWork, mapper)
         {
+            _actionService = actionService;
+            _postActionService = postActionService;
         }
 
         protected override IGenericRepository<ConditionRule> _repository => _unitOfWork.ConditionRuleRepository;
 
+        public async Task<bool> Delete(Guid conditionRuleId)
+        {
+            IGenericRepository<ConditionGroup> groupRepo = _unitOfWork.ConditionGroupRepository;
+            IGenericRepository<ProductCondition> productRepo = _unitOfWork.ProductConditionRepository;
+            IGenericRepository<ProductConditionMapping> mappRepo = _unitOfWork.ProductConditionMappingRepository;
+            IGenericRepository<OrderCondition> orderRepo = _unitOfWork.OrderConditionRepository;
+            IGenericRepository<PromotionTier> tierRepo = _unitOfWork.PromotionTierRepository;
+            try
+            {
+                var conditionRule = await _repository.GetFirst(filter: o => o.ConditionRuleId.Equals(conditionRuleId),
+                    includeProperties: "ConditionGroup," +
+                    "ConditionGroup.ProductCondition," +
+                    "ConditionGroup.OrderCondition," +
+                    "PromotionTier," +
+                    "PromotionTier.Action," +
+                    "PromotionTier.PostAction");
+                var groups = conditionRule.ConditionGroup.ToList();
+                if (groups != null && groups.Count > 0)
+                {
+                    foreach (var group in groups)
+                    {
+                        var productConds = group.ProductCondition;
+                        var orderConds = group.OrderCondition;
+                        if (productConds != null && productConds.Count > 0)
+                        {
+                            foreach (var product in productConds)
+                            {
+                                mappRepo.Delete(id: Guid.Empty, filter: o => o.ProductConditionId.Equals(product.ProductConditionId));
+                                productRepo.Delete(id: product.ProductConditionId);
+                            }
+                            await _unitOfWork.SaveAsync();
+                        }
+
+                        if (orderConds != null && orderConds.Count > 0)
+                        {
+                            foreach (var orderCond in orderConds)
+                            {
+                                orderRepo.Delete(id: orderCond.OrderConditionId);
+                            }
+                            await _unitOfWork.SaveAsync();
+                        }
+                        groupRepo.Delete(id: group.ConditionGroupId);
+                    }
+                }
+                var promotionTier = conditionRule.PromotionTier;
+                if (promotionTier.Action != null)
+                {
+                    await _actionService.Delete((Guid)promotionTier.ActionId);
+                }
+                else if (promotionTier.PostAction != null)
+                {
+                    await _postActionService.Delete((Guid)promotionTier.PostActionId);
+                }
+                tierRepo.Delete(id: promotionTier.PromotionTierId);
+                _repository.Delete(id: conditionRuleId);
+                return await _unitOfWork.SaveAsync() > 0;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.StackTrace);
+                Debug.WriteLine(e.InnerException);
+                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.", description: "Internal Server Error");
+            }
+
+        }
+
         public async Task<List<ConditionRuleResponse>> ReorderResult(List<ConditionRule> paramList)
         {
             List<ConditionRuleResponse> result = new List<ConditionRuleResponse>();
+            IGenericRepository<ProductConditionMapping> mappRepo = _unitOfWork.ProductConditionMappingRepository;
+            IGenericRepository<ProductCategory> cateRepo = _unitOfWork.ProductCategoryRepository;
 
             foreach (var rule in paramList)
             {
@@ -33,6 +106,12 @@ namespace ApplicationCore.Services
                     Description = rule.Description,
                     ConditionGroups = new List<ConditionGroupResponse>(),
                 };
+                if (rule.PromotionTier.PromotionId != null)
+                {
+                    conditionRuleResponse.PromotionId = rule.PromotionTier.PromotionId;
+                    conditionRuleResponse.PromotionName = rule.PromotionTier.Promotion.PromotionName;
+                }
+
                 ICollection<ConditionGroup> groupsParam = rule.ConditionGroup;
                 foreach (var group in groupsParam)
                 {
@@ -46,10 +125,35 @@ namespace ApplicationCore.Services
                     };
                     if (group.ProductCondition != null && group.ProductCondition.Count > 0)
                     {
+
                         var productConditions = group.ProductCondition;
+
                         foreach (var productCondition in productConditions)
                         {
-                            groupResponse.Conditions.Add(_mapper.Map<ProductConditionDto>(productCondition));
+                            var dto = _mapper.Map<ProductConditionTierDto>(productCondition);
+                            dto.ListProduct = new List<ProductDto>();
+                            var mapps = (await mappRepo.Get(filter: o => o.ProductConditionId.Equals(dto.ProductConditionId),
+                                includeProperties: "Product")).ToList();
+                            if (mapps != null && mapps.Count > 0)
+                            {
+                                foreach (var mapp in mapps)
+                                {
+                                    var product = mapp.Product;
+                                    var cate = await cateRepo.GetFirst(filter: o => o.ProductCateId.Equals(product.ProductCateId)
+                                    && !o.DelFlg);
+                                    var productDto = new ProductDto()
+                                    {
+                                        CateId = cate != null ? cate.CateId : "",
+                                        ProductCateId = cate != null ? cate.ProductCateId : Guid.Empty,
+                                        Code = product.Code,
+                                        Name = product.Name,
+                                        ProductId = product.ProductId,
+                                    };
+                                    dto.ListProduct.Add(productDto);
+                                }
+                            }
+
+                            groupResponse.Conditions.Add(dto);
                         }
                     }
                     if (group.OrderCondition != null && group.OrderCondition.Count > 0)
@@ -60,18 +164,10 @@ namespace ApplicationCore.Services
                             groupResponse.Conditions.Add(_mapper.Map<OrderConditionDto>(orderCondition));
                         }
                     }
-                    /*if (group.MembershipCondition != null && group.MembershipCondition.Count > 0)
-                    {
-                        var membershipConditions = group.MembershipCondition;
-                        foreach (var membershipCondition in membershipConditions)
-                        {
-                            groupResponse.Conditions.Add(_mapper.Map<MembershipConditionDto>(membershipCondition));
-                        }
-                    }*/
                     groupResponse.Conditions = groupResponse.Conditions.OrderBy(
-                        o => (o.GetType() == typeof(ProductConditionDto) ? ((ProductConditionDto)o).IndexGroup
-                        : o.GetType() == typeof(OrderConditionDto) ? ((OrderConditionDto)o).IndexGroup
-                        : ((MembershipConditionDto)o).IndexGroup)).ToList();
+                        o => (o.GetType() == typeof(ProductConditionTierDto)
+                        ? ((ProductConditionTierDto)o).IndexGroup
+                        : ((OrderConditionDto)o).IndexGroup)).ToList();
                     conditionRuleResponse.ConditionGroups.Add(groupResponse);
                 }
                 conditionRuleResponse.ConditionGroups = conditionRuleResponse.ConditionGroups.OrderBy(o => o.GroupNo).ToList();
@@ -82,6 +178,8 @@ namespace ApplicationCore.Services
 
         public async Task<ConditionRuleResponse> ReorderResult(ConditionRule param)
         {
+            IGenericRepository<ProductConditionMapping> mappRepo = _unitOfWork.ProductConditionMappingRepository;
+            IGenericRepository<ProductCategory> cateRepo = _unitOfWork.ProductCategoryRepository;
             ConditionRuleResponse conditionRuleResponse = new ConditionRuleResponse
             {
                 ConditionRuleId = param.ConditionRuleId,
@@ -104,10 +202,40 @@ namespace ApplicationCore.Services
                 };
                 if (group.ProductCondition != null && group.ProductCondition.Count > 0)
                 {
+
                     var productConditions = group.ProductCondition;
                     foreach (var productCondition in productConditions)
                     {
-                        groupResponse.Conditions.Add(_mapper.Map<ProductConditionDto>(productCondition));
+
+                        var dto = _mapper.Map<ProductConditionTierDto>(productCondition);
+                        dto.ListProduct = new List<ProductDto>();
+
+                        // Lấy các record trong bảng Product Condition Mapping
+                        var mapps = (await mappRepo.Get(filter: o => o.ProductConditionId.Equals(dto.ProductConditionId),
+                            includeProperties: "Product")).ToList();
+
+                        // Nếu có record
+                        if (mapps != null && mapps.Count > 0)
+                        {
+                            foreach (var mapp in mapps)
+                            {
+                                var product = mapp.Product;
+
+                                // Lấy category của product
+                                var cate = await cateRepo.GetFirst(filter: o => o.ProductCateId.Equals(product.ProductCateId)
+                                && !o.DelFlg);
+                                var productDto = new ProductDto()
+                                {
+                                    CateId = cate != null ? cate.CateId : "",
+                                    ProductCateId = cate != null ? cate.ProductCateId : Guid.Empty,
+                                    Code = product.Code,
+                                    Name = product.Name,
+                                    ProductId = product.ProductId,
+                                };
+                                dto.ListProduct.Add(productDto);
+                            }
+                        }
+                        groupResponse.Conditions.Add(dto);
                     }
                 }
                 if (group.OrderCondition != null && group.OrderCondition.Count > 0)
@@ -115,21 +243,14 @@ namespace ApplicationCore.Services
                     var orderConditions = group.OrderCondition;
                     foreach (var orderCondition in orderConditions)
                     {
-                        groupResponse.Conditions.Add(_mapper.Map<OrderConditionDto>(orderCondition));
+                        var dto = _mapper.Map<OrderConditionDto>(orderCondition);
+                        groupResponse.Conditions.Add(dto);
                     }
                 }
-                /*if (group.MembershipCondition != null && group.MembershipCondition.Count > 0)
-                {
-                    var membershipConditions = group.MembershipCondition;
-                    foreach (var membershipCondition in membershipConditions)
-                    {
-                        groupResponse.Conditions.Add(_mapper.Map<MembershipConditionDto>(membershipCondition));
-                    }
-                }*/
                 groupResponse.Conditions = groupResponse.Conditions.OrderBy(
-                    o => (o.GetType() == typeof(ProductConditionDto) ? ((ProductConditionDto)o).IndexGroup
-                    : o.GetType() == typeof(OrderConditionDto) ? ((OrderConditionDto)o).IndexGroup
-                    : ((MembershipConditionDto)o).IndexGroup)).ToList();
+                    o => (o.GetType() == typeof(ProductConditionTierDto)
+                    ? ((ProductConditionTierDto)o).IndexGroup
+                    : ((OrderConditionDto)o).IndexGroup)).ToList();
                 conditionRuleResponse.ConditionGroups.Add(groupResponse);
                 conditionRuleResponse.ConditionGroups = conditionRuleResponse.ConditionGroups.OrderBy(o => o.GroupNo).ToList();
             }

@@ -54,6 +54,9 @@ namespace ApplicationCore.Services
                 IGenericRepository<ProductCondition> productConditionRepo = _unitOfWork.ProductConditionRepository;
                 IGenericRepository<OrderCondition> orderConditionRepo = _unitOfWork.OrderConditionRepository;
                 IGenericRepository<MembershipCondition> membershipConditionRepo = _unitOfWork.MembershipConditionRepository;
+                IGenericRepository<PromotionTier> promotionTierRepo = _unitOfWork.PromotionTierRepository;
+                IGenericRepository<PostAction> postActionRepo = _unitOfWork.PostActionRepository;
+                IGenericRepository<Infrastructure.Models.Action> actionRepo = _unitOfWork.ActionRepository;
                 // Create condition rule
                 var conditionRuleEntity = _mapper.Map<ConditionRule>(param.ConditionRule);
                 // Nếu param truyền vào không có condition rule id thì add mới vào db
@@ -75,7 +78,7 @@ namespace ApplicationCore.Services
                 // Create condition group
                 InsertConditionGroup(conditionGroups: param.ConditionGroups, conditionRuleEntity: conditionRuleEntity);
                 // Create promotion tier
-                IGenericRepository<PromotionTier> promotionTierRepo = _unitOfWork.PromotionTierRepository;
+
                 PromotionTier promotionTier = new PromotionTier
                 {
                     PromotionTierId = Guid.NewGuid(),
@@ -95,15 +98,16 @@ namespace ApplicationCore.Services
                 // Create action
                 if (param.Action.ActionType != null)
                 {
-                    IGenericRepository<Infrastructure.Models.Action> actionRepo = _unitOfWork.ActionRepository;
+
+                    var countTier = await promotionTierRepo.CountAsync(filter: o => o.PromotionId.Equals(promotionTier.PromotionId));
                     var actionEntity = _mapper.Map<Infrastructure.Models.Action>(param.Action);
                     actionEntity.ActionId = Guid.NewGuid();
                     actionEntity.PromotionTierId = promotionTier.PromotionTierId;
                     actionEntity.ActionType = actionEntity.ActionType.Trim();
                     actionEntity.DiscountType = actionEntity.DiscountType.Trim();
-                    //promotionTier.Summary = CreateSummaryAction(actionEntity);
-                    promotionTier.Summary = "";
+                    promotionTier.Summary = CreateSummaryAction(actionEntity);
                     promotionTier.ActionId = actionEntity.ActionId;
+                    promotionTier.TierIndex = countTier;
                     promotionTierRepo.Add(promotionTier);
                     actionRepo.Add(actionEntity);
 
@@ -132,15 +136,16 @@ namespace ApplicationCore.Services
                 if (param.PostAction.ActionType != null)
                 {
                     // Create membership action
-                    IGenericRepository<PostAction> postActionRepo = _unitOfWork.PostActionRepository;
 
+                    var countTier = await promotionTierRepo.CountAsync(filter: o => o.PromotionId.Equals(promotionTier.ActionId));
                     var postAction = _mapper.Map<PostAction>(param.PostAction);
                     postAction.PostActionId = Guid.NewGuid();
                     postAction.PromotionTierId = promotionTier.PromotionTierId;
                     postAction.ActionType = postAction.ActionType.Trim();
                     postAction.DiscountType = postAction.DiscountType.Trim();
-                    //promotionTier.Summary = CreateSummaryMembershipAction(membershipAction);
+                    //promotionTier.Summary = CreateSummarypostAction(postAction);
                     promotionTier.Summary = "";
+                    promotionTier.TierIndex = countTier;
                     promotionTier.PostActionId = postAction.PostActionId;
 
                     promotionTierRepo.Add(promotionTier);
@@ -191,33 +196,31 @@ namespace ApplicationCore.Services
         {
             try
             {
-                // Delete action or membership action
-                if (!param.ActionId.Equals(Guid.Empty))
-                {
-                    IGenericRepository<Infrastructure.Models.Action> actionRepo = _unitOfWork.ActionRepository;
-                    actionRepo.Delete(param.ActionId);
-                }
-                else if (!param.MembershipActionId.Equals(Guid.Empty))
-                {
-                    IGenericRepository<PostAction> membershipActionRepo = _unitOfWork.PostActionRepository;
-                    membershipActionRepo.Delete(param.MembershipActionId);
-                }
-                else
-                {
-                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: "Action or Membership action is not null", description: "Invalid param");
-                }
-                // Delete promotion tier
                 IGenericRepository<PromotionTier> tierRepo = _unitOfWork.PromotionTierRepository;
-                tierRepo.Delete(param.PromotionTierId);
+                var tierEntity = await tierRepo.GetFirst(filter: o => o.PromotionTierId.Equals(param.PromotionTierId));
+
+                var promotions = await _repository.GetFirst(filter: o => o.PromotionId.Equals(param.PromotionId) && !o.DelFlg, includeProperties: "PromotionTier");
+                var tiers = promotions.PromotionTier;
+                tiers.Remove(tierEntity);
+                var result = await _unitOfWork.SaveAsync();
+                if (result > 0)
+                {
+                    var promotionTiers = await tierRepo.Get(filter: o => o.PromotionId.Equals(param.PromotionId));
+                    for (int i = 0; i < promotionTiers.Count(); i++)
+                    {
+                        var tier = promotionTiers.ElementAt(i);
+                        tier.TierIndex = i;
+                        tierRepo.Update(tier);
+                    }
+                }
+
+
                 return await _unitOfWork.SaveAsync() > 0;
-            }
-            catch (ErrorObj e)
-            {
-                throw e;
             }
             catch (Exception e)
             {
                 Debug.WriteLine(e.StackTrace);
+                Debug.WriteLine(e.InnerException);
                 throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.", description: "Internal Server Error");
             }
         }
@@ -225,6 +228,9 @@ namespace ApplicationCore.Services
         public async Task<List<PromotionTierResponseParam>> GetPromotionTierDetail(Guid promotionId)
         {
             IGenericRepository<PromotionTier> _tierRepo = _unitOfWork.PromotionTierRepository;
+            IGenericRepository<ActionProductMapping> actionMappRepo = _unitOfWork.ActionProductMappingRepository;
+            IGenericRepository<ProductCategory> cateRepo = _unitOfWork.ProductCategoryRepository;
+            IGenericRepository<PostActionProductMapping> postActionMappRepo = _unitOfWork.PostActionProductMappingRepository;
             try
             {
                 // Lấy danh sách promotion tier
@@ -245,9 +251,9 @@ namespace ApplicationCore.Services
                 {
                     PromotionTierResponseParam responseParam = new PromotionTierResponseParam
                     {
-                        Action = tier.Action,
+                        Action = _mapper.Map<ActionTierDto>(tier.Action),
                         ActionId = tier.ActionId,
-                        PostAction = tier.PostAction,
+                        PostAction = _mapper.Map<PostActionTierDto>(tier.PostAction),
                         PostActionId = tier.PostActionId,
                         PromotionId = tier.PromotionId,
                         PromotionTierId = tier.PromotionTierId,
@@ -255,6 +261,64 @@ namespace ApplicationCore.Services
                         ConditionRule = await _conditionRuleService.ReorderResult(tier.ConditionRule),
                         Summary = tier.Summary,
                     };
+                    if (responseParam.Action != null)
+                    {
+                        responseParam.Action.productList = new List<ProductDto>();
+                        var mapps = (await actionMappRepo.Get(filter: o => o.ActionId.Equals(responseParam.ActionId),
+                            includeProperties: "Product")).ToList();
+                        if (mapps != null && mapps.Count > 0)
+                        {
+                            foreach (var mapp in mapps)
+                            {
+                                var product = mapp.Product;
+                                var cate = await cateRepo.GetFirst(filter: o => o.ProductCateId.Equals(product.ProductCateId)
+                                && !o.DelFlg);
+                                var dto = new ProductDto()
+                                {
+                                    CateId = cate != null ? cate.CateId : "",
+                                    ProductCateId = cate != null ? cate.ProductCateId : Guid.Empty,
+                                    Name = product.Name,
+                                    Code = product.Code,
+                                    ProductId = product.ProductId
+                                };
+                                responseParam.Action.productList.Add(dto);
+                            }
+
+                        }
+                        else
+                        {
+                            responseParam.Action.productList = new List<ProductDto>();
+                        }
+                    }
+                    else if (responseParam.PostAction != null)
+                    {
+                        responseParam.PostAction.productList = new List<ProductDto>();
+                        var mapps = (await postActionMappRepo.Get(filter: o => o.PostActionId.Equals(responseParam.PostActionId),
+                            includeProperties: "Product")).ToList();
+                        if (mapps != null && mapps.Count > 0)
+                        {
+                            foreach (var mapp in mapps)
+                            {
+                                var product = mapp.Product;
+                                var cate = await cateRepo.GetFirst(filter: o => o.ProductCateId.Equals(product.ProductCateId)
+                                  && !o.DelFlg);
+                                var dto = new ProductDto()
+                                {
+                                    CateId = cate != null ? cate.CateId : "",
+                                    ProductCateId = cate != null ? cate.ProductCateId : Guid.Empty,
+                                    Name = product.Name,
+                                    Code = product.Code,
+                                    ProductId = product.ProductId
+                                };
+                                responseParam.PostAction.productList.Add(dto);
+                            }
+
+                        }
+                        else
+                        {
+                            responseParam.PostAction.productList = new List<ProductDto>();
+                        }
+                    }
                     result.Add(responseParam);
                 }
                 return result;
@@ -262,6 +326,7 @@ namespace ApplicationCore.Services
             catch (Exception e)
             {
                 Debug.WriteLine(e.StackTrace);
+                Debug.WriteLine(e.InnerException);
                 throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.", description: "Internal Server Error");
             }
         }
@@ -277,31 +342,65 @@ namespace ApplicationCore.Services
                     var actionEntity = _mapper.Map<Infrastructure.Models.Action>(updateParam.Action);
                     IGenericRepository<Infrastructure.Models.Action> actionRepo = _unitOfWork.ActionRepository;
                     actionEntity.UpdDate = DateTime.Now;
-                    /*actionEntity.InsDate = null;*/
+                    actionEntity.InsDate = null;
                     actionEntity.PromotionTierId = updateParam.PromotionTierId;
                     actionRepo.Update(actionEntity);
                     var tier = await promotionTierRepo.GetFirst(filter: el => el.ActionId.Equals(actionEntity.ActionId));
                     tier.Summary = CreateSummaryAction(actionEntity);
                     tier.UpdDate = DateTime.Now;
                     promotionTierRepo.Update(tier);
+                    // Update danh sách các product trong bảng map
+                    IGenericRepository<ActionProductMapping> actMapp = _unitOfWork.ActionProductMappingRepository;
+                    actMapp.Delete(Guid.Empty, filter: o => o.ActionId.Equals(actionEntity.ActionId));
+                    await _unitOfWork.SaveAsync();
+                    var productIds = updateParam.Action.ListProduct;
+                    foreach (var productId in productIds)
+                    {
+                        var mapp = new ActionProductMapping()
+                        {
+                            Id = Guid.NewGuid(),
+                            ActionId = actionEntity.ActionId,
+                            ProductId = productId,
+                            InsDate = DateTime.Now,
+                            UpdDate = DateTime.Now,
+                        };
+                        actMapp.Add(mapp);
+                    }
                 }
-                /* else if (!updateParam.MembershipAction.MembershipActionId.Equals(Guid.Empty))
-                 {
-                     var membershipActionEntity = _mapper.Map<PostAction>(updateParam.MembershipAction);
-                     IGenericRepository<PostAction> membershipActionRepo = _unitOfWork.MembershipActionRepository;
-                     membershipActionEntity.UpdDate = DateTime.Now;
-                     membershipActionEntity.InsDate = null;
-                     membershipActionEntity.PromotionTierId = updateParam.PromotionTierId;
-                     membershipActionRepo.Update(membershipActionEntity);
-                     var tier = await promotionTierRepo.GetFirst(filter: el => el.MembershipActionId.Equals(membershipActionEntity.MembershipActionId));
-                     tier.Summary = CreateSummaryMembershipAction(membershipActionEntity);
-                     tier.UpdDate = DateTime.Now;
-                     promotionTierRepo.Update(tier);
-                 }*/
-                //else
-                //{
-                //    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: "Action or Membership action is not null", description: "Invalid param");
-                //}
+                else if (!updateParam.PostAction.PostActionId.Equals(Guid.Empty))
+                {
+                    var postActionEntity = _mapper.Map<PostAction>(updateParam.PostAction);
+                    IGenericRepository<PostAction> postActionRepo = _unitOfWork.PostActionRepository;
+                    postActionEntity.UpdDate = DateTime.Now;
+                    postActionEntity.InsDate = null;
+                    postActionEntity.PromotionTierId = updateParam.PromotionTierId;
+                    postActionRepo.Update(postActionEntity);
+                    var tier = await promotionTierRepo.GetFirst(filter: el => el.PostActionId.Equals(postActionEntity.PostActionId));
+                    //tier.Summary = CreateSummaryPostAction(postActionEntity);
+                    tier.UpdDate = DateTime.Now;
+                    promotionTierRepo.Update(tier);
+                    // Update danh sách các product trong bảng map
+                    IGenericRepository<PostActionProductMapping> actMapp = _unitOfWork.PostActionProductMappingRepository;
+                    actMapp.Delete(Guid.Empty, filter: o => o.PostActionId.Equals(postActionEntity.PostActionId));
+                    await _unitOfWork.SaveAsync();
+                    var productIds = updateParam.PostAction.ListProduct;
+                    foreach (var productId in productIds)
+                    {
+                        var mapp = new PostActionProductMapping()
+                        {
+                            Id = Guid.NewGuid(),
+                            PostActionId = postActionEntity.PostActionId,
+                            ProductId = productId,
+                            InsDate = DateTime.Now,
+                            UpdDate = DateTime.Now,
+                        };
+                        actMapp.Add(mapp);
+                    }
+                }
+                else
+                {
+                    throw new ErrorObj(code: 400, message: "Action or Membership action is not null", description: "Invalid param");
+                }
                 //await _unitOfWork.SaveAsync();
                 // update condition rule
                 if (!updateParam.ConditionRule.ConditionRuleId.Equals(Guid.Empty))
@@ -309,12 +408,8 @@ namespace ApplicationCore.Services
                     IGenericRepository<ConditionRule> conditionRepo = _unitOfWork.ConditionRuleRepository;
                     var conditionRuleEntity = _mapper.Map<ConditionRule>(updateParam.ConditionRule);
                     conditionRuleEntity.UpdDate = DateTime.Now;
-                    /*conditionRuleEntity.InsDate = null;*/
                     conditionRepo.Update(conditionRuleEntity);
-                    //await _unitOfWork.SaveAsync();
-                    // Update condition group
                     await DeleteOldGroups(conditionRuleEntity: conditionRuleEntity);
-                    //await _unitOfWork.SaveAsync();
                     InsertConditionGroup(conditionGroups: updateParam.ConditionGroups, conditionRuleEntity: conditionRuleEntity);
                 }
 
@@ -339,19 +434,27 @@ namespace ApplicationCore.Services
             IGenericRepository<ConditionGroup> conditionGroupRepo = _unitOfWork.ConditionGroupRepository;
             IGenericRepository<ProductCondition> productConditionRepo = _unitOfWork.ProductConditionRepository;
             IGenericRepository<OrderCondition> orderConditionRepo = _unitOfWork.OrderConditionRepository;
-            IGenericRepository<MembershipCondition> membershipConditionRepo = _unitOfWork.MembershipConditionRepository;
+            IGenericRepository<ProductConditionMapping> prodCondMapRepo = _unitOfWork.ProductConditionMappingRepository;
+
 
             // Delete old groups and old conditions
-            List<ConditionGroup> oldGroups = (await conditionGroupRepo.Get(pageIndex: 0, pageSize: 0, filter: o => o.ConditionRuleId.Equals(conditionRuleEntity.ConditionRuleId))).ToList();
+            List<ConditionGroup> oldGroups = (await conditionGroupRepo.Get(pageIndex: 0, pageSize: 0,
+                filter: o => o.ConditionRuleId.Equals(conditionRuleEntity.ConditionRuleId), includeProperties: "ProductCondition")).ToList();
             if (oldGroups.Count > 0)
             {
                 foreach (var group in oldGroups)
                 {
-                    membershipConditionRepo.Delete(id: Guid.Empty, filter: o => o.ConditionGroupId.Equals(group.ConditionGroupId));
+                    var productConditions = group.ProductCondition.ToList();
+                    foreach (var prodCond in productConditions)
+                    {
+                        prodCondMapRepo.Delete(id: Guid.Empty, filter: o => o.ProductConditionId.Equals(prodCond.ProductConditionId));
+                    }
+
                     productConditionRepo.Delete(id: Guid.Empty, filter: o => o.ConditionGroupId.Equals(group.ConditionGroupId));
                     orderConditionRepo.Delete(id: Guid.Empty, filter: o => o.ConditionGroupId.Equals(group.ConditionGroupId));
                     conditionGroupRepo.Delete(id: group.ConditionGroupId);
                 }
+                await _unitOfWork.SaveAsync();
             }
             return true;
         }
@@ -381,6 +484,7 @@ namespace ApplicationCore.Services
                 // Create product condition
                 if (group.ProductCondition != null && group.ProductCondition.Count > 0)
                 {
+                    IGenericRepository<ProductConditionMapping> mappRepo = _unitOfWork.ProductConditionMappingRepository;
                     foreach (var productCondition in group.ProductCondition)
                     {
                         var productConditionEntity = _mapper.Map<ProductCondition>(productCondition);
@@ -391,6 +495,20 @@ namespace ApplicationCore.Services
                         productConditionEntity.InsDate = DateTime.Now;
                         productConditionRepo.Add(productConditionEntity);
                         productCondition.ProductConditionId = productConditionEntity.ProductConditionId;
+                        var products = productCondition.ListProduct;
+                        foreach (var product in products)
+                        {
+                            var mapp = new ProductConditionMapping()
+                            {
+                                Id = Guid.NewGuid(),
+                                ProductConditionId = productConditionEntity.ProductConditionId,
+                                ProductId = product,
+                                UpdTime = DateTime.Now,
+                                InsDate = DateTime.Now,
+                            };
+                            mappRepo.Add(mapp);
+                        }
+
                     }
                 }
                 // Create order condition
@@ -408,22 +526,6 @@ namespace ApplicationCore.Services
                         orderCondition.OrderConditionId = orderConditionEntity.OrderConditionId;
                     }
                 }
-
-                //    // Create membership condition
-                //if (group.MembershipCondition != null && group.MembershipCondition.Count > 0)
-                //{
-                //    foreach (var membershipCondition in group.MembershipCondition)
-                //    {
-                //        var membershipConditionEntity = _mapper.Map<MembershipCondition>(membershipCondition);
-                //        membershipConditionEntity.ConditionGroupId = conditionGroupEntity.ConditionGroupId;
-                //        membershipConditionEntity.MembershipConditionId = Guid.NewGuid();
-                //        membershipConditionEntity.DelFlg = false;
-                //        membershipConditionEntity.UpdDate = DateTime.Now;
-                //        membershipConditionEntity.InsDate = DateTime.Now;
-                //        membershipConditionRepo.Add(membershipConditionEntity);
-                //        membershipCondition.MembershipConditionId = membershipConditionEntity.MembershipConditionId;
-                //    }
-                //}
             }
 
         }
@@ -487,7 +589,6 @@ namespace ApplicationCore.Services
             var totalCondition = 0;
             var productCond = false;
             var orderCond = false;
-            //var membershipCond = false;
 
             if (group.ProductCondition != null && group.ProductCondition.Count > 0)
             {
@@ -499,18 +600,12 @@ namespace ApplicationCore.Services
                 totalCondition += group.OrderCondition.Count;
                 orderCond = true;
             }
-            //if (group.MembershipCondition != null && group.MembershipCondition.Count > 0)
-            //{
-            //    totalCondition += group.MembershipCondition.Count;
-            //    membershipCond = true;
-            //}
             Object[] conditions = new Object[totalCondition];
             if (productCond)
             {
                 foreach (var productCondition in group.ProductCondition)
                 {
                     conditions[productCondition.IndexGroup] = productCondition;
-                    //conditions.Insert(productCondition.IndexGroup, productCondition);
                 }
             }
             if (orderCond)
@@ -518,17 +613,8 @@ namespace ApplicationCore.Services
                 foreach (var orderCondition in group.OrderCondition)
                 {
                     conditions[orderCondition.IndexGroup] = orderCondition;
-                    //conditions.Insert(orderCondition.IndexGroup, orderCondition);
                 }
             }
-            //if (membershipCond)
-            //{
-            //    foreach (var membershipCondition in group.MembershipCondition)
-            //    {
-            //        conditions[membershipCondition.IndexGroup] = membershipCondition;
-            //        //conditions.Insert(membershipCondition.IndexGroup, membershipCondition);
-            //    }
-            //}
             return conditions.ToList();
         }
         private string CreateSummary(ConditionGroupDto group)
@@ -882,7 +968,7 @@ namespace ApplicationCore.Services
             return result;
         }
 
-        /*   private string CreateSummaryMembershipAction(PostAction entity)
+        /*   private string CreateSummarypostAction(PostAction entity)
            {
                var result = "";
                var actionType = entity.ActionType;

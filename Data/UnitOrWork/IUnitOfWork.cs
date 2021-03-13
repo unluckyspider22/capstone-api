@@ -55,6 +55,7 @@ namespace Infrastructure.UnitOrWork
         IGenericRepository<MemberLevelMapping> MemberLevelMappingRepository { get; }
 
         IGenericRepository<PostActionProductMapping> PostActionProductMappingRepository { get; }
+        IGenericRepository<ProductConditionMapping> ProductConditionMappingRepository { get; }
 
         Task<int> SaveAsync();
     }

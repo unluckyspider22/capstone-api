@@ -1,6 +1,4 @@
-﻿
-
-using AutoMapper;
+﻿using AutoMapper;
 using Infrastructure.DTOs;
 using Infrastructure.Models;
 using Infrastructure.Repository;
@@ -11,20 +9,20 @@ using System.Threading.Tasks;
 
 namespace ApplicationCore.Services
 {
-    public class ActionService : BaseService<Infrastructure.Models.Action, ActionDto>, IActionService
+    public class PostActionService : BaseService<PostAction, MembershipActionDto>, IPostActionService
     {
-        public ActionService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
+        public PostActionService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
         {
         }
 
-        protected override IGenericRepository<Infrastructure.Models.Action> _repository => _unitOfWork.ActionRepository;
+        protected override IGenericRepository<PostAction> _repository => _unitOfWork.PostActionRepository;
 
-        public async Task<bool> Delete(System.Guid id)
+        public async Task<bool> Delete(Guid id)
         {
             try
             {
-                IGenericRepository<ActionProductMapping> mappRepo = _unitOfWork.ActionProductMappingRepository;
-                mappRepo.Delete(id: Guid.Empty, filter: o => o.ActionId.Equals(id));
+                IGenericRepository<PostActionProductMapping> mappRepo = _unitOfWork.PostActionProductMappingRepository;
+                mappRepo.Delete(id: Guid.Empty, filter: o => o.PostActionId.Equals(id));
                 _repository.Delete(id: id);
                 return await _unitOfWork.SaveAsync() > 0;
             }

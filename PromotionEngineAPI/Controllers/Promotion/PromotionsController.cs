@@ -1,19 +1,14 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using ApplicationCore.Request;
 using ApplicationCore.Services;
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
+using Infrastructure.Models;
+using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Linq;
 using System.Linq.Expressions;
-using Infrastructure.Models;
-using System.Diagnostics;
-using ApplicationCore.Request;
-using System.Collections.Generic;
-using ApplicationCore.Models;
 using System.Net;
-using Infrastructure.DTOs.VoucherChannel;
-using Microsoft.AspNetCore.Authorization;
+using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers
 {

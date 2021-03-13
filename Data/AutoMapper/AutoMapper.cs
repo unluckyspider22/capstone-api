@@ -96,8 +96,8 @@ namespace Infrastructure.AutoMapper
             CreateMap<Action, ActionUpdateParam>();
             CreateMap<ActionUpdateParam, Action>();
             // MembershipActionUpdateParam
-            CreateMap<PostAction, MembershipActionUpdateParam>();
-            CreateMap<MembershipActionUpdateParam, PostAction>();
+            CreateMap<PostAction, PostActionUpdateParam>();
+            CreateMap<PostActionUpdateParam, PostAction>();
 
             // PromotionInfomation
             CreateMap<PromotionInfomation, Promotion>();
@@ -122,6 +122,16 @@ namespace Infrastructure.AutoMapper
 
             CreateMap<MemberLevel, MemberLevelDto>();
             CreateMap<MemberLevelDto, MemberLevel>();
+
+            CreateMap<Action, ActionTierDto>();
+            CreateMap<ActionTierDto, Action>();
+
+            CreateMap<PostAction, PostActionTierDto>();
+            CreateMap<PostActionTierDto, PostAction>();
+
+            CreateMap<ProductCondition, ProductConditionTierDto>();
+            CreateMap<ProductConditionTierDto, ProductCondition>();
+
 
         }
     }

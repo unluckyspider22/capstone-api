@@ -16,7 +16,41 @@ namespace Infrastructure.DTOs
         public string Summary { get; set; }
 
         public ConditionRuleResponse ConditionRule { get; set; }
-        public virtual Models.Action Action { get; set; }
-        public virtual PostAction PostAction { get; set; }
+        public virtual ActionTierDto Action { get; set; }
+        public virtual PostActionTierDto PostAction { get; set; }
+    }
+
+    public class ActionTierDto
+    {
+        public Guid ActionId { get; set; }
+        public Guid PromotionTierId { get; set; }
+        public string ActionType { get; set; }
+        public string DiscountType { get; set; }
+        public decimal? DiscountQuantity { get; set; }
+        public decimal? DiscountAmount { get; set; }
+        public decimal? DiscountPercentage { get; set; }
+        public decimal? FixedPrice { get; set; }
+        public decimal? MaxAmount { get; set; }
+        public decimal? MinPriceAfter { get; set; }
+        public decimal? OrderLadderProduct { get; set; }
+        public decimal? LadderPrice { get; set; }
+        public decimal? BundlePrice { get; set; }
+        public decimal? BundleQuantity { get; set; }
+        public string BundleStrategy { get; set; }
+        public List<ProductDto> productList { get; set; }
+    }
+
+    public class PostActionTierDto
+    {
+        public Guid PostActionId { get; set; }
+        public Guid PromotionTierId { get; set; }
+        public string ActionType { get; set; }
+        public string DiscountType { get; set; }
+        public decimal? GiftQuantity { get; set; }
+        public string GiftProductCode { get; set; }
+        public string GiftName { get; set; }
+        public string GiftVoucherCode { get; set; }
+        public decimal? BonusPoint { get; set; }
+        public List<ProductDto> productList { get; set; }
     }
 }
