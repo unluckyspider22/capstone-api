@@ -81,6 +81,7 @@ namespace Infrastructure.UnitOrWork
 
         public IGenericRepository<MemberLevelMapping> MemberLevelMappingRepository { get; set; }
         public IGenericRepository<PostActionProductMapping> PostActionProductMappingRepository { get; set; }
+        public IGenericRepository<ProductConditionMapping> ProductConditionMappingRepository { get; set; }
 
         private void initRepository()
         {
@@ -131,6 +132,7 @@ namespace Infrastructure.UnitOrWork
             ActionProductMappingRepository = new GenericRepository<ActionProductMapping>(_context);
             MemberLevelMappingRepository = new GenericRepository<MemberLevelMapping>(_context);
             PostActionProductMappingRepository = new GenericRepository<PostActionProductMapping>(_context);
+            ProductConditionMappingRepository = new GenericRepository<ProductConditionMapping>(_context);
         }
         public void Dispose()
         {

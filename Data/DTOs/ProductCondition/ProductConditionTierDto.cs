@@ -6,20 +6,20 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.DTOs
 {
-    public class OrderConditionDto
+    public class ProductConditionTierDto
     {
-        public Guid OrderConditionId { get; set; }
+        public Guid ProductConditionId { get; set; }
         [StringLength(1)]
-        public string NextOperator { get; set; }
+        public string ProductConditionType { get; set; }
         [Range(0, 999999)]
-        public decimal Quantity { get; set; }
+        public decimal ProductQuantity { get; set; }
         [StringLength(1)]
         public string QuantityOperator { get; set; }
-        [Range(0, 9999999999)]
-        public decimal Amount { get; set; }
         [StringLength(1)]
-        public string AmountOperator { get; set; }
+        public string NextOperator { get; set; }
         [Range(0, 999)]
         public int IndexGroup { get; set; }
+
+        public List<ProductDto> ListProduct { get; set; }
     }
 }

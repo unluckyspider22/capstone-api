@@ -1,9 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
-using ApplicationCore.Services;
+﻿using ApplicationCore.Services;
 using Infrastructure.DTOs;
-using Infrastructure.Helper;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers
 {
@@ -11,9 +10,9 @@ namespace PromotionEngineAPI.Controllers
     [ApiController]
     public class MembershipActionsController : ControllerBase
     {
-        private readonly IMembershipActionService _service;
+        private readonly IPostActionService _service;
 
-        public MembershipActionsController(IMembershipActionService service)
+        public MembershipActionsController(IPostActionService service)
         {
             _service = service;
         }
@@ -41,7 +40,7 @@ namespace PromotionEngineAPI.Controllers
 
         // GET: api/MembershipActions/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetMembershipAction([FromRoute]Guid id)
+        public async Task<IActionResult> GetMembershipAction([FromRoute] Guid id)
         {
             var result = await _service.GetByIdAsync(id);
             if (result == null)
@@ -53,7 +52,7 @@ namespace PromotionEngineAPI.Controllers
 
         // PUT: api/MembershipActions/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutMembershipAction([FromRoute]Guid id, [FromBody] MembershipActionDto dto)
+        public async Task<IActionResult> PutMembershipAction([FromRoute] Guid id, [FromBody] MembershipActionDto dto)
         {
             if (id != dto.MembershipActionId)
             {
@@ -93,7 +92,7 @@ namespace PromotionEngineAPI.Controllers
 
         // DELETE: api/MembershipActions/5
         [HttpDelete]
-        public async Task<IActionResult> DeleteMembershipAction([FromQuery]Guid id)
+        public async Task<IActionResult> DeleteMembershipAction([FromQuery] Guid id)
         {
             if (id == null)
             {
@@ -107,6 +106,6 @@ namespace PromotionEngineAPI.Controllers
             return Ok();
         }
 
-        
+
     }
 }

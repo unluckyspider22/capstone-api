@@ -12,5 +12,6 @@ namespace ApplicationCore.Services
     {
         public Task<List<ConditionRuleResponse>> ReorderResult(List<ConditionRule> paramList);
         public Task<ConditionRuleResponse> ReorderResult(ConditionRule param);
+        public Task<bool> Delete(Guid conditionRuleId);
     }
 }

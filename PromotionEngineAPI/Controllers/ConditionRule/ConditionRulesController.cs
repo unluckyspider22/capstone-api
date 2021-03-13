@@ -36,11 +36,15 @@ namespace PromotionEngineAPI.Controllers
         public async Task<IActionResult> GetConditionRule([FromQuery] PagingRequestParam param, Guid BrandId, bool available)
         {
             Expression<Func<ConditionRule, bool>> filter = el => !el.DelFlg && el.BrandId.Equals(BrandId);
-            string includedProperties = "ConditionGroup,ConditionGroup.ProductCondition,ConditionGroup.OrderCondition";
+            string includedProperties = "" +
+                "ConditionGroup," +
+                "ConditionGroup.ProductCondition," +
+                "ConditionGroup.OrderCondition," +
+                "PromotionTier," +
+                "PromotionTier.Promotion";
             if (available != null && available)
             {
                 filter = el => !el.DelFlg && el.BrandId.Equals(BrandId) && (el.PromotionTier == null);
-                includedProperties = "ConditionGroup,ConditionGroup.ProductCondition,ConditionGroup.OrderCondition,PromotionTier";
             }
             try
             {
@@ -51,7 +55,7 @@ namespace PromotionEngineAPI.Controllers
                orderBy: el => el.OrderByDescending(b => b.InsDate),
                includeProperties: includedProperties
                );
-          
+
                 GenericRespones<ConditionRuleResponse> result = new GenericRespones<ConditionRuleResponse>(await _service.ReorderResult(conditionRules.Data), conditionRules.Metadata);
                 return Ok(result);
             }
@@ -143,18 +147,22 @@ namespace PromotionEngineAPI.Controllers
 
         // DELETE: api/ConditionRules/5
         [HttpDelete]
-        public async Task<IActionResult> DeleteConditionRule([FromQuery] Guid id)
+        [Route("{conditionRuleId}")]
+        public async Task<IActionResult> DeleteConditionRule([FromRoute] Guid conditionRuleId)
         {
-            if (id == null)
+            if (conditionRuleId.Equals(Guid.Empty))
             {
-                return BadRequest();
+                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
             }
-            var result = await _service.DeleteAsync(id);
-            if (result == false)
+            try
             {
-                return NotFound();
+                return Ok(await _service.Delete(conditionRuleId));
             }
-            return Ok();
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+
         }
 
 
