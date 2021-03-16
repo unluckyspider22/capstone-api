@@ -140,7 +140,6 @@ namespace PromotionEngineAPI.Controllers
             {
                 return StatusCode(statusCode: e.Code, e);
             }
-           
         }
 
         [HttpGet]

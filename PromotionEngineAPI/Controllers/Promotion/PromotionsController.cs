@@ -59,7 +59,7 @@ namespace PromotionEngineAPI.Controllers
         }
         [HttpPost]
         [Route("check-auto-promotion")]
-        public async Task<IActionResult> CheckAutoPromotion([FromBody] CustomerOrderInfo orderInfo,[FromQuery] Guid promotionId)
+        public async Task<IActionResult> CheckAutoPromotion([FromBody] CustomerOrderInfo orderInfo, [FromQuery] Guid promotionId)
         {
             //Lấy promotion bởi voucher code
             OrderResponseModel prepareModel = new OrderResponseModel();
@@ -73,19 +73,19 @@ namespace PromotionEngineAPI.Controllers
                     //Check promotion
                     prepareModel = await _promotionService.HandlePromotion(prepareModel);
 
-                  /*  promotions = _promotionService.GetPromotions();
+                    /*  promotions = _promotionService.GetPromotions();
 
-                    if (promotions.Count > 1)
-                    {
-                        return Ok(promotions);
-                    }*/
+                      if (promotions.Count > 1)
+                      {
+                          return Ok(promotions);
+                      }*/
 
                 }
                 else return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, orderInfo);
             }
             catch (ErrorObj e)
             {
-                return StatusCode(statusCode: e.Code, e);
+                return StatusCode(statusCode: e.Code, orderInfo);
             }
             return Ok(prepareModel);
         }
