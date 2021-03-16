@@ -144,19 +144,20 @@ namespace PromotionEngineAPI.Controllers
 
         [HttpGet]
         [Route("{channelCode}/brands/{BrandCode}/promotions")]
-        public async Task<IActionResult> GetPromotionForChannel(string channelCode, string BrandCode, [FromBody] VoucherChannelParam param)
+        public async Task<IActionResult> GetPromotionForChannel(string channelCode, string BrandCode)
         {
             try
             {
-                if (!channelCode.Equals(param.ChannelCode))
+                VoucherChannelParam param = new VoucherChannelParam
                 {
-                    return NotFound();
-                }
-                if (!BrandCode.Equals(param.BrandCode))
-                {
-                    return NotFound();
-                }
+                    ChannelCode = channelCode,
+                    BrandCode = BrandCode
+                };
                 var result = await _service.GetPromotionsForChannel(param);
+                if (result.Count() == 0)
+                {
+                    return NoContent();
+                }
                 return Ok(result);
             }
             catch (ErrorObj e)

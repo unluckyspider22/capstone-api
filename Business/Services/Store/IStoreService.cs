@@ -1,4 +1,5 @@
 ﻿using Infrastructure.DTOs;
+using Infrastructure.DTOs.Voucher;
 using Infrastructure.Models;
 using System;
 using System.Collections.Generic;
@@ -12,5 +13,7 @@ namespace ApplicationCore.Services
     {
         public Task<List<GroupStoreOfPromotion>> GetStoreOfPromotion(Guid promotionId, Guid brandId);
         public Task<List<GroupStoreOfPromotion>> UpdateStoreOfPromotion(UpdateStoreOfPromotion dto);
+
+        public Task<List<PromotionInfomation>> GetPromotionsForStore(string brandCode, string storeCode);
     }
 }

@@ -32,5 +32,6 @@ namespace Infrastructure.DTOs.Voucher
         public string ForHoliday { get; set; }
         public string DayFilter { get; set; }
         public string HourFilter { get; set; }
+        public string ImgUrl { get; set; }
     }
 }

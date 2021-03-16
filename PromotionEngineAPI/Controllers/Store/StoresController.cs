@@ -41,11 +41,26 @@ namespace PromotionEngineAPI.Controllers
             {
                 return StatusCode(statusCode: e.Code, e);
             }
-
         }
-
-
-
+        // GET: api/Stores
+        [HttpGet]
+        [Route("promotions")]
+        public async Task<IActionResult> GetPromotionForStore([FromQuery] string storeCode, [FromQuery] string brandCode)
+        {
+            try
+            {
+                var result = await _service.GetPromotionsForStore(brandCode, storeCode);
+                if (result.Count == 0)
+                {
+                    return NoContent();
+                }
+                return Ok(result);
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
         // GET: api/Stores/count
         [HttpGet]
         [Route("count")]

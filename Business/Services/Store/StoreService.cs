@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Infrastructure.DTOs.Voucher;
+using Infrastructure.Helper;
 
 namespace ApplicationCore.Services
 {
@@ -18,6 +20,29 @@ namespace ApplicationCore.Services
         }
 
         protected override IGenericRepository<Store> _repository => _unitOfWork.StoreRepository;
+
+        public async Task<List<PromotionInfomation>> GetPromotionsForStore(string brandCode, string storeCode)
+        {
+            List<PromotionInfomation> result = null;
+            var promotions = (await _repository.GetFirst(filter: el =>
+                    !el.DelFlg
+                    && el.StoreCode.Equals(storeCode)
+                    && el.Brand.BrandCode.Equals(brandCode),
+                includeProperties: "Brand.Promotion," +
+                "PromotionStoreMapping")).PromotionStoreMapping.Where(w => w.Store.StoreCode.Equals(storeCode)
+                    && w.Promotion.Status.Equals(AppConstant.EnvVar.PromotionStatus.PUBLISH))
+                        .Select(s => s.Promotion);
+            foreach (var promotion in promotions)
+            {
+                var promotionInfomation = _mapper.Map<PromotionInfomation>(promotion);
+                if (result == null)
+                {
+                    result = new List<PromotionInfomation>();
+                }
+                result.Add(promotionInfomation);
+            }
+            return result;
+        }
 
         public async Task<List<GroupStoreOfPromotion>> GetStoreOfPromotion(Guid promotionId, Guid brandId)
         {
