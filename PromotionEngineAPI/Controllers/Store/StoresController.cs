@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PromotionEngineAPI.Controllers
 {
@@ -44,6 +45,7 @@ namespace PromotionEngineAPI.Controllers
         }
         // GET: api/Stores
         [HttpGet]
+        [Authorize]
         [Route("promotions")]
         public async Task<IActionResult> GetPromotionForStore([FromQuery] string storeCode, [FromQuery] string brandCode)
         {
