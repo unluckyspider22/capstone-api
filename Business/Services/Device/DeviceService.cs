@@ -4,25 +4,35 @@ using Infrastructure.Helper;
 using Infrastructure.Models;
 using Infrastructure.Repository;
 using Infrastructure.UnitOrWork;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace ApplicationCore.Services
 {
     public class DeviceService : BaseService<Device, DeviceDto>, IDeviceService
     {
-        public DeviceService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
+        private IConfiguration _config;
+
+        public DeviceService(IUnitOfWork unitOfWork, IMapper mapper, IConfiguration configuration) : base(unitOfWork, mapper)
         {
+            _config = configuration;
         }
 
         protected override IGenericRepository<Device> _repository => _unitOfWork.DeviceRepository;
 
-        public async Task<bool> CheckExistingDevice(string imei)
+        public async Task<bool> CheckExistingDevice(string code)
         {
-            var isExist = (await _repository.Get(filter: o => o.Imei.Equals(imei) && !o.DelFlg)).ToList().Count > 0;
+            var isExist = (await _repository.Get(filter: o => o.Code.Equals(code) && !o.DelFlg)).ToList().Count > 0;
             return isExist;
         }
 
@@ -41,11 +51,12 @@ namespace ApplicationCore.Services
                     {
                         foreach (var device in devices)
                         {
-                            if (!device.DelFlg) {
+                            if (!device.DelFlg)
+                            {
                                 var dto = new BrandDeviceDto()
                                 {
                                     DeviceId = device.DeviceId,
-                                    Imei = device.Imei,
+                                    Code = device.Code,
                                     Name = device.Name,
                                     Group = store.Group,
                                     StoreCode = store.StoreCode,
@@ -78,10 +89,6 @@ namespace ApplicationCore.Services
                 {
                     entity.UpdDate = DateTime.Now;
                     //var updParam = _mapper.Map<Device>(dto);
-                    if (dto.Imei != null)
-                    {
-                        entity.Imei = dto.Imei;
-                    }
                     if (dto.Name != null)
                     {
                         entity.Name = dto.Name;
@@ -114,6 +121,103 @@ namespace ApplicationCore.Services
                 throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
             }
 
+
+        }
+
+        public async Task<PairResponseDto> GetTokenDevice(string deviceCode)
+        {
+
+            try
+            {
+                var isExist = await _repository.GetFirst(
+                    filter: o => o.Code.Equals(deviceCode) && !o.DelFlg) != null;
+                if (!isExist)
+                {
+                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Device_Access_Fail);
+                }
+                else
+                {
+                    var result = new PairResponseDto();
+                    var device = await _repository.GetFirst(
+                        filter: o => o.Code.Equals(deviceCode)
+                                && !o.DelFlg
+                                && !o.Store.DelFlg
+                                && !o.Store.Brand.DelFlg,
+                        includeProperties: "Store.Brand");
+                    if (device != null)
+                    {
+                        var token = GenerateTokenDevice(device.Name);
+                        result.BrandCode = device.Store.Brand.BrandCode;
+                        result.DeviceCode = device.Code;
+                        result.StoreCode = device.Store.StoreCode;
+                        result.Token = token;
+                        return result;
+                    }
+                    else
+                    {
+                        throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Device_Access_Fail);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                if (e.GetType() != typeof(ErrorObj))
+                {
+                    throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: AppConstant.ErrMessage.Device_Access_Server_Fail);
+                } else
+                {
+                    throw e;
+                }
+
+            }
+        }
+
+        private string GenerateTokenDevice(string name)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_config["AppSettings:SecretKey"]));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
+            var claims = new[]
+            {
+                    new Claim(ClaimTypes.Name, name),
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = credentials
+            };
+            var securityToken = tokenHandler.CreateToken(tokenDescriptor);
+            var token = tokenHandler.WriteToken(securityToken);
+            return token;
+        }
+        public string GenerateCode(Guid deviceId)
+        {
+            try
+            {
+                MD5 md5Hasher = MD5.Create();
+                Random rd = new Random();
+                var hashed = md5Hasher.ComputeHash(Encoding.UTF8.GetBytes(deviceId.ToString()));
+                var ivalue = BitConverter.ToInt16(hashed, 0);
+                if (ivalue < 0)
+                {
+                    ivalue *= -1;
+                }
+
+                var result = ivalue.ToString();
+                while (result.Length < 6)
+                {
+                    result += (rd.Next(0, 9).ToString());
+                }
+                return result;
+            }
+            catch (Exception e)
+            {
+                //chạy bằng debug mode để xem log
+                Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.InnerException);
+                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+            }
 
         }
     }

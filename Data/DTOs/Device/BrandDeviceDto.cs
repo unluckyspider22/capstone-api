@@ -13,9 +13,9 @@ namespace Infrastructure.DTOs
         public string StoreCode { get; set; }
         public string StoreName { get; set; }
         public decimal? Group { get; set; }
-        [StringLength(15)]
-        public string Imei { get; set; }
         [StringLength(50)]
         public string Name { get; set; }
+        [StringLength(8)]
+        public string Code { get; set; }
     }
 }

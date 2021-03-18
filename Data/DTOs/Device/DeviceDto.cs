@@ -10,9 +10,9 @@ namespace Infrastructure.DTOs
     {
         public Guid DeviceId { get; set; }
         public Guid StoreId { get; set; }
-        [StringLength(15)]
-        public string Imei { get; set; }
         [StringLength(50)]
         public string Name { get; set; }
+        [StringLength(8)]
+        public string Code { get; set; }
     }
 }
