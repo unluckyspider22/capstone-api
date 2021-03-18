@@ -318,10 +318,8 @@ namespace Infrastructure.Models
             {
                 entity.Property(e => e.DeviceId).HasDefaultValueSql("(newid())");
 
-                entity.Property(e => e.Imei)
-                    .IsRequired()
-                    .HasColumnName("IMEI")
-                    .HasMaxLength(15)
+                entity.Property(e => e.Code)
+                    .HasMaxLength(6)
                     .IsUnicode(false);
 
                 entity.Property(e => e.InsDate)
@@ -638,7 +636,7 @@ namespace Infrastructure.Models
 
             modelBuilder.Entity<ProductConditionMapping>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.InsDate).HasColumnType("datetime");
 
@@ -824,9 +822,7 @@ namespace Infrastructure.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.Summary)
-                    .HasMaxLength(4000)
-                    .IsUnicode(false);
+                entity.Property(e => e.Summary).HasMaxLength(4000);
 
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")

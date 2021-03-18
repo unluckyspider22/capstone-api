@@ -181,6 +181,9 @@ namespace Infrastructure.Helper
             public const string Voucher_OutOfStock = "Voucher đã được phát hết";
             public const string Login_Success = "Success";
             public const string Login_Fail = "Unauthorized";
+
+            public const string Device_Access_Fail = "Không tìm thấy thiết bị, vui lòng thử lại";
+            public const string Device_Access_Server_Fail = "Hệ thống xảy ra lỗi, vui lòng thử lại";
         }
 
         public class EffectMessage

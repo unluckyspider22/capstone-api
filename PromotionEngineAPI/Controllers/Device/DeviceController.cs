@@ -103,16 +103,33 @@ namespace PromotionEngineAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> PostDevice([FromBody] DeviceDto dto)
         {
-            if (await _service.CheckExistingDevice(dto.Imei))
-            {
-                return StatusCode(statusCode: 500, new ErrorObj(500, "Device exist"));
-            }
+            //if (await _service.CheckExistingDevice(dto.Code))
+            //{
+            //    return StatusCode(statusCode: 500, new ErrorObj(500, "Device exist"));
+            //}
             try
             {
                 dto.DeviceId = Guid.NewGuid();
+                dto.Code = _service.GenerateCode(dto.DeviceId);
                 dto.InsDate = DateTime.Now;
                 dto.UpdDate = DateTime.Now;
                 var result = await _service.CreateAsync(dto);
+                return Ok(result);
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
+
+        [HttpPost]
+        [Route("pair/{pairCode}")]
+        public async Task<IActionResult> PairDevice([FromRoute] string pairCode)
+        {
+
+            try
+            {
+                var result = await _service.GetTokenDevice(pairCode);
                 return Ok(result);
             }
             catch (ErrorObj e)

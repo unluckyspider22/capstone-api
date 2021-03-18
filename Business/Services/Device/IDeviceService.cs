@@ -12,5 +12,7 @@ namespace ApplicationCore.Services
         public Task<bool> CheckExistingDevice(string imei);
         public Task<DeviceDto> Update(DeviceDto dto);
         public Task<GenericRespones<BrandDeviceDto>> GetBrandDevice(int PageSize, int PageIndex, Guid brandId);
+        public string GenerateCode(Guid deviceId);
+        public Task<PairResponseDto> GetTokenDevice(string deviceCode);
     }
 }
