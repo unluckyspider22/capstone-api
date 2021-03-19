@@ -44,6 +44,8 @@ namespace Infrastructure.DTOs
         public string ForMembership { get; set; }
         public bool IsForStore { get; set; }
         [StringLength(10)]
+        public bool IsForGame { get; set; }
+        [StringLength(1)]
         public string DayFilter { get; set; }
         [StringLength(10)]
         public string HourFilter { get; set; }

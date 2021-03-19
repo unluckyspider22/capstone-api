@@ -34,6 +34,7 @@ namespace Infrastructure.Models
         public string ForHoliday { get; set; }
         public string ForMembership { get; set; }
         public bool IsForStore { get; set; }
+        public bool IsForGame { get; set; }
         public string DayFilter { get; set; }
         public string HourFilter { get; set; }
         public string Rank { get; set; }

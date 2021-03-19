@@ -34,7 +34,7 @@ namespace Infrastructure.Helper
             public const string UNLIMIT = "0";
             public const string CONNECTOR = "-";
             public const bool ISLIMIT = true;
-
+            public const bool IS_FOR_GAME = true;
             public const string FOR_WEEKEND = "1";
             public const string FOR_HOLIDAY = "1";
             public const string NO_FILTER = "0";
