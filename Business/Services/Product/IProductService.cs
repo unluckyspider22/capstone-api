@@ -15,5 +15,6 @@ namespace ApplicationCore.Services
 
         public Task<GenericRespones<BrandProductDto>> GetBrandProduct(int PageSize, int PageIndex, Guid brandId);
         public Task<List<BrandProductDto>> GetAllBrandProduct(Guid brandId);
+        public Task<ProductSyncParamDTO> SyncProduct(Guid brandId, ProductRequestParam productRequestParam);
     }
 }
