@@ -58,14 +58,13 @@ namespace ApplicationCore.Chain
                 _applyPromotion.Apply(order);
                 return;
             }
-            else
+            else 
             {
                 if (order.CustomerOrderInfo.Vouchers != null && order.CustomerOrderInfo.Vouchers.Count > 0)
                 {
                     _applyPromotion.Apply(order);
                 }
             }
-
             #endregion
             /*base.Handle(order);*/
         }

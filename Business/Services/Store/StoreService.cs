@@ -31,6 +31,7 @@ namespace ApplicationCore.Services
                 includeProperties: "Brand.Promotion," +
                 "PromotionStoreMapping")).PromotionStoreMapping.Where(w => w.Store.StoreCode.Equals(storeCode)
                     && w.Promotion.Status.Equals(AppConstant.EnvVar.PromotionStatus.PUBLISH))
+                    .Where(w => DateTime.Now <= w.Promotion.EndDate)
                         .Select(s => s.Promotion);
             foreach (var promotion in promotions)
             {

@@ -3,6 +3,7 @@ using ApplicationCore.Request;
 using ApplicationCore.Services;
 
 using Infrastructure.DTOs;
+using Infrastructure.DTOs.Voucher;
 using Infrastructure.Helper;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -38,6 +39,20 @@ namespace PromotionEngineAPI.Controllers
                 filter: el => el.VoucherGroupId.Equals(VoucherGroupId),
                 orderBy: el => el.OrderByDescending(obj => obj.InsDate)
                 ));
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
+        [HttpPost]
+        [Route("voucher-on-site/{promotionId}")]
+        public async Task<IActionResult> GetVoucherForCustomer([FromBody] VoucherForCustomerModel param, Guid promotionId)
+        {
+            try
+            {
+                await _service.GetVoucherForCusOnSite(param, promotionId);
+                return Ok();
             }
             catch (ErrorObj e)
             {
@@ -97,8 +112,8 @@ namespace PromotionEngineAPI.Controllers
         {
             try
             {
-                 
-             
+
+
                 return Ok(await _service.GetVoucherForCustomer(dto));
             }
             catch (ErrorObj e)
