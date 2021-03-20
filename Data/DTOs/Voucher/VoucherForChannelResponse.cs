@@ -20,6 +20,7 @@ namespace Infrastructure.DTOs.Voucher
     }
     public class PromotionInfomation
     {
+        public Guid PromotionId { get; set; }
         public string PromotionCode { get; set; }
         public string PromotionName { get; set; }
         public string VoucherName { get; set; }

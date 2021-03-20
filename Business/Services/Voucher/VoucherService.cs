@@ -1,15 +1,18 @@
 ﻿
 using ApplicationCore.Request;
+using ApplicationCore.Utils;
 using AutoMapper;
 using Infrastructure.DTOs;
+using Infrastructure.DTOs.Voucher;
 using Infrastructure.DTOs.VoucherChannel;
 using Infrastructure.Helper;
 using Infrastructure.Models;
 using Infrastructure.Repository;
 using Infrastructure.UnitOrWork;
+using MailKit.Net.Smtp;
+using MimeKit;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -228,6 +231,129 @@ namespace ApplicationCore.Services
                 var result = await _membershipService.CreateAsync(membership);
                 voucher.MembershipId = result.MembershipId;
             }
+            _repository.Update(voucher);
+            await _unitOfWork.SaveAsync();
+        }
+        #endregion
+        #region Lấy voucher cho customer qua Chatbot
+        public async Task<VoucherForCustomerModel> GetVoucherForCusOnSite(VoucherForCustomerModel param, Guid promotionId)
+        {
+            try
+            {
+                var voucher = (await _repository.Get(
+                    filter: el =>
+                    el.VoucherGroup.PromotionId == promotionId
+                    && !el.IsUsed
+                    && !el.IsRedemped
+                    && !el.VoucherGroup.Promotion.DelFlg
+                    && el.VoucherGroup.Promotion.Status == AppConstant.EnvVar.PromotionStatus.PUBLISH,
+                    includeProperties:
+                    "VoucherGroup.Promotion.PromotionChannelMapping.Channel," +
+                    "VoucherGroup.Brand.UsernameNavigation," +
+                    "Membership")).FirstOrDefault();
+                await SendEmailSmtp(param, voucher);
+                return param;
+            }
+            catch (Exception e)
+            {
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
+            }
+
+        }
+
+
+        private async Task SendEmailSmtp(VoucherForCustomerModel param, Voucher voucher)
+        {
+            //Tạo người gửi - nhận
+            MimeMessage message = new MimeMessage();
+            MailboxAddress from = new MailboxAddress(AppConstant.Sender, AppConstant.Sender_Email);
+            message.From.Add(from);
+
+            MailboxAddress to = new MailboxAddress(param.CusFullName, param.CusEmail);
+            message.To.Add(to);
+
+            message.Subject = AppConstant.Subject;
+
+            //Tạo nội dung email
+            BodyBuilder bodyBuilder = new BodyBuilder();
+            bodyBuilder.HtmlBody = GenerateContent(param, voucher);
+            message.Body = bodyBuilder.ToMessageBody();
+
+            //Kết nối tới SMTP server
+            SmtpClient client = new SmtpClient();
+            client.Connect("smtp.gmail.com", 465, true);
+            client.Authenticate(AppConstant.Sender_Email, AppConstant.Sender_Email_Pwd);
+            client.Send(message);
+            //Teminate
+            client.Disconnect(true);
+            client.Dispose();
+
+            //Update voucher vừa lấy
+            await UpdateVoucherRedemped(voucher, param);
+        }
+
+        private string GenerateContent(VoucherForCustomerModel param, Voucher voucher)
+        {
+            var promotion = voucher.VoucherGroup.Promotion;
+            var brand = voucher.VoucherGroup.Brand;
+            //Header
+            string header = string.Format("<h1>[Promotion] {0}</h1>", promotion.PromotionName);
+            //Opening
+            string dearGender = param.CusGender == "Male" ? "Mr." : "Ms.";
+            string openning = string.Format(@"<p>Dear <b>{0} {1},</b></p>", dearGender, param.CusFullName);
+            //Preface
+            string preface = string.Format("<p>Thank you for your submission. " +
+                "Hope that you enjoy this promotion of <b>{0}</b>. Detail of your voucher is below:<p>", brand.BrandName);
+            //Body
+            string voucherCode = promotion.PromotionCode + "-" + voucher.VoucherCode;
+            string QrCode = AppConstant.Url_Gen_QR + voucherCode;
+            string body = string.Format("<p>Promotion Code: <b>{0}</b></p>" +
+                "<p>Voucher Code: <b>{1}</b></p>" +
+                "<p>Description:</p>" +
+                "<p>{2}</p>" +
+                "<p>Or you can use the code below:</p>" +
+                "<img src={3}><br>", promotion.PromotionCode, voucherCode, promotion.Description, QrCode);
+            //Note
+            string note = string.Format("<p>Note:</p>" +
+                "<ul>" +
+                "<li>This promotion may end before the duration</li>" +
+                "<li>If have any questions, please call the hotline <b>{0}</b> or email <a href=\"mailto: {1}\" target=\"_blank\">{1}</a></li>" +
+                "</ul>", brand.PhoneNumber, brand.UsernameNavigation.Email);
+
+            //Footer
+            string footer = "<p>Regards,</p>" +
+                "<p>PMSR Team</p>";
+            string emailContent = header + openning + preface + body + note + footer;
+
+            return emailContent;
+        }
+        public async Task UpdateVoucherRedemped(Voucher voucher, VoucherForCustomerModel param)
+        {
+            //Update channel
+            var channel = voucher.VoucherGroup.Promotion.PromotionChannelMapping.FirstOrDefault(w => w.Channel.ChannelCode == param.ChannelCode).Channel;
+            voucher.Channel = channel;
+
+            //Update membership
+
+            MembershipDto membership = new MembershipDto
+            {
+                MembershipId = Guid.NewGuid(),
+                Email = param.CusEmail,
+                Fullname = param.CusFullName,
+                PhoneNumber = param.CusPhoneNo
+            };
+            var result = await _membershipService.CreateAsync(membership);
+            voucher.MembershipId = membership.MembershipId;
+
+            // Update ngày lấy
+            DateTime now = Common.GetCurrentDatetime();
+            voucher.RedempedDate = now;
+            voucher.IsRedemped = true;
+            voucher.UpdDate = now;
+            //Update voucher group
+            voucher.VoucherGroup.RedempedQuantity += 1;
+            voucher.VoucherGroup.UpdDate = now;
+
             _repository.Update(voucher);
             await _unitOfWork.SaveAsync();
         }
