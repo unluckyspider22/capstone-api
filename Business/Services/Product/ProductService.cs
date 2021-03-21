@@ -21,17 +21,17 @@ namespace ApplicationCore.Services
 {
     public class ProductService : BaseService<Product, ProductDto>, IProductService
     {
-        IProductCateService _cateService;
-        const string PASSIO_PRODUCT_HOST = "http://localhost:6789/localservice/getproducts";
-        const string PASSIO_LOGIN_HOST = "http://localhost:6789/localservice/login";
+        //IProductCateService _cateService;
+        //const string PASSIO_PRODUCT_HOST = "http://localhost:6789/localservice/getproducts";
+        //const string PASSIO_LOGIN_HOST = "http://localhost:6789/localservice/login";
 
         public ProductService(IUnitOfWork unitOfWork, IMapper mapper, IProductCateService cateService) : base(unitOfWork, mapper)
         {
-            this._cateService = cateService;
+            //this._cateService = cateService;
         }
 
         protected override IGenericRepository<Product> _repository => _unitOfWork.ProductRepository;
-
+        protected IGenericRepository<ProductCategory> _cateRepos => _unitOfWork.ProductCategoryRepository;
         public async Task<bool> CheckExistin(string code, string cateId, Guid productCateId)
         {
             var isExist = (await _repository.Get(filter: o => o.Code.Equals(code)
@@ -136,55 +136,121 @@ namespace ApplicationCore.Services
 
         }
 
-        public async Task<ProductSyncParamDTO> SyncProduct(Guid brandId, ProductRequestParam productRequestParam)
+        public async Task addCateFromSync(Guid brandId, ProductSyncParamDTO productSyncs)
         {
-            //List<ProductCategoryDto> listCate = new List<ProductCategoryDto>();
-            //List<ProductDto> listProduct = new List<ProductDto>();
-            try
+            var listCateBefore = _cateRepos.Get(filter: el => el.BrandId.Equals(brandId) && !el.DelFlg).Result.ToList();
+            foreach (CategorySync cateSync in productSyncs.data.Categories)
             {
-                var result = await getProductFromApiUrl(productRequestParam);
-                var listCate = await _cateService.GetAll(brandId);
-                foreach (CategorySync cateSync in result.data.Categories)
+                if (listCateBefore.Any(a => a.CateId.Equals(cateSync.Id.ToString())))
                 {
-                    ProductCategoryDto cateDto = new ProductCategoryDto();
-                    cateDto.ProductCateId = Guid.NewGuid();
-                    cateDto.BrandId = brandId;
-                    cateDto.CateId = cateSync.Id.ToString();
-                    cateDto.Name = cateSync.Name;
-                    cateDto.InsDate = DateTime.Now;
-                    //if(listCate.Where(w => w.CateId.Equals(cateDto.CateId))))
-                    await _cateService.CreateAsync(cateDto);
+                    var productCate = listCateBefore.Where(w => w.CateId.Equals(cateSync.Id.ToString())).First();
+                    productCate.Name = cateSync.Name;
+                    _cateRepos.Update(productCate);
+
                 }
-                foreach (ProductSync productSync in result.data.Products)
+                else
                 {
-                    if (productSync.ChildrenProducts.Count < 1 || productSync.ChildrenProducts == null)
+                    ProductCategoryDto cateDto = new ProductCategoryDto
                     {
-                        ProductDto productDto = new ProductDto();
-                        productDto.CateId = productSync.CateId.ToString();
-                        productDto.Name = productSync.ProductName;
-                        productDto.Code = productSync.Code;
-                        productDto.ProductId = Guid.NewGuid();
-                        productDto.InsDate = DateTime.Now;
-                        _repository.Add(_mapper.Map<Product>(productDto));
+                        ProductCateId = Guid.NewGuid(),
+                        BrandId = brandId,
+                        CateId = cateSync.Id.ToString(),
+                        Name = cateSync.Name,
+                        InsDate = DateTime.Now,
+                        UpdDate = DateTime.Now
+                    };
+
+                    _cateRepos.Add(_mapper.Map<ProductCategory>(cateDto));
+                }
+            }
+            await _unitOfWork.SaveAsync();
+        }
+        public async Task addProductFromSync(Guid brandId, ProductSyncParamDTO productSyncs)
+        {
+            var listProduct = _repository.Get(filter: el => !el.DelFlg && el.ProductCate.BrandId.Equals(brandId)).Result.ToList();
+            var listCateAfter = _cateRepos.Get(filter: el => el.BrandId.Equals(brandId) && !el.DelFlg).Result.ToList();
+            foreach (var productSync in productSyncs.data.Products)
+            {
+                if (productSync.ChildrenProducts.Count < 1 || productSync.ChildrenProducts == null)
+                {
+                    if (!listProduct.Any(a => a.Code.Equals(productSync.Code)))
+                    {
+                        var existCate = listCateAfter.Where(w => w.CateId.Equals(productSync.CateId.ToString())).ToList();
+                        if (existCate != null && existCate.Count > 0)
+                        {
+                            ProductDto productDto = new ProductDto
+                            {
+                                CateId = productSync.CateId.ToString(),
+                                Name = productSync.ProductName,
+                                Code = productSync.Code,
+                                ProductId = Guid.NewGuid(),
+                                InsDate = DateTime.Now,
+                                UpdDate = DateTime.Now,
+                                ProductCateId = existCate.First().ProductCateId
+                            };
+                            _repository.Add(_mapper.Map<Product>(productDto));
+                        }
+                        //await _unitOfWork.SaveAsync();
                     }
                     else
                     {
-                        foreach (ChildrenProductSync childrenProductSync in productSync.ChildrenProducts)
+                        var product = listProduct.Where(w => w.Code.Equals(productSync.Code)).First();
+                        product.Name = productSync.ProductName;
+                        _repository.Update(product);
+                    }
+
+                }
+                else
+                {
+                    foreach (var child in productSync.ChildrenProducts)
+                    {
+                        if (!listProduct.Any(a => a.Code.Equals(child.Code)))
                         {
-                            ProductDto productDto = new ProductDto();
-                            productDto.CateId = childrenProductSync.CatID.ToString();
-                            productDto.Name = childrenProductSync.ProductName;
-                            productDto.Code = childrenProductSync.Code;
-                            productDto.ProductId = Guid.NewGuid();
-                            productDto.InsDate = DateTime.Now;
-                            _repository.Add(_mapper.Map<Product>(productDto));
+                            var existCate = listCateAfter.Where(w => w.CateId.Equals(child.CatID.ToString())).ToList();
+                            if (existCate != null && existCate.Count > 0)
+                            {
+                                ProductDto productDto = new ProductDto
+                                {
+                                    CateId = child.CatID.ToString(),
+                                    Name = child.ProductName,
+                                    Code = child.Code,
+                                    ProductId = Guid.NewGuid(),
+                                    InsDate = DateTime.Now,
+                                    UpdDate = DateTime.Now,
+                                    ProductCateId = existCate.First().ProductCateId
+                                };
+
+                                _repository.Add(_mapper.Map<Product>(productDto));
+                            }
+
+                        }
+                        else
+                        {
+                            var product = listProduct.Where(w => w.Code.Equals(child.Code)).First();
+                            product.Name = productSync.ProductName;
+                            _repository.Update(product);
                         }
                     }
                 }
-                return result;
+
+            }
+            await _unitOfWork.SaveAsync();
+        }
+        public async Task<ProductSyncParamDTO> SyncProduct(
+            Guid brandId, ProductRequestParam productRequestParam)
+        {
+
+            try
+            {
+                var productSyncs = await getProductFromApiUrl(productRequestParam);
+                //var cateList = _cateRepos.Get(filter: el => el.BrandId.Equals(brandId)).Result.ToList();
+                await addCateFromSync(brandId, productSyncs);
+                await addProductFromSync(brandId, productSyncs);
+                return productSyncs;
             }
             catch (Exception e)
             {
+                Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.Message);
                 throw new ErrorObj(code: 500, message: e.Message);
             }
 
@@ -200,7 +266,7 @@ namespace ApplicationCore.Services
                 //var url = (PASSIO_PRODUCT_HOST);
                 var request = new HttpRequestMessage
                 {
-                    Method = HttpMethod.Get,                   
+                    Method = HttpMethod.Get,
                     RequestUri = new Uri(productRequestParam.SyncUrl),
                     //Content = new StringContent(json, Encoding.UTF8, "application/json"),
                 };
@@ -219,14 +285,13 @@ namespace ApplicationCore.Services
                 Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.Message);
                 throw new ErrorObj(code: 500, message: e.Message);
             }
-           
+
         }
         private async Task<string> getToken(ProductRequestParam productRequestParam)
         {
             try
             {
                 string bearerToken = "";
-                //var encodedPair = Base64Encode(String.Format("{0}:{1}", encodedConsumerKey, encodedConsumerKeySecret));
                 var client = new HttpClient();
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(
@@ -241,13 +306,9 @@ namespace ApplicationCore.Services
                 var request = new HttpRequestMessage
                 {
                     Method = HttpMethod.Post,
-                    //productRequestParam.TokenUrl
                     RequestUri = new Uri(productRequestParam.TokenUrl),
-                    Content = new StringContent(json, Encoding.UTF8, "application/json"),                  
+                    Content = new StringContent(json, Encoding.UTF8, "application/json"),
                 };
-                //requestToken.Content.Headers.ContentType = new MediaTypeWithQualityHeaderValue("application/x-www-form-urlencoded") { CharSet = "UTF-8" };
-                //requestToken.Headers.TryAddWithoutValidation("Authorization", String.Format("Basic {0}", encodedPair));
-                //request.Content.Headers.ContentType = new MediaTypeWithQualityHeaderValue("application/x-www-form-urlencoded") { CharSet = "UTF-8" };
                 HttpResponseMessage bearerResult = await client.SendAsync(request);
 
                 if (bearerResult.IsSuccessStatusCode)
@@ -256,8 +317,6 @@ namespace ApplicationCore.Services
                     JObject jObject = JObject.Parse(bearerData);
                     TokenData tokenData = jObject.ToObject<TokenData>();
                     bearerToken = tokenData.data.Token;
-                    //var responseBody = await response.Content.ReadAsStringAsync();
-                    //productSyncParamDTO = JsonConvert.DeserializeObject<ProductSyncParamDTO>(responseBody);
                 }
                 return bearerToken;
             }
@@ -267,7 +326,7 @@ namespace ApplicationCore.Services
                 throw new ErrorObj(code: 500, message: e.Message);
 
             }
-           
+
         }
 
         public async Task<ProductDto> Update(ProductDto dto)

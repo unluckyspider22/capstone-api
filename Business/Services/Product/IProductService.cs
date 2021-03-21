@@ -13,6 +13,7 @@ namespace ApplicationCore.Services
         public Task<bool> CheckExistin(string code, string cateId, Guid productCateId);
         public Task<ProductDto> Update(ProductDto dto);
 
+        //public Task<ProductSyncParamDTO> CallSyncProduct(Guid brandId, ProductRequestParam productRequestParam);
         public Task<GenericRespones<BrandProductDto>> GetBrandProduct(int PageSize, int PageIndex, Guid brandId);
         public Task<List<BrandProductDto>> GetAllBrandProduct(Guid brandId);
         public Task<ProductSyncParamDTO> SyncProduct(Guid brandId, ProductRequestParam productRequestParam);
