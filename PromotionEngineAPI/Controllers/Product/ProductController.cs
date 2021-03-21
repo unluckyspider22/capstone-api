@@ -1,10 +1,7 @@
 ﻿using ApplicationCore.Services;
 using Infrastructure.DTOs;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers.Product
@@ -14,7 +11,6 @@ namespace PromotionEngineAPI.Controllers.Product
     public class ProductController : ControllerBase
     {
         private readonly IProductService _service;
-
         public ProductController(IProductService service)
         {
             _service = service;
@@ -135,6 +131,24 @@ namespace PromotionEngineAPI.Controllers.Product
             {
                 return StatusCode(statusCode: e.Code, e);
             }
+        }
+        [HttpPost]
+        [Route("sync-product")]
+        public async Task<IActionResult> SyncProduct([FromQuery] Guid brandId, [FromBody]  ProductRequestParam productRequestParam)
+        {
+
+            try
+            {
+                var result = await _service.SyncProduct(brandId, productRequestParam);
+                return Ok(result);
+            }
+            
+            catch (ErrorObj e)
+            {
+
+                return StatusCode(statusCode: e.Code, e);
+            }   
+            
         }
 
         [HttpDelete]

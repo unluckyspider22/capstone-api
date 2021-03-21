@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Infrastructure.Models;
@@ -142,7 +143,16 @@ namespace Infrastructure.UnitOrWork
 
         public async Task<int> SaveAsync()
         {
-            return await _context.SaveChangesAsync();
+            try
+            {
+                return await _context.SaveChangesAsync();
+
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("\n\nError at unitOfWork: \n" + e.InnerException);            
+            }
+            return 0;
         }
 
         protected virtual void Dispose(bool disposing)
