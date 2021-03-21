@@ -240,7 +240,7 @@ namespace ApplicationCore.Services
         {
             try
             {
-                var voucher = (await _repository.Get(
+                var vouchers = await _repository.Get(
                     filter: el =>
                     el.VoucherGroup.PromotionId == promotionId
                     && !el.IsUsed
@@ -250,20 +250,35 @@ namespace ApplicationCore.Services
                     includeProperties:
                     "VoucherGroup.Promotion.PromotionChannelMapping.Channel," +
                     "VoucherGroup.Brand.UsernameNavigation," +
-                    "Membership")).FirstOrDefault();
-                await SendEmailSmtp(param, voucher);
+                    "Membership");
+                var voucher = new Voucher();
+                if (vouchers.Count() > 0)
+                {
+                    voucher = vouchers.FirstOrDefault();
+                    await SendEmailSmtp(param, voucher);
+                }
+                else
+                {
+                    throw new ErrorObj(code: (int)HttpStatusCode.Gone, message: AppConstant.ErrMessage.Voucher_OutOfStock);
+                }
                 return param;
+            }
+            catch (ErrorObj e1)
+            {
+                throw e1;
             }
             catch (Exception e)
             {
                 throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
 
+
         }
 
 
         private async Task SendEmailSmtp(VoucherForCustomerModel param, Voucher voucher)
         {
+
             //Tạo người gửi - nhận
             MimeMessage message = new MimeMessage();
             MailboxAddress from = new MailboxAddress(AppConstant.Sender, AppConstant.Sender_Email);
@@ -281,12 +296,23 @@ namespace ApplicationCore.Services
 
             //Kết nối tới SMTP server
             SmtpClient client = new SmtpClient();
-            client.Connect("smtp.gmail.com", 465, true);
-            client.Authenticate(AppConstant.Sender_Email, AppConstant.Sender_Email_Pwd);
-            client.Send(message);
-            //Teminate
-            client.Disconnect(true);
-            client.Dispose();
+            try
+            {
+                client.Connect("smtp.gmail.com", 465, true);
+                client.Authenticate(AppConstant.Sender_Email, AppConstant.Sender_Email_Pwd);
+                client.Send(message);
+
+            }
+            catch (Exception e)
+            {
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, e.Message);
+            }
+            finally
+            {
+                //Teminate
+                client.Disconnect(true);
+                client.Dispose();
+            }
 
             //Update voucher vừa lấy
             await UpdateVoucherRedemped(voucher, param);
@@ -329,6 +355,7 @@ namespace ApplicationCore.Services
         }
         public async Task UpdateVoucherRedemped(Voucher voucher, VoucherForCustomerModel param)
         {
+
             //Update channel
             var channel = voucher.VoucherGroup.Promotion.PromotionChannelMapping.FirstOrDefault(w => w.Channel.ChannelCode == param.ChannelCode).Channel;
             voucher.Channel = channel;
