@@ -226,14 +226,15 @@ namespace Infrastructure.Helper
 
         }
 
-        //public const string URL = "https://localhost:44367/";
-        public const string URL = "https://promoengine.azurewebsites.net/";
+        public const string URL = "https://localhost:44367/";
+        //public const string URL = "https://promoengine.azurewebsites.net/";
 
         public struct NotiMess
         {
             public const string PROCESSING_MESS = "is processing";
             public const string PROCESSED_MESS = "is finished";
             public const string ERROR_MESS = "is error";
+            public const string VOUCHER_GENERATE_MESS = "Generating voucher";
             public const string VOUCHER_INSERT_MESS = "Inserting voucher";
             public const string VOUCHER_DELETE_MESS = "Deleting voucher";
             public struct Type

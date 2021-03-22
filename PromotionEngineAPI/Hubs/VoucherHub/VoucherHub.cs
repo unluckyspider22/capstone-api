@@ -8,6 +8,14 @@ namespace PromotionEngineAPI.Hubs
 {
     public class VoucherHub : Hub
     {
+        public async Task GeneratingVoucher(object item)
+        {
+            await Clients.All.SendAsync("GeneratingVouchers", item);
+        }
+        public async Task GeneratedVoucher(object item)
+        {
+            await Clients.All.SendAsync("GeneratedVouchers", item);
+        }
         public async Task ProcessingNoti(object item)
         {
             await Clients.All.SendAsync("InsertingVouchers", item);

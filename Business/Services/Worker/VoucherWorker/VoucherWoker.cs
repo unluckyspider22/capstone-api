@@ -1,9 +1,9 @@
-﻿using AutoMapper;
+﻿using ApplicationCore.Utils;
+using AutoMapper;
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
 using Infrastructure.Models;
 using Infrastructure.Repository;
-using Infrastructure.Repository.Voucher;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
@@ -12,7 +12,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace PromotionEngineAPI.Worker
+namespace ApplicationCore.Worker
 {
     public interface IVoucherWorker
     {
@@ -51,35 +51,35 @@ namespace PromotionEngineAPI.Worker
             };
 
             // Chạy luồng
-            Task.Run(async () =>
-            {
-                if (!_cancellationToken.IsCancellationRequested)
-                {
-                    _logger.LogInformation("DeleteVouchers is starting.");
-                    // Gửi notify processing task
-                    await notify.ProcessingVoucher(item: item);
-                    _taskQueue.QueueBackgroundWorkItem(async token =>
-                    {
-                        try
-                        {
-                            // Delete voucher
-                            voucherRepository.DeleteBulk(voucherGroupId: voucherGroupId);
-                            item.Message = AppConstant.NotiMess.VOUCHER_DELETE_MESS + " " + AppConstant.NotiMess.PROCESSED_MESS;
-                            item.IsDone = true;
-                            // Gửi notify hoàn thành task
-                            await notify.ProcessedVoucher(item: item);
-                        }
-                        catch (Exception e)
-                        {
-                            _logger.LogInformation(e.Message);
-                            item.Message = AppConstant.NotiMess.VOUCHER_DELETE_MESS + " " + AppConstant.NotiMess.ERROR_MESS;
-                            item.IsDone = true;
-                            // Gửi notify lỗi
-                            await notify.ErrorProcess(item: item);
-                        }
-                    });
-                }
-            });
+            Task.Run(() =>
+             {
+                 if (!_cancellationToken.IsCancellationRequested)
+                 {
+                     _logger.LogInformation("DeleteVouchers is starting.");
+                     // Gửi notify processing task
+                     notify.ProcessingVoucher(item: item);
+                     _taskQueue.QueueBackgroundWorkItem(async token =>
+                     {
+                         try
+                         {
+                             // Delete voucher
+                             await voucherRepository.DeleteBulk(voucherGroupId: voucherGroupId);
+                             item.Message = AppConstant.NotiMess.VOUCHER_DELETE_MESS + " " + AppConstant.NotiMess.PROCESSED_MESS;
+                             item.IsDone = true;
+                             // Gửi notify hoàn thành task
+                             await notify.ProcessedVoucher(item: item);
+                         }
+                         catch (Exception e)
+                         {
+                             _logger.LogInformation(e.Message);
+                             item.Message = AppConstant.NotiMess.VOUCHER_DELETE_MESS + " " + AppConstant.NotiMess.ERROR_MESS;
+                             item.IsDone = true;
+                             // Gửi notify lỗi
+                             await notify.ErrorProcess(item: item);
+                         }
+                     });
+                 }
+             });
         }
 
         public void InsertVouchers(VoucherGroupDto dto, string promotionCode)
@@ -93,7 +93,6 @@ namespace PromotionEngineAPI.Worker
             //{
             //    promotionCode += "-";
             //}
-            List<Voucher> vouchers = GenerateVoucher(dto, promotionCode);
 
             // Task item để notify cho client
             var item = new VoucherNotiObj()
@@ -104,6 +103,14 @@ namespace PromotionEngineAPI.Worker
                 Message = AppConstant.NotiMess.VOUCHER_INSERT_MESS + " " + AppConstant.NotiMess.PROCESSING_MESS,
                 Type = AppConstant.NotiMess.Type.INSERT_VOUCHERS
             };
+
+            item.Message = AppConstant.NotiMess.VOUCHER_GENERATE_MESS + " " + AppConstant.NotiMess.PROCESSING_MESS;
+            notify.GeneratingVoucher(item);
+            _logger.LogInformation(">>>>>>Start generate: " + DateTime.Now.ToString("HH:mm:ss"));
+            List<Voucher> vouchers = GenerateVoucher(dto, promotionCode);
+            _logger.LogInformation(">>>>>>End generate: " + DateTime.Now.ToString("HH:mm:ss"));
+            item.Message = AppConstant.NotiMess.VOUCHER_GENERATE_MESS + " " + AppConstant.NotiMess.PROCESSED_MESS;
+            notify.GeneratedVoucher(item);
 
             // Chạy luồng
             Task.Run(() =>
@@ -117,8 +124,10 @@ namespace PromotionEngineAPI.Worker
                     {
                         try
                         {
+                            _logger.LogInformation(">>>>>>Start insert: " + DateTime.Now.ToString("HH:mm:ss"));
                             // Insert vouchers 
                             await voucherRepository.InsertBulk(vouchers);
+                            _logger.LogInformation(">>>>>>End insert: " + DateTime.Now.ToString("HH:mm:ss"));
                             item.Message = AppConstant.NotiMess.VOUCHER_INSERT_MESS + " " + AppConstant.NotiMess.PROCESSED_MESS;
                             item.IsDone = true;
                             // Gửi notify hoàn thành task
@@ -139,16 +148,14 @@ namespace PromotionEngineAPI.Worker
         #region generate voucher
         private List<Voucher> GenerateVoucher(VoucherGroupDto dto, string promotionCode)
         {
-            List<VoucherDto> voucherDto = new List<VoucherDto>();
             if (dto.VoucherType.Equals(AppConstant.EnvVar.VoucherType.BULK_CODE))
             {
-                voucherDto = GenerateBulkCodeVoucher(dto, promotionCode);
+                return _mapper.Map<List<Voucher>>(GenerateBulkCodeVoucher(dto, promotionCode));
             }
             else
             {
-                voucherDto = GenerateStandaloneVoucher(dto, promotionCode);
+                return _mapper.Map<List<Voucher>>(GenerateStandaloneVoucher(dto, promotionCode));
             }
-            return _mapper.Map<List<Voucher>>(voucherDto);
         }
         private List<VoucherDto> GenerateStandaloneVoucher(VoucherGroupDto dto, string promotionCode)
         {
@@ -167,12 +174,15 @@ namespace PromotionEngineAPI.Worker
             List<VoucherDto> result = new List<VoucherDto>();
             if (!dto.IsLimit)
             {
+                var now = Common.GetCurrentDatetime();
                 for (var i = 0; i < dto.Quantity; i++)
                 {
                     VoucherDto voucher = new VoucherDto();
                     string randomVoucher = RandomString(dto.Charset, dto.CustomCharset, dto.CodeLength);
                     voucher.VoucherCode = promotionCode + dto.Prefix + randomVoucher + dto.Postfix;
                     voucher.VoucherGroupId = dto.VoucherGroupId;
+                    voucher.InsDate = now;
+                    voucher.UpdDate = now;
                     result.Add(voucher);
                 }
             }

@@ -4,11 +4,8 @@ using ApplicationCore.Services;
 
 using Infrastructure.DTOs;
 using Infrastructure.DTOs.Voucher;
-using Infrastructure.Helper;
-using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -19,11 +16,9 @@ namespace PromotionEngineAPI.Controllers
     public class VouchersController : ControllerBase
     {
         private readonly IVoucherService _service;
-        private readonly IVoucherGroupService _voucherGroupService;
-        public VouchersController(IVoucherService service, IVoucherGroupService voucherGroupService)
+        public VouchersController(IVoucherService service)
         {
             _service = service;
-            _voucherGroupService = voucherGroupService;
         }
 
         // GET: api/Vouchers

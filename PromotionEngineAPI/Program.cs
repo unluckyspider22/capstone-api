@@ -1,9 +1,8 @@
+using ApplicationCore.Worker;
 using AutoMapper;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using PromotionEngineAPI.Worker;
-using System;
 using System.Threading.Tasks;
 
 namespace PromotionEngineAPI
