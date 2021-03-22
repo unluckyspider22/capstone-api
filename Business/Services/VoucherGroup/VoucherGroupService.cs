@@ -19,7 +19,7 @@ namespace ApplicationCore.Services
     {
         public VoucherGroupService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
         {
-            
+
         }
 
         protected override IGenericRepository<VoucherGroup> _repository => _unitOfWork.VoucherGroupRepository;
@@ -105,29 +105,32 @@ namespace ApplicationCore.Services
             return result;
         }
 
-        public async Task<IEnumerable<VoucherGroup>> GetVoucherGroupForGame(int PageIndex = 0, int PageSize = 0, 
+        public async Task<IEnumerable<VoucherGroup>> GetVoucherGroupForGame(int PageIndex = 0, int PageSize = 0,
             string BrandCode = null, string StoreCode = null)
         {
             try
-            {              
-                 var listVoucherGroup = await _repository.Get(pageIndex: PageIndex, pageSize: PageSize
-                    , filter: (el => !el.DelFlg
-                    && el.VoucherType.Equals(AppConstant.EnvVar.VoucherType.BULK_CODE)
-                     && el.IsActive
-                     && el.RedempedQuantity < el.Quantity
-                     && !el.Promotion.PromotionType.Equals(AppConstant.EnvVar.PromotionType.AUTO_PROMOTION)
-                     && el.Promotion.Status.Equals(AppConstant.EnvVar.PromotionStatus.PUBLISH)
-                     && !el.Promotion.DelFlg
-                         && el.Promotion.StartDate.Value.CompareTo(DateTime.Now) <= 0
-                         && (el.Promotion.EndDate.Value.CompareTo(DateTime.Now) >= 0 || el.Promotion.EndDate.Value == null)
-                         && el.Promotion.IsForGame == AppConstant.EnvVar.IS_FOR_GAME
+            {
+                var listVoucherGroup = await _repository.Get(pageIndex: PageIndex, pageSize: PageSize
+                   , filter: (el => !el.DelFlg
+                   && el.VoucherType.Equals(AppConstant.EnvVar.VoucherType.BULK_CODE)
+                    && el.IsActive
+                    && el.RedempedQuantity < el.Quantity
+                    && !el.Promotion.PromotionType.Equals(AppConstant.EnvVar.PromotionType.AUTO_PROMOTION)
+                    && el.Promotion.Status.Equals(AppConstant.EnvVar.PromotionStatus.PUBLISH)
+                    && !el.Promotion.DelFlg
+                        && el.Promotion.StartDate.Value.CompareTo(DateTime.Now) <= 0
+                        && (el.Promotion.EndDate.Value.CompareTo(DateTime.Now) >= 0 || el.Promotion.EndDate.Value == null)
+                        && el.Promotion.IsForGame == AppConstant.EnvVar.IS_FOR_GAME
 
-                         //điều kiện tùy chọn để lấy voucher cho game (Brand)
-                         && el.Promotion.Brand.BrandCode.Equals(BrandCode)
-                    //điều kiện tùy chọn để lấy voucher cho game (Store)
-                    && el.Promotion.PromotionStoreMapping.Any(x => x.Store.StoreCode.Equals(StoreCode))));
-                
-                return listVoucherGroup;
+                        //điều kiện tùy chọn để lấy voucher cho game (Brand)
+                        && el.Promotion.Brand.BrandCode.Equals(BrandCode)
+                   //điều kiện tùy chọn để lấy voucher cho game (Store)
+                   && el.Promotion.PromotionStoreMapping.Any(x => x.Store.StoreCode.Equals(StoreCode))));
+                if (listVoucherGroup != null && listVoucherGroup.Count() > 0)
+                    return listVoucherGroup;
+                else
+                    throw new ErrorObj(code: 204, message: "No promotion for game exists !!!");
+
             }
             catch (Exception e)
             {
@@ -270,12 +273,13 @@ namespace ApplicationCore.Services
                     _repository.Update(voucherGroup);
                     await _unitOfWork.SaveAsync();
                 }
-            } catch(Exception e)
+            }
+            catch (Exception e)
             {
                 Debug.WriteLine("aaaa " + e.Message);
                 throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
-            
+
         }
 
         public async Task UpdateVoucherGroupForApplied(VoucherGroup voucherGroup)
@@ -293,7 +297,7 @@ namespace ApplicationCore.Services
 
                 throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
-            
+
         }
     }
 }

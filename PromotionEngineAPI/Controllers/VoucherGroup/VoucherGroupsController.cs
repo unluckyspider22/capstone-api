@@ -4,6 +4,7 @@ using ApplicationCore.Services;
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
 using Infrastructure.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PromotionEngineAPI.Worker;
 using System;
@@ -65,20 +66,21 @@ namespace PromotionEngineAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         [Route("game")]
         // api/VoucherGroups/game
-        public async Task<IActionResult> GetVoucherGroupForGame([FromQuery] PagingRequestParam param, [FromQuery] string BrandCode,
-            [FromQuery] string StoreCode)
+        public async Task<IActionResult> GetVoucherGroupForGame([FromQuery] PagingRequestParam param, [FromQuery] string brandCode,
+            [FromQuery] string storeCode)
         {
             try
             {
-                if (StoreCode == null || BrandCode == null)
+                if (storeCode == null || brandCode == null)
                     return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
-                return Ok(await _service.GetVoucherGroupForGame(PageIndex: param.PageIndex, PageSize: param.PageSize, StoreCode: StoreCode, BrandCode: BrandCode)); ;
+                return Ok(await _service.GetVoucherGroupForGame(PageIndex: param.PageIndex, PageSize: param.PageSize, StoreCode: storeCode, BrandCode: brandCode)); ;
             }
             catch (ErrorObj e)
             {
-                return StatusCode(statusCode: e.Code, e);
+                return StatusCode(statusCode: e.Code, e.Message);
             }
         }
 
