@@ -90,7 +90,7 @@ namespace PromotionEngineAPI.Controllers
         }
         [HttpGet]
         [Route("exist")]
-        public async Task<IActionResult> ExistMemberLevel([FromQuery] string Level, [FromQuery] Guid BrandId)
+        public async Task<IActionResult> ExistMemberLevel([FromQuery] string Level, [FromQuery] Guid BrandId, [FromRoute] Guid MemberLevelId)
         {
             if (String.IsNullOrEmpty(Level) || BrandId.Equals(Guid.Empty))
             {
@@ -98,7 +98,7 @@ namespace PromotionEngineAPI.Controllers
             }
             try
             {
-                return Ok(await _service.CheckExistingLevel(name: Level, brandId: BrandId));
+                return Ok(await _service.CheckExistingLevel(name: Level, brandId: BrandId, memberLevelId: MemberLevelId));
             }
             catch (ErrorObj e)
             {
@@ -109,7 +109,7 @@ namespace PromotionEngineAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> PostMemberLevel([FromBody] MemberLevelDto dto)
         {
-            if (await _service.CheckExistingLevel(name: dto.Name, brandId: dto.BrandId))
+            if (await _service.CheckExistingLevel(name: dto.Name, brandId: dto.BrandId, memberLevelId: Guid.Empty))
             {
                 return StatusCode(statusCode: 500, new ErrorObj(500, "MemberLevel exist"));
             }

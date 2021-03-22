@@ -34,13 +34,25 @@ namespace ApplicationCore.Services
 
 
         protected IGenericRepository<ProductCategory> _cateRepos => _unitOfWork.ProductCategoryRepository;
-        public async Task<bool> CheckExistin(string code, Guid brandId)
+        public async Task<bool> CheckExistin(string code, Guid brandId, Guid productId)
         {
             try
             {
-                var isExist = (await _repository.Get(filter: o => o.Code.Equals(code)
-                           && o.ProductCate.BrandId.Equals(brandId)
-                           && !o.DelFlg)).ToList().Count > 0;
+                var isExist = false;
+                if (productId != Guid.Empty)
+                {
+                    isExist = (await _repository.Get(filter: o => o.Code.Equals(code)
+                          && o.ProductCate.BrandId.Equals(brandId)
+                          && !o.ProductId.Equals(productId)
+                          && !o.DelFlg)).ToList().Count > 0;
+                }
+                else
+                {
+                    isExist = (await _repository.Get(filter: o => o.Code.Equals(code)
+                          && o.ProductCate.BrandId.Equals(brandId)
+                          && !o.DelFlg)).ToList().Count > 0;
+                }
+
                 return isExist;
             }
             catch (Exception e)

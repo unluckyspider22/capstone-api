@@ -4,7 +4,6 @@ using Infrastructure.Models;
 using Infrastructure.Repository;
 using Infrastructure.UnitOrWork;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,12 +18,34 @@ namespace ApplicationCore.Services
 
         protected override IGenericRepository<MemberLevel> _repository => _unitOfWork.MemberLevelRepository;
 
-        public async Task<bool> CheckExistingLevel(string name, Guid brandId)
+        public async Task<bool> CheckExistingLevel(string name, Guid brandId, Guid memberLevelId)
         {
-            var isExist = (await _repository.Get(filter: o => o.Name.ToLower().Equals(name)
-            && !o.DelFlg
-            && o.BrandId.Equals(brandId))).ToList().Count > 0;
-            return isExist;
+            try
+            {
+                var isExist = false;
+                if (!memberLevelId.Equals(Guid.Empty))
+                {
+                    isExist = (await _repository.Get(filter: o => o.Name.ToLower().Equals(name)
+                        && !o.DelFlg
+                        && !o.MemberLevelId.Equals(memberLevelId)
+                        && o.BrandId.Equals(brandId))).ToList().Count > 0;
+                }
+                else
+                {
+                    isExist = (await _repository.Get(filter: o => o.Name.ToLower().Equals(name)
+                        && !o.DelFlg
+                        && o.BrandId.Equals(brandId))).ToList().Count > 0;
+                }
+
+                return isExist;
+            }
+            catch (Exception e)
+            {
+                //chạy bằng debug mode để xem log
+                Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.Message);
+                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+            }
+
         }
 
         public async Task<MemberLevelDto> Update(MemberLevelDto dto)

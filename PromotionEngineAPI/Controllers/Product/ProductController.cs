@@ -96,15 +96,15 @@ namespace PromotionEngineAPI.Controllers.Product
 
         [HttpGet]
         [Route("exist")]
-        public async Task<IActionResult> ExistProduct([FromQuery] string PromoCode, [FromQuery] Guid BrandId)
+        public async Task<IActionResult> ExistProduct([FromQuery] string ProductCode, [FromQuery] Guid BrandId, [FromQuery] Guid ProductId)
         {
-            if (String.IsNullOrEmpty(PromoCode) || BrandId.Equals(Guid.Empty))
+            if (String.IsNullOrEmpty(ProductCode) || BrandId.Equals(Guid.Empty))
             {
                 return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
             }
             try
             {
-                var result = await _service.CheckExistin(code: PromoCode, brandId: BrandId);
+                var result = await _service.CheckExistin(code: ProductCode, brandId: BrandId, productId: ProductId);
                 return Ok(result);
 
             }
@@ -135,7 +135,7 @@ namespace PromotionEngineAPI.Controllers.Product
         [HttpPost]
         public async Task<IActionResult> PostProduct([FromBody] ProductDto dto)
         {
-            if (await _service.CheckExistin(code: dto.Code, brandId: dto.BrandId))
+            if (await _service.CheckExistin(code: dto.Code, brandId: dto.BrandId, productId: Guid.Empty))
             {
                 return StatusCode(statusCode: 500, new ErrorObj(500, "Product exist"));
             }
@@ -154,7 +154,7 @@ namespace PromotionEngineAPI.Controllers.Product
         }
         [HttpPost]
         [Route("sync-product")]
-        public async Task<IActionResult> SyncProduct([FromQuery] Guid brandId, [FromBody]  ProductRequestParam productRequestParam)
+        public async Task<IActionResult> SyncProduct([FromQuery] Guid brandId, [FromBody] ProductRequestParam productRequestParam)
         {
 
             try
@@ -162,13 +162,13 @@ namespace PromotionEngineAPI.Controllers.Product
                 var result = await _service.SyncProduct(brandId, productRequestParam);
                 return Ok(result);
             }
-            
+
             catch (ErrorObj e)
             {
 
                 return StatusCode(statusCode: e.Code, e);
-            }   
-            
+            }
+
         }
 
         [HttpDelete]

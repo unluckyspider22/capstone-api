@@ -19,12 +19,25 @@ namespace ApplicationCore.Services
 
         protected override IGenericRepository<ProductCategory> _repository => _unitOfWork.ProductCategoryRepository;
 
-        public async Task<bool> CheckExistin(string cateId, Guid brandId)
+        public async Task<bool> CheckExistin(string cateId, Guid brandId, Guid productCateId)
         {
             try
             {
-                var isExist = (await _repository.Get(filter: o => o.CateId.Equals(cateId.ToString()) 
-                && o.BrandId.Equals(brandId) && !o.DelFlg)).ToList().Count > 0;
+                var isExist = false;
+                if (productCateId.Equals(Guid.Empty))
+                {
+                    isExist = (await _repository.Get(filter: o => o.CateId.Equals(cateId.ToString())
+                        && o.BrandId.Equals(brandId)
+                        && !o.ProductCateId.Equals(productCateId)
+                        && !o.DelFlg)).ToList().Count > 0;
+                }
+                else
+                {
+                    isExist = (await _repository.Get(filter: o => o.CateId.Equals(cateId.ToString())
+                        && o.BrandId.Equals(brandId) 
+                        && !o.DelFlg)).ToList().Count > 0;
+                }
+
                 return isExist;
             }
             catch (Exception e)

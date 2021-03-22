@@ -70,7 +70,7 @@ namespace PromotionEngineAPI.Controllers.ProductCategory
 
         [HttpGet]
         [Route("exist")]
-        public async Task<IActionResult> ExistProductCategory([FromQuery] string CateId, [FromQuery] Guid BrandId)
+        public async Task<IActionResult> ExistProductCategory([FromQuery] string CateId, [FromQuery] Guid BrandId, [FromQuery] Guid ProductCateId)
         {
             if (BrandId.Equals(Guid.Empty) || String.IsNullOrEmpty(CateId))
             {
@@ -78,7 +78,7 @@ namespace PromotionEngineAPI.Controllers.ProductCategory
             }
             try
             {
-                return Ok(await _service.CheckExistin(cateId: CateId.Trim(), brandId: BrandId));
+                return Ok(await _service.CheckExistin(cateId: CateId.Trim(), brandId: BrandId, productCateId: ProductCateId));
             }
             catch (ErrorObj e)
             {
@@ -123,7 +123,7 @@ namespace PromotionEngineAPI.Controllers.ProductCategory
         [HttpPost]
         public async Task<IActionResult> PostProductCategory([FromBody] ProductCategoryDto dto)
         {
-            if (await _service.CheckExistin(dto.CateId, dto.BrandId))
+            if (await _service.CheckExistin(dto.CateId, dto.BrandId, Guid.Empty))
             {
                 return StatusCode(statusCode: 500, new ErrorObj(500, "ProductCategory exist"));
             }

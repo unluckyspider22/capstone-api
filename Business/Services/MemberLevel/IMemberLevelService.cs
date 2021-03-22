@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace ApplicationCore.Services
 {
-   public interface IMemberLevelService : IBaseService<MemberLevel, MemberLevelDto>
+    public interface IMemberLevelService : IBaseService<MemberLevel, MemberLevelDto>
     {
-        public Task<bool> CheckExistingLevel(string name, Guid brandId);
+        public Task<bool> CheckExistingLevel(string name, Guid brandId, Guid memberLevelId);
         public Task<MemberLevelDto> Update(MemberLevelDto dto);
     }
 }

@@ -10,7 +10,7 @@ namespace ApplicationCore.Services
 {
     public interface IProductService : IBaseService<Product,ProductDto>
     {
-        public Task<bool> CheckExistin(string code, Guid brandId);
+        public Task<bool> CheckExistin(string code, Guid brandId, Guid productId);
         public Task<ProductDto> Update(ProductDto dto);
 
         //public Task<ProductSyncParamDTO> CallSyncProduct(Guid brandId, ProductRequestParam productRequestParam);
