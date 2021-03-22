@@ -26,7 +26,13 @@ namespace ApplicationCore.Services
         private readonly ITimeframeHandle _timeframeHandle;
         private List<Promotion> _promotions;
 
-        public PromotionService(IUnitOfWork unitOfWork, IMapper mapper, IApplyPromotionHandler promotionHandle, IConditionRuleService conditionRuleService, IHolidayService holidayService, ITimeframeHandle timeframeHandle) : base(unitOfWork, mapper)
+        public PromotionService(
+            IUnitOfWork unitOfWork,
+            IMapper mapper,
+            IApplyPromotionHandler promotionHandle,
+            IConditionRuleService conditionRuleService,
+            IHolidayService holidayService,
+            ITimeframeHandle timeframeHandle) : base(unitOfWork, mapper)
         {
             _applyPromotionHandler = promotionHandle;
             _conditionRuleService = conditionRuleService;
@@ -1125,7 +1131,7 @@ namespace ApplicationCore.Services
                     {
                         ChannelId = channel.ChannelId,
                         ChannelName = channel.ChannelName,
-                        RedempVoucherCount = await voucherRepo.CountAsync(filter: o => o.StoreId.Equals(channel.ChannelId) && o.IsRedemped
+                        RedempVoucherCount = await voucherRepo.CountAsync(filter: o => o.ChannelId.Equals(channel.ChannelId) && o.IsRedemped
                         && o.VoucherGroupId.Equals(voucherGroupId)),
                         GroupNo = (int)channel.Group,
                     };
@@ -1143,8 +1149,6 @@ namespace ApplicationCore.Services
                     };
                     result.ChannelStat.Add(groupChannel);
                 }
-
-
                 return result;
             }
             catch (Exception e)
@@ -1180,6 +1184,128 @@ namespace ApplicationCore.Services
             return promotions.ToList();
         }
 
+        public async Task<bool> ExistPromoCode(string promoCode)
+        {
+            try
+            {
+                var promo = await _repository.GetFirst(filter:
+                        o => o.PromotionCode.Trim().ToLower().Equals(promoCode.Trim().ToLower())
+                       && !o.DelFlg
+                       && !o.Status.Equals(AppConstant.EnvVar.PromotionStatus.EXPIRED));
+                return promo != null;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.InnerException);
+                throw new ErrorObj(code: 500, message: "Oops, something went wrong. Try again", description: "Internal Server Error");
+            }
 
+        }
+
+        public async Task<bool> DeletePromotion(Guid promotionId)
+        {
+            try
+            {
+                #region Update DelFlag của promotion
+                var promo = await _repository.GetFirst(filter: o => o.PromotionId.Equals(promotionId));
+                promo.DelFlg = true;
+   
+                _repository.Update(promo);
+                //await _unitOfWork.SaveAsync();
+                #endregion
+                #region Xóa bảng store mapping
+                IGenericRepository<PromotionStoreMapping> storeMappRepo = _unitOfWork.PromotionStoreMappingRepository;
+                storeMappRepo.Delete(id: Guid.Empty, filter: o => o.PromotionId.Equals(promotionId));
+                //await _unitOfWork.SaveAsync();
+                #endregion
+                #region Xóa bảng channel mapping
+                IGenericRepository<PromotionChannelMapping> channelMappRepo = _unitOfWork.VoucherChannelRepository;
+                channelMappRepo.Delete(id: Guid.Empty, filter: o => o.PromotionId.Equals(promotionId));
+                //await _unitOfWork.SaveAsync();
+                #endregion
+                #region Xóa bảng member level mapping
+                IGenericRepository<MemberLevelMapping> memberMappRepo = _unitOfWork.MemberLevelMappingRepository;
+                memberMappRepo.Delete(id: Guid.Empty, filter: o => o.PromotionId.Equals(promotionId));
+                #endregion
+                #region Update DelFlg của Voucher group
+                IGenericRepository<VoucherGroup> voucherGroupRepo = _unitOfWork.VoucherGroupRepository;
+                var voucherGroup = await voucherGroupRepo.GetFirst(filter: o => o.PromotionId.Equals(promotionId));
+                if (voucherGroup != null)
+                {
+                    voucherGroup.DelFlg = true;
+                    #region Xóa voucher
+                    IGenericRepository<Voucher> voucherRepo = _unitOfWork.VoucherRepository;
+                    voucherRepo.Delete(id: Guid.Empty, filter: o => o.VoucherGroupId.Equals(voucherGroup.VoucherGroupId));
+                    #endregion
+                }
+                //await _unitOfWork.SaveAsync();
+                #endregion
+                #region Xóa tier
+                IGenericRepository<PromotionTier> tierRepo = _unitOfWork.PromotionTierRepository;
+                var tierList = (await tierRepo.Get(filter: o => o.PromotionId.Equals(promotionId))).ToList();
+                if (tierList != null && tierList.Count > 0) 
+                {
+                    foreach(var tier in tierList)
+                    {
+                        promo.PromotionTier.Remove(tier);
+                        _repository.Update(promo);
+                        //tierRepo.Delete(id: tier.PromotionTierId);
+
+                        //tierRepo.Update(tier);
+                        //#region Xóa action
+
+                        //IGenericRepository<Infrastructure.Models.Action> actionRepo = _unitOfWork.ActionRepository;
+                        //var act = await actionRepo.GetFirst(filter: o => o.PromotionTierId.Equals(tier.PromotionTierId));
+                        //if (act != null)
+                        //{
+                        //    // Delete bảng mapp
+                        //    IGenericRepository<ActionProductMapping> actionMappingRepo = _unitOfWork.ActionProductMappingRepository;
+                        //    actionMappingRepo.Delete(id: Guid.Empty, filter: o => o.ActionId.Equals(act.ActionId));
+
+                        //    // Delete action
+                        //    actionRepo.Delete(id: act.ActionId);
+                        //}
+
+                        //#endregion
+                        //#region Xóa post action
+
+                        //IGenericRepository<PostAction> postActionRepo = _unitOfWork.PostActionRepository;
+                        //var postAct = await postActionRepo.GetFirst(filter: o => o.PromotionTierId.Equals(tier.PromotionTierId));
+                        //if (postAct != null)
+                        //{
+                        //    // Delete bảng mapp
+                        //    IGenericRepository<PostActionProductMapping> postActionMappingRepo = _unitOfWork.PostActionProductMappingRepository;
+                        //    postActionMappingRepo.Delete(id: Guid.Empty, filter: o => o.PostActionId.Equals(postAct.PostActionId));
+
+                        //    // Delete post action
+                        //    postActionRepo.Delete(id: postAct.PostActionId);
+                        //}
+
+                        //#endregion
+                        //#region Xóa condition rule
+                        //IGenericRepository<ConditionRule> condRuleRepo = _unitOfWork.ConditionRuleRepository;
+                        //var conditionRuleEntity = await condRuleRepo.GetFirst(filter: o => o.PromotionTier.PromotionTierId.Equals(tier.PromotionTierId));
+                        //if (conditionRuleEntity != null)
+                        //{
+                        //    await DeleteOldGroups(conditionRuleEntity: conditionRuleEntity);
+                        //    condRuleRepo.Delete(id: conditionRuleEntity.ConditionRuleId);
+                        //    await _unitOfWork.SaveAsync();
+                        //}
+
+                        //#endregion
+                    }
+
+
+                }
+
+                #endregion
+                return await _unitOfWork.SaveAsync() > 0;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.InnerException);
+                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.", description: "Internal Server Error");
+            }
+        }
     }
 }

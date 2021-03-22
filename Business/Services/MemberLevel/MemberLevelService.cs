@@ -19,9 +19,11 @@ namespace ApplicationCore.Services
 
         protected override IGenericRepository<MemberLevel> _repository => _unitOfWork.MemberLevelRepository;
 
-        public async Task<bool> CheckExistingLevel(string name)
+        public async Task<bool> CheckExistingLevel(string name, Guid brandId)
         {
-            var isExist = (await _repository.Get(filter: o => o.Name.ToLower().Equals(name) && !o.DelFlg)).ToList().Count > 0;
+            var isExist = (await _repository.Get(filter: o => o.Name.ToLower().Equals(name)
+            && !o.DelFlg
+            && o.BrandId.Equals(brandId))).ToList().Count > 0;
             return isExist;
         }
 

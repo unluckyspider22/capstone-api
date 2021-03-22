@@ -31,14 +31,25 @@ namespace ApplicationCore.Services
         }
 
         protected override IGenericRepository<Product> _repository => _unitOfWork.ProductRepository;
+
+
         protected IGenericRepository<ProductCategory> _cateRepos => _unitOfWork.ProductCategoryRepository;
-        public async Task<bool> CheckExistin(string code, string cateId, Guid productCateId)
+        public async Task<bool> CheckExistin(string code, Guid brandId)
         {
-            var isExist = (await _repository.Get(filter: o => o.Code.Equals(code)
-            && o.ProductCateId.Equals(productCateId)
-            && o.CateId.Equals(cateId)
-            && !o.DelFlg)).ToList().Count > 0;
-            return isExist;
+            try
+            {
+                var isExist = (await _repository.Get(filter: o => o.Code.Equals(code)
+                           && o.ProductCate.BrandId.Equals(brandId)
+                           && !o.DelFlg)).ToList().Count > 0;
+                return isExist;
+            }
+            catch (Exception e)
+            {
+                //chạy bằng debug mode để xem log
+                Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.StackTrace);
+                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+            }
+
         }
 
         public async Task<List<BrandProductDto>> GetAllBrandProduct(Guid brandId)

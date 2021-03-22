@@ -9,7 +9,7 @@ namespace ApplicationCore.Services
 {
    public interface IMemberLevelService : IBaseService<MemberLevel, MemberLevelDto>
     {
-        public Task<bool> CheckExistingLevel(string name);
+        public Task<bool> CheckExistingLevel(string name, Guid brandId);
         public Task<MemberLevelDto> Update(MemberLevelDto dto);
     }
 }

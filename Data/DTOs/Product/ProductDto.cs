@@ -8,6 +8,7 @@ namespace Infrastructure.DTOs
 {
     public class ProductDto : BaseDto
     {
+        public Guid BrandId { get; set; }
         public Guid ProductId { get; set; }
         public Guid ProductCateId { get; set; }
         [StringLength(30)]

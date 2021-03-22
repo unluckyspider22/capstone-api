@@ -88,11 +88,28 @@ namespace PromotionEngineAPI.Controllers
             //    return StatusCode(statusCode: e.Code, e);
             //}
         }
+        [HttpGet]
+        [Route("exist")]
+        public async Task<IActionResult> ExistMemberLevel([FromQuery] string Level, [FromQuery] Guid BrandId)
+        {
+            if (String.IsNullOrEmpty(Level) || BrandId.Equals(Guid.Empty))
+            {
+                return StatusCode(statusCode: 400, value: new ErrorResponse().BadRequest);
+            }
+            try
+            {
+                return Ok(await _service.CheckExistingLevel(name: Level, brandId: BrandId));
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
 
         [HttpPost]
         public async Task<IActionResult> PostMemberLevel([FromBody] MemberLevelDto dto)
         {
-            if (await _service.CheckExistingLevel(dto.Name))
+            if (await _service.CheckExistingLevel(name: dto.Name, brandId: dto.BrandId))
             {
                 return StatusCode(statusCode: 500, new ErrorObj(500, "MemberLevel exist"));
             }

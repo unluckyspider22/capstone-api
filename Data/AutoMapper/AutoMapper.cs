@@ -132,6 +132,9 @@ namespace Infrastructure.AutoMapper
             CreateMap<ProductCondition, ProductConditionTierDto>();
             CreateMap<ProductConditionTierDto, ProductCondition>();
 
+            CreateMap<MemberLevelMapping, MemberLevelMappingDto>();
+            CreateMap<MemberLevelMappingDto, MemberLevelMapping>();
+
 
         }
     }

@@ -68,6 +68,25 @@ namespace PromotionEngineAPI.Controllers.ProductCategory
 
         }
 
+        [HttpGet]
+        [Route("exist")]
+        public async Task<IActionResult> ExistProductCategory([FromQuery] string CateId, [FromQuery] Guid BrandId)
+        {
+            if (BrandId.Equals(Guid.Empty) || String.IsNullOrEmpty(CateId))
+            {
+                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+            }
+            try
+            {
+                return Ok(await _service.CheckExistin(cateId: CateId.Trim(), brandId: BrandId));
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetProductCategory([FromRoute] Guid id)
         {
@@ -121,6 +140,8 @@ namespace PromotionEngineAPI.Controllers.ProductCategory
                 return StatusCode(statusCode: e.Code, e);
             }
         }
+
+
 
         [HttpDelete]
         public async Task<IActionResult> DeleteProductCategory([FromQuery] Guid id)
