@@ -18,7 +18,7 @@ namespace Infrastructure.DTOs
         public string PromotionType { get; set; }
         [StringLength(1)]
         public string ActionType { get; set; }
-        [StringLength(1)]
+        [StringLength(2)]
         public string DiscountType { get; set; }
         [StringLength(1)]
         public string PromotionLevel { get; set; }
@@ -42,10 +42,8 @@ namespace Infrastructure.DTOs
         public string ForHoliday { get; set; }
         [StringLength(1)]
         public string ForMembership { get; set; }
-        public bool IsForStore { get; set; }
-        [StringLength(10)]
         public bool IsForGame { get; set; }
-        [StringLength(1)]
+        [StringLength(3)]
         public string DayFilter { get; set; }
         [StringLength(10)]
         public string HourFilter { get; set; }
@@ -53,8 +51,8 @@ namespace Infrastructure.DTOs
         public string Rank { get; set; }
         [StringLength(1)]
         public string Status { get; set; }
-        public bool IsActive { get; set; }
 
         public virtual ICollection<PromotionStoreMappingDto> PromotionStoreMapping { get; set; }
+        public virtual ICollection<MemberLevelMappingDto> MemberLevelMapping { get; set; }
     }
 }

@@ -90,20 +90,19 @@ namespace PromotionEngineAPI.Controllers
             return Ok(prepareModel);
         }
 
-        // GET: api/Promotions
         [HttpGet]
-        // api/Promotions?pageIndex=...&pageSize=...
         public async Task<IActionResult> GetPromotion([FromQuery] PagingRequestParam param, [FromQuery] Guid BrandId, [FromQuery] string status)
         {
             if (status == null) return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
             try
             {
-                return Ok(await _promotionService.GetAsync(
-              pageIndex: param.PageIndex,
-              pageSize: param.PageSize,
-              orderBy: el => el.OrderByDescending(b => b.InsDate),
-              filter: HandlePromotionFilter(status, BrandId),
-              includeProperties: "PromotionStoreMapping,PromotionTier,PromotionChannelMapping,VoucherGroup"));
+                var result = await _promotionService.GetAsync(
+                  pageIndex: param.PageIndex,
+                  pageSize: param.PageSize,
+                  orderBy: el => el.OrderByDescending(b => b.InsDate),
+                  filter: HandlePromotionFilter(status, BrandId),
+                  includeProperties: "PromotionStoreMapping,PromotionTier,PromotionChannelMapping,VoucherGroup");
+                return Ok(result);
 
             }
             catch (ErrorObj e)
@@ -231,7 +230,8 @@ namespace PromotionEngineAPI.Controllers
                 dto.PromotionId = Guid.NewGuid();
                 dto.InsDate = DateTime.Now;
                 dto.UpdDate = DateTime.Now;
-                return Ok(await _promotionService.CreateAsync(dto));
+                var result = await _promotionService.CreateAsync(dto);
+                return Ok(result);
             }
             catch (ErrorObj e)
             {
@@ -241,7 +241,8 @@ namespace PromotionEngineAPI.Controllers
 
         // DELETE: api/Promotions/5
         [HttpDelete]
-        public async Task<IActionResult> DeletePromotion([FromQuery] Guid id)
+        [Route("{id}")]
+        public async Task<IActionResult> DeletePromotion([FromRoute] Guid id)
         {
             if (id == null)
             {
@@ -249,12 +250,7 @@ namespace PromotionEngineAPI.Controllers
             }
             try
             {
-                var result = await _promotionService.DeleteAsync(id);
-                if (result == false)
-                {
-                    return NotFound();
-                }
-                return Ok();
+                return Ok(await _promotionService.DeletePromotion(id));
             }
             catch (ErrorObj e)
             {
@@ -368,6 +364,20 @@ namespace PromotionEngineAPI.Controllers
             try
             {
                 return Ok(await _promotionService.UpdatePromotionTier(updateParam: updateParam));
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
+
+        [HttpGet]
+        [Route("check-exist-promoCode/{promoCode}")]
+        public async Task<IActionResult> CheckExistPromoCode(string promoCode)
+        {
+            try
+            {
+                return Ok(await _promotionService.ExistPromoCode(promoCode: promoCode));
             }
             catch (ErrorObj e)
             {

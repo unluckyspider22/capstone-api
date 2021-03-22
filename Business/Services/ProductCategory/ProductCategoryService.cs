@@ -21,8 +21,19 @@ namespace ApplicationCore.Services
 
         public async Task<bool> CheckExistin(string cateId, Guid brandId)
         {
-            var isExist = (await _repository.Get(filter: o => o.CateId.Equals(cateId) && o.BrandId.Equals(brandId) && !o.DelFlg)).ToList().Count > 0;
-            return isExist;
+            try
+            {
+                var isExist = (await _repository.Get(filter: o => o.CateId.Equals(cateId.ToString()) 
+                && o.BrandId.Equals(brandId) && !o.DelFlg)).ToList().Count > 0;
+                return isExist;
+            }
+            catch (Exception e)
+            {
+                //chạy bằng debug mode để xem log
+                Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.Message);
+                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+            }
+
         }
 
         public async Task<List<ProductCategoryDto>> GetAll(Guid brandId)

@@ -39,36 +39,58 @@ namespace ApplicationCore.Services
         public async Task<GenericRespones<BrandDeviceDto>> GetBrandDevice(int PageSize, int PageIndex, Guid brandId)
         {
             var result = new List<BrandDeviceDto>();
-            IGenericRepository<Store> storeRepo = _unitOfWork.StoreRepository;
-            var stores = await storeRepo.Get(pageSize: PageSize, pageIndex: PageIndex,
-                filter: o => o.BrandId.Equals(brandId) && !o.DelFlg, includeProperties: "Device");
-            if (stores != null)
+            //IGenericRepository<Store> storeRepo = _unitOfWork.StoreRepository;
+            //var stores = await storeRepo.Get(pageSize: PageSize, pageIndex: PageIndex,
+            //    filter: o => o.BrandId.Equals(brandId) && !o.DelFlg, includeProperties: "Device");
+            //if (stores != null)
+            //{
+            //    foreach (var store in stores)
+            //    {
+            //        var devices = store.Device.ToList();
+            //        if (devices != null && devices.Count > 0)
+            //        {
+            //            foreach (var device in devices)
+            //            {
+            //                if (!device.DelFlg)
+            //                {
+            //                    var dto = new BrandDeviceDto()
+            //                    {
+            //                        DeviceId = device.DeviceId,
+            //                        Code = device.Code,
+            //                        Name = device.Name,
+            //                        Group = store.Group,
+            //                        StoreCode = store.StoreCode,
+            //                        StoreId = store.StoreId,
+            //                        StoreName = store.StoreName,
+            //                    };
+            //                    result.Add(dto);
+            //                }
+            //            }
+            //        }
+
+
+            //    }
+            //}
+            var devices = (await _repository.Get(pageIndex: PageIndex, pageSize: PageSize, 
+                filter: o => o.Store.BrandId.Equals(brandId)
+                        && !o.DelFlg, 
+                includeProperties: "Store"
+            )).ToList();
+            if (devices.Count > 0)
             {
-                foreach (var store in stores)
+                foreach(var device in devices)
                 {
-                    var devices = store.Device.ToList();
-                    if (devices != null && devices.Count > 0)
+                    var dto = new BrandDeviceDto()
                     {
-                        foreach (var device in devices)
-                        {
-                            if (!device.DelFlg)
-                            {
-                                var dto = new BrandDeviceDto()
-                                {
-                                    DeviceId = device.DeviceId,
-                                    Code = device.Code,
-                                    Name = device.Name,
-                                    Group = store.Group,
-                                    StoreCode = store.StoreCode,
-                                    StoreId = store.StoreId,
-                                    StoreName = store.StoreName,
-                                };
-                                result.Add(dto);
-                            }
-                        }
-                    }
-
-
+                        DeviceId = device.DeviceId,
+                        Code = device.Code,
+                        Name = device.Name,
+                        Group = device.Store.Group,
+                        StoreCode = device.Store.StoreCode,
+                        StoreId = device.Store.StoreId,
+                        StoreName = device.Store.StoreName,
+                    };
+                    result.Add(dto);
                 }
             }
 
@@ -164,7 +186,8 @@ namespace ApplicationCore.Services
                 if (e.GetType() != typeof(ErrorObj))
                 {
                     throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: AppConstant.ErrMessage.Device_Access_Server_Fail);
-                } else
+                }
+                else
                 {
                     throw e;
                 }

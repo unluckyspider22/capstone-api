@@ -10,7 +10,7 @@ namespace ApplicationCore.Services
 {
     public interface IProductService : IBaseService<Product,ProductDto>
     {
-        public Task<bool> CheckExistin(string code, string cateId, Guid productCateId);
+        public Task<bool> CheckExistin(string code, Guid brandId);
         public Task<ProductDto> Update(ProductDto dto);
 
         public Task<GenericRespones<BrandProductDto>> GetBrandProduct(int PageSize, int PageIndex, Guid brandId);

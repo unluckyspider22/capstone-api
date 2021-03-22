@@ -98,6 +98,26 @@ namespace PromotionEngineAPI.Controllers.Product
             }
         }
 
+        [HttpGet]
+        [Route("exist")]
+        public async Task<IActionResult> ExistProduct([FromQuery] string PromoCode, [FromQuery] Guid BrandId)
+        {
+            if (String.IsNullOrEmpty(PromoCode) || BrandId.Equals(Guid.Empty))
+            {
+                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+            }
+            try
+            {
+                var result = await _service.CheckExistin(code: PromoCode, brandId: BrandId);
+                return Ok(result);
+
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
+
         [HttpPut("{id}")]
         public async Task<IActionResult> PutProduct([FromRoute] Guid id, [FromBody] ProductDto dto)
         {
@@ -119,7 +139,7 @@ namespace PromotionEngineAPI.Controllers.Product
         [HttpPost]
         public async Task<IActionResult> PostProduct([FromBody] ProductDto dto)
         {
-            if (await _service.CheckExistin(cateId: dto.CateId, code: dto.Code, productCateId: dto.ProductCateId))
+            if (await _service.CheckExistin(code: dto.Code, brandId: dto.BrandId))
             {
                 return StatusCode(statusCode: 500, new ErrorObj(500, "Product exist"));
             }

@@ -77,7 +77,7 @@ namespace ApplicationCore.Services
             catch (Exception e)
             {
                 //chạy bằng debug mode để xem log
-                Debug.WriteLine("\n\nError at GetAsync: \n" + e.Message);
+                Debug.WriteLine("\n\nError at GetAsync: \n" + e.InnerException);
                 throw new ErrorObj(code: 500, message: "GetAsync:" + e.Message);
             }
         }
