@@ -145,7 +145,7 @@ namespace ApplicationCore.Services
                     }
                 }
                 var list = result;
-                var totalItem = await _repository.CountAsync(filter: o => o.ProductCate.BrandId.Equals(brandId) && !o.DelFlg);
+                var totalItem = (await _repository.Get(filter: o =>  !o.DelFlg, includeProperties: "ProductCate")).Where(o=>o.ProductCate.BrandId.Equals(brandId)).ToList().Count();
                 MetaData metadata = new MetaData(pageIndex: PageIndex, pageSize: PageSize, totalItems: totalItem);
                 GenericRespones<BrandProductDto> reponse = new GenericRespones<BrandProductDto>(data: list.ToList(), metadata: metadata);
                 return reponse;

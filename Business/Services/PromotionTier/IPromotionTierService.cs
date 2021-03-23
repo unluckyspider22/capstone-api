@@ -1,5 +1,6 @@
 ﻿
 using Infrastructure.DTOs;
+using Infrastructure.Helper;
 using Infrastructure.Models;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ namespace ApplicationCore.Services
 {
     public interface IPromotionTierService : IBaseService<PromotionTier, PromotionTierDto>
     {
-        
+        public Task<GenericRespones<AvailableDto>> GetAvailable(int pageSize, int pageIndex, Guid brandId, string actionType, string discountType);
+        public Task<bool> AssignTierToPromo(Guid promotionId, Guid promotionTierId);
     }
 }

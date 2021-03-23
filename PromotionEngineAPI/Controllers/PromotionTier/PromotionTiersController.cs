@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers
 {
-    [Route("api/promotiontiers")]
+    [Route("api/promotion-tiers")]
     [ApiController]
     public class PromotionTiersController : ControllerBase
     {
@@ -24,94 +24,126 @@ namespace PromotionEngineAPI.Controllers
         }
 
         // GET: api/PromotionTiers
-        [HttpGet]
-        // api/PromotionTiers?pageIndex=...&pageSize=...
-        public async Task<IActionResult> GetPromotionTier([FromQuery] PagingRequestParam param)
-        {
-            var result = await _service.GetAsync(pageIndex: param.PageIndex, pageSize: param.PageSize);
-            if (result == null)
-            {
-                return NotFound();
-            }
-            return Ok(result);
-        }
+        //[HttpGet]
+        //// api/PromotionTiers?pageIndex=...&pageSize=...
+        //public async Task<IActionResult> GetPromotionTier([FromQuery] PagingRequestParam param)
+        //{
+        //    var result = await _service.GetAsync(pageIndex: param.PageIndex, pageSize: param.PageSize);
+        //    if (result == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return Ok(result);
+        //}
 
         // GET: api/PromotionTiers/count
-        [HttpGet]
-        [Route("count")]
-        public async Task<IActionResult> CountPromotionTier()
-        {
-            return Ok(await _service.CountAsync());
-        }
+        //[HttpGet]
+        //[Route("count")]
+        //public async Task<IActionResult> CountPromotionTier()
+        //{
+        //    return Ok(await _service.CountAsync());
+        //}
 
         // GET: api/PromotionTiers/5
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetPromotionTier([FromRoute] Guid id)
-        {
-            var result = await _service.GetByIdAsync(id);
-            if (result == null)
-            {
-                return NotFound();
-            }
-            return Ok(result);
-        }
+        //[HttpGet("{id}")]
+        //public async Task<IActionResult> GetPromotionTier([FromRoute] Guid id)
+        //{
+        //    var result = await _service.GetByIdAsync(id);
+        //    if (result == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return Ok(result);
+        //}
 
         // PUT: api/PromotionTiers/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutPromotionTier([FromRoute] Guid id, [FromBody] PromotionTierDto dto)
-        {
-            if (id != dto.PromotionTierId)
-            {
-                return BadRequest();
-            }
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> PutPromotionTier([FromRoute] Guid id, [FromBody] PromotionTierDto dto)
+        //{
+        //    if (id != dto.PromotionTierId)
+        //    {
+        //        return BadRequest();
+        //    }
 
-            dto.UpdDate = DateTime.Now;
+        //    dto.UpdDate = DateTime.Now;
 
-            var result = await _service.UpdateAsync(dto);
+        //    var result = await _service.UpdateAsync(dto);
 
-            if (result == null)
-            {
-                return NotFound();
-            }
+        //    if (result == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            return Ok(result);
+        //    return Ok(result);
 
-        }
+        //}
 
         // POST: api/PromotionTiers
-        [HttpPost]
-        public async Task<IActionResult> PostPromotionTier([FromBody] PromotionTierDto dto)
-        {
-            dto.PromotionTierId = Guid.NewGuid();
+        //[HttpPost]
+        //public async Task<IActionResult> PostPromotionTier([FromBody] PromotionTierDto dto)
+        //{
+        //    dto.PromotionTierId = Guid.NewGuid();
 
-            var result = await _service.CreateAsync(dto);
+        //    var result = await _service.CreateAsync(dto);
 
-            if (result == null)
-            {
-                return NotFound();
-            }
+        //    if (result == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            //var result = dto;
+        //    //var result = dto;
 
-            return Ok(result);
-        }
+        //    return Ok(result);
+        //}
 
         // DELETE: api/PromotionTiers/5
-        [HttpDelete]
-        public async Task<IActionResult> DeletePromotionTier([FromQuery] Guid id)
+        //[HttpDelete]
+        //public async Task<IActionResult> DeletePromotionTier([FromQuery] Guid id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return BadRequest();
+        //    }
+        //    var result = await _service.DeleteAsync(id);
+        //    if (result == false)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return Ok();
+        //}
+
+        [HttpGet]
+        [Route("available")]
+        public async Task<IActionResult> GetAvailable([FromQuery] PagingRequestParam param, [FromQuery] Guid brandId, [FromQuery] string actionType, [FromQuery] string discountType)
         {
-            if (id == null)
+            try
             {
-                return BadRequest();
+                return Ok(await _service.GetAvailable(pageSize: param.PageSize, pageIndex: param.PageIndex, brandId: brandId, actionType: actionType, discountType: discountType));
             }
-            var result = await _service.DeleteAsync(id);
-            if (result == false)
+            catch (ErrorObj e)
             {
-                return NotFound();
+                return StatusCode(statusCode: e.Code, e);
             }
-            return Ok();
         }
 
-        
+        [HttpPut]
+        [Route("assign")]
+        public async Task<IActionResult> AssignTierToPromo([FromQuery] Guid promotionId, [FromQuery] Guid promotionTierId)
+        {
+            if (promotionId.Equals(Guid.Empty) || promotionTierId.Equals(Guid.Empty))
+            {
+                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+            }
+            try
+            {
+                return Ok(await _service.AssignTierToPromo(promotionId: promotionId, promotionTierId: promotionTierId));
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
+
+
     }
 }
