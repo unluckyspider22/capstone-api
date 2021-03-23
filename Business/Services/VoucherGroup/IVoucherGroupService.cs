@@ -31,7 +31,7 @@ namespace ApplicationCore.Services
 
         public Task UpdateVoucherGroupForApplied(VoucherGroup voucherGroup);
 
-        public Task AddMoreVoucher(VoucherGroupDto dto);
+        public Task<bool> AddMoreVoucher(Guid voucherGroupId, int quantity);
 
         public Task<GenericRespones<AvailableVoucherDto>> GetAvailable(int PageSize, int PageIndex, Guid BrandId);
     }

@@ -177,28 +177,39 @@ namespace ApplicationCore.Worker
         private List<VoucherDto> GenerateBulkCodeVoucher(VoucherGroupDto dto)
         {
             List<VoucherDto> result = new List<VoucherDto>();
-            if (!dto.IsLimit)
-            {
-                var now = Common.GetCurrentDatetime();
-                for (var i = 0; i < dto.Quantity; i++)
-                {
-                    VoucherDto voucher = new VoucherDto();
-                    string randomVoucher = RandomString(dto.Charset, dto.CustomCharset, dto.CodeLength);
-                    voucher.VoucherCode = dto.Prefix + randomVoucher + dto.Postfix;
-                    voucher.VoucherGroupId = dto.VoucherGroupId;
-                    voucher.InsDate = now;
-                    voucher.UpdDate = now;
-                    result.Add(voucher);
-                }
-            }
-            else
+            var now = Common.GetCurrentDatetime();
+            for (var i = 0; i < dto.Quantity; i++)
             {
                 VoucherDto voucher = new VoucherDto();
                 string randomVoucher = RandomString(dto.Charset, dto.CustomCharset, dto.CodeLength);
                 voucher.VoucherCode = dto.Prefix + randomVoucher + dto.Postfix;
                 voucher.VoucherGroupId = dto.VoucherGroupId;
+                voucher.InsDate = now;
+                voucher.UpdDate = now;
                 result.Add(voucher);
             }
+            //if (!dto.IsLimit)
+            //{
+            //    var now = Common.GetCurrentDatetime();
+            //    for (var i = 0; i < dto.Quantity; i++)
+            //    {
+            //        VoucherDto voucher = new VoucherDto();
+            //        string randomVoucher = RandomString(dto.Charset, dto.CustomCharset, dto.CodeLength);
+            //        voucher.VoucherCode = dto.Prefix + randomVoucher + dto.Postfix;
+            //        voucher.VoucherGroupId = dto.VoucherGroupId;
+            //        voucher.InsDate = now;
+            //        voucher.UpdDate = now;
+            //        result.Add(voucher);
+            //    }
+            //}
+            //else
+            //{
+            //    VoucherDto voucher = new VoucherDto();
+            //    string randomVoucher = RandomString(dto.Charset, dto.CustomCharset, dto.CodeLength);
+            //    voucher.VoucherCode = dto.Prefix + randomVoucher + dto.Postfix;
+            //    voucher.VoucherGroupId = dto.VoucherGroupId;
+            //    result.Add(voucher);
+            //}
 
             return result;
         }

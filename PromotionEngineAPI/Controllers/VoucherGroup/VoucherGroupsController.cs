@@ -137,7 +137,7 @@ namespace PromotionEngineAPI.Controllers
             {
                 dto.VoucherGroupId = Guid.NewGuid();
                 await _service.CreateAsync(dto);
-             
+
                 _workerService.InsertVouchers(voucherDto: dto);
                 return Ok(dto);
             }
@@ -147,16 +147,18 @@ namespace PromotionEngineAPI.Controllers
             }
         }
         [HttpPut]
-        public async Task<IActionResult> PutVoucherGroup([FromBody] VoucherGroupDto dto)
+        [Route("add-more")]
+        public async Task<IActionResult> AddMoreVoucher([FromQuery] Guid voucherGroupId, int quantity)
         {
             try
             {
-                if (dto.VoucherGroupId != null)
+                if (voucherGroupId.Equals(Guid.Empty))
                 {
+                    return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
 
-                    await _service.AddMoreVoucher(dto);
                 }
-                return Ok(dto);
+
+                return Ok(await _service.AddMoreVoucher(voucherGroupId: voucherGroupId, quantity: quantity));
             }
             catch (ErrorObj e)
             {

@@ -319,7 +319,7 @@ namespace Infrastructure.Models
                 entity.Property(e => e.DeviceId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.Code)
-                    .HasMaxLength(6)
+                    .HasMaxLength(8)
                     .IsUnicode(false);
 
                 entity.Property(e => e.InsDate)
@@ -385,11 +385,15 @@ namespace Infrastructure.Models
 
             modelBuilder.Entity<MemberLevelMapping>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
-                entity.Property(e => e.InsDate).HasColumnType("datetime");
+                entity.Property(e => e.InsDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.UpdDate).HasColumnType("datetime");
+                entity.Property(e => e.UpdDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
 
                 entity.HasOne(d => d.MemberLevel)
                     .WithMany(p => p.MemberLevelMapping)
@@ -713,6 +717,8 @@ namespace Infrastructure.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.Property(e => e.IsForStore).HasDefaultValueSql("((0))");
+
                 entity.Property(e => e.PaymentMethod)
                     .HasMaxLength(10)
                     .IsUnicode(false);
@@ -958,13 +964,25 @@ namespace Infrastructure.Models
 
                 entity.Property(e => e.VoucherGroupId).HasDefaultValueSql("(newid())");
 
+                entity.Property(e => e.Charset)
+                    .HasMaxLength(42)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CustomCharset)
+                    .HasMaxLength(106)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.LimitInDayCount).HasColumnType("decimal(10, 0)");
+                entity.Property(e => e.Postfix)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
 
-                entity.Property(e => e.PublicDate).HasColumnType("datetime");
+                entity.Property(e => e.Prefix)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Quantity)
                     .HasColumnType("decimal(10, 0)")

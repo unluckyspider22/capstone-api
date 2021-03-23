@@ -28,18 +28,7 @@ namespace ApplicationCore.Services
         public List<VoucherDto> GenerateBulkCodeVoucher(VoucherGroupDto dto)
         {
             List<VoucherDto> result = new List<VoucherDto>();
-            if (!dto.IsLimit)
-            {
-                for (var i = 0; i < dto.Quantity; i++)
-                {
-                    VoucherDto voucher = new VoucherDto();
-                    string randomVoucher = RandomString(dto.Charset, dto.CustomCharset, dto.CodeLength);
-                    voucher.VoucherCode = dto.Prefix + randomVoucher + dto.Postfix;
-                    voucher.VoucherGroupId = dto.VoucherGroupId;
-                    result.Add(voucher);
-                }
-            }
-            else
+            for (var i = 0; i < dto.Quantity; i++)
             {
                 VoucherDto voucher = new VoucherDto();
                 string randomVoucher = RandomString(dto.Charset, dto.CustomCharset, dto.CodeLength);
@@ -47,6 +36,25 @@ namespace ApplicationCore.Services
                 voucher.VoucherGroupId = dto.VoucherGroupId;
                 result.Add(voucher);
             }
+            //if (!dto.IsLimit)
+            //{
+            //    for (var i = 0; i < dto.Quantity; i++)
+            //    {
+            //        VoucherDto voucher = new VoucherDto();
+            //        string randomVoucher = RandomString(dto.Charset, dto.CustomCharset, dto.CodeLength);
+            //        voucher.VoucherCode = dto.Prefix + randomVoucher + dto.Postfix;
+            //        voucher.VoucherGroupId = dto.VoucherGroupId;
+            //        result.Add(voucher);
+            //    }
+            //}
+            //else
+            //{
+            //    VoucherDto voucher = new VoucherDto();
+            //    string randomVoucher = RandomString(dto.Charset, dto.CustomCharset, dto.CodeLength);
+            //    voucher.VoucherCode = dto.Prefix + randomVoucher + dto.Postfix;
+            //    voucher.VoucherGroupId = dto.VoucherGroupId;
+            //    result.Add(voucher);
+            //}
 
             return result;
         }
@@ -307,32 +315,44 @@ namespace ApplicationCore.Services
 
         }
 
-        public async Task AddMoreVoucher(VoucherGroupDto dto)
+        public async Task<bool> AddMoreVoucher(Guid voucherGroupId, int quantityParam)
         {
-            var vouchers = (await _repository.GetFirst(filter: el => el.VoucherGroupId == dto.VoucherGroupId)).Voucher;
-            var newVouchers = _voucherWorker.GenerateVoucher(dto);
-
-            int quantity = vouchers.Count() + (int)dto.Quantity;
-            //Gộp 2 mảng [đã có dưới DB] + [voucher code mới gen]
-            var totalVouchers = newVouchers.Concat(vouchers);
-            //Kiểm tra có trùng voucher code với những cái cũ hay không
-            while (totalVouchers.Select(el => el.VoucherCode).Distinct().Count() < totalVouchers.Select(el => el.VoucherCode).Count())
+            try
             {
-                int remainVoucher = totalVouchers.Select(el => el.VoucherCode).Count() - totalVouchers.Select(el => el.VoucherCode).Distinct().Count();
-                totalVouchers = totalVouchers.Union(newVouchers);
-                dto.Quantity = remainVoucher;
-                //Gen lại số lượng voucher
-                var remainVouchers = _voucherWorker.GenerateVoucher(dto);
-                totalVouchers.ToList().AddRange(remainVouchers);
-            }
-            newVouchers = totalVouchers.Except(vouchers).ToList();
-            _voucherWorker.InsertVouchers(dto, true, newVouchers);
+                var voucherGroup = await _repository.GetFirst(filter: el => el.VoucherGroupId == voucherGroupId, includeProperties: "Voucher");
+                var vouchers = voucherGroup.Voucher;
+                var dto = _mapper.Map<VoucherGroupDto>(voucherGroup);
+                dto.Voucher = null;
+                dto.Quantity = quantityParam;
+                var newVouchers = _voucherWorker.GenerateVoucher(dto);
 
-            //Update lại quantity
-            var voucherGroup = await _repository.GetById(dto.VoucherGroupId);
-            voucherGroup.Quantity = quantity;
-            _repository.Update(voucherGroup);
-            await _unitOfWork.SaveAsync();
+                int quantity = vouchers.Count() + (int)dto.Quantity;
+                //Gộp 2 mảng [đã có dưới DB] + [voucher code mới gen]
+                var totalVouchers = newVouchers.Concat(vouchers);
+                //Kiểm tra có trùng voucher code với những cái cũ hay không
+                while (totalVouchers.Select(el => el.VoucherCode).Distinct().Count() < totalVouchers.Select(el => el.VoucherCode).Count())
+                {
+                    int remainVoucher = totalVouchers.Select(el => el.VoucherCode).Count() - totalVouchers.Select(el => el.VoucherCode).Distinct().Count();
+                    totalVouchers = totalVouchers.Union(newVouchers);
+                    dto.Quantity = remainVoucher;
+                    //Gen lại số lượng voucher
+                    var remainVouchers = _voucherWorker.GenerateVoucher(dto);
+                    totalVouchers.ToList().AddRange(remainVouchers);
+                }
+                newVouchers = totalVouchers.Except(vouchers).ToList();
+                _voucherWorker.InsertVouchers(dto, true, newVouchers);
+
+                //Update lại quantity
+                //var voucherGroup = await _repository.GetById(dto.VoucherGroupId);
+                voucherGroup.Quantity = quantity;
+                _repository.Update(voucherGroup);
+                return await _unitOfWork.SaveAsync() > 0;
+            }
+            catch (Exception)
+            {
+                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+            }
+
 
         }
 
