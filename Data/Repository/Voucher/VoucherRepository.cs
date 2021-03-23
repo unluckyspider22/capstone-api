@@ -1,38 +1,35 @@
-﻿using Infrastructure.DTOs;
-using Infrastructure.Models;
+﻿using Infrastructure.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Z.EntityFramework.Plus;
 
-namespace Infrastructure.Repository.Voucher
+namespace Infrastructure.Repository
 {
     public interface IVoucherRepository
     {
-        public void DeleteBulk(Guid voucherGroupId);
-        public Task<List<Models.Voucher>> InsertBulk(List<Models.Voucher> vouchers);
+        public Task DeleteBulk(Guid voucherGroupId);
+        public Task InsertBulk(List<Voucher> vouchers);
     }
     public class VoucherRepositoryImp : IVoucherRepository
     {
-        private PromotionEngineContext ctx = new PromotionEngineContext();
-        public async void DeleteBulk(Guid voucherGroupId)
+        private PromotionEngineContext context = new PromotionEngineContext();
+        public async Task DeleteBulk(Guid voucherGroupId)
         {
-            ctx.Voucher.Where(x => x.VoucherGroupId.Equals(voucherGroupId)).Delete();
-            ctx.VoucherGroup.Where(x => x.VoucherGroupId.Equals(voucherGroupId)).Delete();
-            await ctx.SaveChangesAsync();
-            ctx.Dispose();
+            var vouchers = context.Voucher.Where(x => x.VoucherGroupId.Equals(voucherGroupId));
+            await context.BulkDeleteAsync(vouchers);
+            var voucherGroup = context.VoucherGroup.FirstOrDefault(x => x.VoucherGroupId.Equals(voucherGroupId));
+            await context.SingleDeleteAsync(voucherGroup);
+
         }
 
-        public async Task<List<Models.Voucher>> InsertBulk(List<Models.Voucher> vouchers)
+        public async Task InsertBulk(List<Voucher> vouchers)
         {
-            await using (var transaction = ctx.Database.BeginTransaction())
+            using (var context = new PromotionEngineContext())
             {
-                ctx.Voucher.AddRange(vouchers);
-                transaction.Commit();
-                ctx.SaveChanges();
+                await context.BulkInsertAsync(vouchers, b => b.IncludeGraph = true);
             }
-            return vouchers;
+
         }
     }
 }

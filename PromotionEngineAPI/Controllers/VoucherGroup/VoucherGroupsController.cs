@@ -1,16 +1,13 @@
 ﻿
 using ApplicationCore.Services;
-
+using ApplicationCore.Worker;
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PromotionEngineAPI.Worker;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers

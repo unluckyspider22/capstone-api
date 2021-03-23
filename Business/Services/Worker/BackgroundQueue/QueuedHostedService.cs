@@ -4,7 +4,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace PromotionEngineAPI.Worker
+namespace ApplicationCore.Worker
 {
     public class QueuedHostedService : BackgroundService
     {

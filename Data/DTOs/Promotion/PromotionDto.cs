@@ -52,6 +52,7 @@ namespace Infrastructure.DTOs
         [StringLength(1)]
         public string Status { get; set; }
 
+        
         public virtual ICollection<PromotionStoreMappingDto> PromotionStoreMapping { get; set; }
         public virtual ICollection<MemberLevelMappingDto> MemberLevelMapping { get; set; }
     }

@@ -78,6 +78,20 @@ namespace PromotionEngineAPI.Controllers
             }
 
         }
+        [HttpPost]
+        [Route("checkStoreCodeExist")]
+        public async Task<IActionResult> CheckEmailExisting([FromBody] DuplicateParam param)
+        {
+            bool isExisting = false;
+            var store = await _service.GetFirst(filter: el =>
+                    el.StoreCode == param.StoreCode
+                    && el.BrandId == param.BrandID);
+            if (store != null)
+            {
+                isExisting = true;
+            }
+            return Ok(isExisting);
+        }
 
         // GET: api/Stores/5
         [HttpGet("{id}")]
