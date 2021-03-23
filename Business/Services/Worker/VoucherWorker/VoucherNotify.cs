@@ -1,14 +1,14 @@
 ﻿using Infrastructure.Helper;
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
-namespace PromotionEngineAPI.Worker
+namespace ApplicationCore.Worker
 {
     public interface IVoucherNotify
     {
+        public Task GeneratingVoucher(VoucherNotiObj item);
+        public Task GeneratedVoucher(VoucherNotiObj item);
         public Task ProcessingVoucher(VoucherNotiObj item);
         public Task ProcessedVoucher(VoucherNotiObj item);
         public Task ErrorProcess(VoucherNotiObj item);
@@ -37,6 +37,16 @@ namespace PromotionEngineAPI.Worker
         public async Task ErrorProcess(VoucherNotiObj item)
         {
             await connection.InvokeAsync("ErrorNoti", item);
+        }
+
+        public async Task GeneratingVoucher(VoucherNotiObj item)
+        {
+            await connection.InvokeAsync("GeneratingVoucher", item);
+        }
+
+        public async Task GeneratedVoucher(VoucherNotiObj item)
+        {
+            await connection.InvokeAsync("GeneratedVoucher", item);
         }
     }
 

@@ -8,7 +8,7 @@ namespace Infrastructure.Helper
 {
     public class PaginatedList<T> : List<T>
     {
-       public int PageIndex { get; private set; }
+        public int PageIndex { get; private set; }
         public int TotalPages { get; private set; }
         //public int totalItems { get; private set; }
 
@@ -27,11 +27,9 @@ namespace Infrastructure.Helper
         {
             var count = await source.CountAsync();
 
-            var entities = await source
+            var entities = await source.Take(pageSize)
                .Skip((pageIndex - 1) * pageSize)
-               .Take(pageSize)
                .ToListAsync();
-
 
             return new PaginatedList<T>(entities, count, pageIndex, pageSize);
         }

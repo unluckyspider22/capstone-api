@@ -49,6 +49,7 @@ namespace ApplicationCore.Services
                         var token = GenerateJSONWebToken(account);
                         var user = new UserInfo
                         {
+                            Username = account.Username,
                             BrandCode = account.Brand.BrandCode,
                             BrandId = account.Brand.BrandId,
                             Token = token,
