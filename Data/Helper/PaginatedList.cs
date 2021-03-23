@@ -27,8 +27,9 @@ namespace Infrastructure.Helper
         {
             var count = await source.CountAsync();
 
-            var entities = await source.Take(pageSize)
+            var entities = await source
                .Skip((pageIndex - 1) * pageSize)
+               .Take(pageSize)
                .ToListAsync();
 
             return new PaginatedList<T>(entities, count, pageIndex, pageSize);
