@@ -26,7 +26,7 @@ namespace Infrastructure.Helper
         public const string Sender = "Promotion Engine";
         public const string Sender_Email = "promotion.engine.fpt@gmail.com";
         public const string Sender_Email_Pwd = "promotionengine";
-        public const string Subject = "[Promotion Engine] We send you voucher. Enjoy it!";
+        public const string Subject = "Promotion Engine send you a voucher. Enjoy it!";
         public const string Url_Gen_QR = "http://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=";
 
         public struct EnvVar
@@ -226,8 +226,8 @@ namespace Infrastructure.Helper
 
         }
 
-        public const string URL = "https://localhost:44367/";
-        //public const string URL = "https://promoengine.azurewebsites.net/";
+        //public const string URL = "https://localhost:44367/";
+        public const string URL = "https://promoengine.azurewebsites.net/";
 
         public struct NotiMess
         {
