@@ -14,6 +14,7 @@ namespace Infrastructure.DTOs.Account
     }
     public class UserInfo
     {
+        public string Username { get; set; }
         public string Token { get; set; }
         public string BrandCode { get; set; }
         public Guid BrandId { get; set; }
