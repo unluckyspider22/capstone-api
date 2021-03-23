@@ -1,4 +1,5 @@
 ﻿using Infrastructure.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,7 @@ namespace Infrastructure.Repository
     {
         public Task DeleteBulk(Guid voucherGroupId);
         public Task InsertBulk(List<Voucher> vouchers);
+        public Task<bool> RejectVoucher(Guid voucherGroupId, Guid promotionId);
     }
     public class VoucherRepositoryImp : IVoucherRepository
     {
@@ -30,6 +32,34 @@ namespace Infrastructure.Repository
                 await context.BulkInsertAsync(vouchers, b => b.IncludeGraph = true);
             }
 
+        }
+
+        public async Task<bool> RejectVoucher(Guid voucherGroupId, Guid promotionId)
+        {
+            using (var context = new PromotionEngineContext())
+            {
+                var now = DateTime.Now;
+                var voucher = await context.VoucherGroup.FindAsync(voucherGroupId);
+                var promo = await context.Promotion.FindAsync(promotionId);
+                if (voucher != null)
+                {
+                    context.Entry(voucher).State = EntityState.Modified;
+                    voucher.Promotion = null;
+                    voucher.PromotionId = null;
+                    voucher.UpdDate = now;
+                    context.VoucherGroup.Update(voucher);
+                }
+                if (promo != null)
+                {
+                    context.Entry(promo).State = EntityState.Modified;
+                    promo.VoucherGroup = null;
+                    promo.UpdDate = now;
+                }
+
+
+
+                return await context.SaveChangesAsync() > 0;
+            }
         }
     }
 }

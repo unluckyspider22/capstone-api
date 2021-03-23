@@ -27,18 +27,24 @@ namespace ApplicationCore.Services
             try
             {
                 var tier = await _repository.GetFirst(filter: o => o.PromotionTierId.Equals(promotionTierId)
-                        && o.PromotionId == null 
-                        || o.PromotionId.Equals(Guid.Empty));
+                        && (o.PromotionId == null || o.PromotionId.Equals(Guid.Empty)
+                        ));
                 if (tier != null)
                 {
                     IGenericRepository<Promotion> promoRepo = _unitOfWork.PromotionRepository;
+                    var now = DateTime.Now;
                     var promo = await promoRepo.GetFirst(filter: o => o.PromotionId.Equals(promotionId) && !o.DelFlg);
                     if (promo != null)
                     {
+
                         promo.PromotionTier.Add(tier);
+                        promo.UpdDate = now;
                         promoRepo.Update(promo);
+
                         tier.Promotion = promo;
                         tier.PromotionId = promo.PromotionId;
+                        tier.TierIndex = promo.PromotionTier.Count();
+                        tier.UpdDate = now;
                         _repository.Update(tier);
                     }
                 }

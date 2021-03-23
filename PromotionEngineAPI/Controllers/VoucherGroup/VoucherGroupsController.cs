@@ -210,16 +210,34 @@ namespace PromotionEngineAPI.Controllers
         }
 
         [HttpPut]
-        [Route("reject/{id}")]
-        public async Task<IActionResult> RejectVoucherGroup([FromRoute] Guid id)
+        [Route("reject")]
+        public async Task<IActionResult> RejectVoucherGroup([FromQuery] Guid voucherGroupId, [FromQuery] Guid promotionId)
         {
-            if (id.Equals(Guid.Empty))
+            if (voucherGroupId.Equals(Guid.Empty) || promotionId.Equals(Guid.Empty))
             {
                 return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
             }
             try
             {
-                var result = await _service.RejectVoucherGroup(id);
+                var result = await _service.RejectVoucherGroup(voucherGroupId: voucherGroupId, promotionId: promotionId);
+                return Ok(result);
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
+        [HttpGet]
+        [Route("available")]
+        public async Task<IActionResult> GetAvailableVoucherGroup([FromQuery] Guid brandId, [FromQuery] PagingRequestParam param)
+        {
+            if (brandId.Equals(Guid.Empty))
+            {
+                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+            }
+            try
+            {
+                var result = await _service.GetAvailable(PageSize: param.PageSize, PageIndex: param.PageIndex, BrandId: brandId);
                 return Ok(result);
             }
             catch (ErrorObj e)

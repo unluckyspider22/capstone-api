@@ -204,18 +204,20 @@ namespace ApplicationCore.Services
             {
                 IGenericRepository<PromotionTier> tierRepo = _unitOfWork.PromotionTierRepository;
                 var tierEntity = await tierRepo.GetFirst(filter: o => o.PromotionTierId.Equals(param.PromotionTierId));
-
+                var now = DateTime.Now;
                 var promotions = await _repository.GetFirst(filter: o => o.PromotionId.Equals(param.PromotionId) && !o.DelFlg, includeProperties: "PromotionTier");
                 var tiers = promotions.PromotionTier;
                 tiers.Remove(tierEntity);
                 var result = await _unitOfWork.SaveAsync();
                 if (result > 0)
                 {
+                    
                     var promotionTiers = await tierRepo.Get(filter: o => o.PromotionId.Equals(param.PromotionId));
                     for (int i = 0; i < promotionTiers.Count(); i++)
                     {
                         var tier = promotionTiers.ElementAt(i);
                         tier.TierIndex = i;
+                        tier.UpdDate = now;
                         tierRepo.Update(tier);
                     }
                 }

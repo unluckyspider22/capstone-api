@@ -286,10 +286,6 @@ namespace PromotionEngineAPI.Controllers
         [Route("{promotionId}/promotion-tier-detail")]
         public async Task<IActionResult> GetPromotionTierDetail([FromRoute] Guid promotionId)
         {
-            //if (!promotionId.Equals(Guid.Empty))
-            //{
-            //    return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
-            //}
             try
             {
                 return Ok(await _promotionService.GetPromotionTierDetail(promotionId));
@@ -321,10 +317,6 @@ namespace PromotionEngineAPI.Controllers
         [Route("create-tier")]
         public async Task<IActionResult> CreatePromotionTier([FromBody] PromotionTierParam promotionTierParam)
         {
-            //if (!promotionId.Equals(promotionTierParam.PromotionId))
-            //{
-            //    return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
-            //}
             try
             {
                 return Ok(await _promotionService.CreatePromotionTier(promotionTierParam: promotionTierParam));
