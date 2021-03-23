@@ -1,5 +1,6 @@
 ﻿
 using Infrastructure.DTOs;
+using Infrastructure.Helper;
 using Infrastructure.Models;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ namespace ApplicationCore.Services
         // Xóa hoàn toàn voucher group
         public Task<bool> DeleteVoucherGroup(Guid id);
         // Reject voucher group ra khỏi promotion
-        public Task<bool> RejectVoucherGroup(Guid id);
+        public Task<bool> RejectVoucherGroup(Guid voucherGroupId, Guid promotionId);
         // Assign voucher group cho promotion
         public Task<bool> AssignVoucherGroup(Guid promotionId, Guid voucherGroupId);
         public Task<List<VoucherDto>> CreateVoucherBulk(List<VoucherDto> vouchers);
@@ -31,5 +32,7 @@ namespace ApplicationCore.Services
         public Task UpdateVoucherGroupForApplied(VoucherGroup voucherGroup);
 
         public Task AddMoreVoucher(VoucherGroupDto dto);
+
+        public Task<GenericRespones<AvailableVoucherDto>> GetAvailable(int PageSize, int PageIndex, Guid BrandId);
     }
 }

@@ -161,24 +161,18 @@ namespace ApplicationCore.Services
             }
         }
 
-        public async Task<bool> RejectVoucherGroup(Guid id)
+        public async Task<bool> RejectVoucherGroup(Guid voucherGroupId, Guid promotionId)
         {
             try
             {
-                // Reject voucher group
-                var voucherGroupEntity = await _repository.GetFirst(filter: o => o.VoucherGroupId.Equals(id) && !o.DelFlg);
-                if (voucherGroupEntity != null)
-                {
-                    voucherGroupEntity.PromotionId = null;
-                    _repository.Update(voucherGroupEntity);
-                }
-                return await _unitOfWork.SaveAsync() > 0;
+                IVoucherRepository voucherRepository = new VoucherRepositoryImp();
+                var result = await voucherRepository.RejectVoucher(voucherGroupId: voucherGroupId, promotionId: promotionId);
+                return result;
             }
 
             catch (Exception e)
             {
-                //chạy bằng debug mode để xem log
-                Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.Message);
+                Debug.WriteLine(e.InnerException);
                 throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
             }
         }
@@ -188,19 +182,31 @@ namespace ApplicationCore.Services
             try
             {
                 // Assign voucher group
-                var voucherGroupEntity = await _repository.GetFirst(filter: o => o.VoucherGroupId.Equals(voucherGroupId) && !o.DelFlg);
+                var now = DateTime.Now;
+                var voucherGroupEntity = await _repository.GetFirst(filter: o => o.VoucherGroupId.Equals(voucherGroupId)
+                                        && (o.PromotionId.Equals(Guid.Empty) || o.PromotionId == null)
+                                        && !o.DelFlg);
                 if (voucherGroupEntity != null)
                 {
-                    voucherGroupEntity.PromotionId = promotionId;
-                    _repository.Update(voucherGroupEntity);
+                    IGenericRepository<Promotion> promoRepo = _unitOfWork.PromotionRepository;
+                    var promo = await promoRepo.GetFirst(filter: o => o.PromotionId.Equals(promotionId) && !o.DelFlg);
+                    if (promo != null)
+                    {
+                        promo.VoucherGroup = voucherGroupEntity;
+                        promo.UpdDate = now;
+                        promoRepo.Update(promo);
+                        voucherGroupEntity.PromotionId = promotionId;
+                        voucherGroupEntity.UpdDate = now;
+                        _repository.Update(voucherGroupEntity);
+                    }
+
                 }
                 return await _unitOfWork.SaveAsync() > 0;
             }
 
             catch (Exception e)
             {
-                //chạy bằng debug mode để xem log
-                Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.Message);
+                Debug.WriteLine(e.InnerException);
                 throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
             }
         }
@@ -277,7 +283,7 @@ namespace ApplicationCore.Services
             }
             catch (Exception e)
             {
-                Debug.WriteLine("aaaa " + e.Message);
+                Debug.WriteLine(e.InnerException);
                 throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
 
@@ -327,6 +333,42 @@ namespace ApplicationCore.Services
             voucherGroup.Quantity = quantity;
             _repository.Update(voucherGroup);
             await _unitOfWork.SaveAsync();
+
+        }
+
+        public async Task<GenericRespones<AvailableVoucherDto>> GetAvailable(int PageSize, int PageIndex, Guid BrandId)
+        {
+            try
+            {
+                var availGroups = (await _repository.Get(pageSize: PageSize, pageIndex: PageIndex,
+                                        filter: o => o.BrandId.Equals(BrandId)
+                                        && (o.PromotionId == null || o.PromotionId.Equals(Guid.Empty))
+                                        )).ToList();
+                var result = new List<AvailableVoucherDto>();
+                if (availGroups.Count() > 0)
+                {
+                    foreach (var group in availGroups)
+                    {
+                        var dto = new AvailableVoucherDto()
+                        {
+                            VoucherGroupId = group.VoucherGroupId,
+                            Name = group.VoucherName,
+                            Quantity = Convert.ToInt16(group.Quantity)
+                        };
+                        result.Add(dto);
+                    }
+                }
+                var totalItems = await _repository.CountAsync(
+                                             filter: o => o.BrandId.Equals(BrandId)
+                                     && (o.PromotionId == null || o.PromotionId.Equals(Guid.Empty)));
+                MetaData metadata = new MetaData(pageIndex: PageSize, pageSize: PageIndex, totalItems: totalItems);
+                GenericRespones<AvailableVoucherDto> response = new GenericRespones<AvailableVoucherDto>(data: result, metadata: metadata);
+                return response;
+            }
+            catch (Exception e)
+            {
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
+            }
 
         }
     }
