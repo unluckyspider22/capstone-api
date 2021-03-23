@@ -12,6 +12,7 @@ namespace Infrastructure.DTOs.Voucher
         public string CusPhoneNo { get; set; }
         public string CusGender { get; set; }
         public string ChannelCode { get; set; }
+        public string StoreCode { get; set; }
 
     }
 }

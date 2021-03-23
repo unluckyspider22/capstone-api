@@ -24,24 +24,30 @@ namespace ApplicationCore.Services
         public async Task<List<PromotionInfomation>> GetPromotionsForStore(string brandCode, string storeCode)
         {
             List<PromotionInfomation> result = null;
-            var promotions = (await _repository.GetFirst(filter: el =>
+            var store = await _repository.GetFirst(filter: el =>
                     !el.DelFlg
                     && el.StoreCode.Equals(storeCode)
                     && el.Brand.BrandCode.Equals(brandCode),
                 includeProperties: "Brand.Promotion," +
-                "PromotionStoreMapping")).PromotionStoreMapping.Where(w => w.Store.StoreCode.Equals(storeCode)
+                "PromotionStoreMapping");
+
+            var promotions = store.PromotionStoreMapping.Where(w => w.Store.StoreCode.Equals(storeCode)
                     && w.Promotion.Status.Equals(AppConstant.EnvVar.PromotionStatus.PUBLISH))
                     .Where(w => DateTime.Now <= w.Promotion.EndDate)
                         .Select(s => s.Promotion);
-            foreach (var promotion in promotions)
+            if (promotions != null && promotions.Count() > 0)
             {
-                var promotionInfomation = _mapper.Map<PromotionInfomation>(promotion);
-                if (result == null)
+                foreach (var promotion in promotions)
                 {
-                    result = new List<PromotionInfomation>();
+                    var promotionInfomation = _mapper.Map<PromotionInfomation>(promotion);
+                    if (result == null)
+                    {
+                        result = new List<PromotionInfomation>();
+                    }
+                    result.Add(promotionInfomation);
                 }
-                result.Add(promotionInfomation);
             }
+
             return result;
         }
 

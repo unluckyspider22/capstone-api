@@ -256,6 +256,9 @@ namespace ApplicationCore.Services
                 {
                     voucher = vouchers.FirstOrDefault();
                     await SendEmailSmtp(param, voucher);
+
+                    //Update voucher vừa lấy
+                    await UpdateVoucherRedemped(voucher, param);
                 }
                 else
                 {
@@ -314,8 +317,7 @@ namespace ApplicationCore.Services
                 client.Dispose();
             }
 
-            //Update voucher vừa lấy
-            await UpdateVoucherRedemped(voucher, param);
+
         }
 
         private string GenerateContent(VoucherForCustomerModel param, Voucher voucher)
@@ -361,7 +363,6 @@ namespace ApplicationCore.Services
             voucher.Channel = channel;
 
             //Update membership
-
             MembershipDto membership = new MembershipDto
             {
                 MembershipId = Guid.NewGuid(),

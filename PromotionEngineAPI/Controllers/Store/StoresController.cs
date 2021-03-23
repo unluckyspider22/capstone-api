@@ -52,7 +52,7 @@ namespace PromotionEngineAPI.Controllers
             try
             {
                 var result = await _service.GetPromotionsForStore(brandCode, storeCode);
-                if (result.Count == 0)
+                if (result == null)
                 {
                     return NoContent();
                 }
