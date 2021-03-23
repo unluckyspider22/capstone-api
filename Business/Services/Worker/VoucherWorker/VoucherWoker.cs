@@ -16,8 +16,9 @@ namespace ApplicationCore.Worker
 {
     public interface IVoucherWorker
     {
-        public void InsertVouchers(VoucherGroupDto voucherDto, string promotionCode);
+        public void InsertVouchers(VoucherGroupDto voucherDto, bool isAddMore = false, List<Voucher> vouchersAdd = null);
         public void DeleteVouchers(Guid voucherGroupId, Guid? promotionId);
+        public List<Voucher> GenerateVoucher(VoucherGroupDto dto);
     }
     public class VoucherWorker : IVoucherWorker
     {
@@ -82,7 +83,7 @@ namespace ApplicationCore.Worker
              });
         }
 
-        public void InsertVouchers(VoucherGroupDto dto, string promotionCode)
+        public void InsertVouchers(VoucherGroupDto dto, bool isAddMore, List<Voucher> vouchersAdd)
         {
             // Param để insert
             Guid voucherGroupId = dto.VoucherGroupId;
@@ -107,7 +108,11 @@ namespace ApplicationCore.Worker
             item.Message = AppConstant.NotiMess.VOUCHER_GENERATE_MESS + " " + AppConstant.NotiMess.PROCESSING_MESS;
             notify.GeneratingVoucher(item);
             _logger.LogInformation(">>>>>>Start generate: " + DateTime.Now.ToString("HH:mm:ss"));
-            List<Voucher> vouchers = GenerateVoucher(dto, promotionCode);
+            List<Voucher> vouchers = vouchersAdd;
+            if (!isAddMore && vouchersAdd == null)
+            {
+                vouchers = GenerateVoucher(dto);
+            }
             _logger.LogInformation(">>>>>>End generate: " + DateTime.Now.ToString("HH:mm:ss"));
             item.Message = AppConstant.NotiMess.VOUCHER_GENERATE_MESS + " " + AppConstant.NotiMess.PROCESSED_MESS;
             notify.GeneratedVoucher(item);
@@ -146,30 +151,30 @@ namespace ApplicationCore.Worker
             });
         }
         #region generate voucher
-        private List<Voucher> GenerateVoucher(VoucherGroupDto dto, string promotionCode)
+        public List<Voucher> GenerateVoucher(VoucherGroupDto dto)
         {
             if (dto.VoucherType.Equals(AppConstant.EnvVar.VoucherType.BULK_CODE))
             {
-                return _mapper.Map<List<Voucher>>(GenerateBulkCodeVoucher(dto, promotionCode));
+                return _mapper.Map<List<Voucher>>(GenerateBulkCodeVoucher(dto));
             }
             else
             {
-                return _mapper.Map<List<Voucher>>(GenerateStandaloneVoucher(dto, promotionCode));
+                return _mapper.Map<List<Voucher>>(GenerateStandaloneVoucher(dto));
             }
         }
-        private List<VoucherDto> GenerateStandaloneVoucher(VoucherGroupDto dto, string promotionCode)
+        private List<VoucherDto> GenerateStandaloneVoucher(VoucherGroupDto dto)
         {
             List<VoucherDto> result = new List<VoucherDto>();
             VoucherDto voucher = new VoucherDto
             {
-                VoucherCode = promotionCode + dto.Prefix + dto.CustomCode + dto.Postfix,
+                VoucherCode = dto.Prefix + dto.CustomCode + dto.Postfix,
                 VoucherGroupId = dto.VoucherGroupId
             };
             result.Add(voucher);
             return result;
         }
 
-        private List<VoucherDto> GenerateBulkCodeVoucher(VoucherGroupDto dto, string promotionCode)
+        private List<VoucherDto> GenerateBulkCodeVoucher(VoucherGroupDto dto)
         {
             List<VoucherDto> result = new List<VoucherDto>();
             if (!dto.IsLimit)
@@ -179,7 +184,7 @@ namespace ApplicationCore.Worker
                 {
                     VoucherDto voucher = new VoucherDto();
                     string randomVoucher = RandomString(dto.Charset, dto.CustomCharset, dto.CodeLength);
-                    voucher.VoucherCode = promotionCode + dto.Prefix + randomVoucher + dto.Postfix;
+                    voucher.VoucherCode = dto.Prefix + randomVoucher + dto.Postfix;
                     voucher.VoucherGroupId = dto.VoucherGroupId;
                     voucher.InsDate = now;
                     voucher.UpdDate = now;
@@ -190,7 +195,7 @@ namespace ApplicationCore.Worker
             {
                 VoucherDto voucher = new VoucherDto();
                 string randomVoucher = RandomString(dto.Charset, dto.CustomCharset, dto.CodeLength);
-                voucher.VoucherCode = promotionCode + dto.Prefix + randomVoucher + dto.Postfix;
+                voucher.VoucherCode = dto.Prefix + randomVoucher + dto.Postfix;
                 voucher.VoucherGroupId = dto.VoucherGroupId;
                 result.Add(voucher);
             }

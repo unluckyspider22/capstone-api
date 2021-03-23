@@ -1,4 +1,5 @@
-﻿using Infrastructure.Models;
+﻿using Infrastructure.DTOs;
+using Infrastructure.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,7 @@ namespace Infrastructure.Repository
     {
         public Task DeleteBulk(Guid voucherGroupId);
         public Task InsertBulk(List<Voucher> vouchers);
+
     }
     public class VoucherRepositoryImp : IVoucherRepository
     {

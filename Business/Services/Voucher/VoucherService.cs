@@ -236,7 +236,7 @@ namespace ApplicationCore.Services
         }
         #endregion
         #region Lấy voucher cho customer qua Chatbot
-        public async Task<VoucherForCustomerModel> GetVoucherForCusOnSite(VoucherForCustomerModel param, Guid promotionId)
+        public async Task<VoucherForCustomerModel> GetVoucherForCusOnSite(VoucherForCustomerModel param, Guid promotionId, string storeCode)
         {
             try
             {
@@ -249,6 +249,7 @@ namespace ApplicationCore.Services
                     && el.VoucherGroup.Promotion.Status == AppConstant.EnvVar.PromotionStatus.PUBLISH,
                     includeProperties:
                     "VoucherGroup.Promotion.PromotionChannelMapping.Channel," +
+                    "VoucherGroup.Promotion.PromotionStoreMapping.Store," +
                     "VoucherGroup.Brand.UsernameNavigation," +
                     "Membership");
                 var voucher = new Voucher();
@@ -258,7 +259,7 @@ namespace ApplicationCore.Services
                     await SendEmailSmtp(param, voucher);
 
                     //Update voucher vừa lấy
-                    await UpdateVoucherRedemped(voucher, param);
+                    await UpdateVoucherRedemped(voucher, param, storeCode);
                 }
                 else
                 {
@@ -294,7 +295,7 @@ namespace ApplicationCore.Services
 
             //Tạo nội dung email
             BodyBuilder bodyBuilder = new BodyBuilder();
-            bodyBuilder.HtmlBody = GenerateContent(param, voucher);
+            bodyBuilder.HtmlBody = await GenerateContent(param, voucher);
             message.Body = bodyBuilder.ToMessageBody();
 
             //Kết nối tới SMTP server
@@ -303,7 +304,7 @@ namespace ApplicationCore.Services
             {
                 client.Connect("smtp.gmail.com", 465, true);
                 client.Authenticate(AppConstant.Sender_Email, AppConstant.Sender_Email_Pwd);
-                client.Send(message);
+                await client.SendAsync(message);
 
             }
             catch (Exception e)
@@ -320,7 +321,7 @@ namespace ApplicationCore.Services
 
         }
 
-        private string GenerateContent(VoucherForCustomerModel param, Voucher voucher)
+        private async Task<string> GenerateContent(VoucherForCustomerModel param, Voucher voucher)
         {
             var promotion = voucher.VoucherGroup.Promotion;
             var brand = voucher.VoucherGroup.Brand;
@@ -355,12 +356,20 @@ namespace ApplicationCore.Services
 
             return emailContent;
         }
-        public async Task UpdateVoucherRedemped(Voucher voucher, VoucherForCustomerModel param)
+        public async Task UpdateVoucherRedemped(Voucher voucher, VoucherForCustomerModel param, string storeCode)
         {
-
-            //Update channel
-            var channel = voucher.VoucherGroup.Promotion.PromotionChannelMapping.FirstOrDefault(w => w.Channel.ChannelCode == param.ChannelCode).Channel;
-            voucher.Channel = channel;
+            if (!string.IsNullOrEmpty(storeCode))
+            {
+                //Update store
+                var store = voucher.VoucherGroup.Promotion.PromotionStoreMapping.FirstOrDefault(w => w.Store.StoreCode == storeCode).Store;
+                voucher.Store = store;
+            }
+            else
+            {
+                //Update channel
+                var channel = voucher.VoucherGroup.Promotion.PromotionChannelMapping.FirstOrDefault(w => w.Channel.ChannelCode == param.ChannelCode).Channel;
+                voucher.Channel = channel;
+            }
 
             //Update membership
             MembershipDto membership = new MembershipDto

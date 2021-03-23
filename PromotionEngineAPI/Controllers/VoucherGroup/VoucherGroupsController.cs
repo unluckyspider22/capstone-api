@@ -137,12 +137,25 @@ namespace PromotionEngineAPI.Controllers
             {
                 dto.VoucherGroupId = Guid.NewGuid();
                 await _service.CreateAsync(dto);
-                var promotionCode = "";
-                //if (dto.PromotionId != null)
-                //{
-                //    promotionCode = await _service.GetPromotionCode((Guid)dto.PromotionId);
-                //}
-                _workerService.InsertVouchers(voucherDto: dto, promotionCode: promotionCode);
+             
+                _workerService.InsertVouchers(voucherDto: dto);
+                return Ok(dto);
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
+        [HttpPut]
+        public async Task<IActionResult> PutVoucherGroup([FromBody] VoucherGroupDto dto)
+        {
+            try
+            {
+                if (dto.VoucherGroupId != null)
+                {
+
+                    await _service.AddMoreVoucher(dto);
+                }
                 return Ok(dto);
             }
             catch (ErrorObj e)

@@ -42,11 +42,11 @@ namespace PromotionEngineAPI.Controllers
         }
         [HttpPost]
         [Route("voucher-on-site/{promotionId}")]
-        public async Task<IActionResult> GetVoucherForCustomer([FromBody] VoucherForCustomerModel param, Guid promotionId)
+        public async Task<IActionResult> GetVoucherForCustomer([FromBody] VoucherForCustomerModel param, Guid promotionId, [FromQuery] string storeCode)
         {
             try
             {
-                await _service.GetVoucherForCusOnSite(param, promotionId);
+                await _service.GetVoucherForCusOnSite(param, promotionId, storeCode);
                 return Ok();
             }
             catch (ErrorObj e)

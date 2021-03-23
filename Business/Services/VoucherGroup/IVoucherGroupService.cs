@@ -29,5 +29,7 @@ namespace ApplicationCore.Services
         public Task UpdateRedempedQuantity(VoucherGroup voucherGroup, int RedempedQuantity);
 
         public Task UpdateVoucherGroupForApplied(VoucherGroup voucherGroup);
+
+        public Task AddMoreVoucher(VoucherGroupDto dto);
     }
 }

@@ -1,4 +1,5 @@
 ﻿
+using ApplicationCore.Worker;
 using AutoMapper;
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
@@ -16,9 +17,10 @@ namespace ApplicationCore.Services
 {
     public class VoucherGroupService : BaseService<VoucherGroup, VoucherGroupDto>, IVoucherGroupService
     {
-        public VoucherGroupService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
+        private readonly IVoucherWorker _voucherWorker;
+        public VoucherGroupService(IUnitOfWork unitOfWork, IMapper mapper, IVoucherWorker voucherWorker) : base(unitOfWork, mapper)
         {
-
+            _voucherWorker = voucherWorker;
         }
 
         protected override IGenericRepository<VoucherGroup> _repository => _unitOfWork.VoucherGroupRepository;
@@ -296,6 +298,35 @@ namespace ApplicationCore.Services
 
                 throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
+
+        }
+
+        public async Task AddMoreVoucher(VoucherGroupDto dto)
+        {
+            var vouchers = (await _repository.GetFirst(filter: el => el.VoucherGroupId == dto.VoucherGroupId)).Voucher;
+            var newVouchers = _voucherWorker.GenerateVoucher(dto);
+
+            int quantity = vouchers.Count() + (int)dto.Quantity;
+            //Gộp 2 mảng [đã có dưới DB] + [voucher code mới gen]
+            var totalVouchers = newVouchers.Concat(vouchers);
+            //Kiểm tra có trùng voucher code với những cái cũ hay không
+            while (totalVouchers.Select(el => el.VoucherCode).Distinct().Count() < totalVouchers.Select(el => el.VoucherCode).Count())
+            {
+                int remainVoucher = totalVouchers.Select(el => el.VoucherCode).Count() - totalVouchers.Select(el => el.VoucherCode).Distinct().Count();
+                totalVouchers = totalVouchers.Union(newVouchers);
+                dto.Quantity = remainVoucher;
+                //Gen lại số lượng voucher
+                var remainVouchers = _voucherWorker.GenerateVoucher(dto);
+                totalVouchers.ToList().AddRange(remainVouchers);
+            }
+            newVouchers = totalVouchers.Except(vouchers).ToList();
+            _voucherWorker.InsertVouchers(dto, true, newVouchers);
+
+            //Update lại quantity
+            var voucherGroup = await _repository.GetById(dto.VoucherGroupId);
+            voucherGroup.Quantity = quantity;
+            _repository.Update(voucherGroup);
+            await _unitOfWork.SaveAsync();
 
         }
     }
