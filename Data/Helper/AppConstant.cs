@@ -204,7 +204,7 @@ namespace Infrastructure.Helper
             public const string SetShippingFee = "setShippingFee";
             //Chỉ có 1 lần add điểm => action có discount lớn nhất tùy vào Discount Type
             public const string AddPoint = "addPoint";
-            
+
             public const string AddGift = "addGift";
 
         }
