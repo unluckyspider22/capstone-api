@@ -24,7 +24,7 @@ namespace ApplicationCore.Services
             try
             {
                 var isExist = false;
-                if (productCateId.Equals(Guid.Empty))
+                if (!productCateId.Equals(Guid.Empty))
                 {
                     isExist = (await _repository.Get(filter: o => o.CateId.Equals(cateId.ToString())
                         && o.BrandId.Equals(brandId)

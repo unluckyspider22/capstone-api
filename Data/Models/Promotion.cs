@@ -7,6 +7,7 @@ namespace Infrastructure.Models
     {
         public Promotion()
         {
+            GamePromoMapping = new HashSet<GamePromoMapping>();
             MemberLevelMapping = new HashSet<MemberLevelMapping>();
             PromotionChannelMapping = new HashSet<PromotionChannelMapping>();
             PromotionStoreMapping = new HashSet<PromotionStoreMapping>();
@@ -45,6 +46,7 @@ namespace Infrastructure.Models
 
         public virtual Brand Brand { get; set; }
         public virtual VoucherGroup VoucherGroup { get; set; }
+        public virtual ICollection<GamePromoMapping> GamePromoMapping { get; set; }
         public virtual ICollection<MemberLevelMapping> MemberLevelMapping { get; set; }
         public virtual ICollection<PromotionChannelMapping> PromotionChannelMapping { get; set; }
         public virtual ICollection<PromotionStoreMapping> PromotionStoreMapping { get; set; }

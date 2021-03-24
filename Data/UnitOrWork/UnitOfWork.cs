@@ -84,6 +84,12 @@ namespace Infrastructure.UnitOrWork
         public IGenericRepository<PostActionProductMapping> PostActionProductMappingRepository { get; set; }
         public IGenericRepository<ProductConditionMapping> ProductConditionMappingRepository { get; set; }
 
+        public IGenericRepository<Game> GameRepository { get; set; }
+
+        public IGenericRepository<GameItems> GameItemsRepository { get; set; }
+
+        public IGenericRepository<GamePromoMapping> GamePromoMappingRepository { get; set; }
+
         private void initRepository()
         {
             //Account
@@ -134,6 +140,9 @@ namespace Infrastructure.UnitOrWork
             MemberLevelMappingRepository = new GenericRepository<MemberLevelMapping>(_context);
             PostActionProductMappingRepository = new GenericRepository<PostActionProductMapping>(_context);
             ProductConditionMappingRepository = new GenericRepository<ProductConditionMapping>(_context);
+            GameRepository = new GenericRepository<Game>(_context);
+            GameItemsRepository = new GenericRepository<GameItems>(_context);
+            GamePromoMappingRepository = new GenericRepository<GamePromoMapping>(_context);
         }
         public void Dispose()
         {
@@ -150,7 +159,7 @@ namespace Infrastructure.UnitOrWork
             }
             catch (Exception e)
             {
-                Debug.WriteLine("\n\nError at unitOfWork: \n" + e.InnerException);            
+                Debug.WriteLine("\n\nError at unitOfWork: \n" + e.InnerException);
             }
             return 0;
         }

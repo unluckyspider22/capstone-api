@@ -57,6 +57,10 @@ namespace Infrastructure.UnitOrWork
         IGenericRepository<PostActionProductMapping> PostActionProductMappingRepository { get; }
         IGenericRepository<ProductConditionMapping> ProductConditionMappingRepository { get; }
 
+        IGenericRepository<Game> GameRepository { get; }
+        IGenericRepository<GameItems> GameItemsRepository { get; }
+        IGenericRepository<GamePromoMapping> GamePromoMappingRepository { get; }
+
         Task<int> SaveAsync();
     }
 }
