@@ -26,13 +26,11 @@ namespace ApplicationCore.Services
     {
         IVoucherGroupService _voucherGroupService;
         IMembershipService _membershipService;
-        private IConfiguration _config;
 
-        public VoucherService(IUnitOfWork unitOfWork, IMapper mapper, IVoucherGroupService voucherGroupService, IMembershipService membershipService, IConfiguration config) : base(unitOfWork, mapper)
+        public VoucherService(IUnitOfWork unitOfWork, IMapper mapper, IVoucherGroupService voucherGroupService, IMembershipService membershipService) : base(unitOfWork, mapper)
         {
             _voucherGroupService = voucherGroupService;
             _membershipService = membershipService;
-            _config = config;
         }
         protected override IGenericRepository<Voucher> _repository => _unitOfWork.VoucherRepository;
         protected IGenericRepository<VoucherGroup> _voucherGroupRepos => _unitOfWork.VoucherGroupRepository;
