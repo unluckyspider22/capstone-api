@@ -46,7 +46,7 @@ namespace PromotionEngineAPI
                       .WithOrigins("http://localhost:8080")
                       .WithOrigins("https://promotion-engine.netlify.app")
                       .WithOrigins("https://blue-forest-070876000.azurestaticapps.net")
-                      .WithOrigins("http://54.151.235.125:8001/");
+                      .WithOrigins("http://54.151.235.125/");
                 });
             });
             services.AddAuthentication(x =>
