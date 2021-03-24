@@ -10,11 +10,14 @@ using Infrastructure.Models;
 using Infrastructure.Repository;
 using Infrastructure.UnitOrWork;
 using MailKit.Net.Smtp;
+using Microsoft.Extensions.Configuration;
 using MimeKit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace ApplicationCore.Services
@@ -23,11 +26,13 @@ namespace ApplicationCore.Services
     {
         IVoucherGroupService _voucherGroupService;
         IMembershipService _membershipService;
+        private IConfiguration _config;
 
-        public VoucherService(IUnitOfWork unitOfWork, IMapper mapper, IVoucherGroupService voucherGroupService, IMembershipService membershipService) : base(unitOfWork, mapper)
+        public VoucherService(IUnitOfWork unitOfWork, IMapper mapper, IVoucherGroupService voucherGroupService, IMembershipService membershipService, IConfiguration config) : base(unitOfWork, mapper)
         {
             _voucherGroupService = voucherGroupService;
             _membershipService = membershipService;
+            _config = config;
         }
         protected override IGenericRepository<Voucher> _repository => _unitOfWork.VoucherRepository;
         protected IGenericRepository<VoucherGroup> _voucherGroupRepos => _unitOfWork.VoucherGroupRepository;
@@ -394,7 +399,18 @@ namespace ApplicationCore.Services
             _repository.Update(voucher);
             await _unitOfWork.SaveAsync();
         }
+
+
         #endregion
+
+        public string Encrypt(string Encryptval)
+        {
+            return Common.EncodeToBase64(Encryptval);
+        }
+        public string Decrypt(string DecryptText)
+        {
+            return Common.DecodeFromBase64(DecryptText);
+        }
     }
 }
 

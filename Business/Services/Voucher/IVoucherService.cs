@@ -20,6 +20,10 @@ namespace ApplicationCore.Services
         public Task<VoucherParamResponse> GetVoucherForCustomer(VoucherGroupDto voucherGroupDto);
 
         public Task<VoucherForCustomerModel> GetVoucherForCusOnSite(VoucherForCustomerModel param, Guid promotionId, string storeCode);
+
+        public string Encrypt(string Encryptval);
+
+        public string Decrypt(string DecryptText);
     }
 
 }
