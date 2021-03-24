@@ -130,6 +130,7 @@ namespace PromotionEngineAPI
             //LoginService
             services.AddScoped<ILoginService, LoginService>();
             services.AddScoped<IGameService, GameService>();
+            services.AddScoped<IGameItemService, GameItemService>();
 
             ChainOfResponsibilityServices(services);
 

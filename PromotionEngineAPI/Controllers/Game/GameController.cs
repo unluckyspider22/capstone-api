@@ -56,6 +56,7 @@ namespace PromotionEngineAPI.Controllers
             {
                 return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
             }
+
             try
             {
                 var result = await _service.CreateAsync(dto);
