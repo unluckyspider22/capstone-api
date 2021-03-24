@@ -67,12 +67,12 @@ namespace ApplicationCore.Utils
                 throw ex;
             }
         }
-        public  static string EncodePasswordToBase64(string password)
+        public static string EncodeToBase64(string plainText)
         {
             try
             {
-                byte[] encData_byte = new byte[password.Length];
-                encData_byte = Encoding.UTF8.GetBytes(password);
+                byte[] encData_byte = new byte[plainText.Length];
+                encData_byte = Encoding.UTF8.GetBytes(plainText);
                 string encodedData = Convert.ToBase64String(encData_byte);
                 return encodedData;
             }
@@ -81,5 +81,6 @@ namespace ApplicationCore.Utils
                 throw ex;
             }
         }
+
     }
 }

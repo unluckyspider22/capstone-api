@@ -28,6 +28,7 @@ namespace Infrastructure.Helper
         public const string Sender_Email_Pwd = "promotionengine";
         public const string Subject = "Promotion Engine send you a voucher. Enjoy it!";
         public const string Url_Gen_QR = "http://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=";
+        public const string Url_Get_Voucher = "https://promotion-engine.netlify.app/#/";
 
         public struct EnvVar
         {

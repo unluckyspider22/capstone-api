@@ -1,12 +1,13 @@
 ﻿
 using ApplicationCore.Request;
 using ApplicationCore.Services;
-
+using ApplicationCore.Utils;
 using Infrastructure.DTOs;
 using Infrastructure.DTOs.Voucher;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers
@@ -48,6 +49,46 @@ namespace PromotionEngineAPI.Controllers
             {
                 await _service.GetVoucherForCusOnSite(param, promotionId, storeCode);
                 return Ok();
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
+
+        [HttpGet]
+        [Route("urlSession")]
+        public IActionResult GenerateSessionForLink([FromQuery] DateTime datetime)
+        {
+            try
+            {
+                var encryptext = _service.Encrypt(datetime.ToString());
+
+                return Ok(encryptext);
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
+        [HttpPost]
+        [Route("isExpiredUrl")]
+        public IActionResult ValidateSessionLink([FromQuery] string sst)
+        {
+            try
+            {
+                var decypted = _service.Decrypt(sst);
+
+                var timeConvert = DateTime.Parse(decypted);
+
+                var result = timeConvert.AddMinutes(2) >= DateTime.Now;
+
+                if (!result)
+                {
+                    return Forbid();
+                }
+
+                return Ok(result);
             }
             catch (ErrorObj e)
             {

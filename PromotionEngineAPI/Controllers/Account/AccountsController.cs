@@ -100,7 +100,7 @@ namespace PromotionEngineAPI.Controllers
                 dto.InsDate = now;
                 dto.UpdDate = now;
                 dto.RoleId = AppConstant.EnvVar.BrandId;
-                dto.Password = Common.EncodePasswordToBase64(dto.Password);
+                dto.Password = Common.EncodeToBase64(dto.Password);
                 dto.IsActive = false;
                 dto.Brand.InsDate = now;
                 dto.Brand.UpdDate = now;
