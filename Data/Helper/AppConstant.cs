@@ -228,7 +228,8 @@ namespace Infrastructure.Helper
         }
 
         //public const string URL = "https://localhost:44367/";
-        public const string URL = "https://promoengine.azurewebsites.net/";
+        //public const string URL = "https://promoengine.azurewebsites.net/";
+        public const string URL = "http://54.151.235.125:14687/";
 
         public struct NotiMess
         {

@@ -1,5 +1,6 @@
 using ApplicationCore.Chain;
 using ApplicationCore.Services;
+using ApplicationCore.Worker;
 using AutoMapper;
 using Infrastructure.Models;
 using Infrastructure.UnitOrWork;
@@ -7,15 +8,14 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using PromotionEngineAPI.Hubs;
-using ApplicationCore.Worker;
 using System;
 using System.Text;
-using Microsoft.EntityFrameworkCore;
 
 namespace PromotionEngineAPI
 {
@@ -45,7 +45,8 @@ namespace PromotionEngineAPI
                       .AllowCredentials()
                       .WithOrigins("http://localhost:8080")
                       .WithOrigins("https://promotion-engine.netlify.app")
-                      .WithOrigins("https://blue-forest-070876000.azurestaticapps.net");
+                      .WithOrigins("https://blue-forest-070876000.azurestaticapps.net")
+                      .WithOrigins("http://54.151.235.125:8001/");
                 });
             });
             services.AddAuthentication(x =>
