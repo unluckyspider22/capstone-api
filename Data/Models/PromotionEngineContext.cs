@@ -25,7 +25,6 @@ namespace Infrastructure.Models
         public virtual DbSet<Device> Device { get; set; }
         public virtual DbSet<Game> Game { get; set; }
         public virtual DbSet<GameItems> GameItems { get; set; }
-        public virtual DbSet<GamePromoMapping> GamePromoMapping { get; set; }
         public virtual DbSet<Holiday> Holiday { get; set; }
         public virtual DbSet<MemberLevel> MemberLevel { get; set; }
         public virtual DbSet<MemberLevelMapping> MemberLevelMapping { get; set; }
@@ -344,13 +343,19 @@ namespace Infrastructure.Models
 
             modelBuilder.Entity<Game>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
-                entity.Property(e => e.InsDate).HasColumnType("datetime");
+                entity.Property(e => e.InsDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.Name).HasMaxLength(50);
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(50);
 
-                entity.Property(e => e.UpdDate).HasColumnType("datetime");
+                entity.Property(e => e.UpdDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
 
                 entity.HasOne(d => d.Brand)
                     .WithMany(p => p.Game)
@@ -361,43 +366,33 @@ namespace Infrastructure.Models
 
             modelBuilder.Entity<GameItems>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.Description).HasMaxLength(4000);
 
                 entity.Property(e => e.DisplayText).HasMaxLength(30);
 
-                entity.Property(e => e.InsDate).HasColumnType("datetime");
+                entity.Property(e => e.InsDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.UpdDate).HasColumnType("datetime");
+                entity.Property(e => e.Priority).HasDefaultValueSql("((1))");
+
+                entity.Property(e => e.UpdDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
 
                 entity.HasOne(d => d.Game)
                     .WithMany(p => p.GameItems)
                     .HasForeignKey(d => d.GameId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_GameItems_Game");
-            });
-
-            modelBuilder.Entity<GamePromoMapping>(entity =>
-            {
-                entity.HasKey(e => new { e.GameId, e.ItemId, e.PromotionId });
-
-                entity.HasOne(d => d.Game)
-                    .WithMany(p => p.GamePromoMapping)
-                    .HasForeignKey(d => d.GameId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_GamePromoMapping_Game");
-
-                entity.HasOne(d => d.Item)
-                    .WithMany(p => p.GamePromoMapping)
-                    .HasForeignKey(d => d.ItemId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_GamePromoMapping_GameItems");
 
                 entity.HasOne(d => d.Promotion)
-                    .WithMany(p => p.GamePromoMapping)
+                    .WithMany(p => p.GameItems)
                     .HasForeignKey(d => d.PromotionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_GamePromoMapping_Promotion");
+                    .HasConstraintName("FK_GameItems_Promotion");
             });
 
             modelBuilder.Entity<Holiday>(entity =>
@@ -777,8 +772,6 @@ namespace Infrastructure.Models
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
-
-                entity.Property(e => e.IsForStore).HasDefaultValueSql("((0))");
 
                 entity.Property(e => e.PaymentMethod)
                     .HasMaxLength(10)

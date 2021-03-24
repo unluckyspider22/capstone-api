@@ -7,7 +7,7 @@ namespace Infrastructure.DTOs
         public Guid Id { get; set; }
         public Guid BrandId { get; set; }
         public string Name { get; set; }
-        public int? MinItem { get; set; } = 1;
-        public int? MaxItem { get; set; } = 1;
+        public int MinItem { get; set; } = 1;
+        public int MaxItem { get; set; } = 1;
     }
 }

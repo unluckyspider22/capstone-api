@@ -129,7 +129,6 @@ namespace ApplicationCore.Services
                     && !el.Promotion.DelFlg
                         && el.Promotion.StartDate.Value.CompareTo(DateTime.Now) <= 0
                         && (el.Promotion.EndDate.Value.CompareTo(DateTime.Now) >= 0 || el.Promotion.EndDate.Value == null)
-                        && el.Promotion.IsForGame == AppConstant.EnvVar.IS_FOR_GAME
 
                         //điều kiện tùy chọn để lấy voucher cho game (Brand)
                         && el.Promotion.Brand.BrandCode.Equals(BrandCode)

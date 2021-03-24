@@ -42,7 +42,6 @@ namespace Infrastructure.DTOs
         public string ForHoliday { get; set; }
         [StringLength(1)]
         public string ForMembership { get; set; }
-        public bool IsForGame { get; set; }
         [StringLength(3)]
         public string DayFilter { get; set; }
         [StringLength(10)]

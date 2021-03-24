@@ -7,7 +7,7 @@ namespace Infrastructure.Models
     {
         public Promotion()
         {
-            GamePromoMapping = new HashSet<GamePromoMapping>();
+            GameItems = new HashSet<GameItems>();
             MemberLevelMapping = new HashSet<MemberLevelMapping>();
             PromotionChannelMapping = new HashSet<PromotionChannelMapping>();
             PromotionStoreMapping = new HashSet<PromotionStoreMapping>();
@@ -34,7 +34,6 @@ namespace Infrastructure.Models
         public string PaymentMethod { get; set; }
         public string ForHoliday { get; set; }
         public string ForMembership { get; set; }
-        public bool? IsForStore { get; set; }
         public string DayFilter { get; set; }
         public string HourFilter { get; set; }
         public string Rank { get; set; }
@@ -42,11 +41,10 @@ namespace Infrastructure.Models
         public bool DelFlg { get; set; }
         public DateTime? InsDate { get; set; }
         public DateTime? UpdDate { get; set; }
-        public bool IsForGame { get; set; }
 
         public virtual Brand Brand { get; set; }
         public virtual VoucherGroup VoucherGroup { get; set; }
-        public virtual ICollection<GamePromoMapping> GamePromoMapping { get; set; }
+        public virtual ICollection<GameItems> GameItems { get; set; }
         public virtual ICollection<MemberLevelMapping> MemberLevelMapping { get; set; }
         public virtual ICollection<PromotionChannelMapping> PromotionChannelMapping { get; set; }
         public virtual ICollection<PromotionStoreMapping> PromotionStoreMapping { get; set; }
