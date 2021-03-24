@@ -40,7 +40,7 @@ namespace PromotionEngineAPI.Controllers
                 pageSize: param.PageSize,
                 filter: el => !el.DelFlg
                 && el.VoucherName.ToLower().Contains(param.SearchContent.ToLower())
-                && el.BrandId.Equals(BrandId));
+                && el.BrandId.Equals(BrandId), includeProperties: "Promotion");
                     return Ok(resultNofilterVoucherType);
                 }
                 var result = await _service.GetAsync(pageIndex: param.PageIndex,
@@ -48,7 +48,8 @@ namespace PromotionEngineAPI.Controllers
                 filter: el => !el.DelFlg
                 && el.BrandId.Equals(BrandId)
                 && el.VoucherName.ToLower().Contains(param.SearchContent.ToLower().Trim())
-                && el.VoucherType.Equals(voucherType));
+                && el.VoucherType.Equals(voucherType),
+                includeProperties: "Promotion");
                 return Ok(result);
             }
             catch (ErrorObj e)
@@ -168,18 +169,17 @@ namespace PromotionEngineAPI.Controllers
 
         // DELETE: api/VoucherGroups/5
         [HttpDelete]
-        public async Task<IActionResult> DeleteVoucherGroup([FromQuery] Guid voucherGroupId, [FromQuery] Guid promotionId)
+        public async Task<IActionResult> DeleteVoucherGroup([FromQuery] Guid voucherGroupId)
         {
-            if (voucherGroupId.Equals(Guid.Empty) || promotionId.Equals(Guid.Empty))
+            if (voucherGroupId.Equals(Guid.Empty))
             {
                 return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
             }
             try
             {
-                //var result = await _service.DeleteVoucherGroup(id);
-                _workerService.DeleteVouchers(voucherGroupId: voucherGroupId, promotionId: promotionId);
-                //return Ok(result);
-                return Ok();
+                var result = await _service.DeleteVoucherGroup(voucherGroupId);
+                _workerService.DeleteVouchers(voucherGroupId: voucherGroupId);
+                return Ok(result);
             }
             catch (ErrorObj e)
             {

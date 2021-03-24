@@ -153,13 +153,10 @@ namespace ApplicationCore.Services
         {
             try
             {
-                //IVoucherRepository voucherRepo = new VoucherRepositoryImp();
-                // Delete vouchers
-                //voucherRepo.DeleteBulk(voucherGroupId: id);
-                // Delete voucher group
-                //_repository.Delete(id: id, filter: null);
-                //return await _unitOfWork.SaveAsync() > 0;
-                return true;
+                var group = await _repository.GetFirst(filter: o => o.VoucherGroupId.Equals(id));
+                group.DelFlg = true;
+                _repository.Update(group);
+                return await _unitOfWork.SaveAsync() > 0;
             }
             catch (Exception e)
             {

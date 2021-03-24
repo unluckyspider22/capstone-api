@@ -17,7 +17,7 @@ namespace ApplicationCore.Worker
     public interface IVoucherWorker
     {
         public void InsertVouchers(VoucherGroupDto voucherDto, bool isAddMore = false, List<Voucher> vouchersAdd = null);
-        public void DeleteVouchers(Guid voucherGroupId, Guid? promotionId);
+        public void DeleteVouchers(Guid voucherGroupId);
         public List<Voucher> GenerateVoucher(VoucherGroupDto dto);
     }
     public class VoucherWorker : IVoucherWorker
@@ -39,12 +39,12 @@ namespace ApplicationCore.Worker
             _mapper = mapper;
         }
 
-        public void DeleteVouchers(Guid voucherGroupId, Guid? promotionId)
+        public void DeleteVouchers(Guid voucherGroupId)
         {
             // Task item để notify cho client
             var item = new VoucherNotiObj()
             {
-                PromotionId = promotionId,
+                //PromotionId = promotionId,
                 VoucherGroupId = voucherGroupId,
                 IsDone = false,
                 Message = AppConstant.NotiMess.VOUCHER_DELETE_MESS + " " + AppConstant.NotiMess.PROCESSING_MESS,
@@ -58,7 +58,7 @@ namespace ApplicationCore.Worker
                  {
                      _logger.LogInformation("DeleteVouchers is starting.");
                      // Gửi notify processing task
-                     notify.ProcessingVoucher(item: item);
+                     //notify.ProcessingVoucher(item: item);
                      _taskQueue.QueueBackgroundWorkItem(async token =>
                      {
                          try
@@ -68,7 +68,7 @@ namespace ApplicationCore.Worker
                              item.Message = AppConstant.NotiMess.VOUCHER_DELETE_MESS + " " + AppConstant.NotiMess.PROCESSED_MESS;
                              item.IsDone = true;
                              // Gửi notify hoàn thành task
-                             await notify.ProcessedVoucher(item: item);
+                             //await notify.ProcessedVoucher(item: item);
                          }
                          catch (Exception e)
                          {
@@ -76,7 +76,7 @@ namespace ApplicationCore.Worker
                              item.Message = AppConstant.NotiMess.VOUCHER_DELETE_MESS + " " + AppConstant.NotiMess.ERROR_MESS;
                              item.IsDone = true;
                              // Gửi notify lỗi
-                             await notify.ErrorProcess(item: item);
+                             //await notify.ErrorProcess(item: item);
                          }
                      });
                  }
