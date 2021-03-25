@@ -1,33 +1,28 @@
 ﻿using ApplicationCore.Services;
 using Infrastructure.DTOs;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
-namespace PromotionEngineAPI.Controllers.GameItem
+namespace PromotionEngineAPI.Controllers
 {
-    [Route("api/game-item")]
+    [Route("api/game")]
     [ApiController]
-    public class GameItemController : ControllerBase
+    public class GameConfigController : ControllerBase
     {
-        private readonly IGameItemService _service;
-        private readonly IGameConfigService _gameService;
-        public GameItemController(IGameItemService service, IGameConfigService gameService)
+        private readonly IGameConfigService _service;
+
+        public GameConfigController(IGameConfigService service)
         {
             _service = service;
-            _gameService = gameService;
         }
-
         [HttpGet]
-        public async Task<IActionResult> GetGameItem([FromQuery] PagingRequestParam param, [FromQuery] Guid gameId)
+        public async Task<IActionResult> GetGame([FromQuery] PagingRequestParam param, [FromQuery] Guid brandId)
         {
             try
             {
                 var result = await _service.GetAsync(pageIndex: param.PageIndex, pageSize: param.PageSize,
-                    filter: o => o.GameId.Equals(gameId) && !o.DelFlg);
+                    filter: o => o.BrandId.Equals(brandId) && !o.DelFlg);
                 return Ok(result);
             }
             catch (ErrorObj e)
@@ -37,14 +32,9 @@ namespace PromotionEngineAPI.Controllers.GameItem
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateGameItem([FromBody] GameItemDto dto)
+        public async Task<IActionResult> UpdateGame([FromBody] GameConfigDto dto)
         {
-            if (dto.Id.Equals(Guid.Empty) || dto.GameId.Equals(Guid.Empty))
-            {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
-            }
-            var isExistGame = await _gameService.GetFirst(filter: o => o.Id.Equals(dto.GameId) && !o.DelFlg) != null;
-            if (!isExistGame)
+            if (dto.BrandId.Equals(Guid.Empty))
             {
                 return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
             }
@@ -61,17 +51,13 @@ namespace PromotionEngineAPI.Controllers.GameItem
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateGameItem([FromBody] GameItemDto dto)
+        public async Task<IActionResult> CreateGame([FromBody] GameConfigDto dto)
         {
-            if (dto.GameId.Equals(Guid.Empty))
+            if (dto.BrandId.Equals(Guid.Empty))
             {
                 return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
             }
-            var isExistGame = await _gameService.GetFirst(filter: o => o.Id.Equals(dto.GameId) && !o.DelFlg) != null;
-            if (!isExistGame)
-            {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
-            }
+
             try
             {
                 dto.UpdDate = DateTime.Now;

@@ -134,10 +134,12 @@ namespace Infrastructure.AutoMapper
 
             CreateMap<MemberLevelMapping, MemberLevelMappingDto>();
             CreateMap<MemberLevelMappingDto, MemberLevelMapping>();
-            CreateMap<Game, GameDto>();
-            CreateMap<GameDto, Game>();
+            CreateMap<GameConfig, GameConfigDto>();
+            CreateMap<GameConfigDto, GameConfig>();
             CreateMap<GameItemDto, GameItems>();
             CreateMap<GameItems, GameItemDto>();
+            CreateMap<GameMasterDto, GameMaster>();
+            CreateMap<GameMaster, GameMasterDto>();
 
         }
     }

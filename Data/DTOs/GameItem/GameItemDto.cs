@@ -2,7 +2,7 @@
 
 namespace Infrastructure.DTOs
 {
-    public class GameItemDto
+    public class GameItemDto : BaseDto
     {
         public Guid Id { get; set; }
         public Guid PromotionId { get; set; }

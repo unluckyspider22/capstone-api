@@ -4,25 +4,25 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 
-namespace PromotionEngineAPI.Controllers
+namespace PromotionEngineAPI.Controllers.GameMaster
 {
-    [Route("api/game")]
+    [Route("api/game-master")]
     [ApiController]
-    public class GameController : ControllerBase
+    public class GameMasterController : ControllerBase
     {
-        private readonly IGameService _service;
-
-        public GameController(IGameService service)
+        private readonly IGameMasterService _service;
+        public GameMasterController(IGameMasterService service)
         {
             _service = service;
         }
+
         [HttpGet]
-        public async Task<IActionResult> GetGame([FromQuery] PagingRequestParam param, [FromQuery] Guid brandId)
+        public async Task<IActionResult> GetGameMaster([FromQuery] PagingRequestParam param)
         {
             try
             {
                 var result = await _service.GetAsync(pageIndex: param.PageIndex, pageSize: param.PageSize,
-                    filter: o => o.BrandId.Equals(brandId) && !o.DelFlg);
+                    filter: o => !o.DelFlg);
                 return Ok(result);
             }
             catch (ErrorObj e)
@@ -32,14 +32,16 @@ namespace PromotionEngineAPI.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateGame([FromBody] GameDto dto)
+        public async Task<IActionResult> UpdateGameMaster([FromBody] GameMasterDto dto)
         {
-            if (dto.BrandId.Equals(Guid.Empty))
+            if (dto.Id.Equals(Guid.Empty))
             {
                 return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
             }
             try
             {
+                dto.UpdDate = DateTime.Now;
+                dto.InsDate = null;
                 var result = await _service.UpdateAsync(dto);
                 return Ok(result);
             }
@@ -50,15 +52,12 @@ namespace PromotionEngineAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateGame([FromBody] GameDto dto)
+        public async Task<IActionResult> CreateGameMaster([FromBody] GameMasterDto dto)
         {
-            if (dto.BrandId.Equals(Guid.Empty))
-            {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
-            }
-
             try
             {
+                dto.UpdDate = DateTime.Now;
+                dto.InsDate = DateTime.Now;
                 var result = await _service.CreateAsync(dto);
                 return Ok(result);
             }
@@ -70,7 +69,7 @@ namespace PromotionEngineAPI.Controllers
 
         [HttpDelete]
         [Route("{id}")]
-        public async Task<IActionResult> DeleteGame([FromRoute] Guid id)
+        public async Task<IActionResult> DeleteGameMaster([FromRoute] Guid id)
         {
             if (id.Equals(Guid.Empty))
             {

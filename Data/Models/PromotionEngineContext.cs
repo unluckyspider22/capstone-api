@@ -1,6 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Models
 {
@@ -23,8 +21,9 @@ namespace Infrastructure.Models
         public virtual DbSet<ConditionGroup> ConditionGroup { get; set; }
         public virtual DbSet<ConditionRule> ConditionRule { get; set; }
         public virtual DbSet<Device> Device { get; set; }
-        public virtual DbSet<Game> Game { get; set; }
+        public virtual DbSet<GameConfig> GameConfig { get; set; }
         public virtual DbSet<GameItems> GameItems { get; set; }
+        public virtual DbSet<GameMaster> GameMaster { get; set; }
         public virtual DbSet<Holiday> Holiday { get; set; }
         public virtual DbSet<MemberLevel> MemberLevel { get; set; }
         public virtual DbSet<MemberLevelMapping> MemberLevelMapping { get; set; }
@@ -341,7 +340,7 @@ namespace Infrastructure.Models
                     .HasConstraintName("FK_Device_Store");
             });
 
-            modelBuilder.Entity<Game>(entity =>
+            modelBuilder.Entity<GameConfig>(entity =>
             {
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
@@ -358,7 +357,7 @@ namespace Infrastructure.Models
                     .HasDefaultValueSql("(getdate())");
 
                 entity.HasOne(d => d.Brand)
-                    .WithMany(p => p.Game)
+                    .WithMany(p => p.GameConfig)
                     .HasForeignKey(d => d.BrandId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Game_Brand");
@@ -393,6 +392,23 @@ namespace Infrastructure.Models
                     .HasForeignKey(d => d.PromotionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_GameItems_Promotion");
+            });
+
+            modelBuilder.Entity<GameMaster>(entity =>
+            {
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.InsDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.UpdDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
             });
 
             modelBuilder.Entity<Holiday>(entity =>

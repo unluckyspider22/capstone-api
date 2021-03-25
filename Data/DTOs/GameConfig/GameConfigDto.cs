@@ -2,12 +2,12 @@
 
 namespace Infrastructure.DTOs
 {
-    public class GameDto
+    public class GameConfigDto : BaseDto
     {
         public Guid Id { get; set; }
         public Guid BrandId { get; set; }
+        public Guid GameMasterId { get; set; }
         public string Name { get; set; }
-        public int MinItem { get; set; } = 1;
-        public int MaxItem { get; set; } = 1;
+        public int Quantity { get; set; } = 1;
     }
 }

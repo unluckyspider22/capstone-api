@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using Infrastructure.Models;
+﻿using Infrastructure.Models;
 using Infrastructure.Repository;
+using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Infrastructure.UnitOrWork
 {
@@ -84,11 +82,12 @@ namespace Infrastructure.UnitOrWork
         public IGenericRepository<PostActionProductMapping> PostActionProductMappingRepository { get; set; }
         public IGenericRepository<ProductConditionMapping> ProductConditionMappingRepository { get; set; }
 
-        public IGenericRepository<Game> GameRepository { get; set; }
+        public IGenericRepository<GameConfig> GameConfigRepository { get; set; }
 
         public IGenericRepository<GameItems> GameItemsRepository { get; set; }
 
-        public IGenericRepository<GamePromoMapping> GamePromoMappingRepository { get; set; }
+        public IGenericRepository<GameMaster> GameMasterRepository { get; set; }
+
 
         private void initRepository()
         {
@@ -140,9 +139,9 @@ namespace Infrastructure.UnitOrWork
             MemberLevelMappingRepository = new GenericRepository<MemberLevelMapping>(_context);
             PostActionProductMappingRepository = new GenericRepository<PostActionProductMapping>(_context);
             ProductConditionMappingRepository = new GenericRepository<ProductConditionMapping>(_context);
-            GameRepository = new GenericRepository<Game>(_context);
+            GameMasterRepository = new GenericRepository<GameMaster>(_context);
+            GameConfigRepository = new GenericRepository<GameConfig>(_context);
             GameItemsRepository = new GenericRepository<GameItems>(_context);
-            GamePromoMappingRepository = new GenericRepository<GamePromoMapping>(_context);
         }
         public void Dispose()
         {

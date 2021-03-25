@@ -211,7 +211,7 @@ namespace ApplicationCore.Services
                 var result = await _unitOfWork.SaveAsync();
                 if (result > 0)
                 {
-                    
+
                     var promotionTiers = await tierRepo.Get(filter: o => o.PromotionId.Equals(param.PromotionId));
                     for (int i = 0; i < promotionTiers.Count(); i++)
                     {
@@ -1211,7 +1211,7 @@ namespace ApplicationCore.Services
                 #region Update DelFlag của promotion
                 var promo = await _repository.GetFirst(filter: o => o.PromotionId.Equals(promotionId));
                 promo.DelFlg = true;
-   
+
                 _repository.Update(promo);
                 //await _unitOfWork.SaveAsync();
                 #endregion
@@ -1245,9 +1245,9 @@ namespace ApplicationCore.Services
                 #region Xóa tier
                 IGenericRepository<PromotionTier> tierRepo = _unitOfWork.PromotionTierRepository;
                 var tierList = (await tierRepo.Get(filter: o => o.PromotionId.Equals(promotionId))).ToList();
-                if (tierList != null && tierList.Count > 0) 
+                if (tierList != null && tierList.Count > 0)
                 {
-                    foreach(var tier in tierList)
+                    foreach (var tier in tierList)
                     {
                         promo.PromotionTier.Remove(tier);
                         _repository.Update(promo);
