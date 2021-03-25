@@ -365,11 +365,15 @@ namespace PromotionEngineAPI.Controllers
 
         [HttpGet]
         [Route("check-exist-promoCode/{promoCode}")]
-        public async Task<IActionResult> CheckExistPromoCode(string promoCode)
+        public async Task<IActionResult> CheckExistPromoCode(string promoCode, Guid brandId)
         {
+            if (brandId.Equals(Guid.Empty))
+            {
+                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+            }
             try
             {
-                return Ok(await _promotionService.ExistPromoCode(promoCode: promoCode));
+                return Ok(await _promotionService.ExistPromoCode(promoCode: promoCode, brandId: brandId));
             }
             catch (ErrorObj e)
             {
