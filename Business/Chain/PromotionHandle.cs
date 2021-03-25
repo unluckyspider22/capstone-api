@@ -46,12 +46,22 @@ namespace ApplicationCore.Chain
                         HandleGender(promotion, order);
                         acceptPromotions.Add(promotion);
                     }
-                    catch (ErrorObj e)
+                    catch (ErrorObj)
                     {
                         invalidPromotions++;
                         if (invalidPromotions == _promotions.Count())
                         {
-                            throw e;
+                            if (order.Effects == null)
+                            {
+                                order.Effects = new List<Effect>();
+                            }
+                            order.Effects.Add(new Effect
+                            {
+                                Prop = new
+                                {
+                                    value = AppConstant.EffectMessage.NoAutoPromotion
+                                }
+                            });
                         }
                     }
                 }

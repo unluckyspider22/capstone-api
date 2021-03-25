@@ -206,6 +206,9 @@ namespace Infrastructure.Helper
             public const string AddPoint = "addPoint";
 
             public const string AddGift = "addGift";
+            //Không có automatic promotion nào cả
+            public const string NoAutoPromotion = "noAutoPromotion";
+
 
         }
         public class Operator

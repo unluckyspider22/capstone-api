@@ -5,6 +5,7 @@ using Infrastructure.Helper;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
@@ -88,6 +89,59 @@ namespace PromotionEngineAPI.Controllers
                 return StatusCode(statusCode: e.Code, orderInfo);
             }
             return Ok(prepareModel);
+        }
+        [HttpPost]
+        [Route("check-promotion")]
+        public async Task<IActionResult> CheckPromotion([FromBody] CustomerOrderInfo orderInfo, [FromQuery] Guid promotionId)
+        {
+            //Lấy promotion bởi voucher code
+            OrderResponseModel responseModel = new OrderResponseModel();
+            var vouchers = orderInfo.Vouchers;
+            try
+            {
+                List<Promotion> promotions = null;
+                try
+                {
+                    orderInfo.Vouchers = new List<CouponCode>();
+                    promotions = await _promotionService.GetAutoPromotions(orderInfo, promotionId);
+                    if (promotions != null && promotions.Count() > 0)
+                    {
+                        responseModel.CustomerOrderInfo = orderInfo;
+                        _promotionService.SetPromotions(promotions);
+                        //Check promotion
+                        responseModel = await _promotionService.HandlePromotion(responseModel);
+
+                        promotions = _promotionService.GetPromotions();
+
+                        if (promotions.Count > 1)
+                        {
+                            return Ok(responseModel);
+                        }
+                    }
+                }
+                catch (ErrorObj)
+                {
+                }
+                if (vouchers != null && vouchers.Count() > 0)
+                {
+                    orderInfo.Vouchers = vouchers;
+                    promotions = await _voucherService.CheckVoucher(orderInfo);
+                    if (promotions != null && promotions.Count() > 0)
+                    {
+                        responseModel.CustomerOrderInfo = orderInfo;
+
+                        _promotionService.SetPromotions(promotions);
+                        //Check promotion
+                        responseModel = await _promotionService.HandlePromotion(responseModel);
+                    }
+                }
+
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+            return Ok(responseModel);
         }
 
         [HttpGet]
