@@ -26,7 +26,7 @@ namespace ApplicationCore.Services
         Task<List<Promotion>> GetAutoPromotions(CustomerOrderInfo orderInfo, Guid promotionId);
         List<Promotion> GetPromotions();
 
-        Task<bool> ExistPromoCode(string promoCode, Guid brandId);
+        Task<bool> ExistPromoCode(string promoCode);
 
         Task<bool> DeletePromotion(Guid promotionId);
 
