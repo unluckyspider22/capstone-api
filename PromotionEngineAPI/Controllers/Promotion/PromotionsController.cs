@@ -376,6 +376,22 @@ namespace PromotionEngineAPI.Controllers
                 return StatusCode(statusCode: e.Code, e);
             }
         }
+        [HttpGet]
+        [Route("for-game-config/{brandId}")]
+        public async Task<IActionResult> GetPromotionForGameConfig([FromRoute] Guid brandId)
+        {
+            try
+            {
+                return Ok(await _promotionService.GetAsync(filter: o => o.BrandId.Equals(brandId)
+                                && o.Status != AppConstant.EnvVar.PromotionStatus.DRAFT
+                                && o.Status != AppConstant.EnvVar.PromotionStatus.EXPIRED
+                                && !o.DelFlg));
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
     }
 
 }

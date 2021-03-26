@@ -3,7 +3,7 @@ using Infrastructure.Models;
 
 namespace ApplicationCore.Services
 {
-    public interface IGameItemService :IBaseService<GameItems, GameItemDto>
+    public interface IGameItemService : IBaseService<GameItems, GameItemDto>
     {
     }
 }

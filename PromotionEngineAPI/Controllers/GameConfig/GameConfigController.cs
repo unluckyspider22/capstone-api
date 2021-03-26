@@ -6,18 +6,20 @@ using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers
 {
-    [Route("api/game")]
+    [Route("api/game-config")]
     [ApiController]
     public class GameConfigController : ControllerBase
     {
         private readonly IGameConfigService _service;
+        private readonly IGameItemService _itemService;
 
-        public GameConfigController(IGameConfigService service)
+        public GameConfigController(IGameConfigService service, IGameItemService itemService)
         {
             _service = service;
+            _itemService = itemService;
         }
         [HttpGet]
-        public async Task<IActionResult> GetGame([FromQuery] PagingRequestParam param, [FromQuery] Guid brandId)
+        public async Task<IActionResult> GetGameConfig([FromQuery] PagingRequestParam param, [FromQuery] Guid brandId)
         {
             try
             {
@@ -32,9 +34,9 @@ namespace PromotionEngineAPI.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateGame([FromBody] GameConfigDto dto)
+        public async Task<IActionResult> UpdateGame([FromBody] GameConfigDto dto, [FromQuery] Guid gameConfigId)
         {
-            if (dto.BrandId.Equals(Guid.Empty))
+            if (dto.BrandId.Equals(Guid.Empty) || !dto.Id.Equals(gameConfigId) || gameConfigId.Equals(Guid.Empty))
             {
                 return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
             }
@@ -73,7 +75,7 @@ namespace PromotionEngineAPI.Controllers
 
         [HttpDelete]
         [Route("{id}")]
-        public async Task<IActionResult> DeleteGame([FromRoute] Guid id)
+        public async Task<IActionResult> DeleteGameConfig([FromRoute] Guid id)
         {
             if (id.Equals(Guid.Empty))
             {
@@ -81,7 +83,27 @@ namespace PromotionEngineAPI.Controllers
             }
             try
             {
-                var result = await _service.DeleteAsync(id);
+                var result = await _service.DeleteGameConfig(id);
+                return Ok(result);
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
+
+        [HttpGet]
+        [Route("info")]
+        public async Task<IActionResult> GetGameConfigInfo([FromQuery] Guid gameConfigId, [FromQuery] Guid brandId)
+        {
+            if (gameConfigId.Equals(Guid.Empty) || brandId.Equals(Guid.Empty))
+            {
+                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+            }
+            try
+            {
+                var result = await _service.GetFirst(filter: o => o.Id.Equals(gameConfigId) && o.BrandId.Equals(brandId) && !o.DelFlg,
+                    includeProperties: "GameItems");
                 return Ok(result);
             }
             catch (ErrorObj e)
