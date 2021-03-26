@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Infrastructure.DTOs
 {
@@ -9,5 +10,6 @@ namespace Infrastructure.DTOs
         public Guid GameMasterId { get; set; }
         public string Name { get; set; }
         public int Quantity { get; set; } = 1;
+        public virtual ICollection<GameItemDto> GameItems { get; set; }
     }
 }
