@@ -85,7 +85,8 @@ namespace PromotionEngineAPI.Controllers
             bool isExisting = false;
             var store = await _service.GetFirst(filter: el =>
                     el.StoreCode == param.StoreCode
-                    && el.BrandId == param.BrandID);
+                    && el.BrandId == param.BrandID
+                    && !el.DelFlg);
             if (store != null)
             {
                 isExisting = true;

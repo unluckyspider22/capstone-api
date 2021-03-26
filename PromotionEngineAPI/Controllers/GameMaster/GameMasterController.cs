@@ -32,8 +32,13 @@ namespace PromotionEngineAPI.Controllers.GameMaster
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateGameMaster([FromBody] GameMasterDto dto)
+        [Route("{id}")]
+        public async Task<IActionResult> UpdateGameMaster([FromBody] GameMasterDto dto, [FromRoute] Guid id)
         {
+            if (id != dto.Id)
+            {
+                return NotFound();
+            }
             if (dto.Id.Equals(Guid.Empty))
             {
                 return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);

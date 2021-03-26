@@ -49,7 +49,8 @@ namespace PromotionEngineAPI.Controllers
             bool isExisting = false;
             var channel = await _service.GetFirst(filter: el =>
                     el.ChannelCode == param.ChannelCode
-                    && el.BrandId == param.BrandID);
+                    && el.BrandId == param.BrandID
+                    && !el.DelFlg);
             if (channel != null)
             {
                 isExisting = true;
