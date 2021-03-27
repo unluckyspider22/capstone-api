@@ -55,6 +55,8 @@ namespace ApplicationCore.Services
                     && !el.IsUsed,
                     includeProperties:
                     "VoucherGroup.Promotion.PromotionTier.Action.ActionProductMapping.Product," +
+                    "VoucherGroup.Promotion.PromotionTier.PostAction.PostActionProductMapping.Product," +
+                    "VoucherGroup.Promotion.PromotionTier.Action.ActionProductMapping.Product," +
                     "VoucherGroup.Promotion.PromotionTier.ConditionRule.ConditionGroup.OrderCondition," +
                     "VoucherGroup.Promotion.PromotionTier.ConditionRule.ConditionGroup.ProductCondition.ProductConditionMapping.Product," +
                     "VoucherGroup.Promotion.PromotionStoreMapping.Store," +

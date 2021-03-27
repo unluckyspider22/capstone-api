@@ -21,6 +21,7 @@ namespace ApplicationCore.Request
         public decimal? Discount { get; set; }
         public decimal? DiscountOrderDetail { get; set; }
         public decimal? FinalAmount { get; set; }
+        public decimal? BonusPoint { get; set; }
 
     }
     public class Effect
