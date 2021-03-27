@@ -24,6 +24,8 @@ namespace ApplicationCore.Services
         private readonly IConditionRuleService _conditionRuleService;
         private readonly IHolidayService _holidayService;
         private readonly ITimeframeHandle _timeframeHandle;
+        private readonly IDeviceService _deviceService;
+        private readonly IGameConfigService _gameConfigService;
         private List<Promotion> _promotions;
 
         public PromotionService(
@@ -32,12 +34,16 @@ namespace ApplicationCore.Services
             IApplyPromotionHandler promotionHandle,
             IConditionRuleService conditionRuleService,
             IHolidayService holidayService,
-            ITimeframeHandle timeframeHandle) : base(unitOfWork, mapper)
+            ITimeframeHandle timeframeHandle,
+            IDeviceService deviceService,
+            IGameConfigService gameConfigService) : base(unitOfWork, mapper)
         {
             _applyPromotionHandler = promotionHandle;
             _conditionRuleService = conditionRuleService;
             _holidayService = holidayService;
             _timeframeHandle = timeframeHandle;
+            _deviceService = deviceService;
+            _gameConfigService = gameConfigService;
         }
 
         protected override IGenericRepository<Promotion> _repository => _unitOfWork.PromotionRepository;
@@ -1261,6 +1267,59 @@ namespace ApplicationCore.Services
             {
                 Debug.WriteLine(e.InnerException);
                 throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.", description: "Internal Server Error");
+            }
+        }
+
+        public async Task<List<GameItemDto>> GetPromotionForGames(string deviceCode, string brandCode)
+        {
+            try
+            {
+                List<GameItemDto> gameItemDtos = null;
+
+                var device = await _deviceService.GetFirst(filter: el =>
+                        el.Code == deviceCode
+                        && !el.DelFlg
+                        && el.GameConfigId != null
+                        && el.Store.Brand.BrandCode == brandCode,
+                        includeProperties: "Store.Brand");
+                if (device != null)
+                {
+                    var gameConfig = await _gameConfigService.GetFirst(filter: el =>
+                        el.Id == device.GameConfigId,
+                        includeProperties: "GameItems.Promotion");
+
+                    var gameItems = gameConfig.GameItems.Where(w => w.Promotion.Status.Equals(AppConstant.EnvVar.PromotionStatus.PUBLISH)
+                    && !w.Promotion.DelFlg
+                    );
+
+                    if (gameConfig != null && gameItems.Count() > 0)
+                    {
+                        foreach (var gameItem in gameItems)
+                        {
+                            var dto = _mapper.Map<GameItemDto>(gameItem);
+                            if (gameItemDtos == null)
+                            {
+                                gameItemDtos = new List<GameItemDto>();
+                            }
+                            gameItemDtos.Add(dto);
+                        }
+                        var totalPriority = gameConfig.GameItems.Sum(s => s.Priority);
+
+                        //Tính tỷ lệ cho từng item
+                        gameItemDtos = gameItemDtos.Select(
+                            el =>
+                            {
+                                el.Ratio = (decimal)(el.Priority * 1.0 / totalPriority * 1.0);
+                                return el;
+                            }).ToList();
+
+                    }
+                }
+                return gameItemDtos;
+            }
+            catch (Exception e)
+            {
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
         }
     }
