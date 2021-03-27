@@ -1332,11 +1332,15 @@ namespace ApplicationCore.Services
                 {
                     var gameConfig = await _gameConfigService.GetFirst(filter: el =>
                         el.Id == device.GameConfigId,
-                        includeProperties: "GameItems");
+                        includeProperties: "GameItems.Promotion");
 
-                    if (gameConfig != null && gameConfig.GameItems.Count() > 0)
+                    var gameItems = gameConfig.GameItems.Where(w => w.Promotion.Status.Equals(AppConstant.EnvVar.PromotionStatus.PUBLISH)
+                    && !w.Promotion.DelFlg
+                    );
+
+                    if (gameConfig != null && gameItems.Count() > 0)
                     {
-                        foreach (var gameItem in gameConfig.GameItems)
+                        foreach (var gameItem in gameItems)
                         {
                             var dto = _mapper.Map<GameItemDto>(gameItem);
                             if (gameItemDtos == null)
