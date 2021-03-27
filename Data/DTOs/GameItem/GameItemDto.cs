@@ -8,6 +8,7 @@ namespace Infrastructure.DTOs
         public Guid PromotionId { get; set; }
         public Guid GameId { get; set; }
         public int Priority { get; set; }
+        public decimal Ratio { get; set; }
         public string DisplayText { get; set; }
         public string Description { get; set; }
     }

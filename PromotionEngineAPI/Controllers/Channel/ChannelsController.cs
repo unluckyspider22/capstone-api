@@ -47,14 +47,10 @@ namespace PromotionEngineAPI.Controllers
         public async Task<IActionResult> CheckEmailExisting([FromBody] DuplicateParam param)
         {
             bool isExisting = false;
-            var channel = await _service.GetFirst(filter: el =>
-                    el.ChannelCode == param.ChannelCode
-                    && el.BrandId == param.BrandID
-                    && !el.DelFlg);
-            if (channel != null)
-            {
-                isExisting = true;
-            }
+            isExisting = (await _service.GetAsync(filter: el =>
+                    el.BrandId == param.BrandID
+                   && (param.ChannelId != Guid.Empty ? (el.ChannelId == param.ChannelId && el.ChannelCode != param.ChannelCode) : (el.ChannelCode == param.ChannelCode))
+                   && !el.DelFlg)).Data.Count > 0;
             return Ok(isExisting);
         }
         // GET: api/Channels/count

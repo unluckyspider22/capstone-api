@@ -30,5 +30,6 @@ namespace ApplicationCore.Services
 
         Task<bool> DeletePromotion(Guid promotionId);
 
+        Task<List<GameItemDto>> GetPromotionForGames(string deviceCode, string brandCode);
     }
 }
