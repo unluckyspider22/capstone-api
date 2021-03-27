@@ -85,7 +85,7 @@ namespace PromotionEngineAPI.Controllers
             bool isExisting = false;
             isExisting = (await _service.GetAsync(filter: el =>
                     el.BrandId == param.BrandID
-                   && (param.StoreId != Guid.Empty ? (el.StoreId == param.StoreId && el.StoreCode != param.ChannelCode) : (el.StoreCode == param.ChannelCode))
+                   && (param.StoreId != Guid.Empty ? (el.StoreId == param.StoreId && el.StoreCode != param.StoreCode) : (el.StoreCode == param.StoreCode))
                    && !el.DelFlg)).Data.Count > 0;
             return Ok(isExisting);
         }
