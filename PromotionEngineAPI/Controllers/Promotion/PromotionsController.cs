@@ -117,7 +117,7 @@ namespace PromotionEngineAPI.Controllers
                 orderInfo.Vouchers = vouchers;
                 if (vouchers != null && vouchers.Count() > 0)
                 {
-                
+
                     promotions = await _voucherService.CheckVoucher(orderInfo);
                     if (promotions != null && promotions.Count() > 0)
                     {
@@ -132,6 +132,7 @@ namespace PromotionEngineAPI.Controllers
             }
             catch (ErrorObj e)
             {
+                e.Data.Add("order", responseModel);
                 return StatusCode(statusCode: e.Code, e);
             }
             return Ok(responseModel);
