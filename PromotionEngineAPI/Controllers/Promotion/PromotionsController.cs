@@ -100,31 +100,28 @@ namespace PromotionEngineAPI.Controllers
             try
             {
                 List<Promotion> promotions = null;
-                try
+
+                orderInfo.Vouchers = new List<CouponCode>();
+                promotions = await _promotionService.GetAutoPromotions(orderInfo, promotionId);
+                if (promotions != null && promotions.Count() > 0)
                 {
-                    orderInfo.Vouchers = new List<CouponCode>();
-                    promotions = await _promotionService.GetAutoPromotions(orderInfo, promotionId);
-                    if (promotions != null && promotions.Count() > 0)
+                    responseModel.CustomerOrderInfo = orderInfo;
+                    _promotionService.SetPromotions(promotions);
+                    //Check promotion
+                    responseModel = await _promotionService.HandlePromotion(responseModel);
+
+                    promotions = _promotionService.GetPromotions();
+
+                    if (promotions.Count > 1)
                     {
-                        responseModel.CustomerOrderInfo = orderInfo;
-                        _promotionService.SetPromotions(promotions);
-                        //Check promotion
-                        responseModel = await _promotionService.HandlePromotion(responseModel);
-
-                        promotions = _promotionService.GetPromotions();
-
-                        if (promotions.Count > 1)
-                        {
-                            return Ok(responseModel);
-                        }
+                        return Ok(responseModel);
                     }
                 }
-                catch (ErrorObj)
-                {
-                }
+
+                orderInfo.Vouchers = vouchers;
                 if (vouchers != null && vouchers.Count() > 0)
                 {
-                    orderInfo.Vouchers = vouchers;
+                
                     promotions = await _voucherService.CheckVoucher(orderInfo);
                     if (promotions != null && promotions.Count() > 0)
                     {

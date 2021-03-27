@@ -44,12 +44,12 @@ namespace PromotionEngineAPI.Controllers
         }
         [HttpPost]
         [Route("checkChannelCodeExist")]
-        public async Task<IActionResult> CheckEmailExisting([FromBody] DuplicateParam param)
+        public async Task<IActionResult> CheckChannelExisting([FromBody] DuplicateParam param)
         {
             bool isExisting = false;
             isExisting = (await _service.GetAsync(filter: el =>
                     el.BrandId == param.BrandID
-                   && (param.ChannelId != Guid.Empty ? (el.ChannelId == param.ChannelId && el.ChannelCode != param.ChannelCode) : (el.ChannelCode == param.ChannelCode) && !el.DelFlg)
+                   && (param.ChannelId != Guid.Empty ? (el.ChannelId != param.ChannelId && el.ChannelCode == param.ChannelCode) : (el.ChannelCode == param.ChannelCode) && !el.DelFlg)
                    && !el.DelFlg)).Data.Count > 0;
             return Ok(isExisting);
         }
