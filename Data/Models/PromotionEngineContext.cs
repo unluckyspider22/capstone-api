@@ -577,10 +577,6 @@ namespace Infrastructure.Models
 
                 entity.Property(e => e.GiftQuantity).HasColumnType("decimal(6, 0)");
 
-                entity.Property(e => e.GiftVoucherCode)
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
-
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
