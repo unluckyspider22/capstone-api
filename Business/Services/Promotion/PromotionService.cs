@@ -584,6 +584,13 @@ namespace ApplicationCore.Services
                     IPromotionRepository promotionRepo = new PromotionRepositoryImp();
                     await promotionRepo.SetUnlimitedDate(_mapper.Map<Promotion>(dto));
                 }
+                if (dto.MemberLevelMapping != null)
+                {
+                    await DeleteAndAddMemberLevelMapp(promotionId: dto.PromotionId, levels: dto.MemberLevelMapping.ToList());
+                    dto.MemberLevelMapping = null;
+                }
+                
+              
                 var entity = _mapper.Map<Promotion>(dto);
                 _repository.Update(entity);
                 await _unitOfWork.SaveAsync();
@@ -593,7 +600,27 @@ namespace ApplicationCore.Services
             {
                 throw new ErrorObj(code: 500, message: ex.Message);
             }
-
+        }
+        private async Task<bool> DeleteAndAddMemberLevelMapp(Guid promotionId, List<MemberLevelMappingDto> levels)
+        {
+            try
+            {
+                IGenericRepository<MemberLevelMapping> mapRepo = _unitOfWork.MemberLevelMappingRepository;
+                mapRepo.Delete(id: Guid.Empty, filter: o => o.PromotionId.Equals(promotionId));
+                await _unitOfWork.SaveAsync();
+                foreach (var level in levels)
+                {
+                    level.Id = Guid.NewGuid();
+                    level.InsDate = DateTime.Now;
+                    level.UpdDate = DateTime.Now;
+                    mapRepo.Add(_mapper.Map<MemberLevelMapping>(level));
+                }
+                return await _unitOfWork.SaveAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw new ErrorObj(code: 500, message: ex.Message);
+            }
 
         }
         #endregion
@@ -1257,7 +1284,7 @@ namespace ApplicationCore.Services
                     {
                         promo.PromotionTier.Remove(tier);
                         _repository.Update(promo);
-                     
+
                     }
                 }
                 #endregion

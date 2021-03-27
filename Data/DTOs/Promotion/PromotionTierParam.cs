@@ -64,8 +64,7 @@ namespace Infrastructure.DTOs
         public string GiftProductCode { get; set; }
         [StringLength(100)]
         public string GiftName { get; set; }
-        [StringLength(100)]
-        public string GiftVoucherCode { get; set; }
+        public Guid GiftPromotionId { get; set; }
         [Range(0.00, 9999999999.00)]
         public decimal? BonusPoint { get; set; }
         public List<Guid> ListProduct { get; set; }

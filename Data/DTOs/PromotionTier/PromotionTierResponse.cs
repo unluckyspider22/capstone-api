@@ -49,7 +49,7 @@ namespace Infrastructure.DTOs
         public decimal? GiftQuantity { get; set; }
         public string GiftProductCode { get; set; }
         public string GiftName { get; set; }
-        public string GiftVoucherCode { get; set; }
+        public Guid? GiftPromotionId { get; set; }
         public decimal? BonusPoint { get; set; }
         public List<ProductDto> productList { get; set; }
     }

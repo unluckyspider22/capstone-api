@@ -20,15 +20,18 @@ namespace PromotionEngineAPI.Controllers
         private readonly IPromotionService _promotionService;
         private readonly IVoucherService _voucherService;
         private readonly IPromotionStoreMappingService _promotionStoreMappingService;
+        private readonly IMemberLevelService _memberLevelService;
 
 
         public PromotionsController(IPromotionService promotionService,
             IPromotionStoreMappingService promotionStoreMappingService,
-            IVoucherService voucherService)
+            IVoucherService voucherService,
+            IMemberLevelService memberLevelService)
         {
             _promotionService = promotionService;
             _promotionStoreMappingService = promotionStoreMappingService;
             _voucherService = voucherService;
+            _memberLevelService = memberLevelService;
         }
 
         [HttpPost]
