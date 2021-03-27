@@ -89,6 +89,8 @@ namespace ApplicationCore.Request
         public decimal Discount { get; set; }
         public decimal DiscountFromOrder { get; set; }
         public decimal FinalAmount { get; set; }
+
+        public string UrlImg { get; set; }
     }
     public class Customer
     {
