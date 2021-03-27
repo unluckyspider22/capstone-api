@@ -239,7 +239,7 @@ namespace PromotionEngineAPI.Controllers
             try
             {
                 return Ok(await _promotionService.GetFirst(filter: el => el.PromotionId.Equals(id) && !el.DelFlg,
-                    includeProperties: "VoucherGroup,PromotionChannelMapping,PromotionStoreMapping"));
+                    includeProperties: "VoucherGroup,PromotionChannelMapping,PromotionStoreMapping,MemberLevelMapping"));
             }
             catch (ErrorObj e)
             {
