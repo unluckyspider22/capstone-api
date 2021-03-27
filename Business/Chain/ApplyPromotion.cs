@@ -1,4 +1,5 @@
 ﻿using ApplicationCore.Request;
+using ApplicationCore.Services;
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
 using Infrastructure.Models;
@@ -18,10 +19,17 @@ namespace ApplicationCore.Chain
     public class ApplyPromotion : IApplyPromotion
     {
         private List<Promotion> _promotions;
+        private readonly IVoucherService _voucherService;
         public void SetPromotions(List<Promotion> promotions)
         {
             _promotions = promotions;
         }
+
+        public ApplyPromotion(IVoucherService voucherService)
+        {
+            _voucherService = voucherService;
+        }
+
         public void Apply(OrderResponseModel order)
         {
             order.TotalAmount = order.CustomerOrderInfo.Amount + order.CustomerOrderInfo.ShippingFee;
@@ -56,7 +64,7 @@ namespace ApplicationCore.Chain
                             AddGift(order, postAction, promotion);
                             break;
                         case AppConstant.EnvVar.ActionType.BonusPoint:
-                            DiscountProduct(order, action);
+                            AddPoint(order, postAction, promotion);
                             break;
 
                     }
@@ -65,6 +73,7 @@ namespace ApplicationCore.Chain
                 SetFinalAmountApply(order);
             }
         }
+        #region Filter Action & Post Action
         private PostAction FilterPostAction(List<PostAction> postActions)
         {
             PostAction result = null;
@@ -117,6 +126,56 @@ namespace ApplicationCore.Chain
             }
             return result;
         }
+        #endregion
+        #region Post action
+        public void AddGift(OrderResponseModel order, PostAction postAction, Promotion promotion)
+        {
+            if (order.Gift == null)
+            {
+                order.Gift = new List<Gift>();
+            }
+            string effectType = "";
+            switch (postAction.DiscountType.Trim())
+            {
+                case AppConstant.EnvVar.DiscountType.GiftProduct:
+                    effectType = AppConstant.EffectMessage.AddGiftProduct;
+
+                    var gifts = postAction.PostActionProductMapping.Select(el => el.Product);
+                    foreach (var gift in gifts)
+                    {
+                        order.Gift.Add(new Gift
+                        {
+                            ProductCode = gift.Code,
+                            ProductName = gift.Name
+                        });
+                    }
+                    break;
+                case AppConstant.EnvVar.DiscountType.GiftVoucher:
+                    effectType = AppConstant.EffectMessage.AddGiftVoucher;
+                    var voucher = _voucherService.GetFirst(filter: el =>
+                                el.VoucherGroup.PromotionId == postAction.GiftPromotionId
+                                && !el.IsRedemped
+                                && !el.IsUsed,
+                                includeProperties: "VoucherGroup.Promotion").Result;
+
+                    order.Gift.Add(new Gift
+                    {
+                        ProductCode = voucher.VoucherGroup.Promotion.PromotionCode + "-" + voucher.VoucherCode,
+                        ProductName = voucher.VoucherGroup.VoucherName
+                    });
+                    break;
+            }
+
+            SetEffect(order, promotion, 0, effectType, postAction: postAction);
+        }
+
+        public void AddPoint(OrderResponseModel order, PostAction postAction, Promotion promotion)
+        {
+            string effectType = AppConstant.EffectMessage.AddGiftPoint;
+            order.BonusPoint = postAction.BonusPoint;
+            SetEffect(order, promotion, 0, effectType, postAction: postAction);
+        }
+        #endregion
         #region Discount Order
         private void DiscountOrder(OrderResponseModel order, Infrastructure.Models.Action action, Promotion promotion)
         {
@@ -150,24 +209,7 @@ namespace ApplicationCore.Chain
             }
             SetEffect(order, promotion, discount, effectType, action: action);
         }
-        public void AddGift(OrderResponseModel order, PostAction postAction, Promotion promotion)
-        {
-            string effectType = AppConstant.EffectMessage.AddGift;
-            if (order.Gift == null)
-            {
-                order.Gift = new List<Gift>();
-            }
-            var gifts = postAction.PostActionProductMapping.Select(el => el.Product);
-            foreach (var gift in gifts)
-            {
-                order.Gift.Add(new Gift
-                {
-                    ProductCode = gift.Code,
-                    ProductName = gift.Name
-                });
-            }
-            SetEffect(order, promotion, 0, effectType, postAction: postAction);
-        }
+
         public void SetEffect(OrderResponseModel order, Promotion promotion, decimal discount, string effectType, Infrastructure.Models.Action action = null, PostAction postAction = null)
         {
             if (order.Effects == null)
@@ -231,7 +273,6 @@ namespace ApplicationCore.Chain
         }
 
         #endregion
-
         #region Discount for item
         private void DiscountProduct(OrderResponseModel order, Infrastructure.Models.Action action)
         {
