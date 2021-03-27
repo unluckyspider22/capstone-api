@@ -103,10 +103,10 @@ namespace PromotionEngineAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> PostDevice([FromBody] DeviceDto dto)
         {
-            //if (await _service.CheckExistingDevice(dto.Code))
-            //{
-            //    return StatusCode(statusCode: 500, new ErrorObj(500, "Device exist"));
-            //}
+            if (dto.GameConfigId.Equals(Guid.Empty))
+            {
+                return StatusCode(statusCode: 400, new ErrorObj(400, "Select Game Configuration"));
+            }
             try
             {
                 dto.DeviceId = Guid.NewGuid();

@@ -1251,55 +1251,9 @@ namespace ApplicationCore.Services
                     {
                         promo.PromotionTier.Remove(tier);
                         _repository.Update(promo);
-                        //tierRepo.Delete(id: tier.PromotionTierId);
-
-                        //tierRepo.Update(tier);
-                        //#region Xóa action
-
-                        //IGenericRepository<Infrastructure.Models.Action> actionRepo = _unitOfWork.ActionRepository;
-                        //var act = await actionRepo.GetFirst(filter: o => o.PromotionTierId.Equals(tier.PromotionTierId));
-                        //if (act != null)
-                        //{
-                        //    // Delete bảng mapp
-                        //    IGenericRepository<ActionProductMapping> actionMappingRepo = _unitOfWork.ActionProductMappingRepository;
-                        //    actionMappingRepo.Delete(id: Guid.Empty, filter: o => o.ActionId.Equals(act.ActionId));
-
-                        //    // Delete action
-                        //    actionRepo.Delete(id: act.ActionId);
-                        //}
-
-                        //#endregion
-                        //#region Xóa post action
-
-                        //IGenericRepository<PostAction> postActionRepo = _unitOfWork.PostActionRepository;
-                        //var postAct = await postActionRepo.GetFirst(filter: o => o.PromotionTierId.Equals(tier.PromotionTierId));
-                        //if (postAct != null)
-                        //{
-                        //    // Delete bảng mapp
-                        //    IGenericRepository<PostActionProductMapping> postActionMappingRepo = _unitOfWork.PostActionProductMappingRepository;
-                        //    postActionMappingRepo.Delete(id: Guid.Empty, filter: o => o.PostActionId.Equals(postAct.PostActionId));
-
-                        //    // Delete post action
-                        //    postActionRepo.Delete(id: postAct.PostActionId);
-                        //}
-
-                        //#endregion
-                        //#region Xóa condition rule
-                        //IGenericRepository<ConditionRule> condRuleRepo = _unitOfWork.ConditionRuleRepository;
-                        //var conditionRuleEntity = await condRuleRepo.GetFirst(filter: o => o.PromotionTier.PromotionTierId.Equals(tier.PromotionTierId));
-                        //if (conditionRuleEntity != null)
-                        //{
-                        //    await DeleteOldGroups(conditionRuleEntity: conditionRuleEntity);
-                        //    condRuleRepo.Delete(id: conditionRuleEntity.ConditionRuleId);
-                        //    await _unitOfWork.SaveAsync();
-                        //}
-
-                        //#endregion
+                     
                     }
-
-
                 }
-
                 #endregion
                 return await _unitOfWork.SaveAsync() > 0;
             }

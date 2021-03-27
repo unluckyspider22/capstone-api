@@ -8,5 +8,6 @@ namespace ApplicationCore.Services
     public interface IGameConfigService : IBaseService<GameConfig, GameConfigDto>
     {
         public Task<bool> DeleteGameConfig(Guid id);
+        public Task<GameConfigDto> UpdateGameConfig(GameConfigDto dto);
     }
 }

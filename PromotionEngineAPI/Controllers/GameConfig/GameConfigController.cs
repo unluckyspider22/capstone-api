@@ -42,8 +42,7 @@ namespace PromotionEngineAPI.Controllers
             }
             try
             {
-                dto.UpdDate = DateTime.Now;
-                var result = await _service.UpdateAsync(dto);
+                var result = await _service.UpdateGameConfig(dto);
                 return Ok(result);
             }
             catch (ErrorObj e)
@@ -100,7 +99,7 @@ namespace PromotionEngineAPI.Controllers
             {
                 return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
             }
-            try
+            try 
             {
                 var result = await _service.GetFirst(filter: o => o.Id.Equals(gameConfigId) && o.BrandId.Equals(brandId) && !o.DelFlg,
                     includeProperties: "GameItems");

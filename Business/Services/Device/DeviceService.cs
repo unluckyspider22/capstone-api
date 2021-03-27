@@ -38,68 +38,66 @@ namespace ApplicationCore.Services
 
         public async Task<GenericRespones<BrandDeviceDto>> GetBrandDevice(int PageSize, int PageIndex, Guid brandId)
         {
-            var result = new List<BrandDeviceDto>();
-            //IGenericRepository<Store> storeRepo = _unitOfWork.StoreRepository;
-            //var stores = await storeRepo.Get(pageSize: PageSize, pageIndex: PageIndex,
-            //    filter: o => o.BrandId.Equals(brandId) && !o.DelFlg, includeProperties: "Device");
-            //if (stores != null)
-            //{
-            //    foreach (var store in stores)
-            //    {
-            //        var devices = store.Device.ToList();
-            //        if (devices != null && devices.Count > 0)
-            //        {
-            //            foreach (var device in devices)
-            //            {
-            //                if (!device.DelFlg)
-            //                {
-            //                    var dto = new BrandDeviceDto()
-            //                    {
-            //                        DeviceId = device.DeviceId,
-            //                        Code = device.Code,
-            //                        Name = device.Name,
-            //                        Group = store.Group,
-            //                        StoreCode = store.StoreCode,
-            //                        StoreId = store.StoreId,
-            //                        StoreName = store.StoreName,
-            //                    };
-            //                    result.Add(dto);
-            //                }
-            //            }
-            //        }
-
-
-            //    }
-            //}
-            var devices = (await _repository.Get(pageIndex: PageIndex, pageSize: PageSize, 
-                filter: o => o.Store.BrandId.Equals(brandId)
-                        && !o.DelFlg, 
-                includeProperties: "Store"
-            )).ToList();
-            if (devices.Count > 0)
+            try
             {
-                foreach(var device in devices)
+                var result = new List<BrandDeviceDto>();
+
+                var devices = (await _repository.Get(pageIndex: PageIndex, pageSize: PageSize,
+                    filter: o => o.Store.BrandId.Equals(brandId)
+                            && !o.DelFlg,
+                    includeProperties: "Store"
+                )).ToList();
+                if (devices.Count > 0)
                 {
-                    var dto = new BrandDeviceDto()
+                    foreach (var device in devices)
                     {
-                        DeviceId = device.DeviceId,
-                        Code = device.Code,
-                        Name = device.Name,
-                        Group = device.Store.Group,
-                        StoreCode = device.Store.StoreCode,
-                        StoreId = device.Store.StoreId,
-                        StoreName = device.Store.StoreName,
-                    };
-                    result.Add(dto);
+                        var dto = new BrandDeviceDto()
+                        {
+                            DeviceId = device.DeviceId,
+                            Code = device.Code,
+                            Name = device.Name,
+                            Group = device.Store.Group,
+                            StoreCode = device.Store.StoreCode,
+                            StoreId = device.Store.StoreId,
+                            StoreName = device.Store.StoreName,
+                            GameConfigId = device.GameConfigId,
+                        };
+                        dto.GameConfigName = await GetConfigName(device.GameConfigId);
+                        result.Add(dto);
+                    }
                 }
+
+
+                var totalItem = await _repository.CountAsync(filter: o => o.Store.BrandId.Equals(brandId) && !o.DelFlg);
+                MetaData metadata = new MetaData(pageIndex: PageIndex, pageSize: PageSize, totalItems: totalItem);
+
+                GenericRespones<BrandDeviceDto> response = new GenericRespones<BrandDeviceDto>(data: result.ToList(), metadata: metadata);
+                return response;
+            }
+            catch (Exception e)
+            {
+                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
             }
 
+        }
 
-            var totalItem = await _repository.CountAsync(filter: o => o.Store.BrandId.Equals(brandId) && !o.DelFlg);
-            MetaData metadata = new MetaData(pageIndex: PageIndex, pageSize: PageSize, totalItems: totalItem);
+        private async Task<string> GetConfigName(Guid? gameConfigId)
+        {
+            try
+            {
+                IGenericRepository<GameConfig> configRepo = _unitOfWork.GameConfigRepository;
+                var config = await configRepo.GetFirst(filter: o => o.Id.Equals(gameConfigId));
+                if (config != null)
+                {
+                    return config.Name;
+                }
+                return "";
+            }
+            catch (Exception e)
+            {
+                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+            }
 
-            GenericRespones<BrandDeviceDto> response = new GenericRespones<BrandDeviceDto>(data: result.ToList(), metadata: metadata);
-            return response;
         }
 
         public async Task<DeviceDto> Update(DeviceDto dto)
@@ -115,10 +113,8 @@ namespace ApplicationCore.Services
                     {
                         entity.Name = dto.Name;
                     }
-                    if (dto.DelFlg != null)
-                    {
-                        entity.DelFlg = dto.DelFlg;
-                    }
+                    entity.DelFlg = dto.DelFlg;
+                    entity.GameConfigId = dto.GameConfigId;
                     if (!dto.StoreId.Equals(Guid.Empty) && !dto.StoreId.Equals(entity.StoreId))
                     {
                         IGenericRepository<Store> storeRepo = _unitOfWork.StoreRepository;

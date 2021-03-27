@@ -437,8 +437,7 @@ namespace PromotionEngineAPI.Controllers
             try
             {
                 return Ok(await _promotionService.GetAsync(filter: o => o.BrandId.Equals(brandId)
-                                && o.Status != AppConstant.EnvVar.PromotionStatus.DRAFT
-                                && o.Status != AppConstant.EnvVar.PromotionStatus.EXPIRED
+                                && o.Status == AppConstant.EnvVar.PromotionStatus.PUBLISH
                                 && !o.DelFlg));
             }
             catch (ErrorObj e)

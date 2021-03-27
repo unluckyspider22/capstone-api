@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Infrastructure.DTOs
 {
@@ -17,5 +14,7 @@ namespace Infrastructure.DTOs
         public string Name { get; set; }
         [StringLength(8)]
         public string Code { get; set; }
+        public Guid? GameConfigId { get; set; }
+        public string GameConfigName { get; set; }
     }
 }
