@@ -112,10 +112,6 @@ namespace PromotionEngineAPI.Controllers
 
                     promotions = _promotionService.GetPromotions();
 
-                    if (promotions.Count > 1)
-                    {
-                        return Ok(responseModel);
-                    }
                 }
 
                 orderInfo.Vouchers = vouchers;
