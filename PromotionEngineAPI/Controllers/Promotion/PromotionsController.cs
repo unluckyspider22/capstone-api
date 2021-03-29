@@ -254,12 +254,17 @@ namespace PromotionEngineAPI.Controllers
             {
                 if (id != dto.PromotionId || id.Equals(Guid.Empty) || dto.PromotionId.Equals(Guid.Empty))
                 {
-                    return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                    return StatusCode(statusCode: 400, new ErrorObj(400, "Id should not be empty"));
+                }
+                if (await _promotionService.GetFirst(filter: o => o.PromotionId.Equals(dto.PromotionId) && !o.DelFlg) == null)
+                {
+                    return StatusCode(statusCode: 400, new ErrorObj(400, "Promotion Not Found"));
                 }
                 if (dto.PromotionStoreMapping != null)
                 {
                     await _promotionStoreMappingService.DeletePromotionStoreMapping(dto.PromotionId);
                 }
+
                 var result = await _promotionService.UpdatePromotion(dto);
 
                 return Ok(result);
