@@ -60,6 +60,8 @@ namespace Infrastructure.UnitOrWork
         IGenericRepository<GameConfig> GameConfigRepository { get; }
         IGenericRepository<GameItems> GameItemsRepository { get; }
         IGenericRepository<GameMaster> GameMasterRepository { get; }
+        IGenericRepository<Transaction> TransactionRepository { get; }
+
         Task<int> SaveAsync();
     }
 }

@@ -971,12 +971,6 @@ namespace Infrastructure.Models
                     .HasForeignKey(d => d.BrandId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Transaction_Brand");
-
-                entity.HasOne(d => d.Promotion)
-                    .WithMany(p => p.Transaction)
-                    .HasForeignKey(d => d.PromotionId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Transaction_Promotion");
             });
 
             modelBuilder.Entity<Voucher>(entity =>

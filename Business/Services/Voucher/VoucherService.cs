@@ -211,7 +211,6 @@ namespace ApplicationCore.Services
             {
                 throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
-
         }
         private async Task UpdateVoucherGroupAfterApplied(VoucherGroup voucherGroup)
         {
@@ -224,18 +223,6 @@ namespace ApplicationCore.Services
             voucher.UpdDate = DateTime.Now;
             voucher.UsedDate = DateTime.Now;
             voucher.IsUsed = AppConstant.EnvVar.Voucher.USED;
-            if (order.Customer != null)
-            {
-                var memInfor = order.Customer;
-                MembershipDto membership = new MembershipDto();
-                membership.MembershipId = Guid.NewGuid();
-                membership.InsDate = DateTime.Now;
-                membership.Fullname = memInfor.CustomerName;
-                membership.Email = memInfor.CustomerEmail;
-                membership.PhoneNumber = memInfor.CustomerPhoneNo;
-                var result = await _membershipService.CreateAsync(membership);
-                voucher.MembershipId = result.MembershipId;
-            }
             _repository.Update(voucher);
             await _unitOfWork.SaveAsync();
         }
