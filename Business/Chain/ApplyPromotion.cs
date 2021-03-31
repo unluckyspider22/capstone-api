@@ -46,10 +46,10 @@ namespace ApplicationCore.Chain
                 {
                     switch (action.ActionType)
                     {
-                        case AppConstant.EnvVar.ActionType.Order:
+                        case (int)AppConstant.EnvVar.ActionType.Order:
                             DiscountOrder(order, action, promotion);
                             break;
-                        case AppConstant.EnvVar.ActionType.Product:
+                        case (int)AppConstant.EnvVar.ActionType.Product:
                             DiscountProduct(order, action);
                             break;
 
@@ -60,10 +60,10 @@ namespace ApplicationCore.Chain
                 {
                     switch (postAction.ActionType)
                     {
-                        case AppConstant.EnvVar.ActionType.Gift:
+                        case (int)AppConstant.EnvVar.ActionType.Gift:
                             AddGift(order, postAction, promotion);
                             break;
-                        case AppConstant.EnvVar.ActionType.BonusPoint:
+                        case (int)AppConstant.EnvVar.ActionType.BonusPoint:
                             AddPoint(order, postAction, promotion);
                             break;
 
@@ -100,24 +100,24 @@ namespace ApplicationCore.Chain
             {
                 switch (promotion.DiscountType)
                 {
-                    case AppConstant.EnvVar.DiscountType.Amount:
+                    case (int)AppConstant.EnvVar.DiscountType.Amount:
                         result = actions
                         .Where(w =>
-                            w.DiscountType == AppConstant.EnvVar.DiscountType.Amount
+                            w.DiscountType == (int)AppConstant.EnvVar.DiscountType.Amount
                             && w.DiscountAmount > 0
                             && w.DiscountAmount == actions.Max(m => m.DiscountAmount))
                         .SingleOrDefault();
                         break;
-                    case AppConstant.EnvVar.DiscountType.Percentage:
+                    case (int)AppConstant.EnvVar.DiscountType.Percentage:
                         result = actions.Where(w =>
-                                w.DiscountType == AppConstant.EnvVar.DiscountType.Percentage &&
+                                w.DiscountType == (int)AppConstant.EnvVar.DiscountType.Percentage &&
                                 w.DiscountPercentage > 0 &&
                                 w.DiscountPercentage == actions.Max(m => m.DiscountPercentage))
                         .SingleOrDefault();
                         break;
-                    case AppConstant.EnvVar.DiscountType.Shipping:
+                    case (int)AppConstant.EnvVar.DiscountType.Shipping:
                         result = actions.Where(w =>
-                                w.DiscountType == AppConstant.EnvVar.DiscountType.Shipping &&
+                                w.DiscountType == (int)AppConstant.EnvVar.DiscountType.Shipping &&
                                 w.DiscountAmount > 0 &&
                                 w.DiscountAmount == actions.Max(m => m.DiscountAmount))
                         .SingleOrDefault();
@@ -135,9 +135,9 @@ namespace ApplicationCore.Chain
                 order.Gift = new List<Gift>();
             }
             string effectType = "";
-            switch (postAction.DiscountType.Trim())
+            switch (postAction.DiscountType)
             {
-                case AppConstant.EnvVar.DiscountType.GiftProduct:
+                case (int)AppConstant.EnvVar.DiscountType.GiftProduct:
                     effectType = AppConstant.EffectMessage.AddGiftProduct;
 
                     var gifts = postAction.PostActionProductMapping.Select(el => el.Product);
@@ -150,17 +150,17 @@ namespace ApplicationCore.Chain
                         });
                     }
                     break;
-                case AppConstant.EnvVar.DiscountType.GiftVoucher:
+                case (int)AppConstant.EnvVar.DiscountType.GiftVoucher:
                     effectType = AppConstant.EffectMessage.AddGiftVoucher;
                     var voucher = _voucherService.GetFirst(filter: el =>
-                                el.VoucherGroup.PromotionId == postAction.GiftPromotionId
-                                && !el.IsRedemped
+                                  /* el.VoucherGroup.PromotionId == postAction.GiftPromotionId
+                                   && */!el.IsRedemped
                                 && !el.IsUsed,
                                 includeProperties: "VoucherGroup.Promotion").Result;
 
                     order.Gift.Add(new Gift
                     {
-                        ProductCode = voucher.VoucherGroup.Promotion.PromotionCode + "-" + voucher.VoucherCode,
+                        //ProductCode = voucher.VoucherGroup.Promotion.PromotionCode + "-" + voucher.VoucherCode,
                         ProductName = voucher.VoucherGroup.VoucherName
                     });
                     break;
@@ -186,21 +186,21 @@ namespace ApplicationCore.Chain
             var effectType = "";
             switch (action.DiscountType)
             {
-                case AppConstant.EnvVar.DiscountType.Percentage:
+                case (int)AppConstant.EnvVar.DiscountType.Percentage:
                     discount = (decimal)final * (decimal)action.DiscountPercentage / 100;
                     discount = discount > (decimal)action.MaxAmount ? (decimal)action.MaxAmount : discount;
                     effectType = AppConstant.EffectMessage.SetDiscount;
                     discount = discount > (decimal)final ? (decimal)final : discount;
                     SetDiscountFromOrder(order, discount, final, promotion);
                     break;
-                case AppConstant.EnvVar.DiscountType.Amount:
+                case (int)AppConstant.EnvVar.DiscountType.Amount:
                     discount = (decimal)action.DiscountAmount;
                     effectType = AppConstant.EffectMessage.SetDiscount;
 
                     discount = discount > (decimal)final ? (decimal)final : discount;
                     SetDiscountFromOrder(order, discount, final, promotion);
                     break;
-                case AppConstant.EnvVar.DiscountType.Shipping:
+                case (int)AppConstant.EnvVar.DiscountType.Shipping:
                     discount = (decimal)action.DiscountAmount;
                     effectType = AppConstant.EffectMessage.SetShippingFee;
                     order.CustomerOrderInfo.ShippingFee -= discount;
@@ -285,19 +285,19 @@ namespace ApplicationCore.Chain
                     {
                         switch (action.DiscountType)
                         {
-                            case AppConstant.EnvVar.DiscountType.Amount:
+                            case (int)AppConstant.EnvVar.DiscountType.Amount:
                                 DiscountProductAmount(product, action);
                                 break;
-                            case AppConstant.EnvVar.DiscountType.Percentage:
+                            case (int)AppConstant.EnvVar.DiscountType.Percentage:
                                 DiscountProductPercentage(product, action);
                                 break;
-                            case AppConstant.EnvVar.DiscountType.Unit:
+                            case (int)AppConstant.EnvVar.DiscountType.Unit:
                                 DiscountProductUnit(product, action);
                                 break;
-                            case AppConstant.EnvVar.DiscountType.Fixed:
+                            case (int)AppConstant.EnvVar.DiscountType.Fixed:
                                 DiscountProductFixedPrice(product, action);
                                 break;
-                            case AppConstant.EnvVar.DiscountType.Ladder:
+                            case (int)AppConstant.EnvVar.DiscountType.Ladder:
                                 DiscountProductLadderPrice(product, action);
                                 break;
 
@@ -364,10 +364,10 @@ namespace ApplicationCore.Chain
             int discountedProduct = 0;
             switch (action.BundleStrategy)
             {
-                case AppConstant.BundleStrategy.CHEAPEST:
+                case (int)AppConstant.BundleStrategy.CHEAPEST:
                     products = products.OrderBy(e => e.UnitPrice).ToList();
                     break;
-                case AppConstant.BundleStrategy.MOST_EXPENSIVE:
+                case (int)AppConstant.BundleStrategy.MOST_EXPENSIVE:
                     products = products.OrderByDescending(e => e.UnitPrice).ToList();
                     break;
             }

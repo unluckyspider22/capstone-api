@@ -10,7 +10,7 @@ namespace Infrastructure.DTOs
         public Guid PromotionTierId { get; set; }
         public string RuleName { get; set; }
         public string Description { get; set; }
-        public string ActionType { get; set; }
-        public string DiscountType { get; set; }
+        public int ActionType { get; set; }
+        public int DiscountType { get; set; }
     }
 }

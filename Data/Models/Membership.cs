@@ -16,8 +16,8 @@ namespace Infrastructure.Models
         public string Email { get; set; }
         public string Fullname { get; set; }
         public bool DelFlg { get; set; }
-        public DateTime? InsDate { get; set; }
-        public DateTime? UpdDate { get; set; }
+        public DateTime InsDate { get; set; }
+        public DateTime UpdDate { get; set; }
 
         public virtual ICollection<Voucher> Voucher { get; set; }
     }

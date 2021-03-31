@@ -50,17 +50,17 @@ namespace ApplicationCore.Services
                 {
                     var voucher = await _repository.Get(filter: el =>
                     el.VoucherCode.Equals(voucherModel.VoucherCode)
-                    && el.VoucherGroup.Promotion.Brand.BrandCode.Equals(order.Attributes.StoreInfo.BrandCode)
-                    && el.VoucherGroup.Promotion.PromotionCode.Equals(voucherModel.PromotionCode)
+                    && el.Promotion.Brand.BrandCode.Equals(order.Attributes.StoreInfo.BrandCode)
+                    && el.Promotion.PromotionCode.Equals(voucherModel.PromotionCode)
                     && !el.IsUsed,
                     includeProperties:
-                    "VoucherGroup.Promotion.PromotionTier.Action.ActionProductMapping.Product," +
-                    "VoucherGroup.Promotion.PromotionTier.PostAction.PostActionProductMapping.Product," +
-                    "VoucherGroup.Promotion.PromotionTier.Action.ActionProductMapping.Product," +
-                    "VoucherGroup.Promotion.PromotionTier.ConditionRule.ConditionGroup.OrderCondition," +
-                    "VoucherGroup.Promotion.PromotionTier.ConditionRule.ConditionGroup.ProductCondition.ProductConditionMapping.Product," +
-                    "VoucherGroup.Promotion.PromotionStoreMapping.Store," +
-                    "VoucherGroup.Promotion.Brand");
+                    "Promotion.PromotionTier.Action.ActionProductMapping.Product," +
+                    "Promotion.PromotionTier.PostAction.PostActionProductMapping.Product," +
+                    "Promotion.PromotionTier.Action.ActionProductMapping.Product," +
+                    "Promotion.PromotionTier.ConditionRule.ConditionGroup.OrderCondition," +
+                    "Promotion.PromotionTier.ConditionRule.ConditionGroup.ProductCondition.ProductConditionMapping.Product," +
+                    "Promotion.PromotionStoreMapping.Store," +
+                    "Promotion.Brand");
                     if (voucher.Count() > 1)
                     {
                         throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Duplicate_VoucherCode, description: AppConstant.ErrMessage.Duplicate_VoucherCode);
@@ -69,7 +69,7 @@ namespace ApplicationCore.Services
                     {
                         throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_VoucherCode, description: AppConstant.ErrMessage.Invalid_VoucherCode);
                     }
-                    var promotion = voucher.First().VoucherGroup.Promotion;
+                    var promotion = voucher.First().Promotion;
                     promotions.Add(promotion);
                 }
                 if (promotions.Select(s => s.PromotionId).Distinct().Count() < promotions.Select(s => s.PromotionId).Count())
@@ -108,8 +108,7 @@ namespace ApplicationCore.Services
                 pageSize: channelParam.Quantity,
                 pageIndex: 1,
                 filter: el =>
-                    el.VoucherGroup.IsActive
-                   && !el.IsRedemped
+                   !el.IsRedemped
                    && !el.IsUsed
                    && el.VoucherGroupId.Equals(voucherGroup.VoucherGroupId));
             if (vouchers.Count() > 0)
@@ -149,8 +148,8 @@ namespace ApplicationCore.Services
                     entity.UpdDate = DateTime.Now;
                     _voucherGroupRepos.Update(entity);
                     await _unitOfWork.SaveAsync();
-                    var promoCode = voucher.VoucherGroup.Promotion.PromotionCode;
-                    var description = voucher.VoucherGroup.Promotion.Description;
+                    var promoCode = voucher.Promotion.PromotionCode;
+                    var description = voucher.Promotion.Description;
                     return new VoucherParamResponse(voucherGroupId: entity.VoucherGroupId, voucherGroupName: entity.VoucherName,
                         voucherId: voucher.VoucherId, code: promoCode + "-" + voucher.VoucherCode, description: description);
                 }
@@ -182,7 +181,7 @@ namespace ApplicationCore.Services
                             if (voucherParam.PromotionCode.Equals(promotion.PromotionCode))
                             {
                                 var voucherGroup = (await _voucherGroupService.
-                                    GetAsync(filter: el => el.PromotionId.Equals(promotion.PromotionId), includeProperties: "Voucher")).Data.First();
+                                    GetAsync(/*filter: el => el.PromotionId.Equals(promotion.PromotionId), */includeProperties: "Voucher")).Data.First();
                                 if (voucherGroup.Voucher.Where(el => el.VoucherCode.Equals(voucherParam.VoucherCode)).Distinct().Count()
                                 < voucherGroup.Voucher.Where(w => w.VoucherCode.Equals(voucherParam.VoucherCode)).Count())
                                 {
@@ -247,11 +246,11 @@ namespace ApplicationCore.Services
             {
                 var vouchers = await _repository.Get(
                     filter: el =>
-                    el.VoucherGroup.PromotionId == promotionId
+                    el.PromotionId == promotionId
                     && !el.IsUsed
                     && !el.IsRedemped
-                    && !el.VoucherGroup.Promotion.DelFlg
-                    && el.VoucherGroup.Promotion.Status == AppConstant.EnvVar.PromotionStatus.PUBLISH,
+                    && !el.Promotion.DelFlg
+                    && el.Promotion.Status == (int)AppConstant.EnvVar.PromotionStatus.PUBLISH,
                     includeProperties:
                     "VoucherGroup.Promotion.PromotionChannelMapping.Channel," +
                     "VoucherGroup.Promotion.PromotionStoreMapping.Store," +
@@ -300,7 +299,7 @@ namespace ApplicationCore.Services
 
             //Tạo nội dung email
             BodyBuilder bodyBuilder = new BodyBuilder();
-            bodyBuilder.HtmlBody = await GenerateContent(param, voucher);
+            bodyBuilder.HtmlBody = GenerateContent(param, voucher);
             message.Body = bodyBuilder.ToMessageBody();
 
             //Kết nối tới SMTP server
@@ -326,9 +325,9 @@ namespace ApplicationCore.Services
 
         }
 
-        private async Task<string> GenerateContent(VoucherForCustomerModel param, Voucher voucher)
+        private string GenerateContent(VoucherForCustomerModel param, Voucher voucher)
         {
-            var promotion = voucher.VoucherGroup.Promotion;
+            var promotion = voucher.Promotion;
             var brand = voucher.VoucherGroup.Brand;
             //Header
             string header = string.Format("<h1>[Promotion] {0}</h1>", promotion.PromotionName);
@@ -366,13 +365,13 @@ namespace ApplicationCore.Services
             if (!string.IsNullOrEmpty(storeCode))
             {
                 //Update store
-                var store = voucher.VoucherGroup.Promotion.PromotionStoreMapping.FirstOrDefault(w => w.Store.StoreCode == storeCode).Store;
+                var store = voucher.Promotion.PromotionStoreMapping.FirstOrDefault(w => w.Store.StoreCode == storeCode).Store;
                 voucher.Store = store;
             }
             else
             {
                 //Update channel
-                var channel = voucher.VoucherGroup.Promotion.PromotionChannelMapping.FirstOrDefault(w => w.Channel.ChannelCode == param.ChannelCode).Channel;
+                var channel = voucher.Promotion.PromotionChannelMapping.FirstOrDefault(w => w.Channel.ChannelCode == param.ChannelCode).Channel;
                 voucher.Channel = channel;
             }
 

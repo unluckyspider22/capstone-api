@@ -114,7 +114,7 @@ namespace ApplicationCore.Services
             return result;
         }
 
-        public async Task<IEnumerable<VoucherGroup>> GetVoucherGroupForGame(int PageIndex = 0, int PageSize = 0,
+       /* public async Task<IEnumerable<VoucherGroup>> GetVoucherGroupForGame(int PageIndex = 0, int PageSize = 0,
             string BrandCode = null, string StoreCode = null)
         {
             try
@@ -122,7 +122,6 @@ namespace ApplicationCore.Services
                 var listVoucherGroup = await _repository.Get(pageIndex: PageIndex, pageSize: PageSize
                    , filter: (el => !el.DelFlg
                    && el.VoucherType.Equals(AppConstant.EnvVar.VoucherType.BULK_CODE)
-                    && el.IsActive
                     && el.RedempedQuantity < el.Quantity
                     && !el.Promotion.PromotionType.Equals(AppConstant.EnvVar.PromotionType.AUTO_PROMOTION)
                     && el.Promotion.Status.Equals(AppConstant.EnvVar.PromotionStatus.PUBLISH)
@@ -146,7 +145,7 @@ namespace ApplicationCore.Services
                 Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.Message);
                 throw new ErrorObj(code: 500, message: e.Message);
             }
-        }
+        }*/
 
         public async Task<bool> DeleteVoucherGroup(Guid id)
         {
@@ -161,7 +160,7 @@ namespace ApplicationCore.Services
             {
                 //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.Message);
-                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+                throw new ErrorObj(code: 500, message: e.Message);
             }
         }
 
@@ -177,7 +176,7 @@ namespace ApplicationCore.Services
             catch (Exception e)
             {
                 Debug.WriteLine(e.InnerException);
-                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+                throw new ErrorObj(code: 500, message: e.Message);
             }
         }
 
@@ -186,7 +185,7 @@ namespace ApplicationCore.Services
             try
             {
                 // Assign voucher group
-                var now = DateTime.Now;
+              /*  var now = DateTime.Now;
                 var voucherGroupEntity = await _repository.GetFirst(filter: o => o.VoucherGroupId.Equals(voucherGroupId)
                                         && (o.PromotionId.Equals(Guid.Empty) || o.PromotionId == null)
                                         && !o.DelFlg);
@@ -204,14 +203,14 @@ namespace ApplicationCore.Services
                         _repository.Update(voucherGroupEntity);
                     }
 
-                }
+                }*/
                 return await _unitOfWork.SaveAsync() > 0;
             }
 
             catch (Exception e)
             {
                 Debug.WriteLine(e.InnerException);
-                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+                throw new ErrorObj(code: 500, message: e.Message);
             }
         }
 
@@ -233,7 +232,7 @@ namespace ApplicationCore.Services
             {
                 //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.Message);
-                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+                throw new ErrorObj(code: 500, message: e.Message);
             }
         }
 
@@ -250,7 +249,7 @@ namespace ApplicationCore.Services
             {
                 //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.Message);
-                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+                throw new ErrorObj(code: 500, message: e.Message);
             }
 
         }
@@ -269,7 +268,7 @@ namespace ApplicationCore.Services
             }
             catch (Exception e)
             {
-                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+                throw new ErrorObj(code: 500, message: e.Message);
             }
         }
 
@@ -344,9 +343,9 @@ namespace ApplicationCore.Services
                 _repository.Update(voucherGroup);
                 return await _unitOfWork.SaveAsync() > 0;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+                throw new ErrorObj(code: 500, message: e.Message);
             }
 
 
@@ -358,7 +357,7 @@ namespace ApplicationCore.Services
             {
                 var availGroups = (await _repository.Get(pageSize: PageSize, pageIndex: PageIndex,
                                         filter: o => o.BrandId.Equals(BrandId)
-                                        && (o.PromotionId == null || o.PromotionId.Equals(Guid.Empty))
+                                   /*     && (o.PromotionId == null || o.PromotionId.Equals(Guid.Empty))*/
                                         )).ToList();
                 var result = new List<AvailableVoucherDto>();
                 if (availGroups.Count() > 0)
@@ -376,7 +375,7 @@ namespace ApplicationCore.Services
                 }
                 var totalItems = await _repository.CountAsync(
                                              filter: o => o.BrandId.Equals(BrandId)
-                                     && (o.PromotionId == null || o.PromotionId.Equals(Guid.Empty)));
+                                    /* && (o.PromotionId == null || o.PromotionId.Equals(Guid.Empty))*/);
                 MetaData metadata = new MetaData(pageIndex: PageSize, pageSize: PageIndex, totalItems: totalItems);
                 GenericRespones<AvailableVoucherDto> response = new GenericRespones<AvailableVoucherDto>(data: result, metadata: metadata);
                 return response;

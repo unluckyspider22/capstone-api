@@ -65,7 +65,6 @@ namespace ApplicationCore.Services
                 IGenericRepository<ConditionGroup> conditionGroupRepo = _unitOfWork.ConditionGroupRepository;
                 IGenericRepository<ProductCondition> productConditionRepo = _unitOfWork.ProductConditionRepository;
                 IGenericRepository<OrderCondition> orderConditionRepo = _unitOfWork.OrderConditionRepository;
-                IGenericRepository<MembershipCondition> membershipConditionRepo = _unitOfWork.MembershipConditionRepository;
                 IGenericRepository<PromotionTier> promotionTierRepo = _unitOfWork.PromotionTierRepository;
                 IGenericRepository<PostAction> postActionRepo = _unitOfWork.PostActionRepository;
                 IGenericRepository<Infrastructure.Models.Action> actionRepo = _unitOfWork.ActionRepository;
@@ -115,8 +114,8 @@ namespace ApplicationCore.Services
                     var actionEntity = _mapper.Map<Infrastructure.Models.Action>(param.Action);
                     actionEntity.ActionId = Guid.NewGuid();
                     actionEntity.PromotionTierId = promotionTier.PromotionTierId;
-                    actionEntity.ActionType = actionEntity.ActionType.Trim();
-                    actionEntity.DiscountType = actionEntity.DiscountType.Trim();
+                    actionEntity.ActionType = actionEntity.ActionType;
+                    actionEntity.DiscountType = actionEntity.DiscountType;
                     promotionTier.Summary = CreateSummaryAction(actionEntity);
                     promotionTier.ActionId = actionEntity.ActionId;
                     promotionTier.TierIndex = countTier;
@@ -153,8 +152,8 @@ namespace ApplicationCore.Services
                     var postAction = _mapper.Map<PostAction>(param.PostAction);
                     postAction.PostActionId = Guid.NewGuid();
                     postAction.PromotionTierId = promotionTier.PromotionTierId;
-                    postAction.ActionType = postAction.ActionType.Trim();
-                    postAction.DiscountType = postAction.DiscountType.Trim();
+                    postAction.ActionType = postAction.ActionType;
+                    postAction.DiscountType = postAction.DiscountType;
                     //promotionTier.Summary = CreateSummarypostAction(postAction);
                     promotionTier.Summary = "";
                     promotionTier.TierIndex = countTier;
@@ -200,7 +199,7 @@ namespace ApplicationCore.Services
             {
                 Debug.WriteLine(e.StackTrace);
                 Debug.WriteLine(e.InnerException);
-                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.", description: "Internal Server Error");
+                throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
             }
         }
 
@@ -235,7 +234,7 @@ namespace ApplicationCore.Services
             {
                 Debug.WriteLine(e.StackTrace);
                 Debug.WriteLine(e.InnerException);
-                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.", description: "Internal Server Error");
+                throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
             }
         }
 
@@ -341,7 +340,7 @@ namespace ApplicationCore.Services
             {
                 Debug.WriteLine(e.StackTrace);
                 Debug.WriteLine(e.InnerException);
-                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.", description: "Internal Server Error");
+                throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
             }
         }
         public async Task<PromotionTierUpdateParam> UpdatePromotionTier(PromotionTierUpdateParam updateParam)
@@ -356,7 +355,7 @@ namespace ApplicationCore.Services
                     var actionEntity = _mapper.Map<Infrastructure.Models.Action>(updateParam.Action);
                     IGenericRepository<Infrastructure.Models.Action> actionRepo = _unitOfWork.ActionRepository;
                     actionEntity.UpdDate = DateTime.Now;
-                    actionEntity.InsDate = null;
+                    //actionEntity.InsDate = null;
                     actionEntity.PromotionTierId = updateParam.PromotionTierId;
                     actionRepo.Update(actionEntity);
                     var tier = await promotionTierRepo.GetFirst(filter: el => el.ActionId.Equals(actionEntity.ActionId));
@@ -386,7 +385,7 @@ namespace ApplicationCore.Services
                     var postActionEntity = _mapper.Map<PostAction>(updateParam.PostAction);
                     IGenericRepository<PostAction> postActionRepo = _unitOfWork.PostActionRepository;
                     postActionEntity.UpdDate = DateTime.Now;
-                    postActionEntity.InsDate = null;
+                  //  postActionEntity.InsDate = null;
                     postActionEntity.PromotionTierId = updateParam.PromotionTierId;
                     postActionRepo.Update(postActionEntity);
                     var tier = await promotionTierRepo.GetFirst(filter: el => el.PostActionId.Equals(postActionEntity.PostActionId));
@@ -440,7 +439,7 @@ namespace ApplicationCore.Services
                 Debug.WriteLine(e.InnerException);
                 Debug.WriteLine(e.ToString());
                 Debug.WriteLine(e.Message);
-                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.", description: "Internal Server Error");
+                throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
             }
         }
         async Task<bool> DeleteOldGroups(ConditionRule conditionRuleEntity)
@@ -477,7 +476,7 @@ namespace ApplicationCore.Services
             IGenericRepository<ConditionGroup> conditionGroupRepo = _unitOfWork.ConditionGroupRepository;
             IGenericRepository<ProductCondition> productConditionRepo = _unitOfWork.ProductConditionRepository;
             IGenericRepository<OrderCondition> orderConditionRepo = _unitOfWork.OrderConditionRepository;
-            IGenericRepository<MembershipCondition> membershipConditionRepo = _unitOfWork.MembershipConditionRepository;
+           
 
             //Insert new condition groups
             foreach (var group in conditionGroups)
@@ -869,12 +868,12 @@ namespace ApplicationCore.Services
             CultureInfo cul = CultureInfo.GetCultureInfo("vi-VN");
             switch (actionType)
             {
-                case "1":
+                case (int)AppConstant.EnvVar.ActionType.Product:
                     {
 
                         switch (discountType)
                         {
-                            case "1":
+                            case (int)AppConstant.EnvVar.DiscountType.Amount:
                                 {
                                     result += "Discount ";
                                     result += double.Parse(entity.DiscountAmount.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
@@ -889,7 +888,7 @@ namespace ApplicationCore.Services
                                     result += " for product";
                                     break;
                                 }
-                            case "2":
+                            case (int)AppConstant.EnvVar.DiscountType.Percentage:
                                 {
                                     result += "Discount ";
                                     result += entity.DiscountPercentage + "%";
@@ -903,7 +902,7 @@ namespace ApplicationCore.Services
                                     result += " for product";
                                     break;
                                 }
-                            case "3":
+                            case (int)AppConstant.EnvVar.DiscountType.Unit:
                                 {
                                     result += "Free ";
                                     result += entity.DiscountQuantity + " unit(s) ";
@@ -911,7 +910,7 @@ namespace ApplicationCore.Services
                                     break;
                                 }
 
-                            case "5":
+                            case (int)AppConstant.EnvVar.DiscountType.Fixed:
                                 {
                                     result += "Fixed ";
                                     result +=
@@ -920,7 +919,7 @@ namespace ApplicationCore.Services
                                     result += " for product";
                                     break;
                                 }
-                            case "6":
+                            case (int)AppConstant.EnvVar.DiscountType.Ladder:
                                 {
                                     result += "Buy from the ";
                                     result += ToOrdinal((long)entity.OrderLadderProduct);
@@ -930,7 +929,7 @@ namespace ApplicationCore.Services
                                         double.Parse(entity.LadderPrice.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
                                     break;
                                 }
-                            case "7":
+                            case (int)AppConstant.EnvVar.DiscountType.Bundle:
                                 {
                                     result += "Buy ";
                                     result += entity.BundleQuantity + " product(s) for ";
@@ -941,12 +940,12 @@ namespace ApplicationCore.Services
                         }
                         break;
                     }
-                case "2":
+                case (int)AppConstant.EnvVar.ActionType.Order:
                     {
 
                         switch (discountType)
                         {
-                            case "1":
+                            case (int)AppConstant.EnvVar.DiscountType.Amount:
                                 {
                                     result += "Discount ";
                                     result +=
@@ -964,7 +963,7 @@ namespace ApplicationCore.Services
                                     result += " for order";
                                     break;
                                 }
-                            case "2":
+                            case (int)AppConstant.EnvVar.DiscountType.Percentage:
                                 {
                                     result += "Discount ";
                                     result += entity.DiscountPercentage + "%";
@@ -978,7 +977,7 @@ namespace ApplicationCore.Services
                                     result += " for order";
                                     break;
                                 }
-                            case "4":
+                            case (int)AppConstant.EnvVar.DiscountType.Shipping:
                                 {
                                     result += "Discount ";
                                     if (entity.DiscountAmount != 0)
@@ -1108,7 +1107,7 @@ namespace ApplicationCore.Services
 
             try
             {
-                IGenericRepository<PromotionStoreMapping> storeMappRepo = _unitOfWork.PromotionStoreMappingRepository;
+               /* IGenericRepository<PromotionStoreMapping> storeMappRepo = _unitOfWork.PromotionStoreMappingRepository;
                 IGenericRepository<PromotionChannelMapping> channelMappRepo = _unitOfWork.VoucherChannelRepository;
                 IGenericRepository<Store> storeRepo = _unitOfWork.StoreRepository;
                 IGenericRepository<Channel> channelRepo = _unitOfWork.ChannelRepository;
@@ -1122,7 +1121,7 @@ namespace ApplicationCore.Services
                 if (voucherGroup != null)
                 {
                     voucherGroupId = voucherGroup.VoucherGroupId;
-                }
+                }*/
 
                 var result = new DistributionStat()
                 {
@@ -1130,7 +1129,7 @@ namespace ApplicationCore.Services
                     StoreStat = new List<GroupStore>(),
                 };
 
-                var storeMapp = (await storeRepo.Get(filter: o => !o.DelFlg && o.BrandId.Equals(brandId))).ToList();
+               /* var storeMapp = (await storeRepo.Get(filter: o => !o.DelFlg && o.BrandId.Equals(brandId))).ToList();
                 var storeStatList = new List<StoreVoucherStat>();
                 foreach (var store in storeMapp)
                 {
@@ -1183,7 +1182,7 @@ namespace ApplicationCore.Services
                         Channels = listChannel
                     };
                     result.ChannelStat.Add(groupChannel);
-                }
+                }*/
                 return result;
             }
             catch (Exception e)
@@ -1224,7 +1223,7 @@ namespace ApplicationCore.Services
             try
             {
                 var promo = await _repository.GetFirst(filter:
-                        o => o.PromotionCode.Trim().ToLower().Equals(promoCode.Trim().ToLower())
+                        o => o.PromotionCode.ToLower().Equals(promoCode.ToLower())
                        && !o.DelFlg
                        && !o.Status.Equals(AppConstant.EnvVar.PromotionStatus.EXPIRED));
                 return promo != null;
@@ -1270,7 +1269,7 @@ namespace ApplicationCore.Services
                 #endregion
                 #region Update DelFlg của Voucher group
                 IGenericRepository<VoucherGroup> voucherGroupRepo = _unitOfWork.VoucherGroupRepository;
-                var voucherGroup = await voucherGroupRepo.GetFirst(filter: o => o.PromotionId.Equals(promotionId));
+               /* var voucherGroup = await voucherGroupRepo.GetFirst(filter: o => o.PromotionId.Equals(promotionId));
                 if (voucherGroup != null)
                 {
                     voucherGroup.DelFlg = true;
@@ -1278,7 +1277,7 @@ namespace ApplicationCore.Services
                     IGenericRepository<Voucher> voucherRepo = _unitOfWork.VoucherRepository;
                     voucherRepo.Delete(id: Guid.Empty, filter: o => o.VoucherGroupId.Equals(voucherGroup.VoucherGroupId));
                     #endregion
-                }
+                }*/
                 //await _unitOfWork.SaveAsync();
                 #endregion
                 #region Xóa tier
@@ -1299,7 +1298,7 @@ namespace ApplicationCore.Services
             catch (Exception e)
             {
                 Debug.WriteLine(e.InnerException);
-                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.", description: "Internal Server Error");
+                throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
             }
         }
 

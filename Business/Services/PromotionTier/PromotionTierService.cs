@@ -53,7 +53,7 @@ namespace ApplicationCore.Services
             catch (Exception e)
             {
                 Debug.WriteLine(e.InnerException);
-                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+                throw new ErrorObj(code: 500, message: e.Message);
             }
 
         }
@@ -141,7 +141,7 @@ namespace ApplicationCore.Services
             catch (Exception e)
             {
                 Debug.WriteLine(e.Message);
-                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+                throw new ErrorObj(code: 500, message: e.Message);
             }
 
         }

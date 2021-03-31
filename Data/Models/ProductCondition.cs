@@ -12,11 +12,11 @@ namespace Infrastructure.Models
 
         public Guid ProductConditionId { get; set; }
         public Guid ConditionGroupId { get; set; }
-        public int? IndexGroup { get; set; }
-        public string ProductConditionType { get; set; }
-        public decimal ProductQuantity { get; set; }
+        public int IndexGroup { get; set; }
+        public int ProductConditionType { get; set; }
+        public int ProductQuantity { get; set; }
         public string QuantityOperator { get; set; }
-        public string NextOperator { get; set; }
+        public int NextOperator { get; set; }
         public bool DelFlg { get; set; }
         public DateTime InsDate { get; set; }
         public DateTime UpdDate { get; set; }
