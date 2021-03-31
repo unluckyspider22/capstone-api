@@ -12,10 +12,9 @@ namespace Infrastructure.Models
         }
 
         public Guid PostActionId { get; set; }
-        public Guid PromotionTierId { get; set; }
+        public Guid? PromotionTierId { get; set; }
         public int ActionType { get; set; }
         public int DiscountType { get; set; }
-        public decimal? GiftQuantity { get; set; }
         public string GiftProductCode { get; set; }
         public decimal? BonusPoint { get; set; }
         public bool DelFlg { get; set; }

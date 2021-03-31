@@ -12,7 +12,7 @@ namespace Infrastructure.Models
         }
 
         public Guid ActionId { get; set; }
-        public Guid PromotionTierId { get; set; }
+        public Guid? PromotionTierId { get; set; }
         public int ActionType { get; set; }
         public int DiscountType { get; set; }
         public int? DiscountQuantity { get; set; }

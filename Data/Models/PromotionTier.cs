@@ -5,6 +5,12 @@ namespace Infrastructure.Models
 {
     public partial class PromotionTier
     {
+        public PromotionTier()
+        {
+            Action = new HashSet<Action>();
+            PostAction = new HashSet<PostAction>();
+        }
+
         public Guid PromotionTierId { get; set; }
         public Guid? ConditionRuleId { get; set; }
         public Guid? ActionId { get; set; }
@@ -21,7 +27,7 @@ namespace Infrastructure.Models
         public virtual ConditionRule ConditionRule { get; set; }
         public virtual Promotion Promotion { get; set; }
         public virtual VoucherGroup VoucherGroup { get; set; }
-        public virtual Action Action { get; set; }
-        public virtual PostAction PostAction { get; set; }
+        public virtual ICollection<Action> Action { get; set; }
+        public virtual ICollection<PostAction> PostAction { get; set; }
     }
 }

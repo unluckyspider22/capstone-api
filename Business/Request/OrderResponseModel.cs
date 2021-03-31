@@ -27,7 +27,7 @@ namespace ApplicationCore.Request
     public class Effect
     {
         public Guid PromotionId { get; set; }
-        public Guid PromotionTierId { get; set; }
+        public Guid? PromotionTierId { get; set; }
         public int TierIndex { get; set; }
         public string ConditionRuleName { get; set; }
         public string EffectType { get; set; }

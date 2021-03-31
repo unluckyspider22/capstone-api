@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Infrastructure.DTOs;
+using System;
 using System.Threading.Tasks;
-using Infrastructure.DTOs;
-using Infrastructure.Models;
 
 
 namespace ApplicationCore.Services
@@ -11,6 +9,7 @@ namespace ApplicationCore.Services
 
     public interface IActionService : IBaseService<Infrastructure.Models.Action, ActionDto>
     {
+        public Task<ActionDto> MyAddAction(ActionDto dto);
         public Task<bool> Delete(Guid id);
     }
 }

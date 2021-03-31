@@ -4,7 +4,6 @@ using Infrastructure.Helper;
 using Infrastructure.Repository;
 using Infrastructure.UnitOrWork;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
@@ -69,7 +68,7 @@ namespace ApplicationCore.Services
             {
                 var list = await _repository.Get(pageIndex, pageSize, filter, orderBy, includeProperties);
                 var totalItem = await _repository.CountAsync(filter);
-                MetaData metadata  = new MetaData(pageIndex: pageIndex, pageSize: pageSize, totalItems: totalItem);
+                MetaData metadata = new MetaData(pageIndex: pageIndex, pageSize: pageSize, totalItems: totalItem);
 
                 GenericRespones<TEntity> result = new GenericRespones<TEntity>(data: list.ToList(), metadata: metadata);
                 return result;

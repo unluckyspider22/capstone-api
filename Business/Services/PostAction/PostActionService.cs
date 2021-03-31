@@ -1,6 +1,4 @@
-﻿
-
-using AutoMapper;
+﻿using AutoMapper;
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
 using Infrastructure.Models;
@@ -12,20 +10,20 @@ using System.Threading.Tasks;
 
 namespace ApplicationCore.Services
 {
-    public class ActionService : BaseService<Infrastructure.Models.Action, ActionDto>, IActionService
+    public class PostActionService : BaseService<PostAction, PostActionDto>, IPostActionService
     {
-        public ActionService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
+        public PostActionService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
         {
         }
 
-        protected override IGenericRepository<Infrastructure.Models.Action> _repository => _unitOfWork.ActionRepository;
+        protected override IGenericRepository<PostAction> _repository => _unitOfWork.PostActionRepository;
 
-        public async Task<bool> Delete(System.Guid id)
+        public async Task<bool> Delete(Guid id)
         {
             try
             {
-                IGenericRepository<ActionProductMapping> mappRepo = _unitOfWork.ActionProductMappingRepository;
-                mappRepo.Delete(id: Guid.Empty, filter: o => o.ActionId.Equals(id));
+                IGenericRepository<PostActionProductMapping> mappRepo = _unitOfWork.PostActionProductMappingRepository;
+                mappRepo.Delete(id: Guid.Empty, filter: o => o.PostActionId.Equals(id));
                 _repository.Delete(id: id);
                 return await _unitOfWork.SaveAsync() > 0;
             }
@@ -38,34 +36,35 @@ namespace ApplicationCore.Services
             }
         }
 
-        public async Task<ActionDto> MyAddAction(ActionDto dto)
+        public async Task<PostActionDto> MyAddAction(PostActionDto dto)
         {
             try
             {
-                dto.ActionId = Guid.NewGuid();
+                dto.PostActionId = Guid.NewGuid();
                 dto.InsDate = DateTime.Now;
                 dto.UpdDate = DateTime.Now;
-                var entity = _mapper.Map<Infrastructure.Models.Action>(dto);
+                var entity = _mapper.Map<PostAction>(dto);
                 _repository.Add(entity);
-                if (dto.ListProduct.Count > 0 && dto.ActionType == (int)AppConstant.EnvVar.ActionType.Product)
+                if (dto.DiscountType == (int)AppConstant.EnvVar.DiscountType.GiftProduct && dto.ListProduct.Count > 0)
                 {
-                    IGenericRepository<ActionProductMapping> mappRepo = _unitOfWork.ActionProductMappingRepository;
-                    foreach (var productId in dto.ListProduct)
+                    IGenericRepository<PostActionProductMapping> mappRepo = _unitOfWork.PostActionProductMappingRepository;
+                    foreach (var product in dto.ListProduct)
                     {
-                        var mapp = new ActionProductMapping()
+                        var mapp = new PostActionProductMapping()
                         {
-                            ActionId = dto.ActionId,
                             Id = Guid.NewGuid(),
+                            PostActionId = dto.PostActionId,
+                            ProductId = product.ProductId,
                             InsDate = DateTime.Now,
                             UpdDate = DateTime.Now,
-                            ProductId = productId,
+                            Quantity = product.quantity,
+
                         };
                         mappRepo.Add(mapp);
                     }
                 }
                 await _unitOfWork.SaveAsync();
-                return _mapper.Map<ActionDto>(entity);
-
+                return _mapper.Map<PostActionDto>(entity);
             }
             catch (System.Exception e)
             {
