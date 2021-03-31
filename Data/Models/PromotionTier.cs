@@ -18,10 +18,10 @@ namespace Infrastructure.Models
         public int? FromIndex { get; set; }
         public int? ToIndex { get; set; }
 
+        public virtual Action Action { get; set; }
         public virtual ConditionRule ConditionRule { get; set; }
+        public virtual PostAction PostAction { get; set; }
         public virtual Promotion Promotion { get; set; }
         public virtual VoucherGroup VoucherGroup { get; set; }
-        public virtual Action Action { get; set; }
-        public virtual PostAction PostAction { get; set; }
     }
 }

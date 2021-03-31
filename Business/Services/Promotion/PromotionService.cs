@@ -113,7 +113,7 @@ namespace ApplicationCore.Services
                     var countTier = await promotionTierRepo.CountAsync(filter: o => o.PromotionId.Equals(promotionTier.PromotionId));
                     var actionEntity = _mapper.Map<Infrastructure.Models.Action>(param.Action);
                     actionEntity.ActionId = Guid.NewGuid();
-                    actionEntity.PromotionTierId = promotionTier.PromotionTierId;
+                    //actionEntity.PromotionTierId = promotionTier.PromotionTierId;
                     actionEntity.ActionType = actionEntity.ActionType;
                     actionEntity.DiscountType = actionEntity.DiscountType;
                     promotionTier.Summary = CreateSummaryAction(actionEntity);
@@ -151,7 +151,7 @@ namespace ApplicationCore.Services
                     var countTier = await promotionTierRepo.CountAsync(filter: o => o.PromotionId.Equals(promotionTier.ActionId));
                     var postAction = _mapper.Map<PostAction>(param.PostAction);
                     postAction.PostActionId = Guid.NewGuid();
-                    postAction.PromotionTierId = promotionTier.PromotionTierId;
+                    //postAction.PromotionTierId = promotionTier.PromotionTierId;
                     postAction.ActionType = postAction.ActionType;
                     postAction.DiscountType = postAction.DiscountType;
                     //promotionTier.Summary = CreateSummarypostAction(postAction);
@@ -356,7 +356,7 @@ namespace ApplicationCore.Services
                     IGenericRepository<Infrastructure.Models.Action> actionRepo = _unitOfWork.ActionRepository;
                     actionEntity.UpdDate = DateTime.Now;
                     //actionEntity.InsDate = null;
-                    actionEntity.PromotionTierId = updateParam.PromotionTierId;
+                    //actionEntity.PromotionTierId = updateParam.PromotionTierId;
                     actionRepo.Update(actionEntity);
                     var tier = await promotionTierRepo.GetFirst(filter: el => el.ActionId.Equals(actionEntity.ActionId));
                     tier.Summary = CreateSummaryAction(actionEntity);
@@ -386,7 +386,7 @@ namespace ApplicationCore.Services
                     IGenericRepository<PostAction> postActionRepo = _unitOfWork.PostActionRepository;
                     postActionEntity.UpdDate = DateTime.Now;
                   //  postActionEntity.InsDate = null;
-                    postActionEntity.PromotionTierId = updateParam.PromotionTierId;
+                    //postActionEntity.PromotionTierId = updateParam.PromotionTierId;
                     postActionRepo.Update(postActionEntity);
                     var tier = await promotionTierRepo.GetFirst(filter: el => el.PostActionId.Equals(postActionEntity.PostActionId));
                     //tier.Summary = CreateSummaryPostAction(postActionEntity);

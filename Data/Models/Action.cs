@@ -8,11 +8,11 @@ namespace Infrastructure.Models
         public Action()
         {
             ActionProductMapping = new HashSet<ActionProductMapping>();
+            PromotionTier = new HashSet<PromotionTier>();
             VoucherGroup = new HashSet<VoucherGroup>();
         }
 
         public Guid ActionId { get; set; }
-        public Guid PromotionTierId { get; set; }
         public int ActionType { get; set; }
         public int DiscountType { get; set; }
         public int? DiscountQuantity { get; set; }
@@ -33,8 +33,8 @@ namespace Infrastructure.Models
         public Guid? BrandId { get; set; }
 
         public virtual Brand Brand { get; set; }
-        public virtual PromotionTier PromotionTier { get; set; }
         public virtual ICollection<ActionProductMapping> ActionProductMapping { get; set; }
+        public virtual ICollection<PromotionTier> PromotionTier { get; set; }
         public virtual ICollection<VoucherGroup> VoucherGroup { get; set; }
     }
 }

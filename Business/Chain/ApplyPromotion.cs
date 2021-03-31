@@ -83,9 +83,9 @@ namespace ApplicationCore.Chain
             }
             else
             {
-                result = postActions.Where(w =>
-                    w.PromotionTier.TierIndex == postActions.Max(m => m.PromotionTier.TierIndex))
-                    .SingleOrDefault();
+                //result = postActions.Where(w =>
+                //    w.PromotionTier.TierIndex == postActions.Max(m => m.PromotionTier.TierIndex))
+                //    .SingleOrDefault();
             }
             return result;
         }
@@ -218,29 +218,29 @@ namespace ApplicationCore.Chain
             }
             if (action != null)
             {
-                order.Effects.Add(new
-                Effect
-                {
-                    PromotionId = promotion.PromotionId,
-                    PromotionTierId = action.PromotionTierId,
-                    ConditionRuleName = action.PromotionTier.ConditionRule.RuleName,
-                    TierIndex = (int)action.PromotionTier.TierIndex,
-                    EffectType = effectType,
-                    Prop = new
-                    {
-                        name = action.PromotionTier.Summary,
-                        value = discount
-                    }
-                });
+                //order.Effects.Add(new
+                //Effect
+                //{
+                //    PromotionId = promotion.PromotionId,
+                //    PromotionTierId = action.PromotionTierId,
+                //    ConditionRuleName = action.PromotionTier.ConditionRule.RuleName,
+                //    TierIndex = (int)action.PromotionTier.TierIndex,
+                //    EffectType = effectType,
+                //    Prop = new
+                //    {
+                //        name = action.PromotionTier.Summary,
+                //        value = discount
+                //    }
+                //});
             }
             if (postAction != null)
             {
                 order.Effects.Add(new Effect
                 {
                     PromotionId = promotion.PromotionId,
-                    PromotionTierId = postAction.PromotionTierId,
-                    ConditionRuleName = postAction.PromotionTier.ConditionRule.RuleName,
-                    TierIndex = (int)postAction.PromotionTier.TierIndex,
+                    //PromotionTierId = postAction.PromotionTierId,
+                    //ConditionRuleName = postAction.PromotionTier.ConditionRule.RuleName,
+                    //TierIndex = (int)postAction.PromotionTier.TierIndex,
                     EffectType = effectType,
                     Prop = new
                     {
