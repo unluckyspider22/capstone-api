@@ -201,8 +201,6 @@ namespace PromotionEngineAPI.Controllers
             {
                 return StatusCode(statusCode: e.Code, e);
             }
-
-
         }
 
         // GET: api/Promotions/count

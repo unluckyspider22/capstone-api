@@ -1188,12 +1188,10 @@ namespace ApplicationCore.Services
             catch (Exception e)
             {
                 Debug.WriteLine(e.StackTrace);
-                throw new ErrorObj(code: 500, message: "Oops, something went wrong. Try again", description: "Internal Server Error");
+                throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
             }
 
         }
-
-
 
 
         #endregion
@@ -1231,7 +1229,7 @@ namespace ApplicationCore.Services
             catch (Exception e)
             {
                 Debug.WriteLine(e.InnerException);
-                throw new ErrorObj(code: 500, message: "Oops, something went wrong. Try again", description: "Internal Server Error");
+                throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
             }
 
         }
