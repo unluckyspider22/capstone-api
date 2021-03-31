@@ -31,7 +31,7 @@ namespace ApplicationCore.Services
             {
                 Debug.WriteLine(e.StackTrace);
                 Debug.WriteLine(e.InnerException);
-                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.", description: "Internal Server Error");
+                throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
             }
         }
     }

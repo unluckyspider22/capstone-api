@@ -59,7 +59,7 @@ namespace ApplicationCore.Services
             {
                 //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.StackTrace);
-                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+                throw new ErrorObj(code: 500, message: e.Message);
             }
 
         }
@@ -102,7 +102,7 @@ namespace ApplicationCore.Services
             {
                 //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.StackTrace);
-                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+                throw new ErrorObj(code: 500, message: e.Message);
             }
         }
 
@@ -145,7 +145,7 @@ namespace ApplicationCore.Services
                     }
                 }
                 var list = result;
-                var totalItem = (await _repository.Get(filter: o =>  !o.DelFlg, includeProperties: "ProductCate")).Where(o=>o.ProductCate.BrandId.Equals(brandId)).ToList().Count();
+                var totalItem = (await _repository.Get(filter: o => !o.DelFlg, includeProperties: "ProductCate")).Where(o => o.ProductCate.BrandId.Equals(brandId)).ToList().Count();
                 MetaData metadata = new MetaData(pageIndex: PageIndex, pageSize: PageSize, totalItems: totalItem);
                 GenericRespones<BrandProductDto> reponse = new GenericRespones<BrandProductDto>(data: list.ToList(), metadata: metadata);
                 return reponse;
@@ -154,7 +154,7 @@ namespace ApplicationCore.Services
             {
                 //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.StackTrace);
-                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+                throw new ErrorObj(code: 500, message: e.Message);
             }
 
         }
@@ -360,10 +360,6 @@ namespace ApplicationCore.Services
                 if (entity != null)
                 {
                     entity.UpdDate = DateTime.Now;
-                    if (dto.CateId != null)
-                    {
-                        entity.CateId = dto.CateId;
-                    }
                     if (dto.Name != null)
                     {
                         entity.Name = dto.Name;
@@ -371,10 +367,6 @@ namespace ApplicationCore.Services
                     if (dto.Code != null)
                     {
                         entity.Code = dto.Code;
-                    }
-                    if (dto.DelFlg != null)
-                    {
-                        entity.DelFlg = dto.DelFlg;
                     }
                     if (!dto.ProductCateId.Equals(Guid.Empty) && !dto.ProductCateId.Equals(entity.ProductCateId))
                     {
@@ -384,7 +376,7 @@ namespace ApplicationCore.Services
                         var newCate = await cateRepo.GetFirst(filter: o => o.ProductCateId.Equals(dto.ProductCateId) && !o.DelFlg);
                         newCate.Product.Add(entity);
                         entity.ProductCateId = dto.ProductCateId;
-                        entity.CateId = newCate.CateId;
+                        /*entity.CateId = newCate.CateId;*/
                     }
                     _repository.Update(entity);
                     await _unitOfWork.SaveAsync();
@@ -400,7 +392,7 @@ namespace ApplicationCore.Services
             {
                 //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.Message);
-                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+                throw new ErrorObj(code: 500, message: e.Message);
             }
         }
     }

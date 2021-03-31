@@ -76,7 +76,7 @@ namespace ApplicationCore.Services
             VoucherForChannelResponse result = new VoucherForChannelResponse();
             try
             {
-                var promotion = await _promotionService
+               /* var promotion = await _promotionService
                     .GetFirst(el =>
                     el.PromotionId.Equals(channelParam.PromotionId),
                     includeProperties: "PromotionStoreMapping.Store," +
@@ -121,7 +121,7 @@ namespace ApplicationCore.Services
                     {
                         throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Voucher_OutOfStock);
                     }
-                }
+                }*/
                 return result;
             }
             catch (ErrorObj e1)

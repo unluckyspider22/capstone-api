@@ -10,8 +10,8 @@ namespace Infrastructure.DTOs
     {
         public Guid ConditionGroupId { get; set; }
         public Guid ConditionRuleId { get; set; }
-        public decimal GroupNo { get; set; }
-        public string NextOperator { get; set; }
+        public int GroupNo { get; set; }
+        public int NextOperator { get; set; }
         public List<Object> Conditions { get; set; }
         public string Summary { get; set; }
 

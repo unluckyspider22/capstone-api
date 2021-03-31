@@ -39,7 +39,7 @@ namespace Infrastructure.Repository
         {
             using (var context = new PromotionEngineContext())
             {
-                var now = DateTime.Now;
+              /*  var now = DateTime.Now;
                 var voucher = await context.VoucherGroup.FindAsync(voucherGroupId);
                 var promo = await context.Promotion.FindAsync(promotionId);
                 if (voucher != null)
@@ -55,7 +55,7 @@ namespace Infrastructure.Repository
                     context.Entry(promo).State = EntityState.Modified;
                     promo.VoucherGroup = null;
                     promo.UpdDate = now;
-                }
+                }*/
 
 
 

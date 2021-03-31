@@ -7,10 +7,12 @@ namespace Infrastructure.Models
     {
         public Brand()
         {
+            Action = new HashSet<Action>();
             Channel = new HashSet<Channel>();
             ConditionRule = new HashSet<ConditionRule>();
             GameConfig = new HashSet<GameConfig>();
             MemberLevel = new HashSet<MemberLevel>();
+            PostAction = new HashSet<PostAction>();
             ProductCategory = new HashSet<ProductCategory>();
             Promotion = new HashSet<Promotion>();
             Store = new HashSet<Store>();
@@ -28,14 +30,16 @@ namespace Infrastructure.Models
         public string Description { get; set; }
         public string Address { get; set; }
         public bool DelFlg { get; set; }
-        public DateTime? InsDate { get; set; }
-        public DateTime? UpdDate { get; set; }
+        public DateTime InsDate { get; set; }
+        public DateTime UpdDate { get; set; }
 
         public virtual Account UsernameNavigation { get; set; }
+        public virtual ICollection<Action> Action { get; set; }
         public virtual ICollection<Channel> Channel { get; set; }
         public virtual ICollection<ConditionRule> ConditionRule { get; set; }
         public virtual ICollection<GameConfig> GameConfig { get; set; }
         public virtual ICollection<MemberLevel> MemberLevel { get; set; }
+        public virtual ICollection<PostAction> PostAction { get; set; }
         public virtual ICollection<ProductCategory> ProductCategory { get; set; }
         public virtual ICollection<Promotion> Promotion { get; set; }
         public virtual ICollection<Store> Store { get; set; }

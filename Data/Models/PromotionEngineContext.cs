@@ -68,10 +68,13 @@ namespace Infrastructure.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.Email)
+                    .IsRequired()
                     .HasMaxLength(62)
                     .IsUnicode(false);
 
-                entity.Property(e => e.FirstName).HasMaxLength(50);
+                entity.Property(e => e.FirstName)
+                    .IsRequired()
+                    .HasMaxLength(50);
 
                 entity.Property(e => e.ImgUrl)
                     .HasMaxLength(2048)
@@ -81,13 +84,17 @@ namespace Infrastructure.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.LastName).HasMaxLength(50);
+                entity.Property(e => e.LastName)
+                    .IsRequired()
+                    .HasMaxLength(50);
 
                 entity.Property(e => e.Password)
+                    .IsRequired()
                     .HasMaxLength(60)
                     .IsUnicode(false);
 
                 entity.Property(e => e.PhoneNumber)
+                    .IsRequired()
                     .HasMaxLength(11)
                     .IsUnicode(false);
 
@@ -98,6 +105,7 @@ namespace Infrastructure.Models
                 entity.HasOne(d => d.Role)
                     .WithMany(p => p.Account)
                     .HasForeignKey(d => d.RoleId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Account_Role");
             });
 
@@ -109,32 +117,11 @@ namespace Infrastructure.Models
 
                 entity.Property(e => e.ActionId).HasDefaultValueSql("(newid())");
 
-                entity.Property(e => e.ActionType)
-                    .IsRequired()
-                    .HasMaxLength(1)
-                    .IsUnicode(false)
-                    .IsFixedLength();
-
                 entity.Property(e => e.BundlePrice).HasColumnType("decimal(10, 0)");
-
-                entity.Property(e => e.BundleQuantity).HasColumnType("decimal(6, 0)");
-
-                entity.Property(e => e.BundleStrategy)
-                    .HasMaxLength(1)
-                    .IsUnicode(false)
-                    .IsFixedLength();
 
                 entity.Property(e => e.DiscountAmount).HasColumnType("decimal(10, 0)");
 
                 entity.Property(e => e.DiscountPercentage).HasColumnType("decimal(18, 0)");
-
-                entity.Property(e => e.DiscountQuantity).HasColumnType("decimal(6, 0)");
-
-                entity.Property(e => e.DiscountType)
-                    .IsRequired()
-                    .HasMaxLength(1)
-                    .IsUnicode(false)
-                    .IsFixedLength();
 
                 entity.Property(e => e.FixedPrice).HasColumnType("decimal(10, 0)");
 
@@ -148,11 +135,16 @@ namespace Infrastructure.Models
 
                 entity.Property(e => e.MinPriceAfter).HasColumnType("decimal(10, 0)");
 
-                entity.Property(e => e.OrderLadderProduct).HasColumnType("decimal(2, 0)");
+                entity.Property(e => e.Name).HasMaxLength(100);
 
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
+
+                entity.HasOne(d => d.Brand)
+                    .WithMany(p => p.Action)
+                    .HasForeignKey(d => d.BrandId)
+                    .HasConstraintName("FK_Action_Brand");
 
                 entity.HasOne(d => d.PromotionTier)
                     .WithOne(p => p.Action)
@@ -172,11 +164,13 @@ namespace Infrastructure.Models
                 entity.HasOne(d => d.Action)
                     .WithMany(p => p.ActionProductMapping)
                     .HasForeignKey(d => d.ActionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ActionProductMapping_Action");
 
                 entity.HasOne(d => d.Product)
                     .WithMany(p => p.ActionProductMapping)
                     .HasForeignKey(d => d.ProductId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ActionProductMapping_Product");
             });
 
@@ -195,12 +189,17 @@ namespace Infrastructure.Models
                 entity.Property(e => e.Address).HasMaxLength(100);
 
                 entity.Property(e => e.BrandCode)
+                    .IsRequired()
                     .HasMaxLength(30)
                     .IsUnicode(false);
 
-                entity.Property(e => e.BrandName).HasMaxLength(50);
+                entity.Property(e => e.BrandName)
+                    .IsRequired()
+                    .HasMaxLength(50);
 
-                entity.Property(e => e.CompanyName).HasMaxLength(50);
+                entity.Property(e => e.CompanyName)
+                    .IsRequired()
+                    .HasMaxLength(50);
 
                 entity.Property(e => e.Description).HasMaxLength(100);
 
@@ -213,6 +212,7 @@ namespace Infrastructure.Models
                     .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.PhoneNumber)
+                    .IsRequired()
                     .HasMaxLength(11)
                     .IsUnicode(false);
 
@@ -236,17 +236,14 @@ namespace Infrastructure.Models
             {
                 entity.Property(e => e.ChannelId).HasDefaultValueSql("(newid())");
 
-                entity.Property(e => e.AccessToken)
-                    .HasMaxLength(60)
-                    .IsUnicode(false);
-
                 entity.Property(e => e.ChannelCode)
+                    .IsRequired()
                     .HasMaxLength(20)
                     .IsUnicode(false);
 
-                entity.Property(e => e.ChannelName).HasMaxLength(50);
-
-                entity.Property(e => e.Group).HasColumnType("numeric(6, 0)");
+                entity.Property(e => e.ChannelName)
+                    .IsRequired()
+                    .HasMaxLength(50);
 
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
@@ -266,20 +263,11 @@ namespace Infrastructure.Models
             {
                 entity.Property(e => e.ConditionGroupId).HasDefaultValueSql("(newid())");
 
-                entity.Property(e => e.GroupNo).HasColumnType("decimal(5, 0)");
-
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.NextOperator)
-                    .HasMaxLength(1)
-                    .IsUnicode(false)
-                    .IsFixedLength();
-
-                entity.Property(e => e.Summary)
-                    .HasMaxLength(4000)
-                    .IsUnicode(false);
+                entity.Property(e => e.Summary).HasMaxLength(4000);
 
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
@@ -322,6 +310,7 @@ namespace Infrastructure.Models
                 entity.Property(e => e.DeviceId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.Code)
+                    .IsRequired()
                     .HasMaxLength(8)
                     .IsUnicode(false);
 
@@ -329,7 +318,9 @@ namespace Infrastructure.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.Name).HasMaxLength(50);
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(50);
 
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
@@ -363,6 +354,12 @@ namespace Infrastructure.Models
                     .HasForeignKey(d => d.BrandId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Game_Brand");
+
+                entity.HasOne(d => d.GameMaster)
+                    .WithMany(p => p.GameConfig)
+                    .HasForeignKey(d => d.GameMasterId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_GameConfig_GameMaster");
             });
 
             modelBuilder.Entity<GameItems>(entity =>
@@ -371,7 +368,9 @@ namespace Infrastructure.Models
 
                 entity.Property(e => e.Description).HasMaxLength(4000);
 
-                entity.Property(e => e.DisplayText).HasMaxLength(30);
+                entity.Property(e => e.DisplayText)
+                    .IsRequired()
+                    .HasMaxLength(30);
 
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
@@ -419,15 +418,13 @@ namespace Infrastructure.Models
 
                 entity.Property(e => e.Date).HasColumnType("date");
 
-                entity.Property(e => e.HolidayName).HasMaxLength(100);
+                entity.Property(e => e.HolidayName)
+                    .IsRequired()
+                    .HasMaxLength(100);
 
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
-
-                entity.Property(e => e.Rank)
-                    .HasMaxLength(5)
-                    .IsUnicode(false);
 
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
@@ -472,11 +469,13 @@ namespace Infrastructure.Models
                 entity.HasOne(d => d.MemberLevel)
                     .WithMany(p => p.MemberLevelMapping)
                     .HasForeignKey(d => d.MemberLevelId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_MemberLevelMapping_MemberLevel");
 
                 entity.HasOne(d => d.Promotion)
                     .WithMany(p => p.MemberLevelMapping)
                     .HasForeignKey(d => d.PromotionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_MemberLevelMapping_Promotion");
             });
 
@@ -485,10 +484,13 @@ namespace Infrastructure.Models
                 entity.Property(e => e.MembershipId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.Email)
+                    .IsRequired()
                     .HasMaxLength(62)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Fullname).HasMaxLength(50);
+                entity.Property(e => e.Fullname)
+                    .IsRequired()
+                    .HasMaxLength(50);
 
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
@@ -499,6 +501,7 @@ namespace Infrastructure.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.PhoneNumber)
+                    .IsRequired()
                     .HasMaxLength(11)
                     .IsUnicode(false);
 
@@ -515,7 +518,7 @@ namespace Infrastructure.Models
 
                 entity.Property(e => e.AmountOperator)
                     .IsRequired()
-                    .HasMaxLength(1)
+                    .HasMaxLength(2)
                     .IsUnicode(false)
                     .IsFixedLength();
 
@@ -523,16 +526,9 @@ namespace Infrastructure.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.NextOperator)
-                    .HasMaxLength(1)
-                    .IsUnicode(false)
-                    .IsFixedLength();
-
-                entity.Property(e => e.Quantity).HasColumnType("decimal(6, 0)");
-
                 entity.Property(e => e.QuantityOperator)
                     .IsRequired()
-                    .HasMaxLength(1)
+                    .HasMaxLength(2)
                     .IsUnicode(false)
                     .IsFixedLength();
 
@@ -555,21 +551,7 @@ namespace Infrastructure.Models
 
                 entity.Property(e => e.PostActionId).HasDefaultValueSql("(newid())");
 
-                entity.Property(e => e.ActionType)
-                    .IsRequired()
-                    .HasMaxLength(1)
-                    .IsUnicode(false)
-                    .IsFixedLength();
-
                 entity.Property(e => e.BonusPoint).HasColumnType("decimal(10, 2)");
-
-                entity.Property(e => e.DiscountType)
-                    .IsRequired()
-                    .HasMaxLength(2)
-                    .IsUnicode(false)
-                    .IsFixedLength();
-
-                entity.Property(e => e.GiftName).HasMaxLength(50);
 
                 entity.Property(e => e.GiftProductCode)
                     .HasMaxLength(50)
@@ -581,9 +563,16 @@ namespace Infrastructure.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.Property(e => e.Name).HasMaxLength(100);
+
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
+
+                entity.HasOne(d => d.Brand)
+                    .WithMany(p => p.PostAction)
+                    .HasForeignKey(d => d.BrandId)
+                    .HasConstraintName("FK_PostAction_Brand");
 
                 entity.HasOne(d => d.PromotionTier)
                     .WithOne(p => p.PostAction)
@@ -603,21 +592,19 @@ namespace Infrastructure.Models
                 entity.HasOne(d => d.PostAction)
                     .WithMany(p => p.PostActionProductMapping)
                     .HasForeignKey(d => d.PostActionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_PostActionProductMapping_PostAction");
 
                 entity.HasOne(d => d.Product)
                     .WithMany(p => p.PostActionProductMapping)
                     .HasForeignKey(d => d.ProductId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_PostActionProductMapping_Product");
             });
 
             modelBuilder.Entity<Product>(entity =>
             {
                 entity.Property(e => e.ProductId).HasDefaultValueSql("(newid())");
-
-                entity.Property(e => e.CateId)
-                    .HasMaxLength(30)
-                    .IsUnicode(false);
 
                 entity.Property(e => e.Code)
                     .IsRequired()
@@ -628,7 +615,9 @@ namespace Infrastructure.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.Name).HasMaxLength(80);
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(80);
 
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
@@ -677,23 +666,9 @@ namespace Infrastructure.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.NextOperator)
-                    .IsRequired()
-                    .HasMaxLength(1)
-                    .IsUnicode(false)
-                    .IsFixedLength();
-
-                entity.Property(e => e.ProductConditionType)
-                    .IsRequired()
-                    .HasMaxLength(1)
-                    .IsUnicode(false)
-                    .IsFixedLength();
-
-                entity.Property(e => e.ProductQuantity).HasColumnType("decimal(6, 0)");
-
                 entity.Property(e => e.QuantityOperator)
                     .IsRequired()
-                    .HasMaxLength(1)
+                    .HasMaxLength(2)
                     .IsUnicode(false)
                     .IsFixedLength();
 
@@ -719,11 +694,13 @@ namespace Infrastructure.Models
                 entity.HasOne(d => d.ProductCondition)
                     .WithMany(p => p.ProductConditionMapping)
                     .HasForeignKey(d => d.ProductConditionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ProductConditionMapping_ProductCondition");
 
                 entity.HasOne(d => d.Product)
                     .WithMany(p => p.ProductConditionMapping)
                     .HasForeignKey(d => d.ProductId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ProductConditionMapping_Product");
             });
 
@@ -731,53 +708,9 @@ namespace Infrastructure.Models
             {
                 entity.Property(e => e.PromotionId).HasDefaultValueSql("(newid())");
 
-                entity.Property(e => e.ActionType)
-                    .HasMaxLength(1)
-                    .IsUnicode(false)
-                    .IsFixedLength();
-
-                entity.Property(e => e.ApplyBy)
-                    .HasMaxLength(1)
-                    .IsUnicode(false)
-                    .IsFixedLength();
-
-                entity.Property(e => e.DayFilter)
-                    .HasMaxLength(10)
-                    .IsUnicode(false);
-
                 entity.Property(e => e.Description).HasMaxLength(4000);
 
-                entity.Property(e => e.DiscountType)
-                    .HasMaxLength(2)
-                    .IsUnicode(false);
-
                 entity.Property(e => e.EndDate).HasColumnType("datetime");
-
-                entity.Property(e => e.Exclusive)
-                    .HasMaxLength(1)
-                    .IsUnicode(false)
-                    .IsFixedLength();
-
-                entity.Property(e => e.ForHoliday)
-                    .HasMaxLength(1)
-                    .IsUnicode(false)
-                    .IsFixedLength()
-                    .HasDefaultValueSql("((0))");
-
-                entity.Property(e => e.ForMembership)
-                    .HasMaxLength(1)
-                    .IsUnicode(false)
-                    .IsFixedLength()
-                    .HasDefaultValueSql("((0))");
-
-                entity.Property(e => e.Gender)
-                    .HasMaxLength(1)
-                    .IsUnicode(false)
-                    .IsFixedLength();
-
-                entity.Property(e => e.HourFilter)
-                    .HasMaxLength(10)
-                    .IsUnicode(false);
 
                 entity.Property(e => e.ImgUrl)
                     .HasMaxLength(2048)
@@ -787,43 +720,16 @@ namespace Infrastructure.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.PaymentMethod)
-                    .HasMaxLength(10)
-                    .IsUnicode(false);
-
                 entity.Property(e => e.PromotionCode)
+                    .IsRequired()
                     .HasMaxLength(6)
                     .IsUnicode(false);
 
-                entity.Property(e => e.PromotionLevel)
-                    .HasMaxLength(1)
-                    .IsUnicode(false)
-                    .IsFixedLength();
-
-                entity.Property(e => e.PromotionName).HasMaxLength(100);
-
-                entity.Property(e => e.PromotionType)
-                    .HasMaxLength(1)
-                    .IsUnicode(false)
-                    .IsFixedLength();
-
-                entity.Property(e => e.Rank)
-                    .HasMaxLength(3)
-                    .IsUnicode(false)
-                    .HasDefaultValueSql("((0))");
-
-                entity.Property(e => e.SaleMode)
-                    .HasMaxLength(1)
-                    .IsUnicode(false)
-                    .IsFixedLength();
+                entity.Property(e => e.PromotionName)
+                    .IsRequired()
+                    .HasMaxLength(100);
 
                 entity.Property(e => e.StartDate).HasColumnType("datetime");
-
-                entity.Property(e => e.Status)
-                    .HasMaxLength(1)
-                    .IsUnicode(false)
-                    .IsFixedLength()
-                    .HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
@@ -832,6 +738,7 @@ namespace Infrastructure.Models
                 entity.HasOne(d => d.Brand)
                     .WithMany(p => p.Promotion)
                     .HasForeignKey(d => d.BrandId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Promotion_Brand");
             });
 
@@ -853,11 +760,13 @@ namespace Infrastructure.Models
                 entity.HasOne(d => d.Channel)
                     .WithMany(p => p.PromotionChannelMapping)
                     .HasForeignKey(d => d.ChannelId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_VoucherChannel_Channel");
 
                 entity.HasOne(d => d.Promotion)
                     .WithMany(p => p.PromotionChannelMapping)
                     .HasForeignKey(d => d.PromotionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_VoucherChannel_Promotion");
             });
 
@@ -876,11 +785,13 @@ namespace Infrastructure.Models
                 entity.HasOne(d => d.Promotion)
                     .WithMany(p => p.PromotionStoreMapping)
                     .HasForeignKey(d => d.PromotionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_PromotionStoreMapping_Promotion");
 
                 entity.HasOne(d => d.Store)
                     .WithMany(p => p.PromotionStoreMapping)
                     .HasForeignKey(d => d.StoreId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_PromotionStoreMapping_Store");
             });
 
@@ -911,6 +822,11 @@ namespace Infrastructure.Models
                     .WithMany(p => p.PromotionTier)
                     .HasForeignKey(d => d.PromotionId)
                     .HasConstraintName("FK_PromotionTier_Promotion");
+
+                entity.HasOne(d => d.VoucherGroup)
+                    .WithMany(p => p.PromotionTier)
+                    .HasForeignKey(d => d.VoucherGroupId)
+                    .HasConstraintName("FK_PromotionTier_VoucherGroup");
             });
 
             modelBuilder.Entity<RoleEntity>(entity =>
@@ -920,6 +836,7 @@ namespace Infrastructure.Models
                     .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.Name)
+                    .IsRequired()
                     .HasMaxLength(20)
                     .IsUnicode(false);
 
@@ -932,17 +849,18 @@ namespace Infrastructure.Models
             {
                 entity.Property(e => e.StoreId).HasDefaultValueSql("(newid())");
 
-                entity.Property(e => e.Group).HasColumnType("numeric(6, 0)");
-
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.StoreCode)
+                    .IsRequired()
                     .HasMaxLength(20)
                     .IsUnicode(false);
 
-                entity.Property(e => e.StoreName).HasMaxLength(50);
+                entity.Property(e => e.StoreName)
+                    .IsRequired()
+                    .HasMaxLength(50);
 
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
@@ -951,6 +869,7 @@ namespace Infrastructure.Models
                 entity.HasOne(d => d.Brand)
                     .WithMany(p => p.Store)
                     .HasForeignKey(d => d.BrandId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Store_Brand");
             });
 
@@ -971,12 +890,6 @@ namespace Infrastructure.Models
                     .HasForeignKey(d => d.BrandId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Transaction_Brand");
-
-                entity.HasOne(d => d.Promotion)
-                    .WithMany(p => p.Transaction)
-                    .HasForeignKey(d => d.PromotionId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Transaction_Promotion");
             });
 
             modelBuilder.Entity<Voucher>(entity =>
@@ -1012,6 +925,11 @@ namespace Infrastructure.Models
                     .HasForeignKey(d => d.MembershipId)
                     .HasConstraintName("FK_Voucher_Membership");
 
+                entity.HasOne(d => d.Promotion)
+                    .WithMany(p => p.Voucher)
+                    .HasForeignKey(d => d.PromotionId)
+                    .HasConstraintName("FK_Voucher_Promotion");
+
                 entity.HasOne(d => d.Store)
                     .WithMany(p => p.Voucher)
                     .HasForeignKey(d => d.StoreId)
@@ -1020,16 +938,12 @@ namespace Infrastructure.Models
                 entity.HasOne(d => d.VoucherGroup)
                     .WithMany(p => p.Voucher)
                     .HasForeignKey(d => d.VoucherGroupId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Voucher_VoucherGroup");
             });
 
             modelBuilder.Entity<VoucherGroup>(entity =>
             {
-                entity.HasIndex(e => e.PromotionId)
-                    .HasName("IX_UNIQUE_FILTERED")
-                    .IsUnique()
-                    .HasFilter("([PromotionId] IS NOT NULL)");
-
                 entity.Property(e => e.VoucherGroupId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.Charset)
@@ -1052,38 +966,40 @@ namespace Infrastructure.Models
                     .HasMaxLength(10)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Quantity)
-                    .HasColumnType("decimal(10, 0)")
-                    .HasDefaultValueSql("((1))");
-
-                entity.Property(e => e.RedempedQuantity)
-                    .HasColumnType("decimal(10, 0)")
-                    .HasDefaultValueSql("((0))");
-
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.UsedQuantity)
-                    .HasColumnType("decimal(10, 0)")
-                    .HasDefaultValueSql("((0))");
-
-                entity.Property(e => e.VoucherName).HasMaxLength(50);
+                entity.Property(e => e.VoucherName)
+                    .IsRequired()
+                    .HasMaxLength(50);
 
                 entity.Property(e => e.VoucherType)
+                    .IsRequired()
                     .HasMaxLength(1)
                     .IsUnicode(false)
                     .IsFixedLength();
 
+                entity.HasOne(d => d.Action)
+                    .WithMany(p => p.VoucherGroup)
+                    .HasForeignKey(d => d.ActionId)
+                    .HasConstraintName("FK_VoucherGroup_Action");
+
                 entity.HasOne(d => d.Brand)
                     .WithMany(p => p.VoucherGroup)
                     .HasForeignKey(d => d.BrandId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_VoucherGroup_Brand");
 
-                entity.HasOne(d => d.Promotion)
-                    .WithOne(p => p.VoucherGroup)
-                    .HasForeignKey<VoucherGroup>(d => d.PromotionId)
-                    .HasConstraintName("FK_VoucherGroup_Promotion");
+                entity.HasOne(d => d.ConditionRule)
+                    .WithMany(p => p.VoucherGroup)
+                    .HasForeignKey(d => d.ConditionRuleId)
+                    .HasConstraintName("FK_VoucherGroup_ConditionRule");
+
+                entity.HasOne(d => d.PostAction)
+                    .WithMany(p => p.VoucherGroup)
+                    .HasForeignKey(d => d.PostActionId)
+                    .HasConstraintName("FK_VoucherGroup_PostAction");
             });
 
             OnModelCreatingPartial(modelBuilder);

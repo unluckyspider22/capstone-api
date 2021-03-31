@@ -106,14 +106,14 @@ namespace ApplicationCore.Chain
         }
         public void HandleDayOfWeek(Promotion promotion, DayOfWeek dayOfWeek)
         {
-            if (!Common.CompareBinary(((int)(Math.Pow(2, (int)dayOfWeek))).ToString(), promotion.DayFilter))
+            if (!Common.CompareBinary((int)(Math.Pow(2, (int)dayOfWeek)), promotion.DayFilter))
             {
                 throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_DayInWeek);
             }
         }
         public void HandleHour(Promotion promotion, int hourOfDay)
         {
-            if (!Common.CompareBinary(((int)Math.Pow(2, hourOfDay)).ToString(), promotion.HourFilter))
+            if (!Common.CompareBinary((int)Math.Pow(2, hourOfDay), promotion.HourFilter))
             {
                 throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_HourFrame);
             }

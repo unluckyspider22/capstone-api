@@ -52,26 +52,26 @@ namespace Infrastructure.Helper
             public const int AdminId = 2;
             public const string Admin = "Admin";
             public const string BrandManager = "Brand Manager";
-            public struct ActionType
+            public enum ActionType
             {
-                public const string Product = "1";
-                public const string Order = "2";
-                public const string Gift = "3";
-                public const string BonusPoint = "4";
+                Product = 1,
+                Order = 2,
+                Gift = 3,
+                BonusPoint = 4
             }
 
-            public struct DiscountType
+            public enum DiscountType
             {
-                public const string Amount = "1";
-                public const string Percentage = "2";
-                public const string Unit = "3";
-                public const string Shipping = "4";
-                public const string Fixed = "5";
-                public const string Ladder = "6";
-                public const string Bundle = "7";
-                public const string GiftProduct = "8";
-                public const string GiftVoucher = "9";
-                public const string BonusPoint = "10";
+                Amount = 1,
+                Percentage = 2,
+                Unit = 3,
+                Shipping = 4,
+                Fixed = 5,
+                Ladder = 6,
+                Bundle = 7,
+                GiftProduct = 8,
+                GiftVoucher = 9,
+                BonusPoint = 10
             }
             public struct CharsetType
             {
@@ -90,22 +90,22 @@ namespace Infrastructure.Helper
                 public const string ALPHABETIC_UPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
                 public const string NUMBERS = "0123456789";
             }
-            public struct ProductType
+            public enum ProductType
             {
-                public const string SINGLE_PRODUCT = "1";
-                public const string COLLECTION = "2";
-                public const string CATEGORY = "3";
-                public const string TAG = "4";
-                public const string GENERAL = "5";
-                public const string COMBO = "6";
-                public const string COMPLEX = "7";
-                public const string EXTRA = "8";
+                SINGLE_PRODUCT = 1,
+                COLLECTION = 2,
+                CATEGORY = 3,
+                TAG = 4,
+                GENERAL = 5,
+                COMBO = 6,
+                COMPLEX = 7,
+                EXTRA = 8
             }
 
-            public struct VoucherType
+            public enum VoucherType
             {
-                public const string BULK_CODE = "1";
-                public const string STANDALONE_CODE = "2";
+                BULK_CODE = 1,
+                STANDALONE_CODE = 2,
             }
             public struct Voucher
             {
@@ -114,34 +114,34 @@ namespace Infrastructure.Helper
                 public const bool REDEEMPED = true;
                 public const bool UNREDEEM = false;
             }
-            public struct PromotionType
+            public enum PromotionType
             {
-                public const string DISCOUNT = "1";
-                public const string AUTO_PROMOTION = "2";
-                public const string GIFT = "3";
-                public const string BONUS_POINT = "4";
+                DISCOUNT = 1,
+                AUTO_PROMOTION = 2,
+                GIFT = 3,
+                BONUS_POINT = 4,
             }
-            public struct PromotionStatus
+            public enum PromotionStatus
             {
-                public const string DRAFT = "1";
-                public const string PUBLISH = "2";
-                public const string UNPUBLISH = "3";
-                public const string EXPIRED = "4";
+                DRAFT = 1,
+                PUBLISH = 2,
+                UNPUBLISH = 3,
+                EXPIRED = 4,
             }
 
-            public struct Exclusive
+            public enum Exclusive
             {
-                public const string NoneExclusive = "0";
-                public const string GlobalExclusive = "1";
-                public const string ClassExclusiveOrder = "2";
-                public const string ClassExclusiveProduct = "3";
-                public const string ClassExclusiveShipping = "4";
+                NoneExclusive = 0,
+                GlobalExclusive = 1,
+                ClassExclusiveOrder = 2,
+                ClassExclusiveProduct = 3,
+                ClassExclusiveShipping = 4,
             }
-            public struct Holiday
+            public enum Holiday
             {
-                public const int FRIDAY = 5;
-                public const int SATURDAY = 6;
-                public const int SUNDAY = 0;
+                FRIDAY = 5,
+                SATURDAY = 6,
+                SUNDAY = 0,
             }
         }
         public class ErrMessage
@@ -219,16 +219,19 @@ namespace Infrastructure.Helper
             public const string LESS_THAN = "3";
             public const string LESS_THAN_OR_EQUAL = "4";
             public const string EQUAL = "5";
-            public const string AND = "2";
-            public const string OR = "1";
+
 
         }
-        public class BundleStrategy
+        public enum NextOperator
         {
-            public const string CHEAPEST = "1";
-            public const string MOST_EXPENSIVE = "2";
-            public const string DEFAULT = "3";
-
+            OR = 1,
+            AND = 2,
+        }
+        public enum BundleStrategy
+        {
+            CHEAPEST = 1,
+            MOST_EXPENSIVE = 2,
+            DEFAULT = 3
         }
 
         //public const string URL = "https://localhost:44367/";

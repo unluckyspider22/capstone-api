@@ -99,8 +99,6 @@ namespace PromotionEngineAPI
             services.AddScoped<IHolidayService, HolidayService>();
             //Membership
             services.AddScoped<IMembershipService, MembershipService>();
-            //MembershipCondition
-            services.AddScoped<IMembershipConditionService, MembershipConditionService>();
             //OrderCondition
             services.AddScoped<IOrderConditionService, OrderConditionService>();
             //ProductCondition

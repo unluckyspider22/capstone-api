@@ -34,9 +34,6 @@ namespace Infrastructure.AutoMapper
             //MembershipAction
             CreateMap<PostAction, MembershipActionDto>();
             CreateMap<MembershipActionDto, PostAction>();
-            //MembershipCondition
-            CreateMap<MembershipCondition, MembershipConditionDto>();
-            CreateMap<MembershipConditionDto, MembershipCondition>();
             //OrderCondition
             CreateMap<OrderCondition, OrderConditionDto>();
             CreateMap<OrderConditionDto, OrderCondition>();
@@ -85,9 +82,6 @@ namespace Infrastructure.AutoMapper
             //ProductConditionModel
             CreateMap<ProductCondition, ProductConditionModel>();
             CreateMap<ProductConditionModel, ProductCondition>();
-            //MembersipConditionModel
-            CreateMap<MembershipCondition, MembershipConditionModel>();
-            CreateMap<MembershipConditionModel, MembershipCondition>();
 
             //Condition rule update param
             CreateMap<ConditionRule, ConditionRuleUpdateParam>();

@@ -8,6 +8,7 @@ namespace Infrastructure.Models
         public ConditionRule()
         {
             ConditionGroup = new HashSet<ConditionGroup>();
+            VoucherGroup = new HashSet<VoucherGroup>();
         }
 
         public Guid ConditionRuleId { get; set; }
@@ -15,11 +16,12 @@ namespace Infrastructure.Models
         public string RuleName { get; set; }
         public string Description { get; set; }
         public bool DelFlg { get; set; }
-        public DateTime? InsDate { get; set; }
+        public DateTime InsDate { get; set; }
         public DateTime UpdDate { get; set; }
 
         public virtual Brand Brand { get; set; }
         public virtual PromotionTier PromotionTier { get; set; }
         public virtual ICollection<ConditionGroup> ConditionGroup { get; set; }
+        public virtual ICollection<VoucherGroup> VoucherGroup { get; set; }
     }
 }

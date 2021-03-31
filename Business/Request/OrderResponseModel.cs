@@ -55,9 +55,9 @@ namespace ApplicationCore.Request
     }
     public class Attribute
     {
-        public string SalesMode { get; set; }
+        public int SalesMode { get; set; }
         public string Note { get; set; }
-        public string PaymentMethod { get; set; }
+        public int PaymentMethod { get; set; }
         public StoreInfo StoreInfo { get; set; }
     }
     public class Gift
@@ -98,7 +98,7 @@ namespace ApplicationCore.Request
         public string CustomerName { get; set; }
         public string CustomerEmail { get; set; }
         public string CustomerPhoneNo { get; set; }
-        public string CustomerGender { get; set; } = "3";
+        public int CustomerGender { get; set; } = 3;
         public string CustomerLevel { get; set; }
     }
 }

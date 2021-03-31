@@ -8,10 +8,10 @@ namespace Infrastructure.DTOs.Condition
     public class ConditionGroupModel
     {
         public decimal GroupNo { get; set; }
-        public string NextOperator { get; set; }
+        public int NextOperator { get; set; }
         public bool IsMatch { get; set; } = true;
 
-        public ConditionGroupModel(decimal groupNo, string nextOperator, bool isMatch)
+        public ConditionGroupModel(decimal groupNo, int nextOperator, bool isMatch)
         {
             GroupNo = groupNo;
             NextOperator = nextOperator;

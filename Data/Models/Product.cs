@@ -14,7 +14,6 @@ namespace Infrastructure.Models
 
         public Guid ProductId { get; set; }
         public Guid ProductCateId { get; set; }
-        public string CateId { get; set; }
         public string Code { get; set; }
         public string Name { get; set; }
         public bool DelFlg { get; set; }

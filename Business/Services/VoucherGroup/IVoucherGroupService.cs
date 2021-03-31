@@ -14,7 +14,7 @@ namespace ApplicationCore.Services
         public List<VoucherDto> GenerateBulkCodeVoucher(VoucherGroupDto dto);
 
         public List<VoucherDto> GenerateStandaloneVoucher(VoucherGroupDto dto);
-        public Task<IEnumerable<VoucherGroup>> GetVoucherGroupForGame(int PageIndex = 0, int PageSize = 0, string BrandCode = null, string StoreCode = null);
+        //public Task<IEnumerable<VoucherGroup>> GetVoucherGroupForGame(int PageIndex = 0, int PageSize = 0, string BrandCode = null, string StoreCode = null);
         // Ẩn voucher group
         public Task<bool> HideVoucherGroup(Guid id);
         // Xóa hoàn toàn voucher group
