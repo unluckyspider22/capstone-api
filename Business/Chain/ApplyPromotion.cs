@@ -41,34 +41,34 @@ namespace ApplicationCore.Chain
                         order.Effects.Any(a => a.PromotionTierId == el.PromotionTierId)
                 ).ToList();
 
-                var action = FilterAction(promotionTiers.Select(el => el.Action).Where(w => w != null).ToList(), promotion);
-                if (action != null)
-                {
-                    switch (action.ActionType)
-                    {
-                        case (int)AppConstant.EnvVar.ActionType.Order:
-                            DiscountOrder(order, action, promotion);
-                            break;
-                        case (int)AppConstant.EnvVar.ActionType.Product:
-                            DiscountProduct(order, action);
-                            break;
+                //var action = FilterAction(promotionTiers.Select(el => el.Action).Where(w => w != null).ToList(), promotion);
+                //if (action != null)
+                //{
+                //    switch (action.ActionType)
+                //    {
+                //        case (int)AppConstant.EnvVar.ActionType.Order:
+                //            DiscountOrder(order, action, promotion);
+                //            break;
+                //        case (int)AppConstant.EnvVar.ActionType.Product:
+                //            DiscountProduct(order, action);
+                //            break;
 
-                    }
-                }
-                var postAction = FilterPostAction(promotionTiers.Select(el => el.PostAction).Where(w => w != null).ToList());
-                if (postAction != null)
-                {
-                    switch (postAction.ActionType)
-                    {
-                        case (int)AppConstant.EnvVar.ActionType.Gift:
-                            AddGift(order, postAction, promotion);
-                            break;
-                        case (int)AppConstant.EnvVar.ActionType.BonusPoint:
-                            AddPoint(order, postAction, promotion);
-                            break;
+                //    }
+                //}
+                //var postAction = FilterPostAction(promotionTiers.Select(el => el.PostAction).Where(w => w != null).ToList());
+                //if (postAction != null)
+                //{
+                //    switch (postAction.ActionType)
+                //    {
+                //        case (int)AppConstant.EnvVar.ActionType.Gift:
+                //            AddGift(order, postAction, promotion);
+                //            break;
+                //        case (int)AppConstant.EnvVar.ActionType.BonusPoint:
+                //            AddPoint(order, postAction, promotion);
+                //            break;
 
-                    }
-                }
+                //    }
+                //}
 
                 SetFinalAmountApply(order);
             }
@@ -83,9 +83,9 @@ namespace ApplicationCore.Chain
             }
             else
             {
-                result = postActions.Where(w =>
-                    w.PromotionTier.TierIndex == postActions.Max(m => m.PromotionTier.TierIndex))
-                    .SingleOrDefault();
+                //result = postActions.Where(w =>
+                //    w.PromotionTier.TierIndex == postActions.Max(m => m.PromotionTier.TierIndex))
+                //    .SingleOrDefault();
             }
             return result;
         }
@@ -218,29 +218,29 @@ namespace ApplicationCore.Chain
             }
             if (action != null)
             {
-                order.Effects.Add(new
-                Effect
-                {
-                    PromotionId = promotion.PromotionId,
-                    PromotionTierId = action.PromotionTierId,
-                    ConditionRuleName = action.PromotionTier.ConditionRule.RuleName,
-                    TierIndex = (int)action.PromotionTier.TierIndex,
-                    EffectType = effectType,
-                    Prop = new
-                    {
-                        name = action.PromotionTier.Summary,
-                        value = discount
-                    }
-                });
+                //order.Effects.Add(new
+                //Effect
+                //{
+                //    PromotionId = promotion.PromotionId,
+                //    PromotionTierId = action.PromotionTierId,
+                //    ConditionRuleName = action.PromotionTier.ConditionRule.RuleName,
+                //    TierIndex = (int)action.PromotionTier.TierIndex,
+                //    EffectType = effectType,
+                //    Prop = new
+                //    {
+                //        name = action.PromotionTier.Summary,
+                //        value = discount
+                //    }
+                //});
             }
             if (postAction != null)
             {
                 order.Effects.Add(new Effect
                 {
                     PromotionId = promotion.PromotionId,
-                    PromotionTierId = postAction.PromotionTierId,
-                    ConditionRuleName = postAction.PromotionTier.ConditionRule.RuleName,
-                    TierIndex = (int)postAction.PromotionTier.TierIndex,
+                    //PromotionTierId = postAction.PromotionTierId,
+                    //ConditionRuleName = postAction.PromotionTier.ConditionRule.RuleName,
+                    //TierIndex = (int)postAction.PromotionTier.TierIndex,
                     EffectType = effectType,
                     Prop = new
                     {

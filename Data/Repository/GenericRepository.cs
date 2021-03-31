@@ -113,7 +113,7 @@ namespace Infrastructure.Repository
             {
                 query = query.Include(includeProperty);
             }
-            return query.FirstOrDefaultAsync();
+            return query.AsNoTracking().FirstOrDefaultAsync();
         }
 
         public void Hide(Guid id, string value)

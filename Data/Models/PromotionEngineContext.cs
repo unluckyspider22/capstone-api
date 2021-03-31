@@ -111,10 +111,6 @@ namespace Infrastructure.Models
 
             modelBuilder.Entity<Action>(entity =>
             {
-                entity.HasIndex(e => e.PromotionTierId)
-                    .HasName("IX_Action")
-                    .IsUnique();
-
                 entity.Property(e => e.ActionId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.BundlePrice).HasColumnType("decimal(10, 0)");
@@ -145,12 +141,6 @@ namespace Infrastructure.Models
                     .WithMany(p => p.Action)
                     .HasForeignKey(d => d.BrandId)
                     .HasConstraintName("FK_Action_Brand");
-
-                entity.HasOne(d => d.PromotionTier)
-                    .WithOne(p => p.Action)
-                    .HasForeignKey<Action>(d => d.PromotionTierId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("Action_FK");
             });
 
             modelBuilder.Entity<ActionProductMapping>(entity =>
@@ -496,10 +486,6 @@ namespace Infrastructure.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.MembershipCode)
-                    .HasMaxLength(20)
-                    .IsUnicode(false);
-
                 entity.Property(e => e.PhoneNumber)
                     .IsRequired()
                     .HasMaxLength(11)
@@ -545,10 +531,6 @@ namespace Infrastructure.Models
 
             modelBuilder.Entity<PostAction>(entity =>
             {
-                entity.HasIndex(e => e.PromotionTierId)
-                    .HasName("IX_MembershipAction")
-                    .IsUnique();
-
                 entity.Property(e => e.PostActionId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.BonusPoint).HasColumnType("decimal(10, 2)");
@@ -556,8 +538,6 @@ namespace Infrastructure.Models
                 entity.Property(e => e.GiftProductCode)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.Property(e => e.GiftQuantity).HasColumnType("decimal(6, 0)");
 
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
@@ -573,12 +553,6 @@ namespace Infrastructure.Models
                     .WithMany(p => p.PostAction)
                     .HasForeignKey(d => d.BrandId)
                     .HasConstraintName("FK_PostAction_Brand");
-
-                entity.HasOne(d => d.PromotionTier)
-                    .WithOne(p => p.PostAction)
-                    .HasForeignKey<PostAction>(d => d.PromotionTierId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("MembershipAction_FK");
             });
 
             modelBuilder.Entity<PostActionProductMapping>(entity =>
@@ -813,10 +787,20 @@ namespace Infrastructure.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.HasOne(d => d.Action)
+                    .WithMany(p => p.PromotionTier)
+                    .HasForeignKey(d => d.ActionId)
+                    .HasConstraintName("FK_Action_PromotionTier");
+
                 entity.HasOne(d => d.ConditionRule)
                     .WithOne(p => p.PromotionTier)
                     .HasForeignKey<PromotionTier>(d => d.ConditionRuleId)
                     .HasConstraintName("FK_PromotionTier_ConditionRule");
+
+                entity.HasOne(d => d.PostAction)
+                    .WithMany(p => p.PromotionTier)
+                    .HasForeignKey(d => d.PostActionId)
+                    .HasConstraintName("PromotionTier_FK");
 
                 entity.HasOne(d => d.Promotion)
                     .WithMany(p => p.PromotionTier)

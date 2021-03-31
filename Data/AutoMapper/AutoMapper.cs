@@ -32,8 +32,8 @@ namespace Infrastructure.AutoMapper
             CreateMap<Membership, MembershipDto>();
             CreateMap<MembershipDto, Membership>();
             //MembershipAction
-            CreateMap<PostAction, MembershipActionDto>();
-            CreateMap<MembershipActionDto, PostAction>();
+            CreateMap<PostAction, PostActionDto>();
+            CreateMap<PostActionDto, PostAction>();
             //OrderCondition
             CreateMap<OrderCondition, OrderConditionDto>();
             CreateMap<OrderConditionDto, OrderCondition>();
