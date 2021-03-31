@@ -20,18 +20,15 @@ namespace ApplicationCore.Chain
     {
         private readonly IOrderConditionHandle _orderConditionHandle;
         private readonly IProductConditionHandle _productConditionHandle;
-        private readonly IMembershipConditionHandle _membershipConditionHandle;
         private List<Promotion> _promotions;
         private readonly IMapper _mapper;
 
         public ConditionHandle(IOrderConditionHandle orderConditionHandle,
             IProductConditionHandle productConditionHandle,
-            IMembershipConditionHandle membershipConditionHandle,
             IMapper mapper)
         {
             _orderConditionHandle = orderConditionHandle;
             _productConditionHandle = productConditionHandle;
-            _membershipConditionHandle = membershipConditionHandle;
             _mapper = mapper;
         }
 
@@ -158,10 +155,9 @@ namespace ApplicationCore.Chain
                         {
                             #region Handle cho từng condition dựa vào loại của nó
                             //Tạo chuỗi handle cho từng loại condition
-                            _orderConditionHandle.SetNext(_productConditionHandle).SetNext(_membershipConditionHandle);
+                            _orderConditionHandle.SetNext(_productConditionHandle);
                             _orderConditionHandle.SetConditionModel(condition);
                             _productConditionHandle.SetConditionModel(condition);
-                            _membershipConditionHandle.SetConditionModel(condition);
                             _orderConditionHandle.Handle(order);
                             #endregion
                         }
@@ -287,15 +283,6 @@ namespace ApplicationCore.Chain
                 }
 
             }
-            /*foreach (var membershipCondition in conditionGroup.MembershipCondition)
-            {
-                var entity = _mapper.Map<MembershipConditionModel>(membershipCondition);
-                entity.Id = membershipCondition.MembershipConditionId;
-                entity.Index = membershipCondition.IndexGroup;
-                entity.NextOperator = membershipCondition.NextOperator;
-                conditionModels.Add(entity);
-            }
-            conditionModels = conditionModels.OrderBy(el => el.Index).ToList();*/
             return conditionModels;
         }
         #endregion

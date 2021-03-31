@@ -174,6 +174,7 @@ namespace Infrastructure.Helper
             public const string Quantity_Product = "Sản phẩm yêu cầu thấp hơn quy định.";
             public const string NotMatchCondition = "Đơn hàng không thỏa mãn các điều kiện của khuyến mãi.";
             public const string Invalid_Store = "Đơn hàng không áp dụng tại cửa hàng này.";
+            public const string Invalid_MemberLevel = "Đơn hàng không áp dụng cho loại khách hàng này.";
             public const string Duplicate_Promotion = "Khuyến mãi không áp dụng cho các voucher thuộc cùng một chương trình khuyến mãi.";
 
             public const string Invalid_TimeFrame = "Khuyến mãi không áp dụng vào thời gian này.";

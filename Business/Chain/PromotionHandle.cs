@@ -80,6 +80,8 @@ namespace ApplicationCore.Chain
                     HandleSalesMode(promotion, order);
                     HandlePayment(promotion, order);
                     HandleGender(promotion, order);
+                    HandleMemberLevel(promotion, order);
+
                 }
             }
             _timeframeHandle.SetPromotions(_promotions);
@@ -144,6 +146,15 @@ namespace ApplicationCore.Chain
             if (!Common.CompareBinary(order.CustomerOrderInfo.Customer.CustomerGender, promotion.Gender))
             {
                 throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_Gender);
+            }
+        }
+        #endregion
+        #region Handle Member Level
+        private void HandleMemberLevel(Promotion promotion, OrderResponseModel order)
+        {
+            if (promotion.MemberLevelMapping.Where(w => w.MemberLevel.Name.Equals(order.CustomerOrderInfo.Customer.CustomerLevel)).Count() == 0)
+            {
+                throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_MemberLevel);
             }
         }
         #endregion

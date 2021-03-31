@@ -252,9 +252,9 @@ namespace ApplicationCore.Services
                     && !el.Promotion.DelFlg
                     && el.Promotion.Status == (int)AppConstant.EnvVar.PromotionStatus.PUBLISH,
                     includeProperties:
-                    "VoucherGroup.Promotion.PromotionChannelMapping.Channel," +
-                    "VoucherGroup.Promotion.PromotionStoreMapping.Store," +
-                    "VoucherGroup.Brand.UsernameNavigation," +
+                    "Promotion.PromotionChannelMapping.Channel," +
+                    "Promotion.PromotionStoreMapping.Store," +
+                    "Brand.UsernameNavigation," +
                     "Membership");
                 var voucher = new Voucher();
                 if (vouchers.Count() > 0)

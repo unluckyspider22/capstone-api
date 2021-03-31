@@ -1211,7 +1211,8 @@ namespace ApplicationCore.Services
                         "PromotionTier.ConditionRule.ConditionGroup.OrderCondition," +
                         "PromotionTier.ConditionRule.ConditionGroup.ProductCondition.ProductConditionMapping.Product," +
                         "PromotionStoreMapping.Store," +
-                        "Brand"
+                        "Brand," +
+                        "MemberLevelMapping.MemberLevel"
                     );
             return promotions.ToList();
         }
