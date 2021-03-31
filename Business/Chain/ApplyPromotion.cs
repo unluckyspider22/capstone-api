@@ -41,34 +41,34 @@ namespace ApplicationCore.Chain
                         order.Effects.Any(a => a.PromotionTierId == el.PromotionTierId)
                 ).ToList();
 
-                var action = FilterAction(promotionTiers.Select(el => el.Action).Where(w => w != null).ToList(), promotion);
-                if (action != null)
-                {
-                    switch (action.ActionType)
-                    {
-                        case (int)AppConstant.EnvVar.ActionType.Order:
-                            DiscountOrder(order, action, promotion);
-                            break;
-                        case (int)AppConstant.EnvVar.ActionType.Product:
-                            DiscountProduct(order, action);
-                            break;
+                //var action = FilterAction(promotionTiers.Select(el => el.Action).Where(w => w != null).ToList(), promotion);
+                //if (action != null)
+                //{
+                //    switch (action.ActionType)
+                //    {
+                //        case (int)AppConstant.EnvVar.ActionType.Order:
+                //            DiscountOrder(order, action, promotion);
+                //            break;
+                //        case (int)AppConstant.EnvVar.ActionType.Product:
+                //            DiscountProduct(order, action);
+                //            break;
 
-                    }
-                }
-                var postAction = FilterPostAction(promotionTiers.Select(el => el.PostAction).Where(w => w != null).ToList());
-                if (postAction != null)
-                {
-                    switch (postAction.ActionType)
-                    {
-                        case (int)AppConstant.EnvVar.ActionType.Gift:
-                            AddGift(order, postAction, promotion);
-                            break;
-                        case (int)AppConstant.EnvVar.ActionType.BonusPoint:
-                            AddPoint(order, postAction, promotion);
-                            break;
+                //    }
+                //}
+                //var postAction = FilterPostAction(promotionTiers.Select(el => el.PostAction).Where(w => w != null).ToList());
+                //if (postAction != null)
+                //{
+                //    switch (postAction.ActionType)
+                //    {
+                //        case (int)AppConstant.EnvVar.ActionType.Gift:
+                //            AddGift(order, postAction, promotion);
+                //            break;
+                //        case (int)AppConstant.EnvVar.ActionType.BonusPoint:
+                //            AddPoint(order, postAction, promotion);
+                //            break;
 
-                    }
-                }
+                //    }
+                //}
 
                 SetFinalAmountApply(order);
             }
