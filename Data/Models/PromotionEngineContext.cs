@@ -141,12 +141,6 @@ namespace Infrastructure.Models
                     .WithMany(p => p.Action)
                     .HasForeignKey(d => d.BrandId)
                     .HasConstraintName("FK_Action_Brand");
-
-                entity.HasOne(d => d.PromotionTier)
-                    .WithMany(p => p.Action)
-                    .HasForeignKey(d => d.PromotionTierId)
-                    .OnDelete(DeleteBehavior.SetNull)
-                    .HasConstraintName("Action_FK");
             });
 
             modelBuilder.Entity<ActionProductMapping>(entity =>
@@ -492,10 +486,6 @@ namespace Infrastructure.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.MembershipCode)
-                    .HasMaxLength(20)
-                    .IsUnicode(false);
-
                 entity.Property(e => e.PhoneNumber)
                     .IsRequired()
                     .HasMaxLength(11)
@@ -563,12 +553,6 @@ namespace Infrastructure.Models
                     .WithMany(p => p.PostAction)
                     .HasForeignKey(d => d.BrandId)
                     .HasConstraintName("FK_PostAction_Brand");
-
-                entity.HasOne(d => d.PromotionTier)
-                    .WithMany(p => p.PostAction)
-                    .HasForeignKey(d => d.PromotionTierId)
-                    .OnDelete(DeleteBehavior.SetNull)
-                    .HasConstraintName("PostAction_FK");
             });
 
             modelBuilder.Entity<PostActionProductMapping>(entity =>

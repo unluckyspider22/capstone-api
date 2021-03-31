@@ -12,7 +12,6 @@ namespace Infrastructure.Models
         }
 
         public Guid PostActionId { get; set; }
-        public Guid? PromotionTierId { get; set; }
         public int ActionType { get; set; }
         public int DiscountType { get; set; }
         public string GiftProductCode { get; set; }
@@ -25,7 +24,6 @@ namespace Infrastructure.Models
         public Guid? BrandId { get; set; }
 
         public virtual Brand Brand { get; set; }
-        public virtual PromotionTier PromotionTier { get; set; }
         public virtual ICollection<PostActionProductMapping> PostActionProductMapping { get; set; }
         public virtual ICollection<VoucherGroup> VoucherGroup { get; set; }
     }
