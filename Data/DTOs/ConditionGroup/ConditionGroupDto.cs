@@ -10,9 +10,9 @@ namespace Infrastructure.DTOs
     {
         public Guid ConditionGroupId { get; set; }
         [Range(0,99999)]
-        public decimal GroupNo { get; set; }
+        public int GroupNo { get; set; }
         [StringLength(1)]
-        public string NextOperator { get; set; }
+        public int NextOperator { get; set; }
         public string Summary { get; set; }
         public ICollection<OrderConditionDto> OrderCondition { get; set; }
         public ICollection<ProductConditionDto> ProductCondition { get; set; }

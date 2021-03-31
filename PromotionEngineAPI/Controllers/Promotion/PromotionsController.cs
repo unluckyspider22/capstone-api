@@ -103,18 +103,17 @@ namespace PromotionEngineAPI.Controllers
             try
             {
                 List<Promotion> promotions = null;
-
+                responseModel.CustomerOrderInfo = orderInfo;
                 orderInfo.Vouchers = new List<CouponCode>();
                 promotions = await _promotionService.GetAutoPromotions(orderInfo, promotionId);
                 if (promotions != null && promotions.Count() > 0)
                 {
-                    responseModel.CustomerOrderInfo = orderInfo;
+
                     _promotionService.SetPromotions(promotions);
                     //Check promotion
                     responseModel = await _promotionService.HandlePromotion(responseModel);
 
                     promotions = _promotionService.GetPromotions();
-
                 }
 
                 orderInfo.Vouchers = vouchers;
@@ -456,7 +455,7 @@ namespace PromotionEngineAPI.Controllers
             {
 
                 return Ok(await _promotionService.GetAsync(filter: o => o.BrandId.Equals(brandId)
-                                && o.Status == AppConstant.EnvVar.PromotionStatus.PUBLISH
+                                && o.Status == (int)AppConstant.EnvVar.PromotionStatus.PUBLISH
                                 && !o.DelFlg));
             }
             catch (ErrorObj e)

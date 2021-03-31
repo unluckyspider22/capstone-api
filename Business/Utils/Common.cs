@@ -42,11 +42,9 @@ namespace ApplicationCore.Utils
             return DateTime.UtcNow.AddHours(7);
         }
 
-        public static bool CompareBinary(string input, string compareString)
+        public static bool CompareBinary(int input, int compareString)
         {
-            int input_Decimal = Int32.Parse(input);
-            int compareString_Decimal = Int32.Parse(compareString);
-            return (input_Decimal & compareString_Decimal) == input_Decimal;
+            return (input & compareString) == input;
         }
 
         public static string DecodeFromBase64(string encodedData)

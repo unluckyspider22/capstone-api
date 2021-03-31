@@ -21,14 +21,12 @@ namespace PromotionEngineAPI.Controllers
         private readonly IConditionRuleService _service;
         private readonly IProductConditionService _productService;
         private readonly IOrderConditionService _orderService;
-        private readonly IMembershipConditionService _membershipService;
 
-        public ConditionRulesController(IConditionRuleService service, IProductConditionService productService, IOrderConditionService orderService, IMembershipConditionService membershipService)
+        public ConditionRulesController(IConditionRuleService service, IProductConditionService productService, IOrderConditionService orderService)
         {
             _service = service;
             _productService = productService;
             _orderService = orderService;
-            _membershipService = membershipService;
         }
 
         // GET: api/ConditionRules
@@ -130,11 +128,6 @@ namespace PromotionEngineAPI.Controllers
                 foreach (var condition in param.orderConditions)
                 {
                     response.orderConditions.Add(await _orderService.CreateAsync(condition));
-                }
-                // Insert list membership condition
-                foreach (var condition in param.membershipConditions)
-                {
-                    response.membershipConditions.Add(await _membershipService.CreateAsync(condition));
                 }
                 return Ok(response);
             }

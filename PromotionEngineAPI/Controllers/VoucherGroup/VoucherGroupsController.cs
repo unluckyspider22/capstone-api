@@ -63,7 +63,7 @@ namespace PromotionEngineAPI.Controllers
             }
         }
 
-        [HttpGet]
+       /* [HttpGet]
         [Authorize]
         [Route("game")]
         // api/VoucherGroups/game
@@ -80,7 +80,7 @@ namespace PromotionEngineAPI.Controllers
             {
                 return StatusCode(statusCode: e.Code, e.Message);
             }
-        }
+        }*/
 
 
         // GET: api/VoucherGroups/count

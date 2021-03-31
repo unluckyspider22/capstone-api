@@ -8,22 +8,26 @@ namespace Infrastructure.Models
         public PostAction()
         {
             PostActionProductMapping = new HashSet<PostActionProductMapping>();
+            VoucherGroup = new HashSet<VoucherGroup>();
         }
 
         public Guid PostActionId { get; set; }
         public Guid PromotionTierId { get; set; }
-        public string ActionType { get; set; }
-        public string DiscountType { get; set; }
+        public int ActionType { get; set; }
+        public int DiscountType { get; set; }
         public decimal? GiftQuantity { get; set; }
         public string GiftProductCode { get; set; }
-        public string GiftName { get; set; }
         public decimal? BonusPoint { get; set; }
         public bool DelFlg { get; set; }
-        public DateTime? InsDate { get; set; }
+        public DateTime InsDate { get; set; }
         public DateTime UpdDate { get; set; }
         public Guid? GiftPromotionId { get; set; }
+        public string Name { get; set; }
+        public Guid? BrandId { get; set; }
 
+        public virtual Brand Brand { get; set; }
         public virtual PromotionTier PromotionTier { get; set; }
         public virtual ICollection<PostActionProductMapping> PostActionProductMapping { get; set; }
+        public virtual ICollection<VoucherGroup> VoucherGroup { get; set; }
     }
 }

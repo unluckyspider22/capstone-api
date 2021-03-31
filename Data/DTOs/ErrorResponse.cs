@@ -26,9 +26,9 @@ namespace Infrastructure.DTOs
             H_result = h_result;
         }
 
-        public ErrorObj InternalServerError { get; set; } = new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.",description: "Internal Server Error");
+        public ErrorObj InternalServerError { get; set; } = new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.", description: "Internal Server Error");
         public ErrorObj NotFound { get; set; } = new ErrorObj(code: 404, message: "The server can not find the requested resource.", description: "Not Found");
-        public ErrorObj BadRequest { get; set; } = new ErrorObj(code: 400, message: "The server could not understand the request due to invalid syntax.",description: "Bad Request");
+        public ErrorObj BadRequest { get; set; } = new ErrorObj(code: 400, message: "The server could not understand the request due to invalid syntax.", description: "Bad Request");
 
         public ErrorObj Unauthorized { get; set; } = new ErrorObj(code: 401, message: "Unauthorized.", description: "Unauthorized");
 

@@ -44,7 +44,7 @@ namespace ApplicationCore.Services
             {
                 //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.Message);
-                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+                throw new ErrorObj(code: 500, message: e.Message);
             }
 
         }
@@ -65,7 +65,7 @@ namespace ApplicationCore.Services
             {
                 //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.Message);
-                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+                throw new ErrorObj(code: 500, message: e.Message);
             }
         }
 
@@ -103,7 +103,7 @@ namespace ApplicationCore.Services
             {
                 //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.Message);
-                throw new ErrorObj(code: 500, message: "Oops !!! Something Wrong. Try Again.");
+                throw new ErrorObj(code: 500, message: e.Message);
             }
         }
     }

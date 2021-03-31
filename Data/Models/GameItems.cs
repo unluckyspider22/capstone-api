@@ -12,7 +12,7 @@ namespace Infrastructure.Models
         public string DisplayText { get; set; }
         public string Description { get; set; }
         public bool DelFlg { get; set; }
-        public DateTime? InsDate { get; set; }
+        public DateTime InsDate { get; set; }
         public DateTime UpdDate { get; set; }
 
         public virtual GameConfig Game { get; set; }

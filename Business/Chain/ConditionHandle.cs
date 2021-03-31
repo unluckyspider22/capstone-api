@@ -195,19 +195,17 @@ namespace ApplicationCore.Chain
                     int index = (int)condition.GroupNo;
                     if (index != conditionGroups.Count() - 1)
                     {
-                        if (!string.IsNullOrEmpty(condition.NextOperator))
-                        {
-                            int nextIndex = index + 1;
-                            if (condition.NextOperator.Equals(AppConstant.Operator.AND))
-                            {
-                                result = result && conditionGroups[nextIndex].IsMatch;
 
-                            }
-                            else
-                            if (condition.NextOperator.Equals(AppConstant.Operator.OR))
-                            {
-                                result = result || conditionGroups[nextIndex].IsMatch;
-                            }
+                        int nextIndex = index + 1;
+                        if (condition.NextOperator == (int)AppConstant.NextOperator.AND)
+                        {
+                            result = result && conditionGroups[nextIndex].IsMatch;
+
+                        }
+                        else
+                        if (condition.NextOperator == (int)AppConstant.NextOperator.OR)
+                        {
+                            result = result || conditionGroups[nextIndex].IsMatch;
                         }
                     }
 
@@ -234,20 +232,19 @@ namespace ApplicationCore.Chain
                     int index = (int)condition.Index;
                     if (index != conditions.Count() - 1)
                     {
-                        if (!string.IsNullOrEmpty(condition.NextOperator))
-                        {
-                            int nextIndex = index + 1;
-                            if (condition.NextOperator.Equals(AppConstant.Operator.AND))
-                            {
-                                result = result && conditions[nextIndex].IsMatch;
-                            }
-                            else
-                            if (condition.NextOperator.Equals(AppConstant.Operator.OR))
-                            {
-                                result = result || conditions[nextIndex].IsMatch;
-                            }
 
+                        int nextIndex = index + 1;
+                        if (condition.NextOperator == (int)AppConstant.NextOperator.AND)
+                        {
+                            result = result && conditions[nextIndex].IsMatch;
                         }
+                        else
+                        if (condition.NextOperator == (int)AppConstant.NextOperator.OR)
+                        {
+                            result = result || conditions[nextIndex].IsMatch;
+                        }
+
+
                     }
 
                 }
