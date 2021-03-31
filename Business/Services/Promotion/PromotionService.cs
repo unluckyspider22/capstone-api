@@ -589,8 +589,8 @@ namespace ApplicationCore.Services
                     await DeleteAndAddMemberLevelMapp(promotionId: dto.PromotionId, levels: dto.MemberLevelMapping.ToList());
                     dto.MemberLevelMapping = null;
                 }
-                
-              
+
+
                 var entity = _mapper.Map<Promotion>(dto);
                 _repository.Update(entity);
                 await _unitOfWork.SaveAsync();
@@ -1241,10 +1241,16 @@ namespace ApplicationCore.Services
         {
             try
             {
+                #region Tìm promotion
+                var existPromo = await _repository.GetById(promotionId) != null;
+                if (!existPromo)
+                {
+                    throw new ErrorObj(code: 400, message: "Promotion is not exist", description: "Bad request");
+                }
+                #endregion
                 #region Update DelFlag của promotion
                 var promo = await _repository.GetFirst(filter: o => o.PromotionId.Equals(promotionId));
                 promo.DelFlg = true;
-
                 _repository.Update(promo);
                 //await _unitOfWork.SaveAsync();
                 #endregion
