@@ -35,7 +35,8 @@ namespace PromotionEngineAPI.Controllers
                 var result = await _service.GetAsync(
                                pageIndex: param.PageIndex,
                                pageSize: param.PageSize,
-                               filter: el => !el.DelFlg,
+                               filter: el => !el.DelFlg
+                               && el.RoleId != AppConstant.EnvVar.AdminId,
                                orderBy: el => el.OrderByDescending(b => b.InsDate),
                                includeProperties: "Brand");
                 return Ok(result);
