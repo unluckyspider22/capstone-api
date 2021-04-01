@@ -62,7 +62,7 @@ namespace ApplicationCore.Services
         {
             try
             {
-                var result = new List<AvailableDto>();
+               /* var result = new List<AvailableDto>();
                 var tiers = new List<PromotionTier>();
                 if (actionType.Equals(AppConstant.EnvVar.ActionType.Product) || actionType.Equals(AppConstant.EnvVar.ActionType.Order))
                 {
@@ -136,7 +136,7 @@ namespace ApplicationCore.Services
                     //GenericRespones<AvailableDto> response = new GenericRespones<AvailableDto>(data: result, metadata: metadata);
                     //return response;
                     #endregion
-                }
+                }*/
                 return null;
             }
             

@@ -45,7 +45,7 @@ namespace ApplicationCore.Services
                 dto.UpdDate = DateTime.Now;
                 var entity = _mapper.Map<PostAction>(dto);
                 _repository.Add(entity);
-                if (dto.DiscountType == (int)AppConstant.EnvVar.DiscountType.GiftProduct && dto.ListProduct.Count > 0)
+                if (dto.DiscountType == (int)AppConstant.EnvVar.PostActionType.Gift_Product && dto.ListProduct.Count > 0)
                 {
                     IGenericRepository<PostActionProductMapping> mappRepo = _unitOfWork.PostActionProductMappingRepository;
                     foreach (var product in dto.ListProduct)

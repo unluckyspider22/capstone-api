@@ -47,7 +47,7 @@ namespace ApplicationCore.Services
                 dto.UpdDate = DateTime.Now;
                 var entity = _mapper.Map<Infrastructure.Models.Action>(dto);
                 _repository.Add(entity);
-                if (dto.ListProduct.Count > 0 && dto.ActionType == (int)AppConstant.EnvVar.ActionType.Product)
+                if (dto.ListProduct.Count > 0 && dto.ActionType > (int)AppConstant.EnvVar.ActionType.Shipping)
                 {
                     IGenericRepository<ActionProductMapping> mappRepo = _unitOfWork.ActionProductMappingRepository;
                     foreach (var productId in dto.ListProduct)

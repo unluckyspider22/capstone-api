@@ -115,7 +115,6 @@ namespace ApplicationCore.Services
                     actionEntity.ActionId = Guid.NewGuid();
                     //actionEntity.PromotionTierId = promotionTier.PromotionTierId;
                     actionEntity.ActionType = actionEntity.ActionType;
-                    actionEntity.DiscountType = actionEntity.DiscountType;
                     promotionTier.Summary = CreateSummaryAction(actionEntity);
                     promotionTier.ActionId = actionEntity.ActionId;
                     promotionTier.TierIndex = countTier;
@@ -124,7 +123,7 @@ namespace ApplicationCore.Services
 
                     // Create action product mapping
                     IGenericRepository<ActionProductMapping> mapRepo = _unitOfWork.ActionProductMappingRepository;
-                    if (param.Action.ActionType.Equals(AppConstant.EnvVar.ActionType.Product)
+                    /*if (param.Action.ActionType.Equals(AppConstant.EnvVar.ActionType.Product)
                         && param.Action.ListProduct.Count > 0)
                     {
                         foreach (var product in param.Action.ListProduct)
@@ -140,7 +139,7 @@ namespace ApplicationCore.Services
                             mapRepo.Add(mappEntity);
                         }
                         //await _unitOfWork.SaveAsync();
-                    }
+                    }*/
                     param.Action = _mapper.Map<ActionRequestParam>(actionEntity);
                 }
                 else
@@ -152,8 +151,7 @@ namespace ApplicationCore.Services
                     var postAction = _mapper.Map<PostAction>(param.PostAction);
                     postAction.PostActionId = Guid.NewGuid();
                     //postAction.PromotionTierId = promotionTier.PromotionTierId;
-                    postAction.ActionType = postAction.ActionType;
-                    postAction.DiscountType = postAction.DiscountType;
+                    postAction.PostActionType = postAction.PostActionType;
                     //promotionTier.Summary = CreateSummarypostAction(postAction);
                     promotionTier.Summary = "";
                     promotionTier.TierIndex = countTier;
@@ -164,7 +162,7 @@ namespace ApplicationCore.Services
 
                     // Create action product mapping
                     IGenericRepository<PostActionProductMapping> mapRepo = _unitOfWork.PostActionProductMappingRepository;
-                    if (param.PostAction.ActionType.Equals(AppConstant.EnvVar.ActionType.Gift)
+                   /* if (param.PostAction.ActionType.Equals(AppConstant.EnvVar.ActionType.Gift)
                         && param.PostAction.DiscountType.Equals(AppConstant.EnvVar.DiscountType.GiftProduct)
                         && param.PostAction.ListProduct.Count > 0)
                     {
@@ -181,7 +179,7 @@ namespace ApplicationCore.Services
                             mapRepo.Add(mappEntity);
                         }
                         //await _unitOfWork.SaveAsync();
-                    }
+                    }*/
                     param.PostAction = _mapper.Map<PostActionRequestParam>(postAction);
                 }
                 else
@@ -864,9 +862,9 @@ namespace ApplicationCore.Services
         {
             var result = "";
             var actionType = entity.ActionType;
-            var discountType = entity.DiscountType;
+            var discountType = entity.ActionType;
             CultureInfo cul = CultureInfo.GetCultureInfo("vi-VN");
-            switch (actionType)
+           /* switch (actionType)
             {
                 case (int)AppConstant.EnvVar.ActionType.Product:
                     {
@@ -1004,7 +1002,7 @@ namespace ApplicationCore.Services
                         }
                         break;
                     }
-            }
+            }*/
             return result;
         }
 
@@ -1198,8 +1196,8 @@ namespace ApplicationCore.Services
         public async Task<List<Promotion>> GetAutoPromotions(CustomerOrderInfo orderInfo, Guid promotionId)
         {
             var promotions = await _repository.Get(filter: el =>
-                    el.PromotionType.Equals(AppConstant.EnvVar.PromotionType.AUTO_PROMOTION)
-                    && (promotionId != Guid.Empty ? el.PromotionId == promotionId : true)
+                    /*el.PromotionType.Equals(AppConstant.EnvVar.PromotionType.AUTO_PROMOTION)
+                    &&*/ (promotionId != Guid.Empty ? el.PromotionId == promotionId : true)
                     && el.Brand.BrandCode.Equals(orderInfo.Attributes.StoreInfo.BrandCode)
                     && el.StartDate <= orderInfo.BookingDate
                     && (el.EndDate != null ? (el.EndDate >= orderInfo.BookingDate) : true)

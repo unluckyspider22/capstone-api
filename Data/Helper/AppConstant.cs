@@ -52,26 +52,25 @@ namespace Infrastructure.Helper
             public const int AdminId = 2;
             public const string Admin = "Admin";
             public const string BrandManager = "Brand Manager";
-            public enum ActionType
+            public enum PostActionType
             {
-                Product = 1,
-                Order = 2,
-                Gift = 3,
-                BonusPoint = 4
+                Gift_Product = 1,
+                Gift_Voucher = 2,
+                Gift_Point = 3
             }
 
-            public enum DiscountType
+            public enum ActionType
             {
-                Amount = 1,
-                Percentage = 2,
-                Unit = 3,
-                Shipping = 4,
-                Fixed = 5,
-                Ladder = 6,
-                Bundle = 7,
-                GiftProduct = 8,
-                GiftVoucher = 9,
-                BonusPoint = 10
+                Amount_Order = 1,
+                Percentage_Order = 2,
+                Shipping = 3,
+                Amount_Product = 4,
+                Percentage_Product = 5,
+                Unit = 6,
+                Fixed = 7,
+                Ladder = 8,
+                Bundle = 9,
+             
             }
             public struct CharsetType
             {
@@ -90,17 +89,6 @@ namespace Infrastructure.Helper
                 public const string ALPHABETIC_UPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
                 public const string NUMBERS = "0123456789";
             }
-            public enum ProductType
-            {
-                SINGLE_PRODUCT = 1,
-                COLLECTION = 2,
-                CATEGORY = 3,
-                TAG = 4,
-                GENERAL = 5,
-                COMBO = 6,
-                COMPLEX = 7,
-                EXTRA = 8
-            }
 
             public enum VoucherType
             {
@@ -114,13 +102,7 @@ namespace Infrastructure.Helper
                 public const bool REDEEMPED = true;
                 public const bool UNREDEEM = false;
             }
-            public enum PromotionType
-            {
-                DISCOUNT = 1,
-                AUTO_PROMOTION = 2,
-                GIFT = 3,
-                BONUS_POINT = 4,
-            }
+
             public enum PromotionStatus
             {
                 DRAFT = 1,
