@@ -21,7 +21,7 @@ namespace Infrastructure.Models
         public string PromotionName { get; set; }
         public int PromotionType { get; set; }
         public int ActionType { get; set; }
-        public int DiscountType { get; set; }
+        public int PostActionType { get; set; }
         public string ImgUrl { get; set; }
         public string Description { get; set; }
         public DateTime StartDate { get; set; }
@@ -39,7 +39,7 @@ namespace Infrastructure.Models
         public bool DelFlg { get; set; }
         public DateTime InsDate { get; set; }
         public DateTime UpdDate { get; set; }
-        public int? VoucherType { get; set; }
+        public bool? HasVoucher { get; set; }
 
         public virtual Brand Brand { get; set; }
         public virtual ICollection<GameItems> GameItems { get; set; }

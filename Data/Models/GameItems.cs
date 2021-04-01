@@ -11,6 +11,7 @@ namespace Infrastructure.Models
         public int Priority { get; set; }
         public string DisplayText { get; set; }
         public string Description { get; set; }
+        public string ImgUrl { get; set; }
         public bool DelFlg { get; set; }
         public DateTime InsDate { get; set; }
         public DateTime UpdDate { get; set; }

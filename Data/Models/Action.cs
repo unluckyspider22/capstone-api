@@ -14,7 +14,6 @@ namespace Infrastructure.Models
 
         public Guid ActionId { get; set; }
         public int ActionType { get; set; }
-        public int DiscountType { get; set; }
         public int? DiscountQuantity { get; set; }
         public decimal? DiscountAmount { get; set; }
         public decimal? DiscountPercentage { get; set; }

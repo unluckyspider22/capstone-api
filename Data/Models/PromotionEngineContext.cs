@@ -362,6 +362,10 @@ namespace Infrastructure.Models
                     .IsRequired()
                     .HasMaxLength(30);
 
+                entity.Property(e => e.ImgUrl)
+                    .HasMaxLength(2048)
+                    .IsFixedLength();
+
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
@@ -534,10 +538,6 @@ namespace Infrastructure.Models
                 entity.Property(e => e.PostActionId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.BonusPoint).HasColumnType("decimal(10, 2)");
-
-                entity.Property(e => e.GiftProductCode)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
 
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
@@ -741,7 +741,7 @@ namespace Infrastructure.Models
                     .WithMany(p => p.PromotionChannelMapping)
                     .HasForeignKey(d => d.PromotionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_VoucherChannel_Promotion");
+                    .HasConstraintName("FK_PromotionChannelMapping_Promotion");
             });
 
             modelBuilder.Entity<PromotionStoreMapping>(entity =>

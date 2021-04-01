@@ -13,14 +13,12 @@ namespace Infrastructure.Models
         }
 
         public Guid PostActionId { get; set; }
-        public int ActionType { get; set; }
-        public int DiscountType { get; set; }
-        public string GiftProductCode { get; set; }
+        public int PostActionType { get; set; }
         public decimal? BonusPoint { get; set; }
         public bool DelFlg { get; set; }
         public DateTime InsDate { get; set; }
         public DateTime UpdDate { get; set; }
-        public Guid? GiftPromotionId { get; set; }
+        public Guid? GiftVoucherGroupId { get; set; }
         public string Name { get; set; }
         public Guid? BrandId { get; set; }
 
