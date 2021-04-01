@@ -958,12 +958,6 @@ namespace Infrastructure.Models
                     .IsRequired()
                     .HasMaxLength(50);
 
-                entity.Property(e => e.VoucherType)
-                    .IsRequired()
-                    .HasMaxLength(1)
-                    .IsUnicode(false)
-                    .IsFixedLength();
-
                 entity.HasOne(d => d.Action)
                     .WithMany(p => p.VoucherGroup)
                     .HasForeignKey(d => d.ActionId)

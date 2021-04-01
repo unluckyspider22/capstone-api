@@ -14,7 +14,6 @@ namespace Infrastructure.Models
         public Guid VoucherGroupId { get; set; }
         public Guid BrandId { get; set; }
         public string VoucherName { get; set; }
-        public string VoucherType { get; set; }
         public int Quantity { get; set; }
         public int UsedQuantity { get; set; }
         public int RedempedQuantity { get; set; }

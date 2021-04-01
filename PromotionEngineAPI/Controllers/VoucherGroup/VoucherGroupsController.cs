@@ -47,8 +47,8 @@ namespace PromotionEngineAPI.Controllers
                 pageSize: param.PageSize,
                 filter: el => !el.DelFlg
                 && el.BrandId.Equals(BrandId)
-                && el.VoucherName.ToLower().Contains(param.SearchContent.ToLower().Trim())
-                && el.VoucherType.Equals(voucherType),
+                && el.VoucherName.ToLower().Contains(param.SearchContent.ToLower().Trim()),
+                //&& el.VoucherType.Equals(voucherType),
                 includeProperties: "Promotion");
                 return Ok(result);
             }

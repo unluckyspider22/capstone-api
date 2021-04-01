@@ -189,15 +189,15 @@ namespace ApplicationCore.Services
                                         description: AppConstant.ErrMessage.Duplicate_VoucherCode);
                                 }
                                 var vouchers = voucherGroup.Voucher.Where(w => w.VoucherCode.Equals(voucherParam.VoucherCode)).First();
-                                if (voucherGroup.VoucherType.Equals(AppConstant.EnvVar.VoucherType.STANDALONE_CODE))
-                                {
-                                    await UpdateVoucherGroupAfterApplied(voucherGroup);
-                                }
-                                else
-                                {
-                                    await UpdateVoucherGroupAfterApplied(voucherGroup);
-                                    await UpdateVoucherAfterApplied(vouchers, order);
-                                }
+                                //if (voucherGroup.VoucherType.Equals(AppConstant.EnvVar.VoucherType.STANDALONE_CODE))
+                                //{
+                                //    await UpdateVoucherGroupAfterApplied(voucherGroup);
+                                //}
+                                //else
+                                //{
+                                //    await UpdateVoucherGroupAfterApplied(voucherGroup);
+                                //    await UpdateVoucherAfterApplied(vouchers, order);
+                                //}
                                 result.Add(vouchers);
                                 return result;
                             }

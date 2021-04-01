@@ -114,38 +114,38 @@ namespace ApplicationCore.Services
             return result;
         }
 
-       /* public async Task<IEnumerable<VoucherGroup>> GetVoucherGroupForGame(int PageIndex = 0, int PageSize = 0,
-            string BrandCode = null, string StoreCode = null)
-        {
-            try
-            {
-                var listVoucherGroup = await _repository.Get(pageIndex: PageIndex, pageSize: PageSize
-                   , filter: (el => !el.DelFlg
-                   && el.VoucherType.Equals(AppConstant.EnvVar.VoucherType.BULK_CODE)
-                    && el.RedempedQuantity < el.Quantity
-                    && !el.Promotion.PromotionType.Equals(AppConstant.EnvVar.PromotionType.AUTO_PROMOTION)
-                    && el.Promotion.Status.Equals(AppConstant.EnvVar.PromotionStatus.PUBLISH)
-                    && !el.Promotion.DelFlg
-                        && el.Promotion.StartDate.Value.CompareTo(DateTime.Now) <= 0
-                        && (el.Promotion.EndDate.Value.CompareTo(DateTime.Now) >= 0 || el.Promotion.EndDate.Value == null)
+        /* public async Task<IEnumerable<VoucherGroup>> GetVoucherGroupForGame(int PageIndex = 0, int PageSize = 0,
+             string BrandCode = null, string StoreCode = null)
+         {
+             try
+             {
+                 var listVoucherGroup = await _repository.Get(pageIndex: PageIndex, pageSize: PageSize
+                    , filter: (el => !el.DelFlg
+                    && el.VoucherType.Equals(AppConstant.EnvVar.VoucherType.BULK_CODE)
+                     && el.RedempedQuantity < el.Quantity
+                     && !el.Promotion.PromotionType.Equals(AppConstant.EnvVar.PromotionType.AUTO_PROMOTION)
+                     && el.Promotion.Status.Equals(AppConstant.EnvVar.PromotionStatus.PUBLISH)
+                     && !el.Promotion.DelFlg
+                         && el.Promotion.StartDate.Value.CompareTo(DateTime.Now) <= 0
+                         && (el.Promotion.EndDate.Value.CompareTo(DateTime.Now) >= 0 || el.Promotion.EndDate.Value == null)
 
-                        //điều kiện tùy chọn để lấy voucher cho game (Brand)
-                        && el.Promotion.Brand.BrandCode.Equals(BrandCode)
-                   //điều kiện tùy chọn để lấy voucher cho game (Store)
-                   && el.Promotion.PromotionStoreMapping.Any(x => x.Store.StoreCode.Equals(StoreCode))));
-                if (listVoucherGroup != null && listVoucherGroup.Count() > 0)
-                    return listVoucherGroup;
-                else
-                    throw new ErrorObj(code: 204, message: "No promotion for game exists !!!");
+                         //điều kiện tùy chọn để lấy voucher cho game (Brand)
+                         && el.Promotion.Brand.BrandCode.Equals(BrandCode)
+                    //điều kiện tùy chọn để lấy voucher cho game (Store)
+                    && el.Promotion.PromotionStoreMapping.Any(x => x.Store.StoreCode.Equals(StoreCode))));
+                 if (listVoucherGroup != null && listVoucherGroup.Count() > 0)
+                     return listVoucherGroup;
+                 else
+                     throw new ErrorObj(code: 204, message: "No promotion for game exists !!!");
 
-            }
-            catch (Exception e)
-            {
-                //chạy bằng debug mode để xem log
-                Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.Message);
-                throw new ErrorObj(code: 500, message: e.Message);
-            }
-        }*/
+             }
+             catch (Exception e)
+             {
+                 //chạy bằng debug mode để xem log
+                 Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.Message);
+                 throw new ErrorObj(code: 500, message: e.Message);
+             }
+         }*/
 
         public async Task<bool> DeleteVoucherGroup(Guid id)
         {
@@ -185,25 +185,25 @@ namespace ApplicationCore.Services
             try
             {
                 // Assign voucher group
-              /*  var now = DateTime.Now;
-                var voucherGroupEntity = await _repository.GetFirst(filter: o => o.VoucherGroupId.Equals(voucherGroupId)
-                                        && (o.PromotionId.Equals(Guid.Empty) || o.PromotionId == null)
-                                        && !o.DelFlg);
-                if (voucherGroupEntity != null)
-                {
-                    IGenericRepository<Promotion> promoRepo = _unitOfWork.PromotionRepository;
-                    var promo = await promoRepo.GetFirst(filter: o => o.PromotionId.Equals(promotionId) && !o.DelFlg);
-                    if (promo != null)
-                    {
-                        promo.VoucherGroup = voucherGroupEntity;
-                        promo.UpdDate = now;
-                        promoRepo.Update(promo);
-                        voucherGroupEntity.PromotionId = promotionId;
-                        voucherGroupEntity.UpdDate = now;
-                        _repository.Update(voucherGroupEntity);
-                    }
+                /*  var now = DateTime.Now;
+                  var voucherGroupEntity = await _repository.GetFirst(filter: o => o.VoucherGroupId.Equals(voucherGroupId)
+                                          && (o.PromotionId.Equals(Guid.Empty) || o.PromotionId == null)
+                                          && !o.DelFlg);
+                  if (voucherGroupEntity != null)
+                  {
+                      IGenericRepository<Promotion> promoRepo = _unitOfWork.PromotionRepository;
+                      var promo = await promoRepo.GetFirst(filter: o => o.PromotionId.Equals(promotionId) && !o.DelFlg);
+                      if (promo != null)
+                      {
+                          promo.VoucherGroup = voucherGroupEntity;
+                          promo.UpdDate = now;
+                          promoRepo.Update(promo);
+                          voucherGroupEntity.PromotionId = promotionId;
+                          voucherGroupEntity.UpdDate = now;
+                          _repository.Update(voucherGroupEntity);
+                      }
 
-                }*/
+                  }*/
                 return await _unitOfWork.SaveAsync() > 0;
             }
 
@@ -356,9 +356,7 @@ namespace ApplicationCore.Services
             try
             {
                 var availGroups = (await _repository.Get(pageSize: PageSize, pageIndex: PageIndex,
-                                        filter: o => o.BrandId.Equals(BrandId)
-                                   /*     && (o.PromotionId == null || o.PromotionId.Equals(Guid.Empty))*/
-                                        )).ToList();
+                                        filter: o => o.BrandId.Equals(BrandId))).ToList();
                 var result = new List<AvailableVoucherDto>();
                 if (availGroups.Count() > 0)
                 {
@@ -374,8 +372,7 @@ namespace ApplicationCore.Services
                     }
                 }
                 var totalItems = await _repository.CountAsync(
-                                             filter: o => o.BrandId.Equals(BrandId)
-                                    /* && (o.PromotionId == null || o.PromotionId.Equals(Guid.Empty))*/);
+                                             filter: o => o.BrandId.Equals(BrandId));
                 MetaData metadata = new MetaData(pageIndex: PageSize, pageSize: PageIndex, totalItems: totalItems);
                 GenericRespones<AvailableVoucherDto> response = new GenericRespones<AvailableVoucherDto>(data: result, metadata: metadata);
                 return response;
