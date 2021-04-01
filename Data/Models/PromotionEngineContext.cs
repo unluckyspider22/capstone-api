@@ -535,10 +535,6 @@ namespace Infrastructure.Models
 
                 entity.Property(e => e.BonusPoint).HasColumnType("decimal(10, 2)");
 
-                entity.Property(e => e.GiftProductCode)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");

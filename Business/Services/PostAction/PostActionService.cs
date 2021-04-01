@@ -57,7 +57,7 @@ namespace ApplicationCore.Services
                             ProductId = product.ProductId,
                             InsDate = DateTime.Now,
                             UpdDate = DateTime.Now,
-                            Quantity = product.quantity,
+                            Quantity = product.Quantity,
 
                         };
                         mappRepo.Add(mapp);

@@ -15,7 +15,6 @@ namespace Infrastructure.Models
         public Guid PostActionId { get; set; }
         public int ActionType { get; set; }
         public int DiscountType { get; set; }
-        public string GiftProductCode { get; set; }
         public decimal? BonusPoint { get; set; }
         public bool DelFlg { get; set; }
         public DateTime InsDate { get; set; }
