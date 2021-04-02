@@ -151,7 +151,7 @@ namespace PromotionEngineAPI.Controllers
                   pageSize: param.PageSize,
                   orderBy: el => el.OrderByDescending(b => b.InsDate),
                   filter: HandlePromotionFilter(status, BrandId),
-                  includeProperties: "PromotionStoreMapping,PromotionTier,PromotionChannelMapping,VoucherGroup");
+                  includeProperties: "PromotionStoreMapping,PromotionTier.VoucherGroup,PromotionChannelMapping");
                 return Ok(result);
 
             }
@@ -159,8 +159,6 @@ namespace PromotionEngineAPI.Controllers
             {
                 return StatusCode(statusCode: e.Code, e);
             }
-
-
         }
 
         // GET: api/Promotions/count
