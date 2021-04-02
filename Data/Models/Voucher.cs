@@ -19,8 +19,10 @@ namespace Infrastructure.Models
         public DateTime UpdDate { get; set; }
         public Guid? PromotionId { get; set; }
         public int? Index { get; set; }
+        public Guid? GameCampaignId { get; set; }
 
         public virtual Channel Channel { get; set; }
+        public virtual GameCampaign GameCampaign { get; set; }
         public virtual Membership Membership { get; set; }
         public virtual Promotion Promotion { get; set; }
         public virtual Store Store { get; set; }

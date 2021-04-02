@@ -21,8 +21,10 @@ namespace Infrastructure.Models
         public Guid? GiftVoucherGroupId { get; set; }
         public string Name { get; set; }
         public Guid? BrandId { get; set; }
+        public Guid? GameCampaignId { get; set; }
 
         public virtual Brand Brand { get; set; }
+        public virtual GameCampaign GameCampaign { get; set; }
         public virtual ICollection<PostActionProductMapping> PostActionProductMapping { get; set; }
         public virtual ICollection<PromotionTier> PromotionTier { get; set; }
         public virtual ICollection<VoucherGroup> VoucherGroup { get; set; }

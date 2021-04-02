@@ -85,7 +85,7 @@ namespace ApplicationCore.Services
         {
             try
             {
-                IGenericRepository<GameConfig> configRepo = _unitOfWork.GameConfigRepository;
+                IGenericRepository<GameCampaign> configRepo = _unitOfWork.GameConfigRepository;
                 var config = await configRepo.GetFirst(filter: o => o.Id.Equals(gameConfigId));
                 if (config != null)
                 {

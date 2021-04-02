@@ -7,6 +7,7 @@ namespace Infrastructure.Models
     {
         public Promotion()
         {
+            GameCampaign = new HashSet<GameCampaign>();
             GameItems = new HashSet<GameItems>();
             MemberLevelMapping = new HashSet<MemberLevelMapping>();
             PromotionChannelMapping = new HashSet<PromotionChannelMapping>();
@@ -42,6 +43,7 @@ namespace Infrastructure.Models
         public bool IsAuto { get; set; }
 
         public virtual Brand Brand { get; set; }
+        public virtual ICollection<GameCampaign> GameCampaign { get; set; }
         public virtual ICollection<GameItems> GameItems { get; set; }
         public virtual ICollection<MemberLevelMapping> MemberLevelMapping { get; set; }
         public virtual ICollection<PromotionChannelMapping> PromotionChannelMapping { get; set; }

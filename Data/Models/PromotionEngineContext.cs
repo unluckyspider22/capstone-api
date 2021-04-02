@@ -23,7 +23,7 @@ namespace Infrastructure.Models
         public virtual DbSet<ConditionGroup> ConditionGroup { get; set; }
         public virtual DbSet<ConditionRule> ConditionRule { get; set; }
         public virtual DbSet<Device> Device { get; set; }
-        public virtual DbSet<GameConfig> GameConfig { get; set; }
+        public virtual DbSet<GameCampaign> GameCampaign { get; set; }
         public virtual DbSet<GameItems> GameItems { get; set; }
         public virtual DbSet<GameMaster> GameMaster { get; set; }
         public virtual DbSet<Holiday> Holiday { get; set; }
@@ -323,9 +323,11 @@ namespace Infrastructure.Models
                     .HasConstraintName("FK_Device_Store");
             });
 
-            modelBuilder.Entity<GameConfig>(entity =>
+            modelBuilder.Entity<GameCampaign>(entity =>
             {
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.EndGame).HasColumnType("datetime");
 
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
@@ -335,21 +337,28 @@ namespace Infrastructure.Models
                     .IsRequired()
                     .HasMaxLength(50);
 
+                entity.Property(e => e.StartGame).HasColumnType("datetime");
+
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
                 entity.HasOne(d => d.Brand)
-                    .WithMany(p => p.GameConfig)
+                    .WithMany(p => p.GameCampaign)
                     .HasForeignKey(d => d.BrandId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Game_Brand");
 
                 entity.HasOne(d => d.GameMaster)
-                    .WithMany(p => p.GameConfig)
+                    .WithMany(p => p.GameCampaign)
                     .HasForeignKey(d => d.GameMasterId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_GameConfig_GameMaster");
+
+                entity.HasOne(d => d.Promotion)
+                    .WithMany(p => p.GameCampaign)
+                    .HasForeignKey(d => d.PromotionId)
+                    .HasConstraintName("FK_GameCampaign_Promotion");
             });
 
             modelBuilder.Entity<GameItems>(entity =>
@@ -364,7 +373,7 @@ namespace Infrastructure.Models
 
                 entity.Property(e => e.ImgUrl)
                     .HasMaxLength(2048)
-                    .IsFixedLength();
+                    .IsUnicode(false);
 
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
@@ -553,6 +562,11 @@ namespace Infrastructure.Models
                     .WithMany(p => p.PostAction)
                     .HasForeignKey(d => d.BrandId)
                     .HasConstraintName("FK_PostAction_Brand");
+
+                entity.HasOne(d => d.GameCampaign)
+                    .WithMany(p => p.PostAction)
+                    .HasForeignKey(d => d.GameCampaignId)
+                    .HasConstraintName("FK_PostAction_GameCampaign");
             });
 
             modelBuilder.Entity<PostActionProductMapping>(entity =>
@@ -903,6 +917,11 @@ namespace Infrastructure.Models
                     .WithMany(p => p.Voucher)
                     .HasForeignKey(d => d.ChannelId)
                     .HasConstraintName("FK_Voucher_Channel");
+
+                entity.HasOne(d => d.GameCampaign)
+                    .WithMany(p => p.Voucher)
+                    .HasForeignKey(d => d.GameCampaignId)
+                    .HasConstraintName("FK_Voucher_GameCampaign");
 
                 entity.HasOne(d => d.Membership)
                     .WithMany(p => p.Voucher)

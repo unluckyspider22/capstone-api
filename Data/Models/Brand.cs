@@ -10,7 +10,7 @@ namespace Infrastructure.Models
             Action = new HashSet<Action>();
             Channel = new HashSet<Channel>();
             ConditionRule = new HashSet<ConditionRule>();
-            GameConfig = new HashSet<GameConfig>();
+            GameCampaign = new HashSet<GameCampaign>();
             MemberLevel = new HashSet<MemberLevel>();
             PostAction = new HashSet<PostAction>();
             ProductCategory = new HashSet<ProductCategory>();
@@ -37,7 +37,7 @@ namespace Infrastructure.Models
         public virtual ICollection<Action> Action { get; set; }
         public virtual ICollection<Channel> Channel { get; set; }
         public virtual ICollection<ConditionRule> ConditionRule { get; set; }
-        public virtual ICollection<GameConfig> GameConfig { get; set; }
+        public virtual ICollection<GameCampaign> GameCampaign { get; set; }
         public virtual ICollection<MemberLevel> MemberLevel { get; set; }
         public virtual ICollection<PostAction> PostAction { get; set; }
         public virtual ICollection<ProductCategory> ProductCategory { get; set; }

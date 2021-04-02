@@ -7,7 +7,7 @@ namespace Infrastructure.Models
     {
         public GameMaster()
         {
-            GameConfig = new HashSet<GameConfig>();
+            GameCampaign = new HashSet<GameCampaign>();
         }
 
         public Guid Id { get; set; }
@@ -18,6 +18,6 @@ namespace Infrastructure.Models
         public DateTime InsDate { get; set; }
         public DateTime UpdDate { get; set; }
 
-        public virtual ICollection<GameConfig> GameConfig { get; set; }
+        public virtual ICollection<GameCampaign> GameCampaign { get; set; }
     }
 }

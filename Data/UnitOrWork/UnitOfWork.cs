@@ -80,7 +80,7 @@ namespace Infrastructure.UnitOrWork
         public IGenericRepository<PostActionProductMapping> PostActionProductMappingRepository { get; set; }
         public IGenericRepository<ProductConditionMapping> ProductConditionMappingRepository { get; set; }
 
-        public IGenericRepository<GameConfig> GameConfigRepository { get; set; }
+        public IGenericRepository<GameCampaign> GameConfigRepository { get; set; }
 
         public IGenericRepository<GameItems> GameItemsRepository { get; set; }
 
@@ -136,7 +136,7 @@ namespace Infrastructure.UnitOrWork
             PostActionProductMappingRepository = new GenericRepository<PostActionProductMapping>(_context);
             ProductConditionMappingRepository = new GenericRepository<ProductConditionMapping>(_context);
             GameMasterRepository = new GenericRepository<GameMaster>(_context);
-            GameConfigRepository = new GenericRepository<GameConfig>(_context);
+            GameConfigRepository = new GenericRepository<GameCampaign>(_context);
             GameItemsRepository = new GenericRepository<GameItems>(_context);
         }
         public void Dispose()

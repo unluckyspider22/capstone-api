@@ -11,13 +11,13 @@ using System.Threading.Tasks;
 
 namespace ApplicationCore.Services
 {
-    public class GameConfigService : BaseService<GameConfig, GameConfigDto>, IGameConfigService
+    public class GameConfigService : BaseService<GameCampaign, GameConfigDto>, IGameConfigService
     {
         public GameConfigService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
         {
         }
 
-        protected override IGenericRepository<GameConfig> _repository => _unitOfWork.GameConfigRepository;
+        protected override IGenericRepository<GameCampaign> _repository => _unitOfWork.GameConfigRepository;
 
         public async Task<bool> DeleteGameConfig(Guid id)
         {
@@ -56,7 +56,7 @@ namespace ApplicationCore.Services
             try
             {
                 dto.UpdDate = DateTime.Now;
-                var entity = _mapper.Map<GameConfig>(dto);
+                var entity = _mapper.Map<GameCampaign>(dto);
                 var items = entity.GameItems.ToList();
                 await UpdateGameItem(items, dto.Id);
                 _repository.Update(entity);

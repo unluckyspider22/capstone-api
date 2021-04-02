@@ -3,11 +3,13 @@ using System.Collections.Generic;
 
 namespace Infrastructure.Models
 {
-    public partial class GameConfig
+    public partial class GameCampaign
     {
-        public GameConfig()
+        public GameCampaign()
         {
             GameItems = new HashSet<GameItems>();
+            PostAction = new HashSet<PostAction>();
+            Voucher = new HashSet<Voucher>();
         }
 
         public Guid Id { get; set; }
@@ -18,9 +20,15 @@ namespace Infrastructure.Models
         public bool DelFlg { get; set; }
         public DateTime InsDate { get; set; }
         public DateTime UpdDate { get; set; }
+        public DateTime? StartGame { get; set; }
+        public DateTime? EndGame { get; set; }
+        public Guid? PromotionId { get; set; }
 
         public virtual Brand Brand { get; set; }
         public virtual GameMaster GameMaster { get; set; }
+        public virtual Promotion Promotion { get; set; }
         public virtual ICollection<GameItems> GameItems { get; set; }
+        public virtual ICollection<PostAction> PostAction { get; set; }
+        public virtual ICollection<Voucher> Voucher { get; set; }
     }
 }

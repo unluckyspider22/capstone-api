@@ -128,8 +128,8 @@ namespace Infrastructure.AutoMapper
 
             CreateMap<MemberLevelMapping, MemberLevelMappingDto>();
             CreateMap<MemberLevelMappingDto, MemberLevelMapping>();
-            CreateMap<GameConfig, GameConfigDto>();
-            CreateMap<GameConfigDto, GameConfig>();
+            CreateMap<GameCampaign, GameConfigDto>();
+            CreateMap<GameConfigDto, GameCampaign>();
             CreateMap<GameItemDto, GameItems>();
             CreateMap<GameItems, GameItemDto>();
             CreateMap<GameMasterDto, GameMaster>();
