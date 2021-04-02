@@ -6,11 +6,9 @@ namespace Infrastructure.DTOs
     public class PostActionDto : BaseDto
     {
         public Guid PostActionId { get; set; }
-        public Guid? PromotionTierId { get; set; }
         public int ActionType { get; set; }
         public int DiscountType { get; set; }
         public decimal? GiftQuantity { get; set; }
-        public string GiftProductCode { get; set; }
         public decimal? BonusPoint { get; set; }
         public Guid? GiftPromotionId { get; set; }
         public string Name { get; set; }
@@ -21,6 +19,6 @@ namespace Infrastructure.DTOs
     public class PostActionProductMapp
     {
         public Guid ProductId { get; set; }
-        public int quantity { get; set; }
+        public int Quantity { get; set; }
     }
 }
