@@ -105,12 +105,12 @@ namespace ApplicationCore.Services
         public List<VoucherDto> GenerateStandaloneVoucher(VoucherGroupDto dto)
         {
             List<VoucherDto> result = new List<VoucherDto>();
-            VoucherDto voucher = new VoucherDto
-            {
-                VoucherCode = dto.Prefix + dto.CustomCode + dto.Postfix,
-                VoucherGroupId = dto.VoucherGroupId
-            };
-            result.Add(voucher);
+            //VoucherDto voucher = new VoucherDto
+            //{
+            //    VoucherCode = dto.Prefix + dto.CustomCode + dto.Postfix,
+            //    VoucherGroupId = dto.VoucherGroupId
+            //};
+            //result.Add(voucher);
             return result;
         }
 

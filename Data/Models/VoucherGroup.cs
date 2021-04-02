@@ -27,6 +27,7 @@ namespace Infrastructure.Models
         public Guid? ConditionRuleId { get; set; }
         public Guid? ActionId { get; set; }
         public Guid? PostActionId { get; set; }
+        public int? CodeLength { get; set; }
 
         public virtual Action Action { get; set; }
         public virtual Brand Brand { get; set; }

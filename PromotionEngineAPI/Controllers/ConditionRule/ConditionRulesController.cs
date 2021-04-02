@@ -148,7 +148,7 @@ namespace PromotionEngineAPI.Controllers
             }
             try
             {
-                return Ok(await _service.GetAsync(pageIndex: 0, pageSize: 0, filter: o => o.Brand.Equals(brandId) && !o.DelFlg));
+                return Ok(await _service.GetAsync(filter: o => o.BrandId.Equals(brandId) && !o.DelFlg));
             }
             catch (ErrorObj e)
             {

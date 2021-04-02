@@ -8,8 +8,8 @@ namespace Infrastructure.Models
         public Guid Id { get; set; }
         public Guid ProductId { get; set; }
         public Guid ProductConditionId { get; set; }
-        public DateTime InsDate { get; set; } = DateTime.Now;
-        public DateTime UpdTime { get; set; } = DateTime.Now;
+        public DateTime InsDate { get; set; }
+        public DateTime UpdTime { get; set; }
 
         public virtual Product Product { get; set; }
         public virtual ProductCondition ProductCondition { get; set; }

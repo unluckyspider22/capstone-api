@@ -153,26 +153,27 @@ namespace ApplicationCore.Worker
         #region generate voucher
         public List<Voucher> GenerateVoucher(VoucherGroupDto dto)
         {
-            if (dto.VoucherType.Equals(AppConstant.EnvVar.VoucherType.BULK_CODE))
-            {
-                return _mapper.Map<List<Voucher>>(GenerateBulkCodeVoucher(dto));
-            }
-            else
-            {
-                return _mapper.Map<List<Voucher>>(GenerateStandaloneVoucher(dto));
-            }
+            //if (dto.VoucherType.Equals(AppConstant.EnvVar.VoucherType.BULK_CODE))
+            //{
+
+            //}
+            //else
+            //{
+            //    return _mapper.Map<List<Voucher>>(GenerateStandaloneVoucher(dto));
+            //}
+            return _mapper.Map<List<Voucher>>(GenerateBulkCodeVoucher(dto));
         }
-        private List<VoucherDto> GenerateStandaloneVoucher(VoucherGroupDto dto)
-        {
-            List<VoucherDto> result = new List<VoucherDto>();
-            VoucherDto voucher = new VoucherDto
-            {
-                VoucherCode = dto.Prefix + dto.CustomCode + dto.Postfix,
-                VoucherGroupId = dto.VoucherGroupId
-            };
-            result.Add(voucher);
-            return result;
-        }
+        //private List<VoucherDto> GenerateStandaloneVoucher(VoucherGroupDto dto)
+        //{
+        //    List<VoucherDto> result = new List<VoucherDto>();
+        //    VoucherDto voucher = new VoucherDto
+        //    {
+        //        VoucherCode = dto.Prefix + dto.CustomCode + dto.Postfix,
+        //        VoucherGroupId = dto.VoucherGroupId
+        //    };
+        //    result.Add(voucher);
+        //    return result;
+        //}
 
         private List<VoucherDto> GenerateBulkCodeVoucher(VoucherGroupDto dto)
         {

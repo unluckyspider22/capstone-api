@@ -40,16 +40,14 @@ namespace PromotionEngineAPI.Controllers
                 pageSize: param.PageSize,
                 filter: el => !el.DelFlg
                 && el.VoucherName.ToLower().Contains(param.SearchContent.ToLower())
-                && el.BrandId.Equals(BrandId), includeProperties: "Promotion");
+                && el.BrandId.Equals(BrandId));
                     return Ok(resultNofilterVoucherType);
                 }
                 var result = await _service.GetAsync(pageIndex: param.PageIndex,
                 pageSize: param.PageSize,
                 filter: el => !el.DelFlg
                 && el.BrandId.Equals(BrandId)
-                && el.VoucherName.ToLower().Contains(param.SearchContent.ToLower().Trim()),
-                //&& el.VoucherType.Equals(voucherType),
-                includeProperties: "Promotion");
+                && el.VoucherName.ToLower().Contains(param.SearchContent.ToLower().Trim()));
                 return Ok(result);
             }
             catch (ErrorObj e)
