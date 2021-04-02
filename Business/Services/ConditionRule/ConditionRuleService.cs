@@ -3,12 +3,11 @@ using Infrastructure.DTOs;
 using Infrastructure.Models;
 using Infrastructure.Repository;
 using Infrastructure.UnitOrWork;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Linq;
-using System.Linq.Expressions;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ApplicationCore.Services
 {
@@ -87,6 +86,29 @@ namespace ApplicationCore.Services
                 Debug.WriteLine(e.InnerException);
                 throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
             }
+
+        }
+
+        public async Task<ConditionRuleDto> InsertConditionRule(ConditionRuleDto param)
+        {
+            try
+            {
+                // Insert condition rule
+                var ruleEntity = _mapper.Map<ConditionRule>(param);
+                ruleEntity.ConditionRuleId = Guid.NewGuid();
+                ruleEntity.InsDate = DateTime.Now;
+                ruleEntity.UpdDate = DateTime.Now;
+                _repository.Add(ruleEntity);
+                await _unitOfWork.SaveAsync();
+                return _mapper.Map<ConditionRuleDto>(ruleEntity);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.StackTrace);
+                Debug.WriteLine(e.InnerException);
+                throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
+            }
+
 
         }
 

@@ -1,25 +1,18 @@
-﻿using System;
+﻿using Infrastructure.Models;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Infrastructure.DTOs
 {
     public class ProductConditionDto
     {
         public Guid ProductConditionId { get; set; }
-        [StringLength(1)]
-        public string ProductConditionType { get; set; }
-        [Range(0, 999999)]
-        public decimal ProductQuantity { get; set; }
-        [StringLength(1)]
-        public string QuantityOperator { get; set; }
-        [StringLength(1)]
-        public string NextOperator { get; set; }
-        [Range(0, 999)]
+        public Guid ConditionGroupId { get; set; }
         public int IndexGroup { get; set; }
-
-        public List<Guid> ListProduct { get; set; }
+        public int ProductConditionType { get; set; }
+        public int ProductQuantity { get; set; }
+        public string QuantityOperator { get; set; }
+        public int NextOperator { get; set; }
+        public List<ProductConditionMapping> ProductConditionMapping { get; set; }
     }
 }

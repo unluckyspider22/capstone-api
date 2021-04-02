@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-
-using ApplicationCore.Services;
-
+﻿using ApplicationCore.Services;
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
 using Infrastructure.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers
 {
@@ -106,30 +102,14 @@ namespace PromotionEngineAPI.Controllers
 
         }
 
-        // POST: api/ConditionRules
         [HttpPost]
         public async Task<IActionResult> PostConditionRule(
-            [FromBody] ConditionParamDto param)
+            [FromBody] ConditionRuleDto param)
         {
             try
             {
-                ConditionParamDto response = new ConditionParamDto();
-
-                // Insert condition rule
-                param.conditionRule.ConditionRuleId = Guid.NewGuid();
-                response.conditionRule = await _service.CreateAsync(param.conditionRule);
-
-                // Insert list product condition
-                foreach (var condition in param.productConditions)
-                {
-                    response.productConditions.Add(await _productService.CreateAsync(condition));
-                }
-                // Insert list order condition
-                foreach (var condition in param.orderConditions)
-                {
-                    response.orderConditions.Add(await _orderService.CreateAsync(condition));
-                }
-                return Ok(response);
+                var result = await _service.InsertConditionRule(param);
+                return Ok(result);
             }
             catch (ErrorObj e)
             {
@@ -158,6 +138,24 @@ namespace PromotionEngineAPI.Controllers
 
         }
 
+        [HttpGet]
+        [Route("for-voucher/{brandId}")]
+        public async Task<IActionResult> GetConditionForCreateVoucher([FromRoute] Guid brandId)
+        {
+            if (brandId.Equals(Guid.Empty))
+            {
+                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+            }
+            try
+            {
+                return Ok(await _service.GetAsync(pageIndex: 0, pageSize: 0, filter: o => o.Brand.Equals(brandId) && !o.DelFlg));
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+
+        }
 
     }
 }

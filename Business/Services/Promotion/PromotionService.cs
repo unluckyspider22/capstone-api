@@ -506,19 +506,19 @@ namespace ApplicationCore.Services
                         productConditionEntity.InsDate = DateTime.Now;
                         productConditionRepo.Add(productConditionEntity);
                         productCondition.ProductConditionId = productConditionEntity.ProductConditionId;
-                        var products = productCondition.ListProduct;
-                        foreach (var product in products)
-                        {
-                            var mapp = new ProductConditionMapping()
-                            {
-                                Id = Guid.NewGuid(),
-                                ProductConditionId = productConditionEntity.ProductConditionId,
-                                ProductId = product,
-                                UpdTime = DateTime.Now,
-                                InsDate = DateTime.Now,
-                            };
-                            mappRepo.Add(mapp);
-                        }
+                        //var products = productCondition.ListProduct;
+                        //foreach (var product in products)
+                        //{
+                        //    var mapp = new ProductConditionMapping()
+                        //    {
+                        //        Id = Guid.NewGuid(),
+                        //        ProductConditionId = productConditionEntity.ProductConditionId,
+                        //        ProductId = product,
+                        //        UpdTime = DateTime.Now,
+                        //        InsDate = DateTime.Now,
+                        //    };
+                        //    mappRepo.Add(mapp);
+                        //}
 
                     }
                 }
