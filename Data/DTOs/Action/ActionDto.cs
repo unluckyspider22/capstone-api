@@ -7,7 +7,6 @@ namespace Infrastructure.DTOs
     public class ActionDto : BaseDto
     {
         public Guid ActionId { get; set; }
-        public Guid? PromotionTierId { get; set; }
         [Required]
         public string Name { get; set; }
         [Required]

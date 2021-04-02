@@ -18,6 +18,6 @@ namespace Infrastructure.DTOs
     public class PostActionProductMapp
     {
         public Guid ProductId { get; set; }
-        public int quantity { get; set; }
+        public int Quantity { get; set; }
     }
 }

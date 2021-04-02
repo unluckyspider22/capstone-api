@@ -1196,8 +1196,8 @@ namespace ApplicationCore.Services
         public async Task<List<Promotion>> GetAutoPromotions(CustomerOrderInfo orderInfo, Guid promotionId)
         {
             var promotions = await _repository.Get(filter: el =>
-                    /*el.PromotionType.Equals(AppConstant.EnvVar.PromotionType.AUTO_PROMOTION)
-                    &&*/ (promotionId != Guid.Empty ? el.PromotionId == promotionId : true)
+                    el.IsAuto
+                    && (promotionId != Guid.Empty ? el.PromotionId == promotionId : true)
                     && el.Brand.BrandCode.Equals(orderInfo.Attributes.StoreInfo.BrandCode)
                     && el.StartDate <= orderInfo.BookingDate
                     && (el.EndDate != null ? (el.EndDate >= orderInfo.BookingDate) : true)

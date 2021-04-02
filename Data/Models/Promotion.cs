@@ -19,7 +19,6 @@ namespace Infrastructure.Models
         public Guid BrandId { get; set; }
         public string PromotionCode { get; set; }
         public string PromotionName { get; set; }
-        public int PromotionType { get; set; }
         public int ActionType { get; set; }
         public int PostActionType { get; set; }
         public string ImgUrl { get; set; }
@@ -39,7 +38,8 @@ namespace Infrastructure.Models
         public bool DelFlg { get; set; }
         public DateTime InsDate { get; set; }
         public DateTime UpdDate { get; set; }
-        public bool? HasVoucher { get; set; }
+        public bool HasVoucher { get; set; }
+        public bool IsAuto { get; set; }
 
         public virtual Brand Brand { get; set; }
         public virtual ICollection<GameItems> GameItems { get; set; }
