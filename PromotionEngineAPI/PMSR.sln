@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29503.13
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PromotionEngineAPI", "PromotionEngineAPI.csproj", "{78CA85F6-AA04-4550-8C9E-6C017EEE72AD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebAPI", "WebAPI.csproj", "{78CA85F6-AA04-4550-8C9E-6C017EEE72AD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApplicationCore", "..\Business\ApplicationCore.csproj", "{08C3E85E-A690-4C07-9FF0-244D719036CF}"
 EndProject

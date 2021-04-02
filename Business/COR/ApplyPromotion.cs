@@ -1,12 +1,10 @@
 ﻿using ApplicationCore.Request;
 using ApplicationCore.Services;
-using Infrastructure.DTOs;
 using Infrastructure.Helper;
 using Infrastructure.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace ApplicationCore.Chain
 {
@@ -41,46 +39,83 @@ namespace ApplicationCore.Chain
                         order.Effects.Any(a => a.PromotionTierId == el.PromotionTierId)
                 ).ToList();
 
-                var action = FilterAction(promotionTiers.Select(el => el.Action).Where(w => w != null).ToList(), promotion);
-                var postAction = FilterPostAction(promotionTiers.Where(w => w != null).ToList());
-                PromotionTier promotionTier = null;
-                if (action != null)
+                PromotionTier applyTier = FilterTier(promotionTiers, promotion);
+                if (applyTier != null)
                 {
-                    promotionTier = action.PromotionTier.FirstOrDefault(f => promotionTiers.Select(el => el.PromotionTierId).Equals(f.PromotionTierId));
+                    var action = applyTier.Action;
+                    var postAction = applyTier.PostAction;
+                    if (action != null)
+                    {
+                        if (action.ActionType >= 1 && action.ActionType <= 3)
+                        {
+                            DiscountOrder(order, action, promotion, applyTier);
+                        }
+                        else
+                        {
+                            DiscountProduct(order, action);
+                        }
+                    }
+                    if (postAction != null)
+                    {
+                        if (postAction.PostActionType >= 1 && postAction.PostActionType <= 2)
+                        {
+                            AddGift(order, postAction, promotion, applyTier);
 
-                }
-                else if (postAction != null)
-                {
-                    promotionTier = postAction.PromotionTier.FirstOrDefault(f => promotionTiers.Select(el => el.PromotionTierId).Equals(f.PromotionTierId));
-                }
-                if (action != null)
-                {
-                    if (action.ActionType >= 1 && action.ActionType <= 3)
-                    {
-                        DiscountOrder(order, action, promotion, promotionTier);
-                    }
-                    else
-                    {
-                        DiscountProduct(order, action);
+                        }
+                        else
+                        {
+                            AddPoint(order, postAction, promotion, applyTier);
+                        }
                     }
                 }
-                if (postAction != null)
-                {
-                    if (postAction.PostActionType >= 1 && postAction.PostActionType <= 2)
-                    {
-                        AddGift(order, postAction, promotion, promotionTier);
-
-                    }
-                    else
-                    {
-                        AddPoint(order, postAction, promotion, promotionTier);
-                    }
-                }
-
                 SetFinalAmountApply(order);
             }
         }
         #region Filter Action & Post Action
+        private PromotionTier FilterTier(List<PromotionTier> tiers, Promotion promotion)
+        {
+            PromotionTier result = null;
+            if (tiers.Count > 0 && tiers.Count == 1)
+            {
+                return tiers.First();
+            }
+            else
+            {
+                if (promotion.ActionType != 0)
+                {
+                    switch (promotion.ActionType)
+                    {
+                        case (int)AppConstant.EnvVar.ActionType.Amount_Order:
+                            result = tiers.FirstOrDefault(w =>
+                                 w.Action.ActionType == (int)AppConstant.EnvVar.ActionType.Amount_Order
+                                 && w.Action.DiscountAmount > 0
+                                 && w.Action.DiscountAmount == tiers.Select(s => s.Action).Max(m => m.DiscountAmount));
+
+                            break;
+                        case (int)AppConstant.EnvVar.ActionType.Percentage_Order:
+                            result = tiers.FirstOrDefault(w =>
+                                 w.Action.ActionType == (int)AppConstant.EnvVar.ActionType.Percentage_Order
+                                 && w.Action.DiscountPercentage > 0
+                                 && w.Action.DiscountPercentage == tiers.Select(s => s.Action).Max(m => m.DiscountPercentage));
+
+                            break;
+                        case (int)AppConstant.EnvVar.ActionType.Shipping:
+                            result = tiers.FirstOrDefault(w =>
+                                 w.Action.ActionType == (int)AppConstant.EnvVar.ActionType.Shipping
+                                 && w.Action.DiscountAmount > 0
+                                 && w.Action.DiscountAmount == tiers.Select(s => s.Action).Max(m => m.DiscountAmount));
+                            break;
+                    }
+                }
+                else
+                {
+                    result = tiers.Where(w =>
+                    w.TierIndex == tiers.Max(m => m.TierIndex)).SingleOrDefault();
+                }
+            }
+
+            return result;
+        }
         private PostAction FilterPostAction(List<PromotionTier> tiers)
         {
             PostAction result = null;
@@ -160,35 +195,31 @@ namespace ApplicationCore.Chain
                 case (int)AppConstant.EnvVar.PostActionType.Gift_Voucher:
                     effectType = AppConstant.EffectMessage.AddGiftVoucher;
                     var voucher = _voucherService.GetFirst(filter: el =>
-                                             /*el.PromotionId == postAction.GiftPromotionId
-                                             &&*/ !el.IsRedemped
+                                             el.VoucherGroupId == postAction.GiftVoucherGroupId
+                                             && !el.IsRedemped
                                 && !el.IsUsed,
                                 includeProperties: "Promotion").Result;
 
                     order.Gift.Add(new Gift
                     {
-                        //ProductCode = voucher.VoucherGroup.Promotion.PromotionCode + "-" + voucher.VoucherCode,
+                        ProductCode = voucher.Promotion.PromotionCode + "-" + voucher.VoucherCode,
                         ProductName = voucher.VoucherGroup.VoucherName
                     });
                     break;
                 case (int)AppConstant.EnvVar.PostActionType.Gift_Point:
                     effectType = AppConstant.EffectMessage.AddGiftPoint;
                     AddPoint(order, postAction, promotion, promotionTier);
-                   /* order.Gift.Add(new Gift
-                    {
-                        ProductName = postAction
-                    });*/
                     break;
             }
 
-            SetEffect(order, promotion, 0, effectType, promotionTier, postAction: postAction);
+            SetEffect(order, promotion, 0, effectType, promotionTier);
         }
 
         public void AddPoint(OrderResponseModel order, PostAction postAction, Promotion promotion, PromotionTier promotionTier)
         {
             string effectType = AppConstant.EffectMessage.AddGiftPoint;
             order.BonusPoint = postAction.BonusPoint;
-            SetEffect(order, promotion, 0, effectType, promotionTier, postAction: postAction);
+            SetEffect(order, promotion, 0, effectType, promotionTier);
         }
         #endregion
         #region Discount Order
@@ -222,51 +253,44 @@ namespace ApplicationCore.Chain
                     order.CustomerOrderInfo.ShippingFee = order.CustomerOrderInfo.ShippingFee > 0 ? order.CustomerOrderInfo.ShippingFee : 0;
                     break;
             }
-            SetEffect(order, promotion, discount, effectType, promotionTier, action: action);
+            SetEffect(order, promotion, discount, effectType, promotionTier);
         }
 
-        public void SetEffect(OrderResponseModel order, Promotion promotion, decimal discount, string effectType, PromotionTier promotionTier, Infrastructure.Models.Action action = null, PostAction postAction = null)
+        public void SetEffect(OrderResponseModel order, Promotion promotion, decimal discount, string effectType, PromotionTier promotionTier)
         {
             if (order.Effects == null)
             {
                 order.Effects = new List<Effect>();
             }
-            if (action != null)
+            Effect effect = new Effect
             {
-                order.Effects.Add(new
-                Effect
+                PromotionId = promotion.PromotionId,
+                PromotionTierId = promotionTier.PromotionTierId,
+                ConditionRuleName = promotionTier.ConditionRule.RuleName,
+                TierIndex = promotionTier.TierIndex,
+                EffectType = effectType,
+            };
+            if (promotionTier.Action != null)
+            {
+                effect.Prop = new
                 {
-                    PromotionId = promotion.PromotionId,
-                    PromotionTierId = promotionTier.PromotionTierId,
-                    ConditionRuleName = promotionTier.ConditionRule.RuleName,
-                    TierIndex = promotionTier.TierIndex,
-                    EffectType = effectType,
-                    Prop = new
-                    {
-                        name = promotionTier.Summary,
-                        value = discount
-                    }
-                });
+                    name = promotionTier.Summary,
+                    value = discount
+                };
+                order.Effects.Add(effect);
             }
-            if (postAction != null)
+            if (promotionTier.PostAction != null)
             {
-                order.Effects.Add(new Effect
+                effect.Prop = new
                 {
-                    PromotionId = promotion.PromotionId,
-                    PromotionTierId = promotionTier.PromotionTierId,
-                    ConditionRuleName = promotionTier.ConditionRule.RuleName,
-                    TierIndex = promotionTier.TierIndex,
-                    EffectType = effectType,
-                    Prop = new
+                    gifts = promotionTier.PostAction.PostActionProductMapping.Select(s =>
                     {
-                        gifts = postAction.PostActionProductMapping.Select(s =>
-                        {
-                            string listProduct = "";
-                            listProduct += s.Product.Name;
-                            return listProduct;
-                        })
-                    }
-                });
+                        string listProduct = "";
+                        listProduct += s.Product.Name;
+                        return listProduct;
+                    })
+                };
+                order.Effects.Add(effect);
             }
             if (order.Effects.Count() == 0)
             {
