@@ -8,7 +8,7 @@ namespace Infrastructure.DTOs
     public class BaseDto
     {
         public bool DelFlg { get; set; } = false;
-        public DateTime? InsDate { get; set; }
-        public DateTime? UpdDate { get; set; }
+        public DateTime? InsDate { get; set; } = DateTime.Now;
+        public DateTime? UpdDate { get; set; } = DateTime.Now;
     }
 }

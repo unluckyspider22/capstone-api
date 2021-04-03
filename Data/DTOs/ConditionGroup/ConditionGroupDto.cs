@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Infrastructure.DTOs
 {
-    public class ConditionGroupDto
+    public class ConditionGroupDto :BaseDto
     {
         public Guid ConditionGroupId { get; set; }
         public int GroupNo { get; set; }

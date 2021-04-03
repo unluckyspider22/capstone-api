@@ -18,6 +18,7 @@ namespace Infrastructure.DTOs
         public DateTime? UsedDate { get; set; }
         public DateTime? RedempedDate { get; set; }
         public bool IsActive { get; set; }
+        public int Index { get; set; }
         public virtual VoucherGroup VoucherGroup { get; set; }
     }
 }

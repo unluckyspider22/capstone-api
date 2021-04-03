@@ -162,24 +162,24 @@ namespace ApplicationCore.Services
 
                     // Create action product mapping
                     IGenericRepository<PostActionProductMapping> mapRepo = _unitOfWork.PostActionProductMappingRepository;
-                   /* if (param.PostAction.ActionType.Equals(AppConstant.EnvVar.ActionType.Gift)
-                        && param.PostAction.DiscountType.Equals(AppConstant.EnvVar.DiscountType.GiftProduct)
-                        && param.PostAction.ListProduct.Count > 0)
-                    {
-                        foreach (var product in param.PostAction.ListProduct)
-                        {
-                            var mappEntity = new PostActionProductMapping()
-                            {
-                                Id = Guid.NewGuid(),
-                                PostActionId = postAction.PostActionId,
-                                ProductId = product,
-                                InsDate = DateTime.Now,
-                                UpdDate = DateTime.Now,
-                            };
-                            mapRepo.Add(mappEntity);
-                        }
-                        //await _unitOfWork.SaveAsync();
-                    }*/
+                    /* if (param.PostAction.ActionType.Equals(AppConstant.EnvVar.ActionType.Gift)
+                         && param.PostAction.DiscountType.Equals(AppConstant.EnvVar.DiscountType.GiftProduct)
+                         && param.PostAction.ListProduct.Count > 0)
+                     {
+                         foreach (var product in param.PostAction.ListProduct)
+                         {
+                             var mappEntity = new PostActionProductMapping()
+                             {
+                                 Id = Guid.NewGuid(),
+                                 PostActionId = postAction.PostActionId,
+                                 ProductId = product,
+                                 InsDate = DateTime.Now,
+                                 UpdDate = DateTime.Now,
+                             };
+                             mapRepo.Add(mappEntity);
+                         }
+                         //await _unitOfWork.SaveAsync();
+                     }*/
                     param.PostAction = _mapper.Map<PostActionRequestParam>(postAction);
                 }
                 else
@@ -383,7 +383,7 @@ namespace ApplicationCore.Services
                     var postActionEntity = _mapper.Map<PostAction>(updateParam.PostAction);
                     IGenericRepository<PostAction> postActionRepo = _unitOfWork.PostActionRepository;
                     postActionEntity.UpdDate = DateTime.Now;
-                  //  postActionEntity.InsDate = null;
+                    //  postActionEntity.InsDate = null;
                     //postActionEntity.PromotionTierId = updateParam.PromotionTierId;
                     postActionRepo.Update(postActionEntity);
                     var tier = await promotionTierRepo.GetFirst(filter: el => el.PostActionId.Equals(postActionEntity.PostActionId));
@@ -474,7 +474,7 @@ namespace ApplicationCore.Services
             IGenericRepository<ConditionGroup> conditionGroupRepo = _unitOfWork.ConditionGroupRepository;
             IGenericRepository<ProductCondition> productConditionRepo = _unitOfWork.ProductConditionRepository;
             IGenericRepository<OrderCondition> orderConditionRepo = _unitOfWork.OrderConditionRepository;
-           
+
 
             //Insert new condition groups
             foreach (var group in conditionGroups)
@@ -864,145 +864,145 @@ namespace ApplicationCore.Services
             var actionType = entity.ActionType;
             var discountType = entity.ActionType;
             CultureInfo cul = CultureInfo.GetCultureInfo("vi-VN");
-           /* switch (actionType)
-            {
-                case (int)AppConstant.EnvVar.ActionType.Product:
-                    {
+            /* switch (actionType)
+             {
+                 case (int)AppConstant.EnvVar.ActionType.Product:
+                     {
 
-                        switch (discountType)
-                        {
-                            case (int)AppConstant.EnvVar.DiscountType.Amount:
-                                {
-                                    result += "Discount ";
-                                    result += double.Parse(entity.DiscountAmount.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
-                                    if (entity.MinPriceAfter > 0)
-                                    {
-                                        result +=
-                                          ", minimum residual price " +
-                                           double.Parse(entity.MinPriceAfter.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
-
-
-                                    }
-                                    result += " for product";
-                                    break;
-                                }
-                            case (int)AppConstant.EnvVar.DiscountType.Percentage:
-                                {
-                                    result += "Discount ";
-                                    result += entity.DiscountPercentage + "%";
-                                    if (entity.MaxAmount > 0)
-                                    {
-                                        result += ", maximum ";
-                                        result +=
-                                            double.Parse(entity.MaxAmount.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
-
-                                    }
-                                    result += " for product";
-                                    break;
-                                }
-                            case (int)AppConstant.EnvVar.DiscountType.Unit:
-                                {
-                                    result += "Free ";
-                                    result += entity.DiscountQuantity + " unit(s) ";
-                                    result += "of product";
-                                    break;
-                                }
-
-                            case (int)AppConstant.EnvVar.DiscountType.Fixed:
-                                {
-                                    result += "Fixed ";
-                                    result +=
-                                        double.Parse(entity.FixedPrice.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
-
-                                    result += " for product";
-                                    break;
-                                }
-                            case (int)AppConstant.EnvVar.DiscountType.Ladder:
-                                {
-                                    result += "Buy from the ";
-                                    result += ToOrdinal((long)entity.OrderLadderProduct);
-
-                                    result += " product at the price of ";
-                                    result +=
-                                        double.Parse(entity.LadderPrice.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
-                                    break;
-                                }
-                            case (int)AppConstant.EnvVar.DiscountType.Bundle:
-                                {
-                                    result += "Buy ";
-                                    result += entity.BundleQuantity + " product(s) for ";
-                                    result +=
-                                        double.Parse(entity.BundlePrice.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
-                                    break;
-                                }
-                        }
-                        break;
-                    }
-                case (int)AppConstant.EnvVar.ActionType.Order:
-                    {
-
-                        switch (discountType)
-                        {
-                            case (int)AppConstant.EnvVar.DiscountType.Amount:
-                                {
-                                    result += "Discount ";
-                                    result +=
-                                         double.Parse(entity.DiscountAmount.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
-
-                                    if (entity.MinPriceAfter > 0)
-                                    {
-                                        result +=
-                                          ", minimum residual price " +
-                                           double.Parse(entity.MinPriceAfter.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
+                         switch (discountType)
+                         {
+                             case (int)AppConstant.EnvVar.DiscountType.Amount:
+                                 {
+                                     result += "Discount ";
+                                     result += double.Parse(entity.DiscountAmount.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
+                                     if (entity.MinPriceAfter > 0)
+                                     {
+                                         result +=
+                                           ", minimum residual price " +
+                                            double.Parse(entity.MinPriceAfter.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
 
 
-                                    }
-
-                                    result += " for order";
-                                    break;
-                                }
-                            case (int)AppConstant.EnvVar.DiscountType.Percentage:
-                                {
-                                    result += "Discount ";
-                                    result += entity.DiscountPercentage + "%";
-                                    if (entity.MaxAmount > 0)
-                                    {
-                                        result += ", maximum ";
-                                        result +=
+                                     }
+                                     result += " for product";
+                                     break;
+                                 }
+                             case (int)AppConstant.EnvVar.DiscountType.Percentage:
+                                 {
+                                     result += "Discount ";
+                                     result += entity.DiscountPercentage + "%";
+                                     if (entity.MaxAmount > 0)
+                                     {
+                                         result += ", maximum ";
+                                         result +=
                                              double.Parse(entity.MaxAmount.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
 
-                                    }
-                                    result += " for order";
-                                    break;
-                                }
-                            case (int)AppConstant.EnvVar.DiscountType.Shipping:
-                                {
-                                    result += "Discount ";
-                                    if (entity.DiscountAmount != 0)
-                                    {
-                                        result +=
-                                             double.Parse(entity.DiscountAmount.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
+                                     }
+                                     result += " for product";
+                                     break;
+                                 }
+                             case (int)AppConstant.EnvVar.DiscountType.Unit:
+                                 {
+                                     result += "Free ";
+                                     result += entity.DiscountQuantity + " unit(s) ";
+                                     result += "of product";
+                                     break;
+                                 }
 
-                                    }
-                                    else
-                                    {
-                                        result += entity.DiscountPercentage + "% ";
-                                        if (entity.MaxAmount > 0)
-                                        {
-                                            result += ", maximum ";
-                                            result +=
-                                                double.Parse(entity.MaxAmount.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
+                             case (int)AppConstant.EnvVar.DiscountType.Fixed:
+                                 {
+                                     result += "Fixed ";
+                                     result +=
+                                         double.Parse(entity.FixedPrice.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
 
-                                        }
-                                    }
-                                    result += " for shipping of order";
+                                     result += " for product";
+                                     break;
+                                 }
+                             case (int)AppConstant.EnvVar.DiscountType.Ladder:
+                                 {
+                                     result += "Buy from the ";
+                                     result += ToOrdinal((long)entity.OrderLadderProduct);
 
-                                    break;
-                                }
-                        }
-                        break;
-                    }
-            }*/
+                                     result += " product at the price of ";
+                                     result +=
+                                         double.Parse(entity.LadderPrice.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
+                                     break;
+                                 }
+                             case (int)AppConstant.EnvVar.DiscountType.Bundle:
+                                 {
+                                     result += "Buy ";
+                                     result += entity.BundleQuantity + " product(s) for ";
+                                     result +=
+                                         double.Parse(entity.BundlePrice.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
+                                     break;
+                                 }
+                         }
+                         break;
+                     }
+                 case (int)AppConstant.EnvVar.ActionType.Order:
+                     {
+
+                         switch (discountType)
+                         {
+                             case (int)AppConstant.EnvVar.DiscountType.Amount:
+                                 {
+                                     result += "Discount ";
+                                     result +=
+                                          double.Parse(entity.DiscountAmount.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
+
+                                     if (entity.MinPriceAfter > 0)
+                                     {
+                                         result +=
+                                           ", minimum residual price " +
+                                            double.Parse(entity.MinPriceAfter.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
+
+
+                                     }
+
+                                     result += " for order";
+                                     break;
+                                 }
+                             case (int)AppConstant.EnvVar.DiscountType.Percentage:
+                                 {
+                                     result += "Discount ";
+                                     result += entity.DiscountPercentage + "%";
+                                     if (entity.MaxAmount > 0)
+                                     {
+                                         result += ", maximum ";
+                                         result +=
+                                              double.Parse(entity.MaxAmount.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
+
+                                     }
+                                     result += " for order";
+                                     break;
+                                 }
+                             case (int)AppConstant.EnvVar.DiscountType.Shipping:
+                                 {
+                                     result += "Discount ";
+                                     if (entity.DiscountAmount != 0)
+                                     {
+                                         result +=
+                                              double.Parse(entity.DiscountAmount.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
+
+                                     }
+                                     else
+                                     {
+                                         result += entity.DiscountPercentage + "% ";
+                                         if (entity.MaxAmount > 0)
+                                         {
+                                             result += ", maximum ";
+                                             result +=
+                                                 double.Parse(entity.MaxAmount.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
+
+                                         }
+                                     }
+                                     result += " for shipping of order";
+
+                                     break;
+                                 }
+                         }
+                         break;
+                     }
+             }*/
             return result;
         }
 
@@ -1105,21 +1105,21 @@ namespace ApplicationCore.Services
 
             try
             {
-               /* IGenericRepository<PromotionStoreMapping> storeMappRepo = _unitOfWork.PromotionStoreMappingRepository;
-                IGenericRepository<PromotionChannelMapping> channelMappRepo = _unitOfWork.VoucherChannelRepository;
-                IGenericRepository<Store> storeRepo = _unitOfWork.StoreRepository;
-                IGenericRepository<Channel> channelRepo = _unitOfWork.ChannelRepository;
-                IGenericRepository<Voucher> voucherRepo = _unitOfWork.VoucherRepository;
+                /* IGenericRepository<PromotionStoreMapping> storeMappRepo = _unitOfWork.PromotionStoreMappingRepository;
+                 IGenericRepository<PromotionChannelMapping> channelMappRepo = _unitOfWork.VoucherChannelRepository;
+                 IGenericRepository<Store> storeRepo = _unitOfWork.StoreRepository;
+                 IGenericRepository<Channel> channelRepo = _unitOfWork.ChannelRepository;
+                 IGenericRepository<Voucher> voucherRepo = _unitOfWork.VoucherRepository;
 
-                var voucherGroup = (await _repository.GetFirst(filter: o => o.PromotionId.Equals(promotionId)
-                && o.BrandId.Equals(brandId),
-                    includeProperties: "VoucherGroup"))
-                    .VoucherGroup;
-                var voucherGroupId = Guid.Empty;
-                if (voucherGroup != null)
-                {
-                    voucherGroupId = voucherGroup.VoucherGroupId;
-                }*/
+                 var voucherGroup = (await _repository.GetFirst(filter: o => o.PromotionId.Equals(promotionId)
+                 && o.BrandId.Equals(brandId),
+                     includeProperties: "VoucherGroup"))
+                     .VoucherGroup;
+                 var voucherGroupId = Guid.Empty;
+                 if (voucherGroup != null)
+                 {
+                     voucherGroupId = voucherGroup.VoucherGroupId;
+                 }*/
 
                 var result = new DistributionStat()
                 {
@@ -1127,60 +1127,60 @@ namespace ApplicationCore.Services
                     StoreStat = new List<GroupStore>(),
                 };
 
-               /* var storeMapp = (await storeRepo.Get(filter: o => !o.DelFlg && o.BrandId.Equals(brandId))).ToList();
-                var storeStatList = new List<StoreVoucherStat>();
-                foreach (var store in storeMapp)
-                {
-                    var storeStat = new StoreVoucherStat()
-                    {
-                        StoreId = store.StoreId,
-                        StoreName = store.StoreName,
-                        RedempVoucherCount = await voucherRepo.CountAsync(filter: o => o.StoreId.Equals(store.StoreId) && o.IsRedemped
-                        && o.VoucherGroupId.Equals(voucherGroupId)),
-                        GroupNo = (int)store.Group,
-                    };
-                    storeStatList.Add(storeStat);
-                }
+                /* var storeMapp = (await storeRepo.Get(filter: o => !o.DelFlg && o.BrandId.Equals(brandId))).ToList();
+                 var storeStatList = new List<StoreVoucherStat>();
+                 foreach (var store in storeMapp)
+                 {
+                     var storeStat = new StoreVoucherStat()
+                     {
+                         StoreId = store.StoreId,
+                         StoreName = store.StoreName,
+                         RedempVoucherCount = await voucherRepo.CountAsync(filter: o => o.StoreId.Equals(store.StoreId) && o.IsRedemped
+                         && o.VoucherGroupId.Equals(voucherGroupId)),
+                         GroupNo = (int)store.Group,
+                     };
+                     storeStatList.Add(storeStat);
+                 }
 
-                var storeGroups = storeStatList.GroupBy(o => o.GroupNo).Select(o => o.Distinct()).ToList();
-                foreach (var group in storeGroups)
-                {
-                    var listStore = group.ToList();
-                    var groupStore = new GroupStore()
-                    {
-                        GroupNo = listStore.First().GroupNo,
-                        Stores = listStore
-                    };
-                    result.StoreStat.Add(groupStore);
-                }
+                 var storeGroups = storeStatList.GroupBy(o => o.GroupNo).Select(o => o.Distinct()).ToList();
+                 foreach (var group in storeGroups)
+                 {
+                     var listStore = group.ToList();
+                     var groupStore = new GroupStore()
+                     {
+                         GroupNo = listStore.First().GroupNo,
+                         Stores = listStore
+                     };
+                     result.StoreStat.Add(groupStore);
+                 }
 
 
-                var channelMapp = (await channelRepo.Get(filter: o => !o.DelFlg && o.BrandId.Equals(brandId))).ToList();
-                var channelStatList = new List<ChannelVoucherStat>();
-                foreach (var channel in channelMapp)
-                {
-                    var channelStat = new ChannelVoucherStat()
-                    {
-                        ChannelId = channel.ChannelId,
-                        ChannelName = channel.ChannelName,
-                        RedempVoucherCount = await voucherRepo.CountAsync(filter: o => o.ChannelId.Equals(channel.ChannelId) && o.IsRedemped
-                        && o.VoucherGroupId.Equals(voucherGroupId)),
-                        GroupNo = (int)channel.Group,
-                    };
-                    channelStatList.Add(channelStat);
-                }
+                 var channelMapp = (await channelRepo.Get(filter: o => !o.DelFlg && o.BrandId.Equals(brandId))).ToList();
+                 var channelStatList = new List<ChannelVoucherStat>();
+                 foreach (var channel in channelMapp)
+                 {
+                     var channelStat = new ChannelVoucherStat()
+                     {
+                         ChannelId = channel.ChannelId,
+                         ChannelName = channel.ChannelName,
+                         RedempVoucherCount = await voucherRepo.CountAsync(filter: o => o.ChannelId.Equals(channel.ChannelId) && o.IsRedemped
+                         && o.VoucherGroupId.Equals(voucherGroupId)),
+                         GroupNo = (int)channel.Group,
+                     };
+                     channelStatList.Add(channelStat);
+                 }
 
-                var channelGroups = channelStatList.GroupBy(o => o.GroupNo).Select(o => o.Distinct()).ToList();
-                foreach (var group in channelGroups)
-                {
-                    var listChannel = group.ToList();
-                    var groupChannel = new GroupChannel()
-                    {
-                        GroupNo = listChannel.First().GroupNo,
-                        Channels = listChannel
-                    };
-                    result.ChannelStat.Add(groupChannel);
-                }*/
+                 var channelGroups = channelStatList.GroupBy(o => o.GroupNo).Select(o => o.Distinct()).ToList();
+                 foreach (var group in channelGroups)
+                 {
+                     var listChannel = group.ToList();
+                     var groupChannel = new GroupChannel()
+                     {
+                         GroupNo = listChannel.First().GroupNo,
+                         Channels = listChannel
+                     };
+                     result.ChannelStat.Add(groupChannel);
+                 }*/
                 return result;
             }
             catch (Exception e)
@@ -1215,13 +1215,14 @@ namespace ApplicationCore.Services
             return promotions.ToList();
         }
 
-        public async Task<bool> ExistPromoCode(string promoCode)
+        public async Task<bool> ExistPromoCode(string promoCode, Guid brandId)
         {
             try
             {
                 var promo = await _repository.GetFirst(filter:
                         o => o.PromotionCode.ToLower().Equals(promoCode.ToLower())
                        && !o.DelFlg
+                       && o.BrandId.Equals(brandId)
                        && !o.Status.Equals(AppConstant.EnvVar.PromotionStatus.EXPIRED));
                 return promo != null;
             }
@@ -1266,15 +1267,15 @@ namespace ApplicationCore.Services
                 #endregion
                 #region Update DelFlg của Voucher group
                 IGenericRepository<VoucherGroup> voucherGroupRepo = _unitOfWork.VoucherGroupRepository;
-               /* var voucherGroup = await voucherGroupRepo.GetFirst(filter: o => o.PromotionId.Equals(promotionId));
-                if (voucherGroup != null)
-                {
-                    voucherGroup.DelFlg = true;
-                    #region Xóa voucher
-                    IGenericRepository<Voucher> voucherRepo = _unitOfWork.VoucherRepository;
-                    voucherRepo.Delete(id: Guid.Empty, filter: o => o.VoucherGroupId.Equals(voucherGroup.VoucherGroupId));
-                    #endregion
-                }*/
+                /* var voucherGroup = await voucherGroupRepo.GetFirst(filter: o => o.PromotionId.Equals(promotionId));
+                 if (voucherGroup != null)
+                 {
+                     voucherGroup.DelFlg = true;
+                     #region Xóa voucher
+                     IGenericRepository<Voucher> voucherRepo = _unitOfWork.VoucherRepository;
+                     voucherRepo.Delete(id: Guid.Empty, filter: o => o.VoucherGroupId.Equals(voucherGroup.VoucherGroupId));
+                     #endregion
+                 }*/
                 //await _unitOfWork.SaveAsync();
                 #endregion
                 #region Xóa tier
@@ -1301,55 +1302,137 @@ namespace ApplicationCore.Services
 
         public async Task<List<GameItemDto>> GetPromotionForGames(string deviceCode, string brandCode)
         {
+            return null;
+            //try
+            //{
+            //    List<GameItemDto> gameItemDtos = null;
+
+            //    var device = await _deviceService.GetFirst(filter: el =>
+            //            el.Code == deviceCode
+            //            && !el.DelFlg
+            //            && el.GameConfigId != null
+            //            && el.Store.Brand.BrandCode == brandCode,
+            //            includeProperties: "Store.Brand");
+            //    if (device != null)
+            //    {
+            //        var gameConfig = await _gameConfigService.GetFirst(filter: el =>
+            //            el.Id == device.GameConfigId,
+            //            includeProperties: "GameItems.Promotion");
+
+            //        var gameItems = gameConfig.GameItems.Where(w => w.Promotion.Status.Equals(AppConstant.EnvVar.PromotionStatus.PUBLISH)
+            //        && !w.Promotion.DelFlg
+            //        );
+
+            //        if (gameConfig != null && gameItems.Count() > 0)
+            //        {
+            //            foreach (var gameItem in gameItems)
+            //            {
+            //                var dto = _mapper.Map<GameItemDto>(gameItem);
+            //                if (gameItemDtos == null)
+            //                {
+            //                    gameItemDtos = new List<GameItemDto>();
+            //                }
+            //                gameItemDtos.Add(dto);
+            //            }
+            //            var totalPriority = gameConfig.GameItems.Sum(s => s.Priority);
+
+            //            //Tính tỷ lệ cho từng item
+            //            gameItemDtos = gameItemDtos.Select(
+            //                el =>
+            //                {
+            //                    el.Ratio = (decimal)(el.Priority * 1.0 / totalPriority * 1.0);
+            //                    return el;
+            //                }).ToList();
+
+            //        }
+            //    }
+            //    return gameItemDtos;
+            //}
+            //catch (Exception e)
+            //{
+            //    throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
+            //}
+        }
+
+        #region create promotion
+        public async Task<PromotionDto> CreatePromotion(PromotionDto dto)
+        {
             try
             {
-                List<GameItemDto> gameItemDtos = null;
-
-                var device = await _deviceService.GetFirst(filter: el =>
-                        el.Code == deviceCode
-                        && !el.DelFlg
-                        && el.GameConfigId != null
-                        && el.Store.Brand.BrandCode == brandCode,
-                        includeProperties: "Store.Brand");
-                if (device != null)
+                dto.PromotionId = Guid.NewGuid();
+                dto.InsDate = DateTime.Now;
+                dto.UpdDate = DateTime.Now;
+                var promoEntity = _mapper.Map<Promotion>(dto);
+                _repository.Add(promoEntity);
+                var voucherGroupId = dto.VoucherGroupId;
+                if (voucherGroupId != null && !voucherGroupId.Equals(Guid.Empty))
                 {
-                    var gameConfig = await _gameConfigService.GetFirst(filter: el =>
-                        el.Id == device.GameConfigId,
-                        includeProperties: "GameItems.Promotion");
-
-                    var gameItems = gameConfig.GameItems.Where(w => w.Promotion.Status.Equals(AppConstant.EnvVar.PromotionStatus.PUBLISH)
-                    && !w.Promotion.DelFlg
-                    );
-
-                    if (gameConfig != null && gameItems.Count() > 0)
-                    {
-                        foreach (var gameItem in gameItems)
-                        {
-                            var dto = _mapper.Map<GameItemDto>(gameItem);
-                            if (gameItemDtos == null)
-                            {
-                                gameItemDtos = new List<GameItemDto>();
-                            }
-                            gameItemDtos.Add(dto);
-                        }
-                        var totalPriority = gameConfig.GameItems.Sum(s => s.Priority);
-
-                        //Tính tỷ lệ cho từng item
-                        gameItemDtos = gameItemDtos.Select(
-                            el =>
-                            {
-                                el.Ratio = (decimal)(el.Priority * 1.0 / totalPriority * 1.0);
-                                return el;
-                            }).ToList();
-
-                    }
+                    await CreateTier(voucherGroupId, dto);
                 }
-                return gameItemDtos;
+                await _unitOfWork.SaveAsync();
+                return _mapper.Map<PromotionDto>(promoEntity);
             }
             catch (Exception e)
             {
-                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
+                Debug.WriteLine(e.InnerException);
+                throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
+            }
+
+        }
+        private async Task CreateTier(Guid? voucherGroupId, PromotionDto dto)
+        {
+            try
+            {
+                IGenericRepository<PromotionTier> tierRepo = _unitOfWork.PromotionTierRepository;
+                IGenericRepository<VoucherGroup> voucherGroupRepo = _unitOfWork.VoucherGroupRepository;
+                IGenericRepository<Voucher> voucherRepo = _unitOfWork.VoucherRepository;
+                var group = await voucherGroupRepo.GetFirst(filter: o => o.VoucherGroupId.Equals(voucherGroupId) && !o.DelFlg);
+                if (group != null)
+                {
+                    var tier = new PromotionTier()
+                    {
+                        VoucherGroupId = group.VoucherGroupId,
+                        PromotionId = dto.PromotionId,
+                        InsDate = DateTime.Now,
+                        UpdDate = DateTime.Now,
+                        FromIndex = dto.FromIndex,
+                        ToIndex = dto.ToIndex,
+                        TierIndex = 0,
+                        Summary = "",
+                    };
+                    if (group.ActionId != null)
+                    {
+                        tier.ActionId = group.ActionId;
+                    }
+                    if (group.PostActionId != null)
+                    {
+                        tier.PostActionId = group.PostActionId;
+                    }
+                    if (group.ConditionRuleId != null)
+                    {
+                        tier.ConditionRuleId = group.ConditionRuleId;
+                    }
+                    tierRepo.Add(tier);
+                    var vouchers = await voucherRepo.Get(filter: o => o.VoucherGroupId.Equals(group.VoucherGroupId)
+                                   && o.Index >= dto.FromIndex
+                                   && o.Index <= dto.ToIndex);
+                    if (vouchers.Count() > 0)
+                    {
+                        foreach (var voucher in vouchers)
+                        {
+                            voucher.PromotionId = dto.PromotionId;
+                            voucherRepo.Update(voucher);
+                        }
+                    }
+                }
+
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.InnerException);
+                throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
             }
         }
+        #endregion
     }
 }

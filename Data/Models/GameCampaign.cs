@@ -7,6 +7,7 @@ namespace Infrastructure.Models
     {
         public GameCampaign()
         {
+            Device = new HashSet<Device>();
             GameItems = new HashSet<GameItems>();
             PostAction = new HashSet<PostAction>();
             Voucher = new HashSet<Voucher>();
@@ -27,6 +28,7 @@ namespace Infrastructure.Models
         public virtual Brand Brand { get; set; }
         public virtual GameMaster GameMaster { get; set; }
         public virtual Promotion Promotion { get; set; }
+        public virtual ICollection<Device> Device { get; set; }
         public virtual ICollection<GameItems> GameItems { get; set; }
         public virtual ICollection<PostAction> PostAction { get; set; }
         public virtual ICollection<Voucher> Voucher { get; set; }

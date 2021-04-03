@@ -2,7 +2,7 @@
 
 namespace Infrastructure.DTOs
 {
-    public class OrderConditionDto
+    public class OrderConditionDto :BaseDto
     {
         public Guid OrderConditionId { get; set; }
         public Guid ConditionGroupId { get; set; }

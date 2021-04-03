@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Infrastructure.DTOs
 {
-    public class ProductConditionDto
+    public class ProductConditionDto : BaseDto
     {
         public Guid ProductConditionId { get; set; }
         public Guid ConditionGroupId { get; set; }

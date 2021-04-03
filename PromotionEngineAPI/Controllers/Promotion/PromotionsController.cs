@@ -278,10 +278,8 @@ namespace PromotionEngineAPI.Controllers
         {
             try
             {
-                dto.PromotionId = Guid.NewGuid();
-                dto.InsDate = DateTime.Now;
-                dto.UpdDate = DateTime.Now;
-                var result = await _promotionService.CreateAsync(dto);
+              
+                var result = await _promotionService.CreatePromotion(dto);
                 return Ok(result);
             }
             catch (ErrorObj e)
@@ -415,12 +413,12 @@ namespace PromotionEngineAPI.Controllers
         }
 
         [HttpGet]
-        [Route("check-exist-promoCode/{promoCode}")]
-        public async Task<IActionResult> CheckExistPromoCode(string promoCode)
+        [Route("check-exist-promoCode")]
+        public async Task<IActionResult> CheckExistPromoCode([FromQuery]string promoCode, [FromQuery] Guid brandId)
         {
             try
             {
-                return Ok(await _promotionService.ExistPromoCode(promoCode: promoCode));
+                return Ok(await _promotionService.ExistPromoCode(promoCode: promoCode, brandId:brandId));
             }
             catch (ErrorObj e)
             {

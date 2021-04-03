@@ -383,5 +383,101 @@ namespace ApplicationCore.Services
             }
 
         }
+
+        public async Task<List<VoucherGroupForPromo>> GetVoucherGroupForPromo(Guid brandId)
+        {
+            try
+            {
+                var result = new List<VoucherGroupForPromo>();
+                var groups = (await _repository.Get(
+                    filter: o => o.BrandId.Equals(brandId)
+                    && o.Quantity > o.RedempedQuantity
+                    && o.Quantity > o.UsedQuantity
+                    && !o.DelFlg,
+                    includeProperties: "Action,ConditionRule,PostAction")).ToList();
+                if (groups.Count > 0)
+                {
+                    foreach (var group in groups)
+                    {
+                        var dto = new VoucherGroupForPromo()
+                        {
+                            VoucherGroupId = group.VoucherGroupId,
+                            VoucherName = group.VoucherName,
+                            Quantity = group.Quantity,
+                        };
+                        if (group.Action != null)
+                        {
+                            dto.ActionType = group.Action.ActionType;
+                            dto.ActionId = group.ActionId;
+                        }
+                        else if (group.PostAction != null)
+                        {
+                            dto.PostActionType = group.PostAction.PostActionType;
+                            dto.PostActionId = group.PostActionId;
+                        }
+                        result.Add(dto);
+                    }
+                }
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
+            }
+
+        }
+
+        public async Task<VoucherIndexInfo> CheckAvailableIndex(Guid voucherGroupId)
+        {
+            try
+            {
+                var result = new VoucherIndexInfo()
+                {
+                    Available = false,
+                    FromIndex = 0,
+                    MaxIndex = 0,
+                };
+                var maxIndex = 0;
+                var group = await _repository.GetFirst(filter: o => o.VoucherGroupId.Equals(voucherGroupId) && !o.DelFlg);
+                if (group != null)
+                {
+                    IGenericRepository<PromotionTier> tierRepo = _unitOfWork.PromotionTierRepository;
+                    var quantity = group.Quantity;
+                    var tiers = await tierRepo.Get(filter: o => o.VoucherGroupId.Equals(voucherGroupId));
+                    if (tiers.Count() > 0)
+                    {
+                        tiers = tiers.OrderByDescending(o => o.ToIndex);
+                        maxIndex = (int)tiers.First().ToIndex;
+                        if (maxIndex != quantity)
+                        {
+                            result = new VoucherIndexInfo()
+                            {
+                                Available = true,
+                                FromIndex = maxIndex + 1,
+                                MaxIndex = quantity,
+                            };
+                        }
+
+                    }
+                    else
+                    {
+                        result = new VoucherIndexInfo()
+                        {
+                            Available = true,
+                            FromIndex = 1,
+                            MaxIndex = group.Quantity,
+                        };
+
+                    }
+
+                }
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
+            }
+
+        }
     }
 }

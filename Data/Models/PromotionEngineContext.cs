@@ -41,7 +41,7 @@ namespace Infrastructure.Models
         public virtual DbSet<PromotionChannelMapping> PromotionChannelMapping { get; set; }
         public virtual DbSet<PromotionStoreMapping> PromotionStoreMapping { get; set; }
         public virtual DbSet<PromotionTier> PromotionTier { get; set; }
-        public virtual DbSet<RoleEntity> Role { get; set; }
+        public virtual DbSet<Role> Role { get; set; }
         public virtual DbSet<Store> Store { get; set; }
         public virtual DbSet<Transaction> Transaction { get; set; }
         public virtual DbSet<Voucher> Voucher { get; set; }
@@ -316,6 +316,11 @@ namespace Infrastructure.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.HasOne(d => d.GameCampaign)
+                    .WithMany(p => p.Device)
+                    .HasForeignKey(d => d.GameCampaignId)
+                    .HasConstraintName("FK_Device_GameCampaign");
+
                 entity.HasOne(d => d.Store)
                     .WithMany(p => p.Device)
                     .HasForeignKey(d => d.StoreId)
@@ -390,12 +395,6 @@ namespace Infrastructure.Models
                     .HasForeignKey(d => d.GameId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_GameItems_Game");
-
-                entity.HasOne(d => d.Promotion)
-                    .WithMany(p => p.GameItems)
-                    .HasForeignKey(d => d.PromotionId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_GameItems_Promotion");
             });
 
             modelBuilder.Entity<GameMaster>(entity =>
@@ -675,9 +674,13 @@ namespace Infrastructure.Models
             {
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
-                entity.Property(e => e.InsDate).HasColumnType("datetime");
+                entity.Property(e => e.InsDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.UpdTime).HasColumnType("datetime");
+                entity.Property(e => e.UpdDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
 
                 entity.HasOne(d => d.ProductCondition)
                     .WithMany(p => p.ProductConditionMapping)
@@ -827,7 +830,7 @@ namespace Infrastructure.Models
                     .HasConstraintName("FK_PromotionTier_VoucherGroup");
             });
 
-            modelBuilder.Entity<RoleEntity>(entity =>
+            modelBuilder.Entity<Role>(entity =>
             {
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")

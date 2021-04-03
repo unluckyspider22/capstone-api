@@ -17,6 +17,5 @@ namespace Infrastructure.Models
         public DateTime UpdDate { get; set; }
 
         public virtual GameCampaign Game { get; set; }
-        public virtual Promotion Promotion { get; set; }
     }
 }

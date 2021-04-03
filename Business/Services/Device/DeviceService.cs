@@ -60,9 +60,9 @@ namespace ApplicationCore.Services
                             StoreCode = device.Store.StoreCode,
                             StoreId = device.Store.StoreId,
                             StoreName = device.Store.StoreName,
-                            GameConfigId = device.GameConfigId,
+                            //GameConfigId = device.GameConfigId,
                         };
-                        dto.GameConfigName = await GetConfigName(device.GameConfigId);
+                        //dto.GameConfigName = await GetConfigName(device.GameConfigId);
                         result.Add(dto);
                     }
                 }
@@ -114,7 +114,7 @@ namespace ApplicationCore.Services
                         entity.Name = dto.Name;
                     }
                     entity.DelFlg = dto.DelFlg;
-                    entity.GameConfigId = dto.GameConfigId;
+                    //entity.GameConfigId = dto.GameConfigId;
                     if (!dto.StoreId.Equals(Guid.Empty) && !dto.StoreId.Equals(entity.StoreId))
                     {
                         IGenericRepository<Store> storeRepo = _unitOfWork.StoreRepository;
