@@ -316,6 +316,11 @@ namespace Infrastructure.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.HasOne(d => d.GameCampaign)
+                    .WithMany(p => p.Device)
+                    .HasForeignKey(d => d.GameCampaignId)
+                    .HasConstraintName("FK_Device_GameCampaign");
+
                 entity.HasOne(d => d.Store)
                     .WithMany(p => p.Device)
                     .HasForeignKey(d => d.StoreId)
@@ -390,12 +395,6 @@ namespace Infrastructure.Models
                     .HasForeignKey(d => d.GameId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_GameItems_Game");
-
-                entity.HasOne(d => d.Promotion)
-                    .WithMany(p => p.GameItems)
-                    .HasForeignKey(d => d.PromotionId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_GameItems_Promotion");
             });
 
             modelBuilder.Entity<GameMaster>(entity =>

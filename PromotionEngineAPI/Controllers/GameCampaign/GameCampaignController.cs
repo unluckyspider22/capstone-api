@@ -6,17 +6,15 @@ using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers
 {
-    [Route("api/game-config")]
+    [Route("api/game-campaign")]
     [ApiController]
-    public class GameConfigController : ControllerBase
+    public class GameCampaignController : ControllerBase
     {
-        private readonly IGameConfigService _service;
-        private readonly IGameItemService _itemService;
+        private readonly IGameCampaignService _service;
 
-        public GameConfigController(IGameConfigService service, IGameItemService itemService)
+        public GameCampaignController(IGameCampaignService service)
         {
             _service = service;
-            _itemService = itemService;
         }
         [HttpGet]
         public async Task<IActionResult> GetGameConfig([FromQuery] PagingRequestParam param, [FromQuery] Guid brandId)
@@ -32,7 +30,7 @@ namespace PromotionEngineAPI.Controllers
                 return StatusCode(statusCode: e.Code, e);
             }
         }
-
+        
         [HttpPut]
         public async Task<IActionResult> UpdateGame([FromBody] GameConfigDto dto, [FromQuery] Guid gameConfigId)
         {
@@ -99,7 +97,7 @@ namespace PromotionEngineAPI.Controllers
             {
                 return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
             }
-            try 
+            try
             {
                 var result = await _service.GetFirst(filter: o => o.Id.Equals(gameConfigId) && o.BrandId.Equals(brandId) && !o.DelFlg,
                     includeProperties: "GameItems");

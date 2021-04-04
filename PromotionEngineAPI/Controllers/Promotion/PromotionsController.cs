@@ -449,15 +449,17 @@ namespace PromotionEngineAPI.Controllers
         }
 
         [HttpGet]
-        [Route("for-game-config/{brandId}")]
+        [Route("for-game-campaign/{brandId}")]
         public async Task<IActionResult> GetPromotionGameConfig([FromRoute] Guid brandId)
         {
             try
             {
 
                 return Ok(await _promotionService.GetAsync(filter: o => o.BrandId.Equals(brandId)
-                                && o.Status == (int)AppConstant.EnvVar.PromotionStatus.PUBLISH
-                                && !o.DelFlg));
+                                && o.Status != (int)AppConstant.EnvVar.PromotionStatus.EXPIRED
+                                && !o.IsAuto
+                                && !o.DelFlg,
+                                includeProperties:"PromotionTier"));
             }
             catch (ErrorObj e)
             {
