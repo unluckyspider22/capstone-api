@@ -1,11 +1,9 @@
 ﻿using ApplicationCore.Services;
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
-using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers
@@ -27,29 +25,19 @@ namespace PromotionEngineAPI.Controllers
 
         // GET: api/ConditionRules
         [HttpGet]
-        public async Task<IActionResult> GetConditionRule([FromQuery] PagingRequestParam param, Guid BrandId, bool available)
+        public async Task<IActionResult> GetConditionRule([FromQuery] PagingRequestParam param, Guid BrandId)
         {
-            Expression<Func<ConditionRule, bool>> filter = el => !el.DelFlg && el.BrandId.Equals(BrandId);
-            string includedProperties = "" +
-                "ConditionGroup," +
-                "ConditionGroup.ProductCondition," +
-                "ConditionGroup.OrderCondition," +
-                "PromotionTier," +
-                "PromotionTier.Promotion";
-            if (available != null && available)
-            {
-                filter = el => !el.DelFlg && el.BrandId.Equals(BrandId) && (el.PromotionTier == null);
-            }
             try
             {
                 var conditionRules = await _service.GetAsync(
                pageIndex: param.PageIndex,
                pageSize: param.PageSize,
-               filter: filter,
-               orderBy: el => el.OrderByDescending(b => b.InsDate),
-               includeProperties: includedProperties
-               );
-
+               filter: el => !el.DelFlg && el.BrandId.Equals(BrandId),
+               orderBy: el => el.OrderByDescending(b => b.InsDate)
+               , includeProperties: "ConditionGroup," +
+                                    "ConditionGroup.ProductCondition," +
+                                    "ConditionGroup.OrderCondition," +
+                                    "PromotionTier");
                 GenericRespones<ConditionRuleResponse> result = new GenericRespones<ConditionRuleResponse>(await _service.ReorderResult(conditionRules.Data), conditionRules.Metadata);
                 return Ok(result);
             }

@@ -128,11 +128,11 @@ namespace ApplicationCore.Services
                     Description = rule.Description,
                     ConditionGroups = new List<ConditionGroupResponse>(),
                 };
-                if (rule.PromotionTier.PromotionId != null)
-                {
-                    conditionRuleResponse.PromotionId = rule.PromotionTier.PromotionId;
-                    conditionRuleResponse.PromotionName = rule.PromotionTier.Promotion.PromotionName;
-                }
+                //if (rule.PromotionTier.PromotionId != null)
+                //{
+                //    conditionRuleResponse.PromotionId = rule.PromotionTier.PromotionId;
+                //    conditionRuleResponse.PromotionName = rule.PromotionTier.Promotion.PromotionName;
+                //}
 
                 ICollection<ConditionGroup> groupsParam = rule.ConditionGroup;
                 foreach (var group in groupsParam)

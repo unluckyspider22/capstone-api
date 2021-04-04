@@ -36,5 +36,7 @@ namespace ApplicationCore.Services
         public Task<GenericRespones<AvailableVoucherDto>> GetAvailable(int PageSize, int PageIndex, Guid BrandId);
         public Task<List<VoucherGroupForPromo>> GetVoucherGroupForPromo(Guid brandId);
         public Task<VoucherIndexInfo> CheckAvailableIndex(Guid voucherGroupId);
+
+        public Task<VoucherGroupDetailDto> GetDetail(Guid id);
     }
 }

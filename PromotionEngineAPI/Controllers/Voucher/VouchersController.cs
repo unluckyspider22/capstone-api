@@ -1,13 +1,11 @@
 ﻿
 using ApplicationCore.Request;
 using ApplicationCore.Services;
-using ApplicationCore.Utils;
 using Infrastructure.DTOs;
 using Infrastructure.DTOs.Voucher;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers
@@ -25,15 +23,19 @@ namespace PromotionEngineAPI.Controllers
         // GET: api/Vouchers
         [HttpGet]
         // api/Vouchers?pageIndex=...&pageSize=...
-        public async Task<IActionResult> GetVoucher([FromQuery] PagingRequestParam param, [FromQuery] Guid VoucherGroupId)
+        public async Task<IActionResult> GetVoucher(
+            [FromQuery] PagingRequestParam param,
+            [FromQuery] Guid VoucherGroupId,
+            [FromQuery] Guid PromotionId)
         {
             try
             {
                 return Ok(await _service.GetAsync(
                 pageIndex: param.PageIndex,
                 pageSize: param.PageSize,
-                filter: el => el.VoucherGroupId.Equals(VoucherGroupId),
-                orderBy: el => el.OrderByDescending(obj => obj.InsDate)
+                filter: el => el.VoucherGroupId.Equals(VoucherGroupId)
+                && PromotionId.Equals(Guid.Empty) ? !el.PromotionId.Equals(Guid.Empty) : el.PromotionId.Equals(PromotionId),
+                orderBy: el => el.OrderBy(obj => obj.Index)
                 ));
             }
             catch (ErrorObj e)

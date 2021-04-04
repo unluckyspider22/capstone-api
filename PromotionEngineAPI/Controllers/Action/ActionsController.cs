@@ -3,6 +3,7 @@ using Infrastructure.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers
@@ -19,7 +20,10 @@ namespace PromotionEngineAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAction([FromQuery] PagingRequestParam param, [FromQuery] Guid brandId)
+        public async Task<IActionResult> GetAction(
+            [FromQuery] PagingRequestParam param,
+            [FromQuery] Guid brandId,
+            [FromQuery] int ActionType = 0)
         {
             try
             {
@@ -27,11 +31,19 @@ namespace PromotionEngineAPI.Controllers
                 {
                     return StatusCode(statusCode: 400, new ErrorObj(400, "Required Brand Id"));
                 }
-                return Ok(await _service.GetAsync(
+                Expression<Func<Infrastructure.Models.Action, bool>> myFilter = el => !el.DelFlg && el.BrandId.Equals(brandId);
+                if (ActionType > 0)
+                {
+                    myFilter = el => !el.DelFlg 
+                                     && el.BrandId.Equals(brandId) 
+                                     && el.ActionType == ActionType;
+                }
+                var result = await _service.GetAsync(
                 pageIndex: param.PageIndex,
                 pageSize: param.PageSize,
-                filter: el => !el.DelFlg && el.BrandId.Equals(brandId),
-                orderBy: el => el.OrderByDescending(b => b.InsDate)));
+                filter: myFilter,
+                orderBy: el => el.OrderByDescending(b => b.InsDate));
+                return Ok(result);
             }
             catch (ErrorObj e)
             {

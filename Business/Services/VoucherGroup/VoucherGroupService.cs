@@ -479,5 +479,91 @@ namespace ApplicationCore.Services
             }
 
         }
+
+        #region get voucher group detail
+        public async Task<VoucherGroupDetailDto> GetDetail(Guid id)
+        {
+            try
+            {
+                var result = new VoucherGroupDetailDto();
+                var group = await _repository.GetFirst(filter: o => o.VoucherGroupId.Equals(id) && !o.DelFlg,
+                                                        includeProperties: "Action,PostAction");
+                if (group != null)
+                {
+                    result = new VoucherGroupDetailDto()
+                    {
+                        VoucherGroupId = group.VoucherGroupId,
+                        VoucherName = group.VoucherName,
+                        BrandId = group.BrandId,
+                        ActionId = group.ActionId,
+                        PostActionId = group.PostActionId,
+                        ConditionRuleId = group.ConditionRuleId,
+                        RedempedQuantity = group.RedempedQuantity,
+                        Total = group.Quantity,
+                        UsedQuantity = group.UsedQuantity,
+                        Remain = 0,
+                    };
+                    if (group.Action != null)
+                    {
+                        result.ActionType = group.Action.ActionType;
+                    }
+                    if (group.PostAction != null)
+                    {
+                        result.PostActionType = group.PostAction.PostActionType;
+                    }
+                    if (result.UsedQuantity > result.RedempedQuantity)
+                    {
+                        result.Remain = result.Total - result.UsedQuantity;
+                    }
+                    else
+                    {
+                        result.Remain = result.Total - result.RedempedQuantity;
+                    }
+                    result.PromoList = await GetPromoList(id);
+                }
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
+            }
+        }
+        private async Task<List<PromoOfVoucher>> GetPromoList(Guid voucherGroupId)
+        {
+            try
+            {
+                IGenericRepository<PromotionTier> tierRepo = _unitOfWork.PromotionTierRepository;
+                var result = new List<PromoOfVoucher>();
+                var tiers = await tierRepo.Get(filter: o => o.VoucherGroupId.Equals(voucherGroupId), includeProperties: "Promotion");
+                if (tiers.Count() > 0)
+                {
+                    foreach (var tier in tiers)
+                    {
+                        var exist = result.Any(o => o.Equals(tier.PromotionId));
+                        if (!exist)
+                        {
+                            if (tier.PromotionId != null && !tier.PromotionId.Equals(Guid.Empty))
+                            {
+                                var dto = new PromoOfVoucher()
+                                {
+                                    PromotionId = (Guid)tier.PromotionId,
+                                    PromoName = tier.Promotion.PromotionName,
+                                };
+                                result.Add(dto);
+                            }
+
+                        }
+
+                    }
+                }
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
+            }
+        }
+        #endregion
+
     }
 }

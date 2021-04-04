@@ -41,4 +41,27 @@ namespace Infrastructure.DTOs
         public int MaxIndex { get; set; }
         public bool Available { get; set; }
     }
+
+    public class VoucherGroupDetailDto
+    {
+        public Guid VoucherGroupId { get; set; }
+        public Guid BrandId { get; set; }
+        public string VoucherName { get; set; }
+        public int Total { get; set; }
+        public int UsedQuantity { get; set; }
+        public int RedempedQuantity { get; set; }
+        public int Remain { get; set; }
+        public Guid? ConditionRuleId { get; set; }
+        public Guid? ActionId { get; set; }
+        public int ActionType { get; set; } = 0;
+        public Guid? PostActionId { get; set; }
+        public int PostActionType { get; set; } = 0;
+        public List<PromoOfVoucher> PromoList { get; set; } = new List<PromoOfVoucher>();
+    }
+
+    public class PromoOfVoucher
+    {
+        public Guid PromotionId { get; set; }
+        public string PromoName { get; set; }
+    }
 }

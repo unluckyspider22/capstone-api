@@ -2,9 +2,6 @@
 using ApplicationCore.Services;
 using ApplicationCore.Worker;
 using Infrastructure.DTOs;
-using Infrastructure.Helper;
-using Infrastructure.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Diagnostics;
@@ -61,24 +58,24 @@ namespace PromotionEngineAPI.Controllers
             }
         }
 
-       /* [HttpGet]
-        [Authorize]
-        [Route("game")]
-        // api/VoucherGroups/game
-        public async Task<IActionResult> GetVoucherGroupForGame([FromQuery] PagingRequestParam param, [FromQuery] string brandCode,
-            [FromQuery] string storeCode)
-        {
-            try
-            {
-                if (storeCode == null || brandCode == null)
-                    return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
-                return Ok(await _service.GetVoucherGroupForGame(PageIndex: param.PageIndex, PageSize: param.PageSize, StoreCode: storeCode, BrandCode: brandCode)); ;
-            }
-            catch (ErrorObj e)
-            {
-                return StatusCode(statusCode: e.Code, e.Message);
-            }
-        }*/
+        /* [HttpGet]
+         [Authorize]
+         [Route("game")]
+         // api/VoucherGroups/game
+         public async Task<IActionResult> GetVoucherGroupForGame([FromQuery] PagingRequestParam param, [FromQuery] string brandCode,
+             [FromQuery] string storeCode)
+         {
+             try
+             {
+                 if (storeCode == null || brandCode == null)
+                     return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                 return Ok(await _service.GetVoucherGroupForGame(PageIndex: param.PageIndex, PageSize: param.PageSize, StoreCode: storeCode, BrandCode: brandCode)); ;
+             }
+             catch (ErrorObj e)
+             {
+                 return StatusCode(statusCode: e.Code, e.Message);
+             }
+         }*/
 
 
         // GET: api/VoucherGroups/count
@@ -100,9 +97,13 @@ namespace PromotionEngineAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetVoucherGroup([FromRoute] Guid id)
         {
+            if (id.Equals(Guid.Empty))
+            {
+                return StatusCode(statusCode: 400, new ErrorObj(400, "Required Voucher Group Id"));
+            }
             try
             {
-                return Ok(await _service.GetByIdAsync(id));
+                return Ok(await _service.GetDetail(id));
             }
             catch (ErrorObj e)
             {
@@ -295,6 +296,8 @@ namespace PromotionEngineAPI.Controllers
                 return StatusCode(statusCode: e.Code, e);
             }
         }
+       
+
 
 
     }
