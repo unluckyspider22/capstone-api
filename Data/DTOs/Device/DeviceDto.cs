@@ -12,7 +12,7 @@ namespace Infrastructure.DTOs
         public string Name { get; set; }
         [StringLength(8)]
         public string Code { get; set; }
-        public Guid GameConfigId { get; set; }
+        public Guid? GameCampaignId { get; set; }
     }
 
   

@@ -1215,13 +1215,14 @@ namespace ApplicationCore.Services
             return promotions.ToList();
         }
 
-        public async Task<bool> ExistPromoCode(string promoCode)
+        public async Task<bool> ExistPromoCode(string promoCode, Guid brandId)
         {
             try
             {
                 var promo = await _repository.GetFirst(filter:
                         o => o.PromotionCode.ToLower().Equals(promoCode.ToLower())
                        && !o.DelFlg
+                       && o.BrandId.Equals(brandId)
                        && !o.Status.Equals(AppConstant.EnvVar.PromotionStatus.EXPIRED));
                 return promo != null;
             }
@@ -1301,55 +1302,137 @@ namespace ApplicationCore.Services
 
         public async Task<List<GameItemDto>> GetPromotionForGames(string deviceCode, string brandCode)
         {
+            return null;
+            //try
+            //{
+            //    List<GameItemDto> gameItemDtos = null;
+
+            //    var device = await _deviceService.GetFirst(filter: el =>
+            //            el.Code == deviceCode
+            //            && !el.DelFlg
+            //            && el.GameConfigId != null
+            //            && el.Store.Brand.BrandCode == brandCode,
+            //            includeProperties: "Store.Brand");
+            //    if (device != null)
+            //    {
+            //        var gameConfig = await _gameConfigService.GetFirst(filter: el =>
+            //            el.Id == device.GameConfigId,
+            //            includeProperties: "GameItems.Promotion");
+
+            //        var gameItems = gameConfig.GameItems.Where(w => w.Promotion.Status.Equals(AppConstant.EnvVar.PromotionStatus.PUBLISH)
+            //        && !w.Promotion.DelFlg
+            //        );
+
+            //        if (gameConfig != null && gameItems.Count() > 0)
+            //        {
+            //            foreach (var gameItem in gameItems)
+            //            {
+            //                var dto = _mapper.Map<GameItemDto>(gameItem);
+            //                if (gameItemDtos == null)
+            //                {
+            //                    gameItemDtos = new List<GameItemDto>();
+            //                }
+            //                gameItemDtos.Add(dto);
+            //            }
+            //            var totalPriority = gameConfig.GameItems.Sum(s => s.Priority);
+
+            //            //Tính tỷ lệ cho từng item
+            //            gameItemDtos = gameItemDtos.Select(
+            //                el =>
+            //                {
+            //                    el.Ratio = (decimal)(el.Priority * 1.0 / totalPriority * 1.0);
+            //                    return el;
+            //                }).ToList();
+
+            //        }
+            //    }
+            //    return gameItemDtos;
+            //}
+            //catch (Exception e)
+            //{
+            //    throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
+            //}
+        }
+
+        #region create promotion
+        public async Task<PromotionDto> CreatePromotion(PromotionDto dto)
+        {
             try
             {
-                List<GameItemDto> gameItemDtos = null;
-
-                var device = await _deviceService.GetFirst(filter: el =>
-                        el.Code == deviceCode
-                        && !el.DelFlg
-                        && el.GameCampaignId != null
-                        && el.Store.Brand.BrandCode == brandCode,
-                        includeProperties: "Store.Brand");
-                if (device != null)
+                dto.PromotionId = Guid.NewGuid();
+                dto.InsDate = DateTime.Now;
+                dto.UpdDate = DateTime.Now;
+                var promoEntity = _mapper.Map<Promotion>(dto);
+                _repository.Add(promoEntity);
+                var voucherGroupId = dto.VoucherGroupId;
+                if (voucherGroupId != null && !voucherGroupId.Equals(Guid.Empty))
                 {
-                    var gameConfig = await _gameConfigService.GetFirst(filter: el =>
-                        el.Id == device.GameCampaignId,
-                        includeProperties: "GameItems.Promotion");
-
-                    var gameItems = gameConfig.GameItems.Where(w => w.Game.Promotion.Status.Equals(AppConstant.EnvVar.PromotionStatus.PUBLISH)
-                    && !w.Game.Promotion.DelFlg
-                    );
-
-                    if (gameConfig != null && gameItems.Count() > 0)
-                    {
-                        foreach (var gameItem in gameItems)
-                        {
-                            var dto = _mapper.Map<GameItemDto>(gameItem);
-                            if (gameItemDtos == null)
-                            {
-                                gameItemDtos = new List<GameItemDto>();
-                            }
-                            gameItemDtos.Add(dto);
-                        }
-                        var totalPriority = gameConfig.GameItems.Sum(s => s.Priority);
-
-                        //Tính tỷ lệ cho từng item
-                        gameItemDtos = gameItemDtos.Select(
-                            el =>
-                            {
-                                el.Ratio = (decimal)(el.Priority * 1.0 / totalPriority * 1.0);
-                                return el;
-                            }).ToList();
-
-                    }
+                    await CreateTier(voucherGroupId, dto);
                 }
-                return gameItemDtos;
+                await _unitOfWork.SaveAsync();
+                return _mapper.Map<PromotionDto>(promoEntity);
             }
             catch (Exception e)
             {
-                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
+                Debug.WriteLine(e.InnerException);
+                throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
+            }
+
+        }
+        private async Task CreateTier(Guid? voucherGroupId, PromotionDto dto)
+        {
+            try
+            {
+                IGenericRepository<PromotionTier> tierRepo = _unitOfWork.PromotionTierRepository;
+                IGenericRepository<VoucherGroup> voucherGroupRepo = _unitOfWork.VoucherGroupRepository;
+                IGenericRepository<Voucher> voucherRepo = _unitOfWork.VoucherRepository;
+                var group = await voucherGroupRepo.GetFirst(filter: o => o.VoucherGroupId.Equals(voucherGroupId) && !o.DelFlg);
+                if (group != null)
+                {
+                    var tier = new PromotionTier()
+                    {
+                        VoucherGroupId = group.VoucherGroupId,
+                        PromotionId = dto.PromotionId,
+                        InsDate = DateTime.Now,
+                        UpdDate = DateTime.Now,
+                        FromIndex = dto.FromIndex,
+                        ToIndex = dto.ToIndex,
+                        TierIndex = 0,
+                        Summary = "",
+                    };
+                    if (group.ActionId != null)
+                    {
+                        tier.ActionId = group.ActionId;
+                    }
+                    if (group.PostActionId != null)
+                    {
+                        tier.PostActionId = group.PostActionId;
+                    }
+                    if (group.ConditionRuleId != null)
+                    {
+                        tier.ConditionRuleId = group.ConditionRuleId;
+                    }
+                    tierRepo.Add(tier);
+                    var vouchers = await voucherRepo.Get(filter: o => o.VoucherGroupId.Equals(group.VoucherGroupId)
+                                   && o.Index >= dto.FromIndex
+                                   && o.Index <= dto.ToIndex);
+                    if (vouchers.Count() > 0)
+                    {
+                        foreach (var voucher in vouchers)
+                        {
+                            voucher.PromotionId = dto.PromotionId;
+                            voucherRepo.Update(voucher);
+                        }
+                    }
+                }
+
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.InnerException);
+                throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
             }
         }
+        #endregion
     }
 }

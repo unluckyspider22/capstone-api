@@ -258,6 +258,43 @@ namespace PromotionEngineAPI.Controllers
                 return StatusCode(statusCode: e.Code, e);
             }
         }
+        [HttpGet]
+        [Route("for-promo/{brandId}")]
+        public async Task<IActionResult> GetAvailableVoucherGroup([FromRoute] Guid brandId)
+        {
+            if (brandId.Equals(Guid.Empty))
+            {
+                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+            }
+            try
+            {
+                var result = await _service.GetVoucherGroupForPromo(brandId);
+                return Ok(result);
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
+
+        [HttpGet]
+        [Route("index-info/{voucherGroupId}")]
+        public async Task<IActionResult> GetIndexInfo([FromRoute] Guid voucherGroupId)
+        {
+            if (voucherGroupId.Equals(Guid.Empty))
+            {
+                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+            }
+            try
+            {
+                var result = await _service.CheckAvailableIndex(voucherGroupId);
+                return Ok(result);
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
 
 
     }

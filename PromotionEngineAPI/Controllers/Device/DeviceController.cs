@@ -129,7 +129,7 @@ namespace PromotionEngineAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> PostDevice([FromBody] DeviceDto dto)
         {
-            if (dto.GameConfigId.Equals(Guid.Empty))
+            if (dto.GameCampaignId.Equals(Guid.Empty))
             {
                 return StatusCode(statusCode: 400, new ErrorObj(400, "Select Game Configuration"));
             }

@@ -45,7 +45,7 @@ namespace ApplicationCore.Services
                 var devices = (await _repository.Get(pageIndex: PageIndex, pageSize: PageSize,
                     filter: o => o.Store.BrandId.Equals(brandId)
                             && !o.DelFlg,
-                    includeProperties: "Store"
+                    includeProperties: "Store,GameCampaign"
                 )).ToList();
                 if (devices.Count > 0)
                 {
@@ -61,8 +61,10 @@ namespace ApplicationCore.Services
                             StoreId = device.Store.StoreId,
                             StoreName = device.Store.StoreName,
                             GameConfigId = device.GameCampaignId,
+                            GameConfigName = device.GameCampaign.Name
+                            //GameConfigId = device.GameConfigId,
                         };
-                        dto.GameConfigName = await GetConfigName(device.GameCampaignId);
+                        //dto.GameConfigName = await GetConfigName(device.GameConfigId);
                         result.Add(dto);
                     }
                 }
@@ -114,7 +116,7 @@ namespace ApplicationCore.Services
                         entity.Name = dto.Name;
                     }
                     entity.DelFlg = dto.DelFlg;
-                    entity.GameCampaignId = dto.GameConfigId;
+                    //entity.GameConfigId = dto.GameConfigId;
                     if (!dto.StoreId.Equals(Guid.Empty) && !dto.StoreId.Equals(entity.StoreId))
                     {
                         IGenericRepository<Store> storeRepo = _unitOfWork.StoreRepository;

@@ -26,10 +26,12 @@ namespace ApplicationCore.Services
         Task<List<Promotion>> GetAutoPromotions(CustomerOrderInfo orderInfo, Guid promotionId);
         List<Promotion> GetPromotions();
 
-        Task<bool> ExistPromoCode(string promoCode);
+        Task<bool> ExistPromoCode(string promoCode, Guid brandId);
 
         Task<bool> DeletePromotion(Guid promotionId);
 
         Task<List<GameItemDto>> GetPromotionForGames(string deviceCode, string brandCode);
+
+        public Task<PromotionDto> CreatePromotion(PromotionDto dto);
     }
 }

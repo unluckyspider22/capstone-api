@@ -67,7 +67,7 @@ namespace ApplicationCore.Services
                         groupRepo.Delete(id: group.ConditionGroupId);
                     }
                 }
-                var promotionTier = conditionRule.PromotionTier;
+               /* var promotionTier = conditionRule.PromotionTier;
                 if (promotionTier.Action != null)
                 {
                     await _actionService.Delete((Guid)promotionTier.ActionId);
@@ -77,7 +77,7 @@ namespace ApplicationCore.Services
                     await _postActionService.Delete((Guid)promotionTier.PostActionId);
                 }
                 tierRepo.Delete(id: promotionTier.PromotionTierId);
-                _repository.Delete(id: conditionRuleId);
+                _repository.Delete(id: conditionRuleId);*/
                 return await _unitOfWork.SaveAsync() > 0;
             }
             catch (Exception e)
@@ -128,11 +128,11 @@ namespace ApplicationCore.Services
                     Description = rule.Description,
                     ConditionGroups = new List<ConditionGroupResponse>(),
                 };
-                if (rule.PromotionTier.PromotionId != null)
+               /* if (rule.PromotionTier.PromotionId != null)
                 {
                     conditionRuleResponse.PromotionId = rule.PromotionTier.PromotionId;
                     conditionRuleResponse.PromotionName = rule.PromotionTier.Promotion.PromotionName;
-                }
+                }*/
 
                 ICollection<ConditionGroup> groupsParam = rule.ConditionGroup;
                 foreach (var group in groupsParam)

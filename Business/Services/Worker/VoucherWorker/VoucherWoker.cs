@@ -185,6 +185,7 @@ namespace ApplicationCore.Worker
                 string randomVoucher = RandomString(dto.Charset, dto.CustomCharset, dto.CodeLength);
                 voucher.VoucherCode = dto.Prefix + randomVoucher + dto.Postfix;
                 voucher.VoucherGroupId = dto.VoucherGroupId;
+                voucher.Index = i + 1;
                 voucher.InsDate = now;
                 voucher.UpdDate = now;
                 result.Add(voucher);

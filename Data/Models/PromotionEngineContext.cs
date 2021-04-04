@@ -674,9 +674,13 @@ namespace Infrastructure.Models
             {
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
-                entity.Property(e => e.InsDate).HasColumnType("datetime");
+                entity.Property(e => e.InsDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.UpdTime).HasColumnType("datetime");
+                entity.Property(e => e.UpdDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
 
                 entity.HasOne(d => d.ProductCondition)
                     .WithMany(p => p.ProductConditionMapping)
@@ -784,10 +788,6 @@ namespace Infrastructure.Models
 
             modelBuilder.Entity<PromotionTier>(entity =>
             {
-                entity.HasIndex(e => e.ConditionRuleId)
-                    .HasName("ConditionRule")
-                    .IsUnique();
-
                 entity.Property(e => e.PromotionTierId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.InsDate)
@@ -806,8 +806,8 @@ namespace Infrastructure.Models
                     .HasConstraintName("FK_Action_PromotionTier");
 
                 entity.HasOne(d => d.ConditionRule)
-                    .WithOne(p => p.PromotionTier)
-                    .HasForeignKey<PromotionTier>(d => d.ConditionRuleId)
+                    .WithMany(p => p.PromotionTier)
+                    .HasForeignKey(d => d.ConditionRuleId)
                     .HasConstraintName("FK_PromotionTier_ConditionRule");
 
                 entity.HasOne(d => d.PostAction)

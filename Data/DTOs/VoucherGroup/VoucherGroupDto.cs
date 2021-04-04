@@ -24,4 +24,21 @@ namespace Infrastructure.DTOs
         public virtual ICollection<VoucherChannelDto> VoucherChannel { get; set; }
 
     }
+    public class VoucherGroupForPromo
+    {
+        public Guid VoucherGroupId { get; set; }
+        public decimal? Quantity { get; set; }
+        public string VoucherName { get; set; }
+        public Guid? ActionId { get; set; }
+        public Guid? PostActionId { get; set; }
+        public int ActionType { get; set; }
+        public int PostActionType { get; set; }
+    }
+
+    public class VoucherIndexInfo
+    {
+        public int FromIndex { get; set; }
+        public int MaxIndex { get; set; }
+        public bool Available { get; set; }
+    }
 }

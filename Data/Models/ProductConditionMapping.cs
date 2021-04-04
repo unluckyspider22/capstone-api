@@ -9,7 +9,7 @@ namespace Infrastructure.Models
         public Guid ProductId { get; set; }
         public Guid ProductConditionId { get; set; }
         public DateTime InsDate { get; set; }
-        public DateTime UpdTime { get; set; }
+        public DateTime UpdDate { get; set; }
 
         public virtual Product Product { get; set; }
         public virtual ProductCondition ProductCondition { get; set; }

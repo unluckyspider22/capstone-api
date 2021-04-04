@@ -39,6 +39,7 @@ namespace ApplicationCore.Services
                 {
                     config.DelFlg = true;
                     config.UpdDate = DateTime.Now;
+                    _repository.Update(config);
                 }
                 return await _unitOfWork.SaveAsync() > 0;
             }
