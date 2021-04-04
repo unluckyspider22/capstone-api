@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 
 namespace ApplicationCore.Services
 {
-    public class GameConfigService : BaseService<GameCampaign, GameConfigDto>, IGameConfigService
+    public class GameCampaignService : BaseService<GameCampaign, GameConfigDto>, IGameCampaignService
     {
-        public GameConfigService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
+        public GameCampaignService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
         {
         }
 
@@ -39,6 +39,7 @@ namespace ApplicationCore.Services
                 {
                     config.DelFlg = true;
                     config.UpdDate = DateTime.Now;
+                    _repository.Update(config);
                 }
                 return await _unitOfWork.SaveAsync() > 0;
             }

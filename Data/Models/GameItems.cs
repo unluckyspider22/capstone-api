@@ -6,7 +6,7 @@ namespace Infrastructure.Models
     public partial class GameItems
     {
         public Guid Id { get; set; }
-        public Guid PromotionId { get; set; }
+        public Guid PromotionTierId { get; set; }
         public Guid GameId { get; set; }
         public int Priority { get; set; }
         public string DisplayText { get; set; }

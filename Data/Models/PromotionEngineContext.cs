@@ -41,7 +41,7 @@ namespace Infrastructure.Models
         public virtual DbSet<PromotionChannelMapping> PromotionChannelMapping { get; set; }
         public virtual DbSet<PromotionStoreMapping> PromotionStoreMapping { get; set; }
         public virtual DbSet<PromotionTier> PromotionTier { get; set; }
-        public virtual DbSet<Role> Role { get; set; }
+        public virtual DbSet<RoleEntity> Role { get; set; }
         public virtual DbSet<Store> Store { get; set; }
         public virtual DbSet<Transaction> Transaction { get; set; }
         public virtual DbSet<Voucher> Voucher { get; set; }
@@ -788,10 +788,6 @@ namespace Infrastructure.Models
 
             modelBuilder.Entity<PromotionTier>(entity =>
             {
-                entity.HasIndex(e => e.ConditionRuleId)
-                    .HasName("ConditionRule")
-                    .IsUnique();
-
                 entity.Property(e => e.PromotionTierId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.InsDate)
@@ -810,8 +806,8 @@ namespace Infrastructure.Models
                     .HasConstraintName("FK_Action_PromotionTier");
 
                 entity.HasOne(d => d.ConditionRule)
-                    .WithOne(p => p.PromotionTier)
-                    .HasForeignKey<PromotionTier>(d => d.ConditionRuleId)
+                    .WithMany(p => p.PromotionTier)
+                    .HasForeignKey(d => d.ConditionRuleId)
                     .HasConstraintName("FK_PromotionTier_ConditionRule");
 
                 entity.HasOne(d => d.PostAction)
@@ -830,7 +826,7 @@ namespace Infrastructure.Models
                     .HasConstraintName("FK_PromotionTier_VoucherGroup");
             });
 
-            modelBuilder.Entity<Role>(entity =>
+            modelBuilder.Entity<RoleEntity>(entity =>
             {
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")

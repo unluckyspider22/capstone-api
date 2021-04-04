@@ -25,7 +25,7 @@ namespace ApplicationCore.Services
         private readonly IHolidayService _holidayService;
         private readonly ITimeframeHandle _timeframeHandle;
         private readonly IDeviceService _deviceService;
-        private readonly IGameConfigService _gameConfigService;
+        private readonly IGameCampaignService _gameConfigService;
         private List<Promotion> _promotions;
 
         public PromotionService(
@@ -36,7 +36,7 @@ namespace ApplicationCore.Services
             IHolidayService holidayService,
             ITimeframeHandle timeframeHandle,
             IDeviceService deviceService,
-            IGameConfigService gameConfigService) : base(unitOfWork, mapper)
+            IGameCampaignService gameConfigService) : base(unitOfWork, mapper)
         {
             _applyPromotionHandler = promotionHandle;
             _conditionRuleService = conditionRuleService;

@@ -231,7 +231,7 @@ namespace PromotionEngineAPI.Controllers
             try
             {
                 return Ok(await _promotionService.GetFirst(filter: el => el.PromotionId.Equals(id) && !el.DelFlg,
-                    includeProperties: "VoucherGroup,PromotionChannelMapping,PromotionStoreMapping,MemberLevelMapping"));
+                    includeProperties: "PromotionChannelMapping,PromotionStoreMapping,MemberLevelMapping,PromotionTier"));
             }
             catch (ErrorObj e)
             {
@@ -447,15 +447,16 @@ namespace PromotionEngineAPI.Controllers
         }
 
         [HttpGet]
-        [Route("for-game-config/{brandId}")]
+        [Route("for-game-campaign/{brandId}")]
         public async Task<IActionResult> GetPromotionGameConfig([FromRoute] Guid brandId)
         {
             try
             {
-
                 return Ok(await _promotionService.GetAsync(filter: o => o.BrandId.Equals(brandId)
-                                && o.Status == (int)AppConstant.EnvVar.PromotionStatus.PUBLISH
-                                && !o.DelFlg));
+                                && o.Status != (int)AppConstant.EnvVar.PromotionStatus.EXPIRED
+                                && !o.IsAuto
+                                && !o.DelFlg,
+                                includeProperties:"PromotionTier.Action"));
             }
             catch (ErrorObj e)
             {

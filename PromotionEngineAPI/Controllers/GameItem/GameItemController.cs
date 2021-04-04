@@ -14,8 +14,8 @@ namespace PromotionEngineAPI.Controllers.GameItem
     public class GameItemController : ControllerBase
     {
         private readonly IGameItemService _service;
-        private readonly IGameConfigService _gameService;
-        public GameItemController(IGameItemService service, IGameConfigService gameService)
+        private readonly IGameCampaignService _gameService;
+        public GameItemController(IGameItemService service, IGameCampaignService gameService)
         {
             _service = service;
             _gameService = gameService;

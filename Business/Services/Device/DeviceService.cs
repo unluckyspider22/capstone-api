@@ -45,7 +45,7 @@ namespace ApplicationCore.Services
                 var devices = (await _repository.Get(pageIndex: PageIndex, pageSize: PageSize,
                     filter: o => o.Store.BrandId.Equals(brandId)
                             && !o.DelFlg,
-                    includeProperties: "Store"
+                    includeProperties: "Store,GameCampaign"
                 )).ToList();
                 if (devices.Count > 0)
                 {
@@ -60,6 +60,8 @@ namespace ApplicationCore.Services
                             StoreCode = device.Store.StoreCode,
                             StoreId = device.Store.StoreId,
                             StoreName = device.Store.StoreName,
+                            GameConfigId = device.GameCampaignId,
+                            GameConfigName = device.GameCampaign.Name
                             //GameConfigId = device.GameConfigId,
                         };
                         //dto.GameConfigName = await GetConfigName(device.GameConfigId);

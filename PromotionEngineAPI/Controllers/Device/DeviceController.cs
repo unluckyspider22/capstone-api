@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers
@@ -36,7 +37,32 @@ namespace PromotionEngineAPI.Controllers
             }
 
         }
+        [HttpGet]
+        [Route("game-item")]
+        public async Task<IActionResult> GetGameItem(string deviceCode, string brandCode)
+        {
+            try
+            {
+                var result = await _service.GetFirst(filter: el =>
+                            !el.DelFlg
+                            && el.Store.Brand.BrandCode == brandCode
+                            && el.Code != deviceCode,
+                            includeProperties:
+                            "Store.Brand," +
+                            "GameCampaign.GameItems");
 
+                var campaign = result.GameCampaign;
+                if(campaign != null)
+                {
+                    return Ok(campaign.GameItems);
+                }
+                return StatusCode(statusCode: (int)HttpStatusCode.NotFound);
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
         [HttpGet]
         [Route("count")]
         public async Task<IActionResult> CountDevice()
@@ -103,7 +129,7 @@ namespace PromotionEngineAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> PostDevice([FromBody] DeviceDto dto)
         {
-            if (dto.GameConfigId.Equals(Guid.Empty))
+            if (dto.GameCampaignId.Equals(Guid.Empty))
             {
                 return StatusCode(statusCode: 400, new ErrorObj(400, "Select Game Configuration"));
             }
