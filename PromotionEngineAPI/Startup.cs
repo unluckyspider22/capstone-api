@@ -131,6 +131,7 @@ namespace PromotionEngineAPI
             services.AddScoped<IGameCampaignService, GameCampaignService>();
             services.AddScoped<IGameItemService, GameItemService>();
             services.AddScoped<IGameMasterService, GameMasterService>();
+            services.AddScoped<ITransactionService, TransactionService>();
 
             ChainOfResponsibilityServices(services);
 
