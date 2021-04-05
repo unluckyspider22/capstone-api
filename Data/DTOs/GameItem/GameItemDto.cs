@@ -13,5 +13,8 @@ namespace Infrastructure.DTOs
         public decimal Ratio { get; set; }
         public string DisplayText { get; set; }
         public string Description { get; set; }
+        public string TextColor { get; set; }
+        public string ItemColor { get; set; }
+
     }
 }

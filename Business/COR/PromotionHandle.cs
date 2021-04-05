@@ -44,6 +44,7 @@ namespace ApplicationCore.Chain
                         HandleSalesMode(promotion, order);
                         HandlePayment(promotion, order);
                         HandleGender(promotion, order);
+                        HandleMemberLevel(promotion, order);
                         acceptPromotions.Add(promotion);
                     }
                     catch (ErrorObj)
@@ -152,9 +153,12 @@ namespace ApplicationCore.Chain
         #region Handle Member Level
         private void HandleMemberLevel(Promotion promotion, OrderResponseModel order)
         {
-            if (promotion.MemberLevelMapping.Where(w => w.MemberLevel.Name.Equals(order.CustomerOrderInfo.Customer.CustomerLevel)).Count() == 0)
+            if (promotion.MemberLevelMapping != null && promotion.MemberLevelMapping.Count > 0)
             {
-                throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_MemberLevel);
+                if (promotion.MemberLevelMapping.Where(w => w.MemberLevel.Name.Equals(order.CustomerOrderInfo.Customer.CustomerLevel)).Count() == 0)
+                {
+                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_MemberLevel);
+                }
             }
         }
         #endregion

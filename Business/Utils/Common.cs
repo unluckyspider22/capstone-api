@@ -27,7 +27,7 @@ namespace ApplicationCore.Utils
           }*/
         public static bool Compare<T>(string op, T orderAmount, T minAmount) where T : IComparable<T>
         {
-            return op switch
+            return op.Trim() switch
             {
                 AppConstant.Operator.GREATER_THAN => orderAmount.CompareTo(minAmount) > 0,
                 AppConstant.Operator.GREATER_THAN_OR_EQUAL => orderAmount.CompareTo(minAmount) >= 0,

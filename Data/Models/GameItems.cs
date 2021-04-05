@@ -15,6 +15,8 @@ namespace Infrastructure.Models
         public bool DelFlg { get; set; }
         public DateTime InsDate { get; set; }
         public DateTime UpdDate { get; set; }
+        public string TextColor { get; set; }
+        public string ItemColor { get; set; }
 
         public virtual GameCampaign Game { get; set; }
     }

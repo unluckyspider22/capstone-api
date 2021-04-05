@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace ApplicationCore.Services
@@ -52,6 +53,49 @@ namespace ApplicationCore.Services
 
 
         }
+
+        public async Task<List<GameItemDto>> GetGameCampaignItems(Guid deviceId)
+        {
+            try
+            {
+                List<GameItemDto> gameItemDtos = null;
+
+                var gameConfig = await _repository.GetFirst(filter: o => o.Device.Any(el => el.DeviceId == deviceId) && !o.DelFlg,
+                    includeProperties: "Device,GameItems"); ;
+
+                /*  var gameItems = gameConfig.GameItems.Where(w => w.Promotion.Status.Equals(AppConstant.EnvVar.PromotionStatus.PUBLISH)
+                  && !w.Promotion.DelFlg
+                  );*/
+                var gameItems = gameConfig.GameItems;
+                if (gameConfig != null && gameItems.Count() > 0)
+                {
+                    foreach (var gameItem in gameItems)
+                    {
+                        var dto = _mapper.Map<GameItemDto>(gameItem);
+                        if (gameItemDtos == null)
+                        {
+                            gameItemDtos = new List<GameItemDto>();
+                        }
+                        gameItemDtos.Add(dto);
+                    }
+                    var totalPriority = gameConfig.GameItems.Sum(s => s.Priority);
+
+                    //Tính tỷ lệ cho từng item
+                    gameItemDtos = gameItemDtos.Select(
+                        el =>
+                        {
+                            el.Ratio = (decimal)(el.Priority * 1.0 / totalPriority * 1.0);
+                            return el;
+                        }).ToList();
+                }
+                return gameItemDtos;
+            }
+            catch (Exception e)
+            {
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
+            }
+        }
+
         public async Task<GameConfigDto> UpdateGameConfig(GameConfigDto dto)
         {
             try

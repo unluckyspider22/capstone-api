@@ -425,27 +425,7 @@ namespace PromotionEngineAPI.Controllers
                 return StatusCode(statusCode: e.Code, e);
             }
         }
-        [HttpGet]
-        [Route("game-item")]
-        public async Task<IActionResult> GetPromotionForGameConfig([FromQuery] string deviceCode, [FromQuery] string brandCode)
-        {
-            try
-            {
-                var result = await _promotionService.GetPromotionForGames(deviceCode, brandCode);
-
-                if (result.Count > 0)
-                {
-                    return Ok(result);
-                }
-                else return NoContent();
-
-            }
-            catch (ErrorObj e)
-            {
-                return StatusCode(statusCode: e.Code, e);
-            }
-        }
-
+       
         [HttpGet]
         [Route("for-game-campaign/{brandId}")]
         public async Task<IActionResult> GetPromotionGameConfig([FromRoute] Guid brandId)

@@ -183,6 +183,10 @@ namespace Infrastructure.Helper
             public const string AutoPromotion = "autoPromotion";
             //Chỉ có 1 set discount => action có discount lớn nhất tùy vào Discount Type
             public const string SetDiscount = "setDiscount";
+            public const string SetUnit = "setDiscountUnit";
+            public const string SetFixed = "setDiscountFixed";
+            public const string SetLadder = "setDiscountLadder";
+            public const string SetBundle = "setDiscountBundle";
             //Chỉ có 1 set shipping fee => action có discount lớn nhất tùy vào Discount Type
             public const string SetShippingFee = "setShippingFee";
             //Chỉ có 1 lần add điểm => action có discount lớn nhất tùy vào Discount Type
@@ -197,11 +201,11 @@ namespace Infrastructure.Helper
         }
         public class Operator
         {
-            public const string GREATER_THAN = "1";
-            public const string GREATER_THAN_OR_EQUAL = "2";
-            public const string LESS_THAN = "3";
-            public const string LESS_THAN_OR_EQUAL = "4";
-            public const string EQUAL = "5";
+            public const string GREATER_THAN = ">";
+            public const string GREATER_THAN_OR_EQUAL = ">=";
+            public const string LESS_THAN = "<";
+            public const string LESS_THAN_OR_EQUAL = "<=";
+            public const string EQUAL = "=";
 
 
         }

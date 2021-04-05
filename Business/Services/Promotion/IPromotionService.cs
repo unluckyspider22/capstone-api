@@ -18,20 +18,13 @@ namespace ApplicationCore.Services
         Task<bool> DeletePromotionTier(DeleteTierRequestParam deleteTierRequestParam);
         Task<PromotionTierUpdateParam> UpdatePromotionTier(PromotionTierUpdateParam updateParam);
         Task<PromotionDto> UpdatePromotion(PromotionDto dto);
-
         Task<PromotionStatusDto> CountPromotionStatus(Guid brandId);
         Task<DistributionStat> DistributionStatistic(Guid promotionId, Guid brandId);
-
         void SetPromotions(List<Promotion> promotions);
         Task<List<Promotion>> GetAutoPromotions(CustomerOrderInfo orderInfo, Guid promotionId);
         List<Promotion> GetPromotions();
-
         Task<bool> ExistPromoCode(string promoCode, Guid brandId);
-
         Task<bool> DeletePromotion(Guid promotionId);
-
-        Task<List<GameItemDto>> GetPromotionForGames(string deviceCode, string brandCode);
-
         public Task<PromotionDto> CreatePromotion(PromotionDto dto);
     }
 }

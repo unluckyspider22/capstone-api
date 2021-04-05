@@ -52,7 +52,7 @@ namespace ApplicationCore.Chain
                         }
                         else
                         {
-                            DiscountProduct(order, action);
+                            DiscountProduct(order, action, promotion, applyTier);
                         }
                     }
                     if (postAction != null)
@@ -313,9 +313,11 @@ namespace ApplicationCore.Chain
 
         #endregion
         #region Discount for item
-        private void DiscountProduct(OrderResponseModel order, Infrastructure.Models.Action action)
+        private void DiscountProduct(OrderResponseModel order, Infrastructure.Models.Action action, Promotion promotion, PromotionTier promotionTier)
         {
             var actionProducts = action.ActionProductMapping;
+            string effectType ="";
+            decimal discount = 0;
             if (!action.ActionType.Equals(AppConstant.EnvVar.ActionType.Bundle))
             {
                 foreach (var product in order.CustomerOrderInfo.CartItems)
@@ -325,19 +327,39 @@ namespace ApplicationCore.Chain
                         switch (action.ActionType)
                         {
                             case (int)AppConstant.EnvVar.ActionType.Amount_Product:
-                                DiscountProductAmount(product, action);
+                                effectType = AppConstant.EffectMessage.SetDiscount;
+                                discount = (decimal)action.DiscountAmount;
+                                SetDiscountProduct(product, action, discount);
+                                //  DiscountProductAmount(product, action, effectType);
                                 break;
                             case (int)AppConstant.EnvVar.ActionType.Percentage_Product:
-                                DiscountProductPercentage(product, action);
+                                effectType = AppConstant.EffectMessage.SetDiscount;
+                                discount = product.TotalAmount * (decimal)action.DiscountPercentage / 100;
+                                SetDiscountProduct(product, action, discount);
+                                //  DiscountProductPercentage(product, action, effectType);
                                 break;
                             case (int)AppConstant.EnvVar.ActionType.Unit:
-                                DiscountProductUnit(product, action);
+                                effectType = AppConstant.EffectMessage.SetUnit;
+                                if (product.Quantity >= action.DiscountQuantity)
+                                {
+                                    discount = (decimal)(action.DiscountQuantity * product.UnitPrice);
+                                }
+                                //   DiscountProductUnit(product, action, effectType);
                                 break;
                             case (int)AppConstant.EnvVar.ActionType.Fixed:
-                                DiscountProductFixedPrice(product, action);
+                                effectType = AppConstant.EffectMessage.SetFixed;
+                                discount = (decimal)(product.TotalAmount - action.FixedPrice * product.Quantity);
+                                SetDiscountProduct(product, action, discount);
+                                //  DiscountProductFixedPrice(product, action, effectType);
                                 break;
                             case (int)AppConstant.EnvVar.ActionType.Ladder:
-                                DiscountProductLadderPrice(product, action);
+                                effectType = AppConstant.EffectMessage.SetLadder;
+                                if (product.Quantity >= action.OrderLadderProduct)
+                                {
+                                    discount = (decimal)(product.UnitPrice - action.LadderPrice);
+                                }
+                                SetDiscountProduct(product, action, discount);
+                                // DiscountProductLadderPrice(product, action, effectType);
                                 break;
 
                         }
@@ -349,6 +371,7 @@ namespace ApplicationCore.Chain
             {
                 var products = order.CustomerOrderInfo.CartItems;
                 int countProductMatch = 0;
+                effectType = AppConstant.EffectMessage.SetBundle;
                 foreach (var product in products)
                 {
                     if (actionProducts.Any(a => a.Product.Code.Equals(product.ProductCode)))
@@ -358,21 +381,49 @@ namespace ApplicationCore.Chain
                 }
                 if (countProductMatch >= action.BundleQuantity)
                 {
-                    DiscountProductBundlePrice(products, action);
+                    int bundleQuantity = (int)action.BundleQuantity;
+                    int discountedProduct = 0;
+                    switch (action.BundleStrategy)
+                    {
+                        case (int)AppConstant.BundleStrategy.CHEAPEST:
+                            products = products.OrderBy(e => e.UnitPrice).ToList();
+                            break;
+                        case (int)AppConstant.BundleStrategy.MOST_EXPENSIVE:
+                            products = products.OrderByDescending(e => e.UnitPrice).ToList();
+                            break;
+                    }
+                    foreach (var product in products)
+                    {
+                        discount = product.Discount;
+                        if (actionProducts.Any(a => a.Product.Code.Equals(product.ProductCode)))
+                        {
+                            discountedProduct = product.Quantity > bundleQuantity ? bundleQuantity : product.Quantity;
+                            discount += (decimal)(product.TotalAmount - discountedProduct * action.BundlePrice);
+
+                            bundleQuantity -= discountedProduct;
+                            SetDiscountProduct(product, action, discount);
+                        }
+                        if (bundleQuantity <= 0)
+                        {
+                            break;
+                        }
+                    }
+                    /*DiscountProductBundlePrice(products, action, effectType);*/
                 }
             }
+            SetEffect(order, promotion, discount, effectType, promotionTier);
         }
-        private void DiscountProductAmount(Item product, Infrastructure.Models.Action action)
+        /*private void DiscountProductAmount(Item product, Infrastructure.Models.Action action, string effectType)
         {
             decimal discount = (decimal)action.DiscountAmount;
             SetDiscountProduct(product, action, discount);
         }
-        private void DiscountProductPercentage(Item product, Infrastructure.Models.Action action)
+        private void DiscountProductPercentage(Item product, Infrastructure.Models.Action action, string effectType)
         {
             decimal discount = product.TotalAmount * (decimal)action.DiscountPercentage / 100;
             SetDiscountProduct(product, action, discount);
         }
-        private void DiscountProductUnit(Item product, Infrastructure.Models.Action action)
+        private void DiscountProductUnit(Item product, Infrastructure.Models.Action action, string effectType)
         {
             decimal discount = 0;
             if (product.Quantity >= action.DiscountQuantity)
@@ -381,12 +432,12 @@ namespace ApplicationCore.Chain
             }
             SetDiscountProduct(product, action, discount);
         }
-        private void DiscountProductFixedPrice(Item product, Infrastructure.Models.Action action)
+        private void DiscountProductFixedPrice(Item product, Infrastructure.Models.Action action, string effectType)
         {
             decimal discount = (decimal)(product.TotalAmount - action.FixedPrice * product.Quantity);
             SetDiscountProduct(product, action, discount);
         }
-        private void DiscountProductLadderPrice(Item product, Infrastructure.Models.Action action)
+        private void DiscountProductLadderPrice(Item product, Infrastructure.Models.Action action, string effectType)
         {
             decimal discount = 0;
             if (product.Quantity >= action.OrderLadderProduct)
@@ -395,7 +446,7 @@ namespace ApplicationCore.Chain
             }
             SetDiscountProduct(product, action, discount);
         }
-        private void DiscountProductBundlePrice(List<Item> products, Infrastructure.Models.Action action)
+        private void DiscountProductBundlePrice(List<Item> products, Infrastructure.Models.Action action, string effectType)
         {
             var actionProducts = action.ActionProductMapping;
 
@@ -426,7 +477,7 @@ namespace ApplicationCore.Chain
                     break;
                 }
             }
-        }
+        }*/
         private void SetDiscountProduct(Item product, Infrastructure.Models.Action action, decimal discount)
         {
             product.Discount += discount;

@@ -2,6 +2,7 @@
 using Infrastructure.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers
@@ -101,6 +102,24 @@ namespace PromotionEngineAPI.Controllers
             {
                 var result = await _service.GetFirst(filter: o => o.Id.Equals(gameConfigId) && o.BrandId.Equals(brandId) && !o.DelFlg,
                     includeProperties: "GameItems");
+                return Ok(result);
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
+        [HttpGet]
+        [Route("device/{deviceId}/game-campaign")]
+        public async Task<IActionResult> GetGameCampaignDevice([FromRoute] Guid deviceId)
+        {
+            if (deviceId.Equals(Guid.Empty))
+            {
+                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+            }
+            try
+            {
+                var result = await _service.GetGameCampaignItems(deviceId);
                 return Ok(result);
             }
             catch (ErrorObj e)

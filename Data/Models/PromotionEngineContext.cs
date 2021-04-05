@@ -384,7 +384,17 @@ namespace Infrastructure.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.Property(e => e.ItemColor)
+                    .HasMaxLength(7)
+                    .IsUnicode(false)
+                    .IsFixedLength();
+
                 entity.Property(e => e.Priority).HasDefaultValueSql("((1))");
+
+                entity.Property(e => e.TextColor)
+                    .HasMaxLength(7)
+                    .IsUnicode(false)
+                    .IsFixedLength();
 
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")

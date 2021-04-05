@@ -60,7 +60,8 @@ namespace ApplicationCore.Services
                     "Promotion.PromotionTier.ConditionRule.ConditionGroup.OrderCondition," +
                     "Promotion.PromotionTier.ConditionRule.ConditionGroup.ProductCondition.ProductConditionMapping.Product," +
                     "Promotion.PromotionStoreMapping.Store," +
-                    "Promotion.Brand");
+                    "Promotion.Brand," +
+                    "Promotion.MemberLevelMapping.MemberLevel");
                     if (voucher.Count() > 1)
                     {
                         throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Duplicate_VoucherCode, description: AppConstant.ErrMessage.Duplicate_VoucherCode);
