@@ -2,12 +2,8 @@
 using ApplicationCore.Services;
 
 using Infrastructure.DTOs;
-using Infrastructure.Helper;
-using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers
@@ -79,22 +75,19 @@ namespace PromotionEngineAPI.Controllers
         //}
 
         // POST: api/PromotionTiers
-        //[HttpPost]
-        //public async Task<IActionResult> PostPromotionTier([FromBody] PromotionTierDto dto)
-        //{
-        //    dto.PromotionTierId = Guid.NewGuid();
-
-        //    var result = await _service.CreateAsync(dto);
-
-        //    if (result == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    //var result = dto;
-
-        //    return Ok(result);
-        //}
+        [HttpPost]
+        public async Task<IActionResult> PostPromotionTier([FromBody] PromotionTierDto dto)
+        {
+            try
+            {
+                var result = await _service.CreateAsync(dto);
+                return Ok(result);
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
 
         // DELETE: api/PromotionTiers/5
         //[HttpDelete]

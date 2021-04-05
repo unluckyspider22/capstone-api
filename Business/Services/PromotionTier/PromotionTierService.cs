@@ -6,7 +6,6 @@ using Infrastructure.Models;
 using Infrastructure.Repository;
 using Infrastructure.UnitOrWork;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -58,88 +57,131 @@ namespace ApplicationCore.Services
 
         }
 
+        public async Task<PromotionTierDto> CreateTier(PromotionTierDto dto)
+        {
+            dto.PromotionTierId = Guid.NewGuid();
+            dto.InsDate = DateTime.Now;
+            dto.UpdDate = DateTime.Now;
+            var entity = _mapper.Map<PromotionTier>(dto);
+            _repository.Add(entity);
+            if (dto.VoucherGroupId != null && !dto.VoucherGroupId.Equals(Guid.Empty))
+            {
+                await UpdateVoucher(dto);
+            }
+            await _unitOfWork.SaveAsync();
+            return _mapper.Map<PromotionTierDto>(entity);
+
+        }
+        private async Task UpdateVoucher(PromotionTierDto dto)
+        {
+            try
+            {
+                IGenericRepository<Voucher> voucherRepo = _unitOfWork.VoucherRepository;
+                var voucherGroupId = dto.VoucherGroupId;
+
+                var vouchers = await voucherRepo.Get(filter: o => o.VoucherGroupId.Equals(voucherGroupId)
+                                                    && o.Index >= dto.FromIndex
+                                                    && o.Index >= dto.ToIndex);
+                if (vouchers.Count() > 0)
+                {
+                    foreach (var voucher in vouchers)
+                    {
+                        voucher.PromotionId = dto.PromotionId;
+                        voucherRepo.Update(voucher);
+                    }
+                    await _unitOfWork.SaveAsync();
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                throw new ErrorObj(code: 500, message: e.Message);
+            }
+
+        }
+
         public async Task<GenericRespones<AvailableDto>> GetAvailable(int pageSize, int pageIndex, Guid brandId, string actionType, string discountType)
         {
             try
             {
-               /* var result = new List<AvailableDto>();
-                var tiers = new List<PromotionTier>();
-                if (actionType.Equals(AppConstant.EnvVar.ActionType.Product) || actionType.Equals(AppConstant.EnvVar.ActionType.Order))
-                {
-                    #region Action
-                    //tiers = (await _repository.Get(pageIndex: pageIndex, pageSize: pageSize,
-                    //    filter: o => o.PromotionId.Equals(Guid.Empty)
-                    //        || o.PromotionId == null,
-                    //    includeProperties: "ConditionRule,Action"
-                    // )).Where(o => o.Action != null 
-                    //        && o.Action.ActionType.Equals(actionType.ToString())
-                    //        && o.Action.DiscountType.Equals(discountType.ToString())
-                    //        && o.ConditionRule.BrandId.Equals(brandId)).ToList();
-                    //foreach (var tier in tiers)
-                    //{
-                    //    var obj = new AvailableDto()
-                    //    {
-                    //        PromotionTierId = tier.PromotionTierId,
-                    //        RuleName = tier.ConditionRule.RuleName,
-                    //        Description = tier.ConditionRule.Description,
-                    //        ActionType = tier.Action.ActionType,
-                    //        DiscountType = tier.Action.DiscountType,
-                    //    };
-                    //    result.Add(obj);
+                /* var result = new List<AvailableDto>();
+                 var tiers = new List<PromotionTier>();
+                 if (actionType.Equals(AppConstant.EnvVar.ActionType.Product) || actionType.Equals(AppConstant.EnvVar.ActionType.Order))
+                 {
+                     #region Action
+                     //tiers = (await _repository.Get(pageIndex: pageIndex, pageSize: pageSize,
+                     //    filter: o => o.PromotionId.Equals(Guid.Empty)
+                     //        || o.PromotionId == null,
+                     //    includeProperties: "ConditionRule,Action"
+                     // )).Where(o => o.Action != null 
+                     //        && o.Action.ActionType.Equals(actionType.ToString())
+                     //        && o.Action.DiscountType.Equals(discountType.ToString())
+                     //        && o.ConditionRule.BrandId.Equals(brandId)).ToList();
+                     //foreach (var tier in tiers)
+                     //{
+                     //    var obj = new AvailableDto()
+                     //    {
+                     //        PromotionTierId = tier.PromotionTierId,
+                     //        RuleName = tier.ConditionRule.RuleName,
+                     //        Description = tier.ConditionRule.Description,
+                     //        ActionType = tier.Action.ActionType,
+                     //        DiscountType = tier.Action.DiscountType,
+                     //    };
+                     //    result.Add(obj);
 
-                    //}
-                    //var totalItem = (await _repository.Get(filter: o => o.PromotionId.Equals(Guid.Empty)
-                    //        || o.PromotionId == null,
-                    //    includeProperties: "ConditionRule,Action"
-                    // )).Where(o => o.Action != null 
-                    //        && o.Action.ActionType.Equals(actionType.ToString())
-                    //        && o.Action.DiscountType.Equals(discountType.ToString())
-                    //        && o.ConditionRule.BrandId.Equals(brandId)).ToList().Count();
-                    //MetaData metadata = new MetaData(pageIndex: pageIndex, pageSize: pageSize, totalItems: totalItem);
-                    //GenericRespones<AvailableDto> response = new GenericRespones<AvailableDto>(data: result, metadata: metadata);
-                    //return response;
-                    #endregion
-                }
-                else
-                {
-                    #region Post Action
-                    //tiers = (await _repository.Get(pageIndex: pageIndex, pageSize: pageSize,
-                    //    filter: o => o.PromotionId.Equals(Guid.Empty)
-                    //        || o.PromotionId == null,
-                    //    includeProperties: "ConditionRule,PostAction"
-                    // )).Where(o => o.PostAction != null
-                    //        && o.PostAction.ActionType.Equals(actionType.ToString())
-                    //        && o.PostAction.DiscountType.Equals(discountType.ToString())
-                    //        && o.ConditionRule.BrandId.Equals(brandId)).ToList();
-                    //foreach (var tier in tiers)
-                    //{
-                    //    var obj = new AvailableDto()
-                    //    {
-                    //        PromotionTierId = tier.PromotionTierId,
-                    //        RuleName = tier.ConditionRule.RuleName,
-                    //        Description = tier.ConditionRule.Description,
-                    //        ActionType = tier.PostAction.ActionType,
-                    //        DiscountType = tier.PostAction.DiscountType,
-                    //    };
-                    //    result.Add(obj);
+                     //}
+                     //var totalItem = (await _repository.Get(filter: o => o.PromotionId.Equals(Guid.Empty)
+                     //        || o.PromotionId == null,
+                     //    includeProperties: "ConditionRule,Action"
+                     // )).Where(o => o.Action != null 
+                     //        && o.Action.ActionType.Equals(actionType.ToString())
+                     //        && o.Action.DiscountType.Equals(discountType.ToString())
+                     //        && o.ConditionRule.BrandId.Equals(brandId)).ToList().Count();
+                     //MetaData metadata = new MetaData(pageIndex: pageIndex, pageSize: pageSize, totalItems: totalItem);
+                     //GenericRespones<AvailableDto> response = new GenericRespones<AvailableDto>(data: result, metadata: metadata);
+                     //return response;
+                     #endregion
+                 }
+                 else
+                 {
+                     #region Post Action
+                     //tiers = (await _repository.Get(pageIndex: pageIndex, pageSize: pageSize,
+                     //    filter: o => o.PromotionId.Equals(Guid.Empty)
+                     //        || o.PromotionId == null,
+                     //    includeProperties: "ConditionRule,PostAction"
+                     // )).Where(o => o.PostAction != null
+                     //        && o.PostAction.ActionType.Equals(actionType.ToString())
+                     //        && o.PostAction.DiscountType.Equals(discountType.ToString())
+                     //        && o.ConditionRule.BrandId.Equals(brandId)).ToList();
+                     //foreach (var tier in tiers)
+                     //{
+                     //    var obj = new AvailableDto()
+                     //    {
+                     //        PromotionTierId = tier.PromotionTierId,
+                     //        RuleName = tier.ConditionRule.RuleName,
+                     //        Description = tier.ConditionRule.Description,
+                     //        ActionType = tier.PostAction.ActionType,
+                     //        DiscountType = tier.PostAction.DiscountType,
+                     //    };
+                     //    result.Add(obj);
 
 
-                    //}
-                    //var totalItem = (await _repository.Get(filter: o => o.PromotionId.Equals(Guid.Empty)
-                    //        || o.PromotionId == null,
-                    //    includeProperties: "ConditionRule,PostAction"
-                    // )).Where(o => o.PostAction != null 
-                    //        && o.PostAction.ActionType.Equals(actionType.ToString())
-                    //        && o.PostAction.DiscountType.Equals(discountType.ToString())
-                    //        && o.ConditionRule.BrandId.Equals(brandId)).ToList().Count();
-                    //MetaData metadata = new MetaData(pageIndex: pageIndex, pageSize: pageSize, totalItems: totalItem);
-                    //GenericRespones<AvailableDto> response = new GenericRespones<AvailableDto>(data: result, metadata: metadata);
-                    //return response;
-                    #endregion
-                }*/
+                     //}
+                     //var totalItem = (await _repository.Get(filter: o => o.PromotionId.Equals(Guid.Empty)
+                     //        || o.PromotionId == null,
+                     //    includeProperties: "ConditionRule,PostAction"
+                     // )).Where(o => o.PostAction != null 
+                     //        && o.PostAction.ActionType.Equals(actionType.ToString())
+                     //        && o.PostAction.DiscountType.Equals(discountType.ToString())
+                     //        && o.ConditionRule.BrandId.Equals(brandId)).ToList().Count();
+                     //MetaData metadata = new MetaData(pageIndex: pageIndex, pageSize: pageSize, totalItems: totalItem);
+                     //GenericRespones<AvailableDto> response = new GenericRespones<AvailableDto>(data: result, metadata: metadata);
+                     //return response;
+                     #endregion
+                 }*/
                 return null;
             }
-            
+
             catch (Exception e)
             {
                 Debug.WriteLine(e.Message);
