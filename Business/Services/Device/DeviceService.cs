@@ -171,6 +171,7 @@ namespace ApplicationCore.Services
                         result.DeviceCode = device.Code;
                         result.StoreCode = device.Store.StoreCode;
                         result.Token = token;
+                        result.DeviceId = device.DeviceId;
                         return result;
                     }
                     else
