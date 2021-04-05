@@ -1233,7 +1233,7 @@ namespace ApplicationCore.Services
             try
             {
                 #region Tìm promotion
-                var existPromo = await _repository.GetById(promotionId) != null;
+                var existPromo = await _repository.GetFirst(filter: el=> el.PromotionId == promotionId) != null;
                 if (!existPromo)
                 {
                     throw new ErrorObj(code: 400, message: "Promotion is not exist", description: "Bad request");
