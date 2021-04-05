@@ -46,16 +46,29 @@ namespace ApplicationCore.Services
                     }
                     if (account.Password == userInfo.Password)
                     {
+                        UserInfo user = null;
                         var token = GenerateJSONWebToken(account);
-                        var user = new UserInfo
+                        switch (account.Role.RoleId)
                         {
-                            Username = account.Username,
-                            BrandCode = account.Brand.BrandCode,
-                            BrandId = account.Brand.BrandId,
-                            Token = token,
-                            RoleName = account.Role.Name                            
-                        };
-
+                            case AppConstant.EnvVar.AdminId:
+                                user = new UserInfo
+                                {
+                                    Username = account.Username,
+                                    Token = token,
+                                    RoleName = account.Role.Name
+                                };
+                                break;
+                            case AppConstant.EnvVar.BrandId:
+                                user = new UserInfo
+                                {
+                                    Username = account.Username,
+                                    BrandCode = account.Brand.BrandCode,
+                                    BrandId = account.Brand.BrandId,
+                                    Token = token,
+                                    RoleName = account.Role.Name
+                                };
+                                break;
+                        }
                         status = (int)HttpStatusCode.OK;
                         message = AppConstant.ErrMessage.Login_Success;
                         result.Data = user;

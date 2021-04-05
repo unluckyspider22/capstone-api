@@ -29,12 +29,13 @@ namespace ApplicationCore.Services
                     && el.StoreCode.Equals(storeCode)
                     && el.Brand.BrandCode.Equals(brandCode),
                 includeProperties: "Brand.Promotion," +
-                "PromotionStoreMapping");
+                "PromotionStoreMapping.Promotion");
 
             var promotions = store.PromotionStoreMapping.Where(w => w.Store.StoreCode.Equals(storeCode)
-                    && w.Promotion.Status.Equals(AppConstant.EnvVar.PromotionStatus.PUBLISH))
+                    && w.Promotion.Status == (int)AppConstant.EnvVar.PromotionStatus.PUBLISH)
                     .Where(w => DateTime.Now <= (w.Promotion.EndDate != null ? w.Promotion.EndDate : DateTime.MaxValue))
                         .Select(s => s.Promotion);
+
             if (promotions != null && promotions.Count() > 0)
             {
                 foreach (var promotion in promotions)

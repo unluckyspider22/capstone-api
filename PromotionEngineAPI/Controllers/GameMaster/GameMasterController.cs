@@ -46,7 +46,6 @@ namespace PromotionEngineAPI.Controllers.GameMaster
             try
             {
                 dto.UpdDate = DateTime.Now;
-                dto.InsDate = null;
                 var result = await _service.UpdateAsync(dto);
                 return Ok(result);
             }
