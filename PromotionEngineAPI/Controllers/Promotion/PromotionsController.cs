@@ -231,7 +231,14 @@ namespace PromotionEngineAPI.Controllers
             try
             {
                 return Ok(await _promotionService.GetFirst(filter: el => el.PromotionId.Equals(id) && !el.DelFlg,
-                    includeProperties: "PromotionChannelMapping,PromotionStoreMapping,MemberLevelMapping,PromotionTier"));
+                    includeProperties: "PromotionChannelMapping," +
+                                        "PromotionStoreMapping," +
+                                        "MemberLevelMapping," +
+                                        "PromotionTier," +
+                                        "PromotionTier.Action," +
+                                        "PromotionTier.PostAction," +
+                                        "PromotionTier.ConditionRule," +
+                                        "PromotionTier.VoucherGroup"));
             }
             catch (ErrorObj e)
             {

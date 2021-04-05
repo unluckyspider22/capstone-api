@@ -2,9 +2,11 @@
 using ApplicationCore.Services;
 using ApplicationCore.Worker;
 using Infrastructure.DTOs;
+using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Diagnostics;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers
@@ -22,29 +24,51 @@ namespace PromotionEngineAPI.Controllers
             _workerService = workerService;
         }
 
-        // GET: api/VoucherGroups
         [HttpGet]
-        // api/VoucherGroups?pageIndex=...&pageSize=...
-        public async Task<IActionResult> GetVoucherGroup([FromQuery] SearchPagingRequestParam param, [FromQuery] Guid BrandId, string voucherType)
+        public async Task<IActionResult> GetVoucherGroup(
+            [FromQuery] SearchPagingRequestParam param,
+            [FromQuery] Guid BrandId,
+            [FromQuery] string voucherType,
+            [FromQuery] int ActionType = 0,
+            [FromQuery] int PostActionType = 0)
         {
             try
             {
+
+
                 if (String.IsNullOrWhiteSpace(param.SearchContent)) param.SearchContent = "";
-                if (String.IsNullOrWhiteSpace(voucherType))
-                //if (voucherType == null)
+                //if (String.IsNullOrWhiteSpace(voucherType))
+                //{
+                //    var resultNofilterVoucherType = await _service.GetAsync(
+                //            pageIndex: param.PageIndex,
+                //            pageSize: param.PageSize,
+                //            filter: el => !el.DelFlg
+                //                            && el.VoucherName.ToLower().Contains(param.SearchContent.ToLower())
+                //                            && el.BrandId.Equals(BrandId)
+                //                     );
+                //    return Ok(resultNofilterVoucherType);
+                //}
+                var myInclude = "";
+                Expression<Func<VoucherGroup, bool>> myFilter = el => !el.DelFlg
+                                                             && el.BrandId.Equals(BrandId)
+                                                             && el.VoucherName.ToLower().Contains(param.SearchContent.ToLower().Trim());
+                var compiled = myFilter.Compile();
+                if (ActionType > 0)
                 {
-                    var resultNofilterVoucherType = await _service.GetAsync(pageIndex: param.PageIndex,
-                pageSize: param.PageSize,
-                filter: el => !el.DelFlg
-                && el.VoucherName.ToLower().Contains(param.SearchContent.ToLower())
-                && el.BrandId.Equals(BrandId));
-                    return Ok(resultNofilterVoucherType);
+                    myFilter = el => !el.DelFlg
+                    && el.Action.ActionType == ActionType
+                                        && el.BrandId.Equals(BrandId)
+                                        && el.VoucherName.ToLower().Contains(param.SearchContent.ToLower().Trim());
                 }
-                var result = await _service.GetAsync(pageIndex: param.PageIndex,
-                pageSize: param.PageSize,
-                filter: el => !el.DelFlg
-                && el.BrandId.Equals(BrandId)
-                && el.VoucherName.ToLower().Contains(param.SearchContent.ToLower().Trim()));
+                else if (PostActionType > 0)
+                {
+                    myFilter = el => !el.DelFlg
+                  && el.PostAction.PostActionType == PostActionType
+                                      && el.BrandId.Equals(BrandId)
+                                      && el.VoucherName.ToLower().Contains(param.SearchContent.ToLower().Trim());
+                }
+                var result = await _service.GetAsync(pageIndex: param.PageIndex, pageSize: param.PageSize, filter: myFilter, includeProperties: myInclude);
+
                 return Ok(result);
             }
             catch (ErrorObj e)
@@ -296,7 +320,7 @@ namespace PromotionEngineAPI.Controllers
                 return StatusCode(statusCode: e.Code, e);
             }
         }
-       
+
 
 
 
