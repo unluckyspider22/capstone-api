@@ -102,6 +102,8 @@ namespace ApplicationCore.Services
             {
                 dto.UpdDate = DateTime.Now;
                 var entity = _mapper.Map<GameCampaign>(dto);
+                var gameMaster = await GetGameMaster(dto.GameMasterId);
+                entity.GameMaster = gameMaster;
                 var items = entity.GameItems.ToList();
                 await UpdateGameItem(items, dto.Id);
                 _repository.Update(entity);
@@ -115,6 +117,12 @@ namespace ApplicationCore.Services
                 throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
             }
 
+        }
+        private async Task<GameMaster> GetGameMaster(Guid gameMasterId)
+        {
+            IGenericRepository<GameMaster> masterRepo = _unitOfWork.GameMasterRepository;
+            var gameMaster = await masterRepo.GetById(gameMasterId);
+            return gameMaster;
         }
         private async Task<bool> UpdateGameItem(List<GameItems> list, Guid gameConfigId)
         {
