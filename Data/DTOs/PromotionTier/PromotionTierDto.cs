@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Infrastructure.DTOs
 {
@@ -11,7 +8,11 @@ namespace Infrastructure.DTOs
         public Guid? ConditionRuleId { get; set; }
         public Guid? ActionId { get; set; }
         public Guid? PromotionId { get; set; }
-        public Guid? MembershipActionId { get; set; }
-        public string Summary { get; set; }
+        public Guid? PostActionId { get; set; }
+        public string Summary { get; set; } = "";
+        public int TierIndex { get; set; } = 0;
+        public Guid? VoucherGroupId { get; set; }
+        public int FromIndex { get; set; } = 0;
+        public int ToIndex { get; set; } = 0;
     }
 }

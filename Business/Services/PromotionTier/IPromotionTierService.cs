@@ -13,5 +13,6 @@ namespace ApplicationCore.Services
     {
         public Task<GenericRespones<AvailableDto>> GetAvailable(int pageSize, int pageIndex, Guid brandId, string actionType, string discountType);
         public Task<bool> AssignTierToPromo(Guid promotionId, Guid promotionTierId);
+        public Task<PromotionTierDto> CreateTier(PromotionTierDto dto);
     }
 }

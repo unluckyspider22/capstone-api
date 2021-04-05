@@ -258,80 +258,80 @@ namespace ApplicationCore.Services
                     .ToList();
                 // Reorder các condition trong group
                 List<PromotionTierResponseParam> result = new List<PromotionTierResponseParam>();
-                foreach (var tier in tiers)
-                {
-                    PromotionTierResponseParam responseParam = new PromotionTierResponseParam
-                    {
-                        Action = _mapper.Map<ActionTierDto>(tier.Action),
-                        ActionId = tier.ActionId,
-                        PostAction = _mapper.Map<PostActionTierDto>(tier.PostAction),
-                        PostActionId = tier.PostActionId,
-                        PromotionId = tier.PromotionId,
-                        PromotionTierId = tier.PromotionTierId,
-                        ConditionRuleId = tier.ConditionRuleId,
-                        ConditionRule = await _conditionRuleService.ReorderResult(tier.ConditionRule),
-                        Summary = tier.Summary,
-                    };
-                    if (responseParam.Action != null)
-                    {
-                        responseParam.Action.productList = new List<ProductDto>();
-                        var mapps = (await actionMappRepo.Get(filter: o => o.ActionId.Equals(responseParam.ActionId),
-                            includeProperties: "Product")).ToList();
-                        if (mapps != null && mapps.Count > 0)
-                        {
-                            foreach (var mapp in mapps)
-                            {
-                                var product = mapp.Product;
-                                var cate = await cateRepo.GetFirst(filter: o => o.ProductCateId.Equals(product.ProductCateId)
-                                && !o.DelFlg);
-                                var dto = new ProductDto()
-                                {
-                                    CateId = cate != null ? cate.CateId : "",
-                                    ProductCateId = cate != null ? cate.ProductCateId : Guid.Empty,
-                                    Name = product.Name,
-                                    Code = product.Code,
-                                    ProductId = product.ProductId
-                                };
-                                responseParam.Action.productList.Add(dto);
-                            }
+                //foreach (var tier in tiers)
+                //{
+                //    PromotionTierResponseParam responseParam = new PromotionTierResponseParam
+                //    {
+                //        Action = _mapper.Map<ActionTierDto>(tier.Action),
+                //        ActionId = tier.ActionId,
+                //        PostAction = _mapper.Map<PostActionTierDto>(tier.PostAction),
+                //        PostActionId = tier.PostActionId,
+                //        PromotionId = tier.PromotionId,
+                //        PromotionTierId = tier.PromotionTierId,
+                //        ConditionRuleId = tier.ConditionRuleId,
+                //        ConditionRule = await _conditionRuleService.ReorderResult(tier.ConditionRule),
+                //        Summary = tier.Summary,
+                //    };
+                //    if (responseParam.Action != null)
+                //    {
+                //        responseParam.Action.productList = new List<ProductDto>();
+                //        var mapps = (await actionMappRepo.Get(filter: o => o.ActionId.Equals(responseParam.ActionId),
+                //            includeProperties: "Product")).ToList();
+                //        if (mapps != null && mapps.Count > 0)
+                //        {
+                //            foreach (var mapp in mapps)
+                //            {
+                //                var product = mapp.Product;
+                //                var cate = await cateRepo.GetFirst(filter: o => o.ProductCateId.Equals(product.ProductCateId)
+                //                && !o.DelFlg);
+                //                var dto = new ProductDto()
+                //                {
+                //                    CateId = cate != null ? cate.CateId : "",
+                //                    ProductCateId = cate != null ? cate.ProductCateId : Guid.Empty,
+                //                    Name = product.Name,
+                //                    Code = product.Code,
+                //                    ProductId = product.ProductId
+                //                };
+                //                responseParam.Action.productList.Add(dto);
+                //            }
 
-                        }
-                        else
-                        {
-                            responseParam.Action.productList = new List<ProductDto>();
-                        }
-                    }
-                    else if (responseParam.PostAction != null)
-                    {
-                        responseParam.PostAction.productList = new List<ProductDto>();
-                        var mapps = (await postActionMappRepo.Get(filter: o => o.PostActionId.Equals(responseParam.PostActionId),
-                            includeProperties: "Product")).ToList();
-                        if (mapps != null && mapps.Count > 0)
-                        {
-                            foreach (var mapp in mapps)
-                            {
-                                var product = mapp.Product;
-                                var cate = await cateRepo.GetFirst(filter: o => o.ProductCateId.Equals(product.ProductCateId)
-                                  && !o.DelFlg);
-                                var dto = new ProductDto()
-                                {
-                                    CateId = cate != null ? cate.CateId : "",
-                                    ProductCateId = cate != null ? cate.ProductCateId : Guid.Empty,
-                                    Name = product.Name,
-                                    Code = product.Code,
-                                    ProductId = product.ProductId
-                                };
-                                responseParam.PostAction.productList.Add(dto);
-                            }
+                //        }
+                //        else
+                //        {
+                //            responseParam.Action.productList = new List<ProductDto>();
+                //        }
+                //    }
+                //    else if (responseParam.PostAction != null)
+                //    {
+                //        responseParam.PostAction.productList = new List<ProductDto>();
+                //        var mapps = (await postActionMappRepo.Get(filter: o => o.PostActionId.Equals(responseParam.PostActionId),
+                //            includeProperties: "Product")).ToList();
+                //        if (mapps != null && mapps.Count > 0)
+                //        {
+                //            foreach (var mapp in mapps)
+                //            {
+                //                var product = mapp.Product;
+                //                var cate = await cateRepo.GetFirst(filter: o => o.ProductCateId.Equals(product.ProductCateId)
+                //                  && !o.DelFlg);
+                //                var dto = new ProductDto()
+                //                {
+                //                    CateId = cate != null ? cate.CateId : "",
+                //                    ProductCateId = cate != null ? cate.ProductCateId : Guid.Empty,
+                //                    Name = product.Name,
+                //                    Code = product.Code,
+                //                    ProductId = product.ProductId
+                //                };
+                //                responseParam.PostAction.productList.Add(dto);
+                //            }
 
-                        }
-                        else
-                        {
-                            responseParam.PostAction.productList = new List<ProductDto>();
-                        }
-                    }
-                    result.Add(responseParam);
-                }
+                //        }
+                //        else
+                //        {
+                //            responseParam.PostAction.productList = new List<ProductDto>();
+                //        }
+                //    }
+                //    result.Add(responseParam);
+                //}
                 return result;
             }
             catch (Exception e)
@@ -1423,6 +1423,7 @@ namespace ApplicationCore.Services
                             voucher.PromotionId = dto.PromotionId;
                             voucherRepo.Update(voucher);
                         }
+                        //await _unitOfWork.SaveAsync();
                     }
                 }
 
