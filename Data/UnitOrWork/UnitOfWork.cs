@@ -86,6 +86,8 @@ namespace Infrastructure.UnitOrWork
 
         public IGenericRepository<GameMaster> GameMasterRepository { get; set; }
 
+        public IGenericRepository<Transaction> TransactionRepository { get; set; }
+
 
         private void initRepository()
         {
@@ -138,6 +140,8 @@ namespace Infrastructure.UnitOrWork
             GameMasterRepository = new GenericRepository<GameMaster>(_context);
             GameConfigRepository = new GenericRepository<GameCampaign>(_context);
             GameItemsRepository = new GenericRepository<GameItems>(_context);
+            TransactionRepository = new GenericRepository<Transaction>(_context);
+
         }
         public void Dispose()
         {

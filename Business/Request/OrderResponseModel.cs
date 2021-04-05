@@ -56,24 +56,33 @@ namespace ApplicationCore.Request
     public class Attribute
     {
         public int SalesMode { get; set; }
+        [StringLength(1000)]
         public string Note { get; set; }
         public int PaymentMethod { get; set; }
         public StoreInfo StoreInfo { get; set; }
     }
     public class Gift
     {
+        [StringLength(20)]
+
         public string ProductCode { get; set; }
+
         public int Quantity { get; set; }
+        [StringLength(100)]
+
         public string ProductName { get; set; }
     }
     public class CouponCode
     {
+        [StringLength(6)]
         public string PromotionCode { get; set; }
+        [StringLength(20)]
         public string VoucherCode { get; set; }
     }
     public class StoreInfo
     {
         public string StoreId { get; set; }
+        [StringLength(100)]
         public string StoreName { get; set; }
         public string BrandCode { get; set; }
         public string Applier { get; set; }
@@ -81,8 +90,11 @@ namespace ApplicationCore.Request
     }
     public class Item
     {
+        [StringLength(20)]
         public string ProductCode { get; set; }
+        [StringLength(20)]
         public string CategoryCode { get; set; }
+        [StringLength(100)]
         public string ProductName { get; set; }
         public decimal UnitPrice { get; set; }
         public int Quantity { get; set; }
@@ -90,15 +102,19 @@ namespace ApplicationCore.Request
         public decimal Discount { get; set; }
         public decimal DiscountFromOrder { get; set; }
         public decimal FinalAmount { get; set; }
-
+        [StringLength(1000)]
         public string UrlImg { get; set; }
     }
     public class Customer
     {
+        [StringLength(100)]
         public string CustomerName { get; set; }
+        [StringLength(100)]
         public string CustomerEmail { get; set; }
+        [StringLength(11)]
         public string CustomerPhoneNo { get; set; }
         public int CustomerGender { get; set; } = 3;
+        [StringLength(100)]
         public string CustomerLevel { get; set; }
     }
 }
