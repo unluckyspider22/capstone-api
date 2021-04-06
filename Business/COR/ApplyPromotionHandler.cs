@@ -40,8 +40,8 @@ namespace ApplicationCore.Chain
         }
         public override void Handle(OrderResponseModel order)
         {
-            #region Check condition
             Setorder(order);
+            #region Check condition
             //ApplyHandle => PromotionHandle => TimeframeHandle(nếu có) => ConditionHandle
 
             _promotionHandle.SetNext(_timeframeHandle).SetNext(_conditionHandle);
@@ -69,14 +69,12 @@ namespace ApplicationCore.Chain
             /*base.Handle(order);*/
         }
 
-
-
         private void Setorder(OrderResponseModel order)
         {
             order.Discount ??= 0;
             order.DiscountOrderDetail ??= 0;
-            order.TotalAmount = order.TotalAmount != null ? order.TotalAmount : 0;
-            order.FinalAmount = order.FinalAmount != null ? order.FinalAmount : 0;
+            order.TotalAmount ??= order.CustomerOrderInfo.Amount;
+            order.FinalAmount ??= order.CustomerOrderInfo.Amount;
         }
     }
 }
