@@ -41,7 +41,7 @@ namespace Infrastructure.Models
         public virtual DbSet<PromotionChannelMapping> PromotionChannelMapping { get; set; }
         public virtual DbSet<PromotionStoreMapping> PromotionStoreMapping { get; set; }
         public virtual DbSet<PromotionTier> PromotionTier { get; set; }
-        public virtual DbSet<Role> Role { get; set; }
+        public virtual DbSet<RoleEntity> Role { get; set; }
         public virtual DbSet<Store> Store { get; set; }
         public virtual DbSet<Transaction> Transaction { get; set; }
         public virtual DbSet<Voucher> Voucher { get; set; }
@@ -833,7 +833,7 @@ namespace Infrastructure.Models
                     .HasConstraintName("FK_PromotionTier_VoucherGroup");
             });
 
-            modelBuilder.Entity<Role>(entity =>
+            modelBuilder.Entity<RoleEntity>(entity =>
             {
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
