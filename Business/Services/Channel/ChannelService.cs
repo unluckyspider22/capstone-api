@@ -46,7 +46,9 @@ namespace ApplicationCore.Services
                 && !el.IsAuto
                 && !el.DelFlg,
                 includeProperties:
-                "Brand,PromotionChannelMapping.Channel")).Data; ;
+                "Brand,PromotionChannelMapping.Channel," +
+                "PromotionTier.Action," +
+                "PromotionTier.VoucherGroup")).Data; ;
 
                 promotions = promotions.Where(w =>
                 w.PromotionChannelMapping.Select(vc =>
@@ -56,9 +58,23 @@ namespace ApplicationCore.Services
                         && !a.DelFlg)).ToList();
                 foreach (var promotion in promotions)
                 {
-                    var promotionInfomation = _mapper.Map<PromotionInfomation>(promotion);
+                    foreach (var promotionTier in promotion.PromotionTier)
+                    {
+                        var tier = new PromotionInfomation
+                        {
+                            PromotionId = promotion.PromotionId,
+                            PromotionName = promotion.PromotionName,
+                            ActionName = promotionTier.Action.Name,
+                            ImgUrl = promotion.ImgUrl,
+                            PromotionCode = promotion.PromotionCode,
+                            PromotionTierId = promotionTier.PromotionTierId,
+                            VoucherName = promotionTier.VoucherGroup.VoucherName
+                        };
+                        result.Add(tier);
+                    }
+                    /*var promotionInfomation = _mapper.Map<PromotionInfomation>(promotion);
 
-                    result.Add(promotionInfomation);
+                    result.Add(promotionInfomation);*/
                 }
                 return result;
             }
