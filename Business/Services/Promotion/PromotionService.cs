@@ -1407,6 +1407,8 @@ namespace ApplicationCore.Services
                         InsDate = DateTime.Now,
                         UpdDate = DateTime.Now,
                         TierIndex = 0,
+                        Priority = 10,
+                        VoucherQuantity = dto.VoucherQuantity,
                         Summary = "",
                     };
                     if (group.ActionId != null)

@@ -13,6 +13,7 @@ namespace Infrastructure.DTOs
         public int TierIndex { get; set; } = 0;
         public Guid? VoucherGroupId { get; set; }
         public int VoucherQuantity { get; set; } = 0;
+        public int Priority { get; set; }
 
     }
 }
