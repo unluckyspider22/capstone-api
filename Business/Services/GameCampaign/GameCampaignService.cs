@@ -104,7 +104,16 @@ namespace ApplicationCore.Services
                 dto.UpdDate = DateTime.Now;
                 var entity = _mapper.Map<GameCampaign>(dto);
                 var gameMaster = await GetGameMaster(dto.GameMasterId);
-                entity.GameMaster = gameMaster;
+                if (gameMaster != null)
+                {
+                    entity.GameMaster = gameMaster;
+
+                }
+                var promotion = await GetPromotion(dto.PromotionId);
+                if (promotion != null)
+                {
+                    entity.Promotion = promotion;
+                }
                 var items = entity.GameItems.ToList();
                 await UpdateGameItem(items, dto.Id);
                 _repository.Update(entity);
@@ -124,6 +133,12 @@ namespace ApplicationCore.Services
             IGenericRepository<GameMaster> masterRepo = _unitOfWork.GameMasterRepository;
             var gameMaster = await masterRepo.GetById(gameMasterId);
             return gameMaster;
+        }
+        private async Task<Promotion> GetPromotion(Guid promotionId)
+        {
+            IGenericRepository<Promotion> promotionRepo = _unitOfWork.PromotionRepository;
+            var promotion = await promotionRepo.GetById(promotionId);
+            return promotion;
         }
         private async Task<bool> UpdateGameItem(List<GameItems> list, Guid gameConfigId)
         {

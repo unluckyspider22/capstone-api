@@ -12,7 +12,7 @@ namespace Infrastructure.DTOs
         public int Quantity { get; set; } = 1;
         public DateTime? StartGame { get; set; }
         public DateTime? EndGame { get; set; }
-        public Guid? PromotionId { get; set; }
+        public Guid PromotionId { get; set; }
         public virtual ICollection<GameItemDto> GameItems { get; set; }
     }
 }
