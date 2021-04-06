@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Infrastructure.Helper
@@ -251,5 +252,37 @@ namespace Infrastructure.Helper
             public const string BRAND_ID_INVALID = "Brand invalid, please try again.";
         }
         #endregion
+
+        public class SwapVisitor : ExpressionVisitor
+        {
+            private readonly Expression from, to;
+            public SwapVisitor(Expression from, Expression to)
+            {
+                this.from = from;
+                this.to = to;
+            }
+            public override Expression Visit(Expression node)
+            {
+                return node == from ? to : base.Visit(node);
+            }
+        }
+        public static Expression<Func<T, bool>> Or<T>(this Expression<Func<T, bool>> expression1, Expression<Func<T, bool>> expression2)
+        {
+            InvocationExpression invocationExpression = Expression.Invoke((Expression)expression2, expression1.Parameters.Cast<Expression>());
+            return Expression.Lambda<Func<T, bool>>((Expression)Expression.OrElse(expression1.Body, (Expression)invocationExpression), (IEnumerable<ParameterExpression>)expression1.Parameters);
+        }
+
+        public static Expression<Func<T, bool>> And<T>(this Expression<Func<T, bool>> expression1, Expression<Func<T, bool>> expression2)
+        {
+            InvocationExpression invocationExpression = Expression.Invoke((Expression)expression2, expression1.Parameters.Cast<Expression>());
+            return Expression.Lambda<Func<T, bool>>((Expression)Expression.AndAlso(expression1.Body, (Expression)invocationExpression), (IEnumerable<ParameterExpression>)expression1.Parameters);
+        }
+        public struct VoucherStatus
+        {
+            public const int ALL = 1;
+            public const int UNUSED = 2;
+            public const int USED = 3;
+            public const int REDEMPED = 4;
+        }
     }
 }

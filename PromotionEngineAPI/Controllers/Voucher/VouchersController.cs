@@ -3,10 +3,15 @@ using ApplicationCore.Request;
 using ApplicationCore.Services;
 using Infrastructure.DTOs;
 using Infrastructure.DTOs.Voucher;
+using Infrastructure.Helper;
+using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
+using static Infrastructure.Helper.AppConstant;
 
 namespace PromotionEngineAPI.Controllers
 {
@@ -19,23 +24,57 @@ namespace PromotionEngineAPI.Controllers
         {
             _service = service;
         }
-
-        // GET: api/Vouchers
         [HttpGet]
-        // api/Vouchers?pageIndex=...&pageSize=...
         public async Task<IActionResult> GetVoucher(
             [FromQuery] PagingRequestParam param,
             [FromQuery] Guid VoucherGroupId,
-            [FromQuery] Guid PromotionId)
+            [FromQuery] Guid PromotionId,
+            [FromQuery] string SearchCode = "",
+            [FromQuery] int VoucherStatus = 1)
         {
+            Expression<Func<Voucher, bool>> filter = el => el.VoucherGroupId.Equals(VoucherGroupId)
+                                                    && el.VoucherCode.ToUpper().Contains(SearchCode.ToUpper());
+            Expression<Func<Voucher, bool>> filter2;
+            if (!PromotionId.Equals(Guid.Empty))
+            {
+
+                filter2 = el => el.PromotionId.Equals(PromotionId);
+                filter = filter.And(filter2);
+            }
+
+
+            if (VoucherStatus > AppConstant.VoucherStatus.ALL)
+            {
+                switch (VoucherStatus)
+                {
+                    case AppConstant.VoucherStatus.USED:
+                        {
+                            filter2 = el => el.IsUsed;
+                            filter = filter.And(filter2);
+                            break;
+                        }
+                    case AppConstant.VoucherStatus.UNUSED:
+                        {
+                            filter2 = el => !el.IsUsed;
+                            filter = filter.And(filter2);
+                            break;
+                        }
+                    case AppConstant.VoucherStatus.REDEMPED:
+                        {
+                            filter2 = el => el.IsRedemped;
+                            filter = filter.And(filter2);
+                            break;
+                        }
+                }
+            }
+
             try
             {
                 return Ok(await _service.GetAsync(
                 pageIndex: param.PageIndex,
                 pageSize: param.PageSize,
-                filter: el => el.VoucherGroupId.Equals(VoucherGroupId)
-                && PromotionId.Equals(Guid.Empty) ? !el.PromotionId.Equals(Guid.Empty) : el.PromotionId.Equals(PromotionId),
-                includeProperties:"Promotion",
+                filter: filter,
+                includeProperties: "Promotion",
                 orderBy: el => el.OrderBy(obj => obj.Index)
                 ));
             }
@@ -44,6 +83,32 @@ namespace PromotionEngineAPI.Controllers
                 return StatusCode(statusCode: e.Code, e);
             }
         }
+
+        [HttpGet]
+        [Route("check-voucher")]
+        public async Task<IActionResult> CheckVoucher(
+         [Required][FromQuery] Guid VoucherGroupId,
+            [FromQuery] string SearchCode = "")
+        {
+            Expression<Func<Voucher, bool>> filter = el => el.VoucherGroupId.Equals(VoucherGroupId)
+                                                    && el.VoucherCode.ToUpper().Equals(SearchCode.ToUpper());
+            try
+            {
+                return Ok(await _service.GetFirst(
+                            filter: filter,
+                            includeProperties:
+                            "Promotion," +
+                            "Channel," +
+                            "GameCampaign," +
+                            "Membership," +
+                            "Store"));
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
+
         [HttpPost]
         [Route("voucher-on-site/{promotionId}/{tierId}")]
         public async Task<IActionResult> GetVoucherForCustomer([FromBody] VoucherForCustomerModel param, Guid promotionId, Guid tierId)

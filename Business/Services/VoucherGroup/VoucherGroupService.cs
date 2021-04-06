@@ -527,7 +527,7 @@ namespace ApplicationCore.Services
                         var exist = result.Any(o => o.PromotionId.Equals(tier.PromotionId));
                         if (!exist)
                         {
-                            if (tier.PromotionId != null && !tier.PromotionId.Equals(Guid.Empty))
+                            if (tier.PromotionId != null && !tier.PromotionId.Equals(Guid.Empty) && !tier.Promotion.DelFlg)
                             {
                                 var dto = new PromoOfVoucher()
                                 {

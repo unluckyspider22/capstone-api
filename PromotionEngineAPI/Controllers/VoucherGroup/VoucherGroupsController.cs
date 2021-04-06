@@ -37,17 +37,6 @@ namespace PromotionEngineAPI.Controllers
 
 
                 if (String.IsNullOrWhiteSpace(param.SearchContent)) param.SearchContent = "";
-                //if (String.IsNullOrWhiteSpace(voucherType))
-                //{
-                //    var resultNofilterVoucherType = await _service.GetAsync(
-                //            pageIndex: param.PageIndex,
-                //            pageSize: param.PageSize,
-                //            filter: el => !el.DelFlg
-                //                            && el.VoucherName.ToLower().Contains(param.SearchContent.ToLower())
-                //                            && el.BrandId.Equals(BrandId)
-                //                     );
-                //    return Ok(resultNofilterVoucherType);
-                //}
                 var myInclude = "";
                 Expression<Func<VoucherGroup, bool>> myFilter = el => !el.DelFlg
                                                              && el.BrandId.Equals(BrandId)
