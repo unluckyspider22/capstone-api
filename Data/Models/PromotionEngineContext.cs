@@ -994,11 +994,6 @@ namespace Infrastructure.Models
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_VoucherGroup_Brand");
 
-                entity.HasOne(d => d.ConditionRule)
-                    .WithMany(p => p.VoucherGroup)
-                    .HasForeignKey(d => d.ConditionRuleId)
-                    .HasConstraintName("FK_VoucherGroup_ConditionRule");
-
                 entity.HasOne(d => d.PostAction)
                     .WithMany(p => p.VoucherGroup)
                     .HasForeignKey(d => d.PostActionId)

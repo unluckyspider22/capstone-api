@@ -1417,10 +1417,6 @@ namespace ApplicationCore.Services
                     {
                         tier.PostActionId = group.PostActionId;
                     }
-                    if (group.ConditionRuleId != null)
-                    {
-                        tier.ConditionRuleId = group.ConditionRuleId;
-                    }
                     tierRepo.Add(tier);
                     var vouchers = await voucherRepo.Get(filter: o => o.VoucherGroupId.Equals(group.VoucherGroupId)
                                    && o.Index >= dto.FromIndex
@@ -1435,7 +1431,6 @@ namespace ApplicationCore.Services
                         //await _unitOfWork.SaveAsync();
                     }
                 }
-
             }
             catch (Exception e)
             {

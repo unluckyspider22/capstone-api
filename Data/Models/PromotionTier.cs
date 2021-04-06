@@ -17,6 +17,7 @@ namespace Infrastructure.Models
         public Guid? VoucherGroupId { get; set; }
         public int? FromIndex { get; set; }
         public int? ToIndex { get; set; }
+        public int? Priority { get; set; }
 
         public virtual Action Action { get; set; }
         public virtual ConditionRule ConditionRule { get; set; }

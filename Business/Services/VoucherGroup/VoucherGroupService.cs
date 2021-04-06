@@ -497,7 +497,7 @@ namespace ApplicationCore.Services
                         BrandId = group.BrandId,
                         ActionId = group.ActionId,
                         PostActionId = group.PostActionId,
-                        ConditionRuleId = group.ConditionRuleId,
+                        
                         RedempedQuantity = group.RedempedQuantity,
                         Total = group.Quantity,
                         UsedQuantity = group.UsedQuantity,

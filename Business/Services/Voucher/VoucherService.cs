@@ -243,7 +243,9 @@ namespace ApplicationCore.Services
                     includeProperties:
                     "Promotion.PromotionChannelMapping.Channel," +
                     "VoucherGroup.Brand.UsernameNavigation," +
-                    "Membership");
+                    "Membership," +
+                    "VoucherGroup.Action," +
+                    "VoucherGroup.PostAction");
                 var voucher = new Voucher();
                 if (vouchers.Count() > 0)
                 {
@@ -329,11 +331,12 @@ namespace ApplicationCore.Services
             string voucherCode = promotion.PromotionCode + "-" + voucher.VoucherCode;
             string QrCode = AppConstant.Url_Gen_QR + voucherCode;
             string body = string.Format("<p>Promotion Code: <b>{0}</b></p>" +
+                "<p>Voucher: <b>{3}</b></p>" +
                 "<p>Voucher Code: <b>{1}</b></p>" +
                 "<p>Description:</p>" +
                 "<p>{2}</p>" +
                 "<p>Or you can use the code below:</p>" +
-                "<img src={3}><br>", promotion.PromotionCode, voucherCode, promotion.Description, QrCode);
+                "<img src={4}><br>", promotion.PromotionCode, voucherCode, promotion.Description, voucher.VoucherGroup.Action.Name, QrCode);
             //Note
             string note = string.Format("<p>Note:</p>" +
                 "<ul>" +
