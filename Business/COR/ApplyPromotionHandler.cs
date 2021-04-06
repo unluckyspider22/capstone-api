@@ -68,7 +68,6 @@ namespace ApplicationCore.Chain
             #endregion
             /*base.Handle(order);*/
         }
-
         private void Setorder(OrderResponseModel order)
         {
             order.Discount ??= 0;

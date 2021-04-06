@@ -228,7 +228,7 @@ namespace ApplicationCore.Services
         }
         #endregion
         #region Lấy voucher cho customer qua Chatbot
-        public async Task<VoucherForCustomerModel> GetVoucherForCusOnSite(VoucherForCustomerModel param, Guid promotionId, string storeCode)
+        public async Task<VoucherForCustomerModel> GetVoucherForCusOnSite(VoucherForCustomerModel param, Guid promotionId, Guid tierId)
         {
             try
             {
@@ -238,11 +238,11 @@ namespace ApplicationCore.Services
                     && !el.IsUsed
                     && !el.IsRedemped
                     && !el.Promotion.DelFlg
+                    && el.PromotionTierId == tierId
                     && el.Promotion.Status == (int)AppConstant.EnvVar.PromotionStatus.PUBLISH,
                     includeProperties:
                     "Promotion.PromotionChannelMapping.Channel," +
-                    "Promotion.PromotionStoreMapping.Store," +
-                    "Brand.UsernameNavigation," +
+                    "VoucherGroup.Brand.UsernameNavigation," +
                     "Membership");
                 var voucher = new Voucher();
                 if (vouchers.Count() > 0)
@@ -251,7 +251,7 @@ namespace ApplicationCore.Services
                     await SendEmailSmtp(param, voucher);
 
                     //Update voucher vừa lấy
-                    await UpdateVoucherRedemped(voucher, param, storeCode);
+                    await UpdateVoucherRedemped(voucher, param);
                 }
                 else
                 {
@@ -348,20 +348,20 @@ namespace ApplicationCore.Services
 
             return emailContent;
         }
-        public async Task UpdateVoucherRedemped(Voucher voucher, VoucherForCustomerModel param, string storeCode)
+        public async Task UpdateVoucherRedemped(Voucher voucher, VoucherForCustomerModel param)
         {
-            if (!string.IsNullOrEmpty(storeCode))
-            {
-                //Update store
-                var store = voucher.Promotion.PromotionStoreMapping.FirstOrDefault(w => w.Store.StoreCode == storeCode).Store;
-                voucher.Store = store;
-            }
-            else
-            {
-                //Update channel
-                var channel = voucher.Promotion.PromotionChannelMapping.FirstOrDefault(w => w.Channel.ChannelCode == param.ChannelCode).Channel;
-                voucher.Channel = channel;
-            }
+            /*  if (!string.IsNullOrEmpty(storeCode))
+              {
+                  //Update store
+                  var store = voucher.Promotion.PromotionStoreMapping.FirstOrDefault(w => w.Store.StoreCode == storeCode).Store;
+                  voucher.Store = store;
+              }
+              else
+              {*/
+            //Update channel
+            var channel = voucher.Promotion.PromotionChannelMapping.FirstOrDefault(w => w.Channel.ChannelCode == param.ChannelCode).Channel;
+            voucher.Channel = channel;
+            //}
 
             //Update membership
             MembershipDto membership = new MembershipDto

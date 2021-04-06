@@ -5,6 +5,7 @@ namespace Infrastructure.DTOs
     public class GameItemDto : BaseDto
     {
         public Guid Id { get; set; }
+        public Guid PromotionId { get; set; }
         public Guid PromotionTierId { get; set; }
         public Guid GameId { get; set; }
         public int Priority { get; set; }

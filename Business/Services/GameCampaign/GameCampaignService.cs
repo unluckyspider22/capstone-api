@@ -72,6 +72,7 @@ namespace ApplicationCore.Services
                     foreach (var gameItem in gameItems)
                     {
                         var dto = _mapper.Map<GameItemDto>(gameItem);
+                        dto.PromotionId = (Guid)gameConfig.PromotionId;
                         if (gameItemDtos == null)
                         {
                             gameItemDtos = new List<GameItemDto>();
