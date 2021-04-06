@@ -1301,6 +1301,7 @@ namespace ApplicationCore.Services
             try
             {
                 #region Tìm promotion
+
                 var existPromo = await _repository.GetFirst(filter: el => el.PromotionId == promotionId) != null;
                 if (!existPromo)
                 {
@@ -1308,7 +1309,7 @@ namespace ApplicationCore.Services
                 }
                 #endregion
                 #region Update DelFlag của promotion
-                var promo = await _repository.GetFirst(filter: o => o.PromotionId.Equals(promotionId));
+                var promo = await _repository.GetFirst(filter: o => o.PromotionId.Equals(promotionId), includeProperties: "Voucher");
                 promo.DelFlg = true;
                 _repository.Update(promo);
                 //await _unitOfWork.SaveAsync();
@@ -1327,19 +1328,6 @@ namespace ApplicationCore.Services
                 IGenericRepository<MemberLevelMapping> memberMappRepo = _unitOfWork.MemberLevelMappingRepository;
                 memberMappRepo.Delete(id: Guid.Empty, filter: o => o.PromotionId.Equals(promotionId));
                 #endregion
-                #region Update DelFlg của Voucher group
-                IGenericRepository<VoucherGroup> voucherGroupRepo = _unitOfWork.VoucherGroupRepository;
-                /* var voucherGroup = await voucherGroupRepo.GetFirst(filter: o => o.PromotionId.Equals(promotionId));
-                 if (voucherGroup != null)
-                 {
-                     voucherGroup.DelFlg = true;
-                     #region Xóa voucher
-                     IGenericRepository<Voucher> voucherRepo = _unitOfWork.VoucherRepository;
-                     voucherRepo.Delete(id: Guid.Empty, filter: o => o.VoucherGroupId.Equals(voucherGroup.VoucherGroupId));
-                     #endregion
-                 }*/
-                //await _unitOfWork.SaveAsync();
-                #endregion
                 #region Xóa tier
                 IGenericRepository<PromotionTier> tierRepo = _unitOfWork.PromotionTierRepository;
                 var tierList = (await tierRepo.Get(filter: o => o.PromotionId.Equals(promotionId))).ToList();
@@ -1352,6 +1340,13 @@ namespace ApplicationCore.Services
 
                     }
                 }
+                #endregion
+                #region Xóa voucher và tierId
+                foreach (var voucher in promo.Voucher)
+                {
+                    voucher.PromotionTierId = null;
+                }
+                promo.Voucher = null;
                 #endregion
                 return await _unitOfWork.SaveAsync() > 0;
             }

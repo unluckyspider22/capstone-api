@@ -19,6 +19,7 @@ namespace Infrastructure.DTOs
         public DateTime? RedempedDate { get; set; }
         public bool IsActive { get; set; }
         public int Index { get; set; }
+        public Guid? PromotionId { get; set; }
         public Guid? PromotionTierId { get; set; }
         public virtual VoucherGroup VoucherGroup { get; set; }
     }
