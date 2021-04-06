@@ -80,7 +80,7 @@ namespace PromotionEngineAPI.Controllers
         {
             try
             {
-                var result = await _service.CreateAsync(dto);
+                var result = await _service.CreateTier(dto);
                 return Ok(result);
             }
             catch (ErrorObj e)

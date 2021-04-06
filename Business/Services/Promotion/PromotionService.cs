@@ -1400,12 +1400,12 @@ namespace ApplicationCore.Services
                 {
                     var tier = new PromotionTier()
                     {
+                        ConditionRuleId = dto.ConditionRuleId,
+                        PromotionTierId = Guid.NewGuid(),
                         VoucherGroupId = group.VoucherGroupId,
                         PromotionId = dto.PromotionId,
                         InsDate = DateTime.Now,
                         UpdDate = DateTime.Now,
-                        FromIndex = dto.FromIndex,
-                        ToIndex = dto.ToIndex,
                         TierIndex = 0,
                         Summary = "",
                     };
@@ -1417,19 +1417,40 @@ namespace ApplicationCore.Services
                     {
                         tier.PostActionId = group.PostActionId;
                     }
+
                     tierRepo.Add(tier);
-                    var vouchers = await voucherRepo.Get(filter: o => o.VoucherGroupId.Equals(group.VoucherGroupId)
-                                   && o.Index >= dto.FromIndex
-                                   && o.Index <= dto.ToIndex);
-                    if (vouchers.Count() > 0)
+                    if (dto.VoucherGroupId != null && !dto.VoucherGroupId.Equals(Guid.Empty))
                     {
-                        foreach (var voucher in vouchers)
+                        var vouchers = await voucherRepo.Get(filter: o => o.VoucherGroupId.Equals(group.VoucherGroupId)
+                                                              && (o.PromotionTierId == null || o.PromotionTierId.Equals(Guid.Empty))
+                                                              && (o.PromotionId == null || o.PromotionId.Equals(Guid.Empty)));
+                        if (vouchers.Count() > 0 && dto.VoucherQuantity > 0)
                         {
-                            voucher.PromotionId = dto.PromotionId;
-                            voucherRepo.Update(voucher);
+                            var remain = dto.VoucherQuantity;
+                            while (remain > 0)
+                            {
+                                var voucher = vouchers.Where(o => (o.PromotionTierId == null || o.PromotionTierId.Equals(Guid.Empty))
+                                                    && (o.PromotionId == null || o.PromotionId.Equals(Guid.Empty))).First();
+                                if (voucher != null)
+                                {
+                                    voucher.PromotionTierId = tier.PromotionTierId;
+                                    voucher.PromotionId = tier.PromotionId;
+                                    voucher.UpdDate = DateTime.Now;
+                                    voucherRepo.Update(voucher);
+                                }
+                                if (voucher == null && remain > 0)
+                                {
+                                    remain = 0;
+                                }
+                                else
+                                {
+                                    remain--;
+                                }
+                            }
+
                         }
-                        //await _unitOfWork.SaveAsync();
                     }
+
                 }
             }
             catch (Exception e)

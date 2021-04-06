@@ -79,13 +79,12 @@ namespace ApplicationCore.Services
                 IGenericRepository<Voucher> voucherRepo = _unitOfWork.VoucherRepository;
                 var voucherGroupId = dto.VoucherGroupId;
 
-                var vouchers = await voucherRepo.Get(filter: o => o.VoucherGroupId.Equals(voucherGroupId)
-                                                    && o.Index >= dto.FromIndex
-                                                    && o.Index >= dto.ToIndex);
+                var vouchers = await voucherRepo.Get(filter: o => o.VoucherGroupId.Equals(voucherGroupId));
                 if (vouchers.Count() > 0)
                 {
                     foreach (var voucher in vouchers)
                     {
+                        voucher.PromotionTierId = dto.PromotionTierId;
                         voucher.PromotionId = dto.PromotionId;
                         voucherRepo.Update(voucher);
                     }

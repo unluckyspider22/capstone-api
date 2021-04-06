@@ -394,7 +394,7 @@ namespace ApplicationCore.Services
                     && o.Quantity > o.RedempedQuantity
                     && o.Quantity > o.UsedQuantity
                     && !o.DelFlg,
-                    includeProperties: "Action,ConditionRule,PostAction")).ToList();
+                    includeProperties: "Action,PostAction")).ToList();
                 if (groups.Count > 0)
                 {
                     foreach (var group in groups)
@@ -434,42 +434,27 @@ namespace ApplicationCore.Services
                 var result = new VoucherIndexInfo()
                 {
                     Available = false,
-                    FromIndex = 0,
-                    MaxIndex = 0,
+                    Total = 0,
+                    Remain = 0,
                 };
-                var maxIndex = 0;
-                var group = await _repository.GetFirst(filter: o => o.VoucherGroupId.Equals(voucherGroupId) && !o.DelFlg);
+                var group = await _repository.GetFirst(filter: o => o.VoucherGroupId.Equals(voucherGroupId) && !o.DelFlg, includeProperties: "Voucher");
                 if (group != null)
                 {
-                    IGenericRepository<PromotionTier> tierRepo = _unitOfWork.PromotionTierRepository;
-                    var quantity = group.Quantity;
-                    var tiers = await tierRepo.Get(filter: o => o.VoucherGroupId.Equals(voucherGroupId));
-                    if (tiers.Count() > 0)
+                    var vouchers = group.Voucher;
+                    if (vouchers.Count() > 0)
                     {
-                        tiers = tiers.OrderByDescending(o => o.ToIndex);
-                        maxIndex = (int)tiers.First().ToIndex;
-                        if (maxIndex != quantity)
-                        {
-                            result = new VoucherIndexInfo()
-                            {
-                                Available = true,
-                                FromIndex = maxIndex + 1,
-                                MaxIndex = quantity,
-                            };
-                        }
-
-                    }
-                    else
-                    {
+                        var remainVouchers = vouchers.Where(o => (o.PromotionTierId == null || o.PromotionTierId.Equals(Guid.Empty))
+                                                                  && (o.PromotionId == null || o.PromotionId.Equals(Guid.Empty)));
+                        var remain = remainVouchers.Count();
+                        var total = vouchers.Count();
+                        var avail = total - remain == 0;
                         result = new VoucherIndexInfo()
                         {
-                            Available = true,
-                            FromIndex = 1,
-                            MaxIndex = group.Quantity,
+                            Available = avail,
+                            Total = total,
+                            Remain = remain,
                         };
-
                     }
-
                 }
                 return result;
             }
@@ -497,7 +482,7 @@ namespace ApplicationCore.Services
                         BrandId = group.BrandId,
                         ActionId = group.ActionId,
                         PostActionId = group.PostActionId,
-                        
+
                         RedempedQuantity = group.RedempedQuantity,
                         Total = group.Quantity,
                         UsedQuantity = group.UsedQuantity,

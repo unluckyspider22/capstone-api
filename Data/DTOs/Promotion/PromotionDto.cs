@@ -28,8 +28,8 @@ namespace Infrastructure.DTOs
         public bool? HasVoucher { get; set; }
         public bool? IsAuto { get; set; }
         public Guid? VoucherGroupId { get; set; }
-        public int FromIndex { get; set; }
-        public int ToIndex { get; set; }
+        public int VoucherQuantity { get; set; } = 0;
+        public Guid? ConditionRuleId { get; set; }
 
 
         public virtual ICollection<PromotionStoreMappingDto> PromotionStoreMapping { get; set; }
