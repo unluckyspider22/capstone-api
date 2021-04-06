@@ -13,7 +13,7 @@ namespace Infrastructure.DTOs
         public int PostActionType { get; set; }
         public string ImgUrl { get; set; }
         public string Description { get; set; }
-        public DateTime StartDate { get; set; }
+        public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public int Exclusive { get; set; }
         public int ApplyBy { get; set; }
@@ -25,8 +25,8 @@ namespace Infrastructure.DTOs
         public int DayFilter { get; set; }
         public int HourFilter { get; set; }
         public int Status { get; set; }
-        public bool HasVoucher { get; set; }
-        public bool IsAuto { get; set; }
+        public bool? HasVoucher { get; set; }
+        public bool? IsAuto { get; set; }
         public Guid? VoucherGroupId { get; set; }
         public int FromIndex { get; set; }
         public int ToIndex { get; set; }

@@ -583,6 +583,7 @@ namespace ApplicationCore.Services
 
 
                 var entity = _mapper.Map<Promotion>(dto);
+                entity = await MapEntityForUpdate(entity, dto);
                 _repository.Update(entity);
                 await _unitOfWork.SaveAsync();
                 return _mapper.Map<PromotionDto>(entity);
@@ -591,6 +592,73 @@ namespace ApplicationCore.Services
             {
                 throw new ErrorObj(code: 500, message: ex.Message);
             }
+        }
+        private async Task<Promotion> MapEntityForUpdate(Promotion dto, PromotionDto param)
+        {
+            try
+            {
+                var entity = await _repository.GetFirst(filter: o => o.PromotionId.Equals(dto.PromotionId));
+                if (entity != null)
+                {
+                    if (dto.Status == 0)
+                    {
+                        dto.Status = entity.Status;
+                    }
+
+                    if (dto.ApplyBy == 0)
+                    {
+                        dto.ApplyBy = entity.ApplyBy;
+                    }
+                    if (dto.SaleMode == 0)
+                    {
+                        dto.SaleMode = entity.SaleMode;
+                    }
+                    if (dto.Gender == 0)
+                    {
+                        dto.Gender = entity.Gender;
+                    }
+                    if (dto.PaymentMethod == 0)
+                    {
+                        dto.PaymentMethod = entity.PaymentMethod;
+                    }
+                    if (dto.ForHoliday == 0)
+                    {
+                        dto.ForHoliday = entity.ForHoliday;
+                    }
+                    if (dto.ForMembership == 0)
+                    {
+                        dto.ForMembership = entity.ForMembership;
+                    }
+                    if (dto.DayFilter == 0)
+                    {
+                        dto.DayFilter = entity.DayFilter;
+                    }
+                    if (dto.HourFilter == 0)
+                    {
+                        dto.HourFilter = entity.HourFilter;
+                    }
+                    if (dto.PostActionType == 0)
+                    {
+                        dto.PostActionType = entity.PostActionType;
+                    }
+                    if (dto.ActionType == 0)
+                    {
+                        dto.ActionType = entity.ActionType;
+                    }
+                    if (param.StartDate == null)
+                    {
+                        dto.StartDate = entity.StartDate;
+                    }
+
+
+                }
+                return dto;
+            }
+            catch (Exception ex)
+            {
+                throw new ErrorObj(code: 500, message: ex.Message);
+            }
+
         }
         private async Task<bool> DeleteAndAddMemberLevelMapp(Guid promotionId, List<MemberLevelMappingDto> levels)
         {
@@ -1306,7 +1374,7 @@ namespace ApplicationCore.Services
                 var promoEntity = _mapper.Map<Promotion>(dto);
                 _repository.Add(promoEntity);
                 var voucherGroupId = dto.VoucherGroupId;
-                if (voucherGroupId != null && !voucherGroupId.Equals(Guid.Empty))
+                if ((bool)dto.HasVoucher)
                 {
                     await CreateTier(voucherGroupId, dto);
                 }
