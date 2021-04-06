@@ -1071,16 +1071,16 @@ namespace ApplicationCore.Services
                     Total = await _repository.CountAsync(filter: o => o.BrandId.Equals(brandId)
                                 && !o.DelFlg),
                     Draft = await _repository.CountAsync(filter: o => o.BrandId.Equals(brandId)
-                                && o.Status.Equals(AppConstant.EnvVar.PromotionStatus.DRAFT)
+                                && o.Status == (int)AppConstant.EnvVar.PromotionStatus.DRAFT
                                 && !o.DelFlg),
                     Publish = await _repository.CountAsync(filter: o => o.BrandId.Equals(brandId)
-                                && o.Status.Equals(AppConstant.EnvVar.PromotionStatus.PUBLISH)
+                                && o.Status == (int)AppConstant.EnvVar.PromotionStatus.PUBLISH
                                 && !o.DelFlg),
                     Unpublish = await _repository.CountAsync(filter: o => o.BrandId.Equals(brandId)
-                                && o.Status.Equals(AppConstant.EnvVar.PromotionStatus.UNPUBLISH)
+                                && o.Status == (int)AppConstant.EnvVar.PromotionStatus.UNPUBLISH
                                 && !o.DelFlg),
                     Expired = await _repository.CountAsync(filter: o => o.BrandId.Equals(brandId)
-                                && o.Status.Equals(AppConstant.EnvVar.PromotionStatus.EXPIRED)
+                                && o.Status == (int)AppConstant.EnvVar.PromotionStatus.EXPIRED
                                 && !o.DelFlg)
                 };
 
@@ -1195,7 +1195,7 @@ namespace ApplicationCore.Services
                     && el.Brand.BrandCode.Equals(orderInfo.Attributes.StoreInfo.BrandCode)
                     && el.StartDate <= orderInfo.BookingDate
                     && (el.EndDate != null ? (el.EndDate >= orderInfo.BookingDate) : true)
-                    && el.Status.Equals(AppConstant.EnvVar.PromotionStatus.PUBLISH)
+                    && el.Status == (int)AppConstant.EnvVar.PromotionStatus.PUBLISH
                     && !el.DelFlg,
                         includeProperties:
                         "PromotionTier.Action.ActionProductMapping.Product," +
@@ -1217,7 +1217,7 @@ namespace ApplicationCore.Services
                         o => o.PromotionCode.ToLower().Equals(promoCode.ToLower())
                        && !o.DelFlg
                        && o.BrandId.Equals(brandId)
-                       && !o.Status.Equals(AppConstant.EnvVar.PromotionStatus.EXPIRED));
+                       && o.Status != (int)AppConstant.EnvVar.PromotionStatus.EXPIRED);
                 return promo != null;
             }
             catch (Exception e)
@@ -1233,7 +1233,7 @@ namespace ApplicationCore.Services
             try
             {
                 #region Tìm promotion
-                var existPromo = await _repository.GetFirst(filter: el=> el.PromotionId == promotionId) != null;
+                var existPromo = await _repository.GetFirst(filter: el => el.PromotionId == promotionId) != null;
                 if (!existPromo)
                 {
                     throw new ErrorObj(code: 400, message: "Promotion is not exist", description: "Bad request");
@@ -1294,7 +1294,7 @@ namespace ApplicationCore.Services
             }
         }
 
-      
+
         #region create promotion
         public async Task<PromotionDto> CreatePromotion(PromotionDto dto)
         {

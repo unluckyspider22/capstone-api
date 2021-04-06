@@ -316,9 +316,9 @@ namespace ApplicationCore.Chain
         private void DiscountProduct(OrderResponseModel order, Infrastructure.Models.Action action, Promotion promotion, PromotionTier promotionTier)
         {
             var actionProducts = action.ActionProductMapping;
-            string effectType ="";
+            string effectType = "";
             decimal discount = 0;
-            if (!action.ActionType.Equals(AppConstant.EnvVar.ActionType.Bundle))
+            if (action.ActionType != (int)AppConstant.EnvVar.ActionType.Bundle)
             {
                 foreach (var product in order.CustomerOrderInfo.CartItems)
                 {
@@ -481,11 +481,11 @@ namespace ApplicationCore.Chain
         private void SetDiscountProduct(Item product, Infrastructure.Models.Action action, decimal discount)
         {
             product.Discount += discount;
-            if (action.ActionType.Equals(AppConstant.EnvVar.ActionType.Amount_Product))
+            if (action.ActionType == (int)AppConstant.EnvVar.ActionType.Amount_Product)
             {
                 product.Discount = product.Discount < action.MinPriceAfter ? (decimal)action.MinPriceAfter : product.Discount;
             }
-            else if (action.ActionType.Equals(AppConstant.EnvVar.ActionType.Percentage_Product))
+            else if (action.ActionType == (int)AppConstant.EnvVar.ActionType.Percentage_Product)
             {
                 product.Discount = (decimal)(product.Discount > action.MaxAmount ? action.MaxAmount : product.Discount);
             }

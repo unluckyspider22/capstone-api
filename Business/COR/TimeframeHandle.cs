@@ -52,7 +52,7 @@ namespace ApplicationCore.Chain
                 {
                     try
                     {
-                        if (!promotion.ForHoliday.Equals(AppConstant.EnvVar.FOR_HOLIDAY))
+                        if (promotion.ForHoliday != (int)AppConstant.EnvVar.Holiday_Env.FOR_HOLIDAY)
                         {
                             HandleHolidayAsync(order);
                         }
@@ -79,7 +79,7 @@ namespace ApplicationCore.Chain
             {
                 foreach (var promotion in _promotions)
                 {
-                    if (!promotion.ForHoliday.Equals(AppConstant.EnvVar.FOR_HOLIDAY))
+                    if (promotion.ForHoliday != (int)AppConstant.EnvVar.Holiday_Env.FOR_HOLIDAY)
                     {
                         HandleHolidayAsync(order);
                     }

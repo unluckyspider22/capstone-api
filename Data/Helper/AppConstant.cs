@@ -41,8 +41,7 @@ namespace Infrastructure.Helper
             public const string CONNECTOR = "-";
             public const bool ISLIMIT = true;
             public const bool IS_FOR_GAME = true;
-            public const string FOR_WEEKEND = "1";
-            public const string FOR_HOLIDAY = "1";
+
             public const string NO_FILTER = "0";
             public const string FOR_MEMBER = "1";
             public const string INCLUDE = "0";
@@ -52,6 +51,11 @@ namespace Infrastructure.Helper
             public const int AdminId = 2;
             public const string Admin = "Admin";
             public const string BrandManager = "Brand Manager";
+            public enum Holiday_Env
+            {
+                FOR_WEEKEND = 1,
+                FOR_HOLIDAY = 1
+            }
             public enum PostActionType
             {
                 Gift_Product = 1,
@@ -70,7 +74,7 @@ namespace Infrastructure.Helper
                 Fixed = 7,
                 Ladder = 8,
                 Bundle = 9,
-             
+
             }
             public struct CharsetType
             {

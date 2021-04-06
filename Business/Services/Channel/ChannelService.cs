@@ -42,7 +42,7 @@ namespace ApplicationCore.Services
             try
             {
                 var promotions = (await _promotionService.GetAsync(filter: el =>
-                el.Status.Equals(AppConstant.EnvVar.PromotionStatus.PUBLISH)
+                el.Status == (int)AppConstant.EnvVar.PromotionStatus.PUBLISH
                 && !el.DelFlg,
                 includeProperties:
                 "Brand,PromotionChannelMapping.Channel")).Data; ;
@@ -76,52 +76,52 @@ namespace ApplicationCore.Services
             VoucherForChannelResponse result = new VoucherForChannelResponse();
             try
             {
-               /* var promotion = await _promotionService
-                    .GetFirst(el =>
-                    el.PromotionId.Equals(channelParam.PromotionId),
-                    includeProperties: "PromotionStoreMapping.Store," +
-                    "VoucherGroup," +
-                    "VoucherChannel.Channel");
+                /* var promotion = await _promotionService
+                     .GetFirst(el =>
+                     el.PromotionId.Equals(channelParam.PromotionId),
+                     includeProperties: "PromotionStoreMapping.Store," +
+                     "VoucherGroup," +
+                     "VoucherChannel.Channel");
 
-                if (promotion != null)
-                {
-                    //Map thông tin promotion
-                    result.PromotionData = _mapper.Map<PromotionInfomation>(promotion);
-                    //Lấy thông tin của các cửa hàng được áp dụng
-                    result.StoresData = promotion.PromotionStoreMapping.Select(s => s.Store.StoreName).ToList();
-                    #region Xử lý lấy các cửa hàng được áp dụng
-                    var storeOfBrand = await _storeService.GetAsync(filter: el => el.BrandId.Equals(promotion.BrandId) && !el.DelFlg);
-                    if (storeOfBrand.Data.Count() == promotion.PromotionStoreMapping.Count())
-                    {
-                        result.StoreAppied = AppConstant.EnvVar.ApplyForAllStore;
-                    }
-                    else
-                    {
-                        foreach (var storeName in result.StoresData)
-                        {
-                            result.StoreAppied += storeName + ", ";
-                        }
-                    }
-                    #endregion
-                    var voucherGroup = promotion.VoucherGroup;
-                    result.PromotionData.VoucherName = voucherGroup.VoucherName;
-                    //Lấy voucherchannel để update khi lấy voucher
-                    var voucherChannel = promotion.PromotionChannelMapping
-                          .FirstOrDefault(w => w.Channel.ChannelCode.Equals(channelParam.ChannelCode));
-                    //Lấy danh sách voucher và đánh dấu đã được lấy bởi channel nào
-                    var vouchers = await _voucherService.GetVouchersForChannel(voucherChannel, voucherGroup, channelParam);
-                    if (vouchers != null && vouchers.Count() > 0)
-                    {
-                        //Lấy danh sách voucher
-                        result.Vouchers = vouchers.Select(s => promotion.PromotionCode + AppConstant.EnvVar.CONNECTOR + s.VoucherCode).ToList();
-                        //Update số lượng voucher đã được Redemped
-                        await _voucherGroupService.UpdateRedempedQuantity(voucherGroup, vouchers.Count());
-                    }
-                    else
-                    {
-                        throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Voucher_OutOfStock);
-                    }
-                }*/
+                 if (promotion != null)
+                 {
+                     //Map thông tin promotion
+                     result.PromotionData = _mapper.Map<PromotionInfomation>(promotion);
+                     //Lấy thông tin của các cửa hàng được áp dụng
+                     result.StoresData = promotion.PromotionStoreMapping.Select(s => s.Store.StoreName).ToList();
+                     #region Xử lý lấy các cửa hàng được áp dụng
+                     var storeOfBrand = await _storeService.GetAsync(filter: el => el.BrandId.Equals(promotion.BrandId) && !el.DelFlg);
+                     if (storeOfBrand.Data.Count() == promotion.PromotionStoreMapping.Count())
+                     {
+                         result.StoreAppied = AppConstant.EnvVar.ApplyForAllStore;
+                     }
+                     else
+                     {
+                         foreach (var storeName in result.StoresData)
+                         {
+                             result.StoreAppied += storeName + ", ";
+                         }
+                     }
+                     #endregion
+                     var voucherGroup = promotion.VoucherGroup;
+                     result.PromotionData.VoucherName = voucherGroup.VoucherName;
+                     //Lấy voucherchannel để update khi lấy voucher
+                     var voucherChannel = promotion.PromotionChannelMapping
+                           .FirstOrDefault(w => w.Channel.ChannelCode.Equals(channelParam.ChannelCode));
+                     //Lấy danh sách voucher và đánh dấu đã được lấy bởi channel nào
+                     var vouchers = await _voucherService.GetVouchersForChannel(voucherChannel, voucherGroup, channelParam);
+                     if (vouchers != null && vouchers.Count() > 0)
+                     {
+                         //Lấy danh sách voucher
+                         result.Vouchers = vouchers.Select(s => promotion.PromotionCode + AppConstant.EnvVar.CONNECTOR + s.VoucherCode).ToList();
+                         //Update số lượng voucher đã được Redemped
+                         await _voucherGroupService.UpdateRedempedQuantity(voucherGroup, vouchers.Count());
+                     }
+                     else
+                     {
+                         throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Voucher_OutOfStock);
+                     }
+                 }*/
                 return result;
             }
             catch (ErrorObj e1)
