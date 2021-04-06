@@ -361,7 +361,6 @@ namespace ApplicationCore.Chain
                                 SetDiscountProduct(product, action, discount);
                                 // DiscountProductLadderPrice(product, action, effectType);
                                 break;
-
                         }
                     }
                     product.FinalAmount = product.TotalAmount - product.Discount;

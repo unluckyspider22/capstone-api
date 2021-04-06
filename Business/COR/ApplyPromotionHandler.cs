@@ -58,7 +58,7 @@ namespace ApplicationCore.Chain
                 _applyPromotion.Apply(order);
                 return;
             }
-            else 
+            else
             {
                 if (order.CustomerOrderInfo.Vouchers != null && order.CustomerOrderInfo.Vouchers.Count > 0)
                 {
@@ -75,8 +75,8 @@ namespace ApplicationCore.Chain
         {
             order.Discount ??= 0;
             order.DiscountOrderDetail ??= 0;
-            order.TotalAmount ??= 0;
-            order.FinalAmount ??= 0;
+            order.TotalAmount = order.TotalAmount != null ? order.TotalAmount : 0;
+            order.FinalAmount = order.FinalAmount != null ? order.FinalAmount : 0;
         }
     }
 }

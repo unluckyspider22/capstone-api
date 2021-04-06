@@ -43,6 +43,7 @@ namespace ApplicationCore.Services
             {
                 var promotions = (await _promotionService.GetAsync(filter: el =>
                 el.Status == (int)AppConstant.EnvVar.PromotionStatus.PUBLISH
+                && !el.IsAuto
                 && !el.DelFlg,
                 includeProperties:
                 "Brand,PromotionChannelMapping.Channel")).Data; ;

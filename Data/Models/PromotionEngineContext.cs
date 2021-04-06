@@ -41,7 +41,7 @@ namespace Infrastructure.Models
         public virtual DbSet<PromotionChannelMapping> PromotionChannelMapping { get; set; }
         public virtual DbSet<PromotionStoreMapping> PromotionStoreMapping { get; set; }
         public virtual DbSet<PromotionTier> PromotionTier { get; set; }
-        public virtual DbSet<RoleEntity> Role { get; set; }
+        public virtual DbSet<Role> Role { get; set; }
         public virtual DbSet<Store> Store { get; set; }
         public virtual DbSet<Transaction> Transaction { get; set; }
         public virtual DbSet<Voucher> Voucher { get; set; }
@@ -527,8 +527,7 @@ namespace Infrastructure.Models
                 entity.Property(e => e.AmountOperator)
                     .IsRequired()
                     .HasMaxLength(2)
-                    .IsUnicode(false)
-                    .IsFixedLength();
+                    .IsUnicode(false);
 
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
@@ -537,8 +536,7 @@ namespace Infrastructure.Models
                 entity.Property(e => e.QuantityOperator)
                     .IsRequired()
                     .HasMaxLength(2)
-                    .IsUnicode(false)
-                    .IsFixedLength();
+                    .IsUnicode(false);
 
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
@@ -666,8 +664,7 @@ namespace Infrastructure.Models
                 entity.Property(e => e.QuantityOperator)
                     .IsRequired()
                     .HasMaxLength(2)
-                    .IsUnicode(false)
-                    .IsFixedLength();
+                    .IsUnicode(false);
 
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
@@ -836,7 +833,7 @@ namespace Infrastructure.Models
                     .HasConstraintName("FK_PromotionTier_VoucherGroup");
             });
 
-            modelBuilder.Entity<RoleEntity>(entity =>
+            modelBuilder.Entity<Role>(entity =>
             {
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
