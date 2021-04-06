@@ -35,6 +35,7 @@ namespace PromotionEngineAPI.Controllers
                 pageSize: param.PageSize,
                 filter: el => el.VoucherGroupId.Equals(VoucherGroupId)
                 && PromotionId.Equals(Guid.Empty) ? !el.PromotionId.Equals(Guid.Empty) : el.PromotionId.Equals(PromotionId),
+                includeProperties:"Promotion",
                 orderBy: el => el.OrderBy(obj => obj.Index)
                 ));
             }

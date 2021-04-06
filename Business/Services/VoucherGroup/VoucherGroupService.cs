@@ -539,7 +539,7 @@ namespace ApplicationCore.Services
                 {
                     foreach (var tier in tiers)
                     {
-                        var exist = result.Any(o => o.Equals(tier.PromotionId));
+                        var exist = result.Any(o => o.PromotionId.Equals(tier.PromotionId));
                         if (!exist)
                         {
                             if (tier.PromotionId != null && !tier.PromotionId.Equals(Guid.Empty))
@@ -548,6 +548,7 @@ namespace ApplicationCore.Services
                                 {
                                     PromotionId = (Guid)tier.PromotionId,
                                     PromoName = tier.Promotion.PromotionName,
+                                    PromoCode = tier.Promotion.PromotionCode,
                                 };
                                 result.Add(dto);
                             }

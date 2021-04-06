@@ -63,5 +63,6 @@ namespace Infrastructure.DTOs
     {
         public Guid PromotionId { get; set; }
         public string PromoName { get; set; }
+        public string PromoCode { get; set; }
     }
 }
