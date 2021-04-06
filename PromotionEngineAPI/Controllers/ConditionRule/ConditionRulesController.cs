@@ -60,33 +60,35 @@ namespace PromotionEngineAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetConditionRule([FromRoute] Guid id)
         {
-            var result = await _service.GetByIdAsync(id);
-            if (result == null)
+            if (id.Equals(Guid.Empty))
             {
-                return NotFound();
+                return StatusCode(400, new ErrorObj(400, "Required Condition Rule Id"));
             }
-            return Ok(result);
+            try
+            {
+                var rule = await _service.GetFirst(filter: el => el.ConditionRuleId.Equals(id) && !el.DelFlg,
+                                    includeProperties: "ConditionGroup,ConditionGroup.ProductCondition,ConditionGroup.OrderCondition");
+                return Ok(await _service.ReorderResult(rule));
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
         }
 
         // PUT: api/ConditionRules/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutConditionRule([FromRoute] Guid id, [FromBody] ConditionRuleDto dto)
+        public async Task<IActionResult> PutConditionRule([FromRoute] Guid id, [FromBody] UpdateConditionDto dto)
         {
-            if (id != dto.ConditionRuleId)
+            try
             {
-                return BadRequest();
+                var result = await _service.UpdateRule(dto);
+                return Ok(result);
             }
-
-            dto.UpdDate = DateTime.Now;
-
-            var result = await _service.UpdateAsync(dto);
-
-            if (result == null)
+            catch (ErrorObj e)
             {
-                return NotFound();
+                return StatusCode(statusCode: e.Code, e);
             }
-
-            return Ok(result);
 
         }
 

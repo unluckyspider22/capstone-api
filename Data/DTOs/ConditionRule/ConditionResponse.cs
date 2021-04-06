@@ -1,8 +1,5 @@
-﻿using Infrastructure.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Infrastructure.DTOs
 {
@@ -26,5 +23,8 @@ namespace Infrastructure.DTOs
         public List<ConditionGroupResponse> ConditionGroups { get; set; }
         public Guid? PromotionId { get; set; }
         public string? PromotionName { get; set; }
+        public DateTime InsDate { get; set; }
+        public DateTime UpdDate { get; set; }
+
     }
 }

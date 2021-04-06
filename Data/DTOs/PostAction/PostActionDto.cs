@@ -10,6 +10,7 @@ namespace Infrastructure.DTOs
         public int PostActionType { get; set; }
         public decimal? BonusPoint { get; set; }
         public Guid? GiftVoucherGroupId { get; set; }
+        public Guid? GameCampaignId { get; set; }
         public string Name { get; set; }
         public Guid BrandId { get; set; }
         public List<PostActionProductMapp> ListProduct { get; set; }

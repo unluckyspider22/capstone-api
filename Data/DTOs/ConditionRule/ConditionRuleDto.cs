@@ -11,4 +11,10 @@ namespace Infrastructure.DTOs
         public string Description { get; set; }
         public virtual ICollection<ConditionGroupDto> ConditionGroup { get; set; }
     }
+
+    public class UpdateConditionDto
+    {
+        public ConditionRequestParam ConditionRule { get; set; }
+        public List<ConditionGroupDto> ConditionGroups { get; set; }
+    }
 }

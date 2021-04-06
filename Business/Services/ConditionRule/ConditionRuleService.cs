@@ -67,17 +67,17 @@ namespace ApplicationCore.Services
                         groupRepo.Delete(id: group.ConditionGroupId);
                     }
                 }
-               /* var promotionTier = conditionRule.PromotionTier;
-                if (promotionTier.Action != null)
-                {
-                    await _actionService.Delete((Guid)promotionTier.ActionId);
-                }
-                else if (promotionTier.PostAction != null)
-                {
-                    await _postActionService.Delete((Guid)promotionTier.PostActionId);
-                }
-                tierRepo.Delete(id: promotionTier.PromotionTierId);
-                _repository.Delete(id: conditionRuleId);*/
+                /* var promotionTier = conditionRule.PromotionTier;
+                 if (promotionTier.Action != null)
+                 {
+                     await _actionService.Delete((Guid)promotionTier.ActionId);
+                 }
+                 else if (promotionTier.PostAction != null)
+                 {
+                     await _postActionService.Delete((Guid)promotionTier.PostActionId);
+                 }
+                 tierRepo.Delete(id: promotionTier.PromotionTierId);
+                 _repository.Delete(id: conditionRuleId);*/
                 return await _unitOfWork.SaveAsync() > 0;
             }
             catch (Exception e)
@@ -208,6 +208,8 @@ namespace ApplicationCore.Services
                 BrandId = param.BrandId,
                 RuleName = param.RuleName,
                 Description = param.Description,
+                InsDate = param.InsDate,
+                UpdDate = param.UpdDate,
                 ConditionGroups = new List<ConditionGroupResponse>(),
             };
             ICollection<ConditionGroup> groupsParam = param.ConditionGroup;
@@ -279,5 +281,120 @@ namespace ApplicationCore.Services
 
             return conditionRuleResponse;
         }
+
+        public async Task<bool> UpdateRule(UpdateConditionDto dto)
+        {
+            if (!dto.ConditionRule.ConditionRuleId.Equals(Guid.Empty))
+            {
+                var conditionRuleEntity = _mapper.Map<ConditionRule>(dto.ConditionRule);
+                conditionRuleEntity.UpdDate = DateTime.Now;
+                _repository.Update(conditionRuleEntity);
+                await DeleteOldGroups(conditionRuleEntity: conditionRuleEntity);
+                InsertConditionGroup(conditionGroups: dto.ConditionGroups, conditionRuleEntity: conditionRuleEntity);
+            }
+
+            return await _unitOfWork.SaveAsync() > 0;
+        }
+        private async Task DeleteOldGroups(ConditionRule conditionRuleEntity)
+        {
+            IGenericRepository<ConditionGroup> conditionGroupRepo = _unitOfWork.ConditionGroupRepository;
+            IGenericRepository<ProductCondition> productConditionRepo = _unitOfWork.ProductConditionRepository;
+            IGenericRepository<OrderCondition> orderConditionRepo = _unitOfWork.OrderConditionRepository;
+            IGenericRepository<ProductConditionMapping> prodCondMapRepo = _unitOfWork.ProductConditionMappingRepository;
+
+
+            // Delete old groups and old conditions
+            List<ConditionGroup> oldGroups = (await conditionGroupRepo.Get(pageIndex: 0, pageSize: 0,
+                filter: o => o.ConditionRuleId.Equals(conditionRuleEntity.ConditionRuleId), includeProperties: "ProductCondition")).ToList();
+            if (oldGroups.Count > 0)
+            {
+                foreach (var group in oldGroups)
+                {
+                    var productConditions = group.ProductCondition.ToList();
+                    foreach (var prodCond in productConditions)
+                    {
+                        prodCondMapRepo.Delete(id: Guid.Empty, filter: o => o.ProductConditionId.Equals(prodCond.ProductConditionId));
+                    }
+
+                    productConditionRepo.Delete(id: Guid.Empty, filter: o => o.ConditionGroupId.Equals(group.ConditionGroupId));
+                    orderConditionRepo.Delete(id: Guid.Empty, filter: o => o.ConditionGroupId.Equals(group.ConditionGroupId));
+                    conditionGroupRepo.Delete(id: group.ConditionGroupId);
+                }
+
+            }
+            //return await _unitOfWork.SaveAsync() > 0;
+        }
+        private void InsertConditionGroup(List<ConditionGroupDto> conditionGroups, ConditionRule conditionRuleEntity)
+        {
+            IGenericRepository<ConditionGroup> conditionGroupRepo = _unitOfWork.ConditionGroupRepository;
+            IGenericRepository<ProductCondition> productConditionRepo = _unitOfWork.ProductConditionRepository;
+            IGenericRepository<OrderCondition> orderConditionRepo = _unitOfWork.OrderConditionRepository;
+
+
+            //Insert new condition groups
+            foreach (var group in conditionGroups)
+            {
+                ConditionGroup conditionGroupEntity = new ConditionGroup
+                {
+                    ConditionGroupId = Guid.NewGuid(),
+                    GroupNo = group.GroupNo,
+                    ConditionRuleId = conditionRuleEntity.ConditionRuleId,
+                    NextOperator = group.NextOperator,
+                    Summary = "",
+                    InsDate = DateTime.Now,
+                    UpdDate = DateTime.Now,
+                };
+                //conditionGroupEntity.Summary = CreateSummary(group);
+                conditionGroupRepo.Add(conditionGroupEntity);
+                group.ConditionGroupId = conditionGroupEntity.ConditionGroupId;
+                // Create product condition
+                if (group.ProductCondition != null && group.ProductCondition.Count > 0)
+                {
+                    IGenericRepository<ProductConditionMapping> mappRepo = _unitOfWork.ProductConditionMappingRepository;
+                    foreach (var productCondition in group.ProductCondition)
+                    {
+                        var productConditionEntity = _mapper.Map<ProductCondition>(productCondition);
+                        productConditionEntity.ConditionGroupId = conditionGroupEntity.ConditionGroupId;
+                        productConditionEntity.ProductConditionId = Guid.NewGuid();
+                        productConditionEntity.DelFlg = false;
+                        productConditionEntity.UpdDate = DateTime.Now;
+                        productConditionEntity.InsDate = DateTime.Now;
+                        productConditionRepo.Add(productConditionEntity);
+                        productCondition.ProductConditionId = productConditionEntity.ProductConditionId;
+                        //var products = productCondition.ListProduct;
+                        //foreach (var product in products)
+                        //{
+                        //    var mapp = new ProductConditionMapping()
+                        //    {
+                        //        Id = Guid.NewGuid(),
+                        //        ProductConditionId = productConditionEntity.ProductConditionId,
+                        //        ProductId = product,
+                        //        UpdTime = DateTime.Now,
+                        //        InsDate = DateTime.Now,
+                        //    };
+                        //    mappRepo.Add(mapp);
+                        //}
+
+                    }
+                }
+                // Create order condition
+                if (group.OrderCondition != null && group.OrderCondition.Count > 0)
+                {
+                    foreach (var orderCondition in group.OrderCondition)
+                    {
+                        var orderConditionEntity = _mapper.Map<OrderCondition>(orderCondition);
+                        orderConditionEntity.ConditionGroupId = conditionGroupEntity.ConditionGroupId;
+                        orderConditionEntity.OrderConditionId = Guid.NewGuid();
+                        orderConditionEntity.DelFlg = false;
+                        orderConditionEntity.UpdDate = DateTime.Now;
+                        orderConditionEntity.InsDate = DateTime.Now;
+                        orderConditionRepo.Add(orderConditionEntity);
+                        orderCondition.OrderConditionId = orderConditionEntity.OrderConditionId;
+                    }
+                }
+            }
+
+        }
+
     }
 }
