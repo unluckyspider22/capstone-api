@@ -20,6 +20,7 @@ namespace Infrastructure.Models
         public Guid? PromotionId { get; set; }
         public int? Index { get; set; }
         public Guid? GameCampaignId { get; set; }
+        public Guid? PromotionTierId { get; set; }
 
         public virtual Channel Channel { get; set; }
         public virtual GameCampaign GameCampaign { get; set; }

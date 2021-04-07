@@ -14,5 +14,7 @@ namespace Infrastructure.DTOs
         public string RuleName { get; set; }
         [StringLength(200)]
         public string Description { get; set; }
+        public DateTime InsDate { get; set; }
+        public DateTime UpdDate { get; set; }
     }
 }

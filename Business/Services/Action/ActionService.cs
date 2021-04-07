@@ -7,6 +7,7 @@ using Infrastructure.Models;
 using Infrastructure.Repository;
 using Infrastructure.UnitOrWork;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
@@ -36,6 +37,27 @@ namespace ApplicationCore.Services
                 Debug.WriteLine(e.InnerException);
                 throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
             }
+        }
+
+        public async Task<ActionDto> GetActionDetail(Guid id)
+        {
+            var result = new ActionDto();
+            var entity = await _repository.GetFirst(filter: o => o.ActionId.Equals(id), includeProperties: "ActionProductMapping");
+            if (entity != null)
+            {
+                result = _mapper.Map<ActionDto>(entity);
+                result.ListProduct = new List<Guid>();
+                if (entity.ActionProductMapping.Count > 0)
+                {
+                    foreach (var product in entity.ActionProductMapping)
+                    {
+                        result.ListProduct.Add(product.ProductId);
+                    }
+                }
+
+            }
+            return result;
+
         }
 
         public async Task<ActionDto> MyAddAction(ActionDto dto)

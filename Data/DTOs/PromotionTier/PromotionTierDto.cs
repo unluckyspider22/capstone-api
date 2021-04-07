@@ -12,7 +12,8 @@ namespace Infrastructure.DTOs
         public string Summary { get; set; } = "";
         public int TierIndex { get; set; } = 0;
         public Guid? VoucherGroupId { get; set; }
-        public int FromIndex { get; set; } = 0;
-        public int ToIndex { get; set; } = 0;
+        public int VoucherQuantity { get; set; } = 0;
+        public int Priority { get; set; }
+
     }
 }

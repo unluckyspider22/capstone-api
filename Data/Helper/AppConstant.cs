@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Infrastructure.Helper
@@ -41,8 +42,7 @@ namespace Infrastructure.Helper
             public const string CONNECTOR = "-";
             public const bool ISLIMIT = true;
             public const bool IS_FOR_GAME = true;
-            public const string FOR_WEEKEND = "1";
-            public const string FOR_HOLIDAY = "1";
+
             public const string NO_FILTER = "0";
             public const string FOR_MEMBER = "1";
             public const string INCLUDE = "0";
@@ -52,11 +52,17 @@ namespace Infrastructure.Helper
             public const int AdminId = 2;
             public const string Admin = "Admin";
             public const string BrandManager = "Brand Manager";
+            public enum Holiday_Env
+            {
+                FOR_WEEKEND = 1,
+                FOR_HOLIDAY = 1
+            }
             public enum PostActionType
             {
                 Gift_Product = 1,
                 Gift_Voucher = 2,
-                Gift_Point = 3
+                Gift_Point = 3,
+                Gift_GameCode = 4
             }
 
             public enum ActionType
@@ -70,7 +76,7 @@ namespace Infrastructure.Helper
                 Fixed = 7,
                 Ladder = 8,
                 Bundle = 9,
-             
+
             }
             public struct CharsetType
             {
@@ -194,6 +200,7 @@ namespace Infrastructure.Helper
             public const string AddGiftProduct = "addGiftProduct";
             public const string AddGiftVoucher = "addGiftVoucher";
             public const string AddGiftPoint = "addGiftPoint";
+            public const string AddGiftGameCode = "addGiftGameCode";
             //Không có automatic promotion nào cả
             public const string NoAutoPromotion = "noAutoPromotion";
 
@@ -247,5 +254,37 @@ namespace Infrastructure.Helper
             public const string BRAND_ID_INVALID = "Brand invalid, please try again.";
         }
         #endregion
+
+        public class SwapVisitor : ExpressionVisitor
+        {
+            private readonly Expression from, to;
+            public SwapVisitor(Expression from, Expression to)
+            {
+                this.from = from;
+                this.to = to;
+            }
+            public override Expression Visit(Expression node)
+            {
+                return node == from ? to : base.Visit(node);
+            }
+        }
+        public static Expression<Func<T, bool>> Or<T>(this Expression<Func<T, bool>> expression1, Expression<Func<T, bool>> expression2)
+        {
+            InvocationExpression invocationExpression = Expression.Invoke((Expression)expression2, expression1.Parameters.Cast<Expression>());
+            return Expression.Lambda<Func<T, bool>>((Expression)Expression.OrElse(expression1.Body, (Expression)invocationExpression), (IEnumerable<ParameterExpression>)expression1.Parameters);
+        }
+
+        public static Expression<Func<T, bool>> And<T>(this Expression<Func<T, bool>> expression1, Expression<Func<T, bool>> expression2)
+        {
+            InvocationExpression invocationExpression = Expression.Invoke((Expression)expression2, expression1.Parameters.Cast<Expression>());
+            return Expression.Lambda<Func<T, bool>>((Expression)Expression.AndAlso(expression1.Body, (Expression)invocationExpression), (IEnumerable<ParameterExpression>)expression1.Parameters);
+        }
+        public struct VoucherStatus
+        {
+            public const int ALL = 1;
+            public const int UNUSED = 2;
+            public const int USED = 3;
+            public const int REDEMPED = 4;
+        }
     }
 }

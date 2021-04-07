@@ -71,7 +71,8 @@ namespace ApplicationCore.Services
                     {
                         throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_VoucherCode, description: AppConstant.ErrMessage.Invalid_VoucherCode);
                     }
-                    var promotion = voucher.First().Promotion;
+                    var promotion = voucher.FirstOrDefault().Promotion;
+                    promotion.PromotionTier = promotion.PromotionTier.Where(w => w.PromotionTierId == voucher.First().PromotionTierId).ToList();
                     promotions.Add(promotion);
                 }
                 if (promotions.Select(s => s.PromotionId).Distinct().Count() < promotions.Select(s => s.PromotionId).Count())
@@ -234,7 +235,7 @@ namespace ApplicationCore.Services
         }
         #endregion
         #region Lấy voucher cho customer qua Chatbot
-        public async Task<VoucherForCustomerModel> GetVoucherForCusOnSite(VoucherForCustomerModel param, Guid promotionId, string storeCode)
+        public async Task<VoucherForCustomerModel> GetVoucherForCusOnSite(VoucherForCustomerModel param, Guid promotionId, Guid tierId)
         {
             try
             {
@@ -244,12 +245,14 @@ namespace ApplicationCore.Services
                     && !el.IsUsed
                     && !el.IsRedemped
                     && !el.Promotion.DelFlg
+                    && el.PromotionTierId == tierId
                     && el.Promotion.Status == (int)AppConstant.EnvVar.PromotionStatus.PUBLISH,
                     includeProperties:
                     "Promotion.PromotionChannelMapping.Channel," +
-                    "Promotion.PromotionStoreMapping.Store," +
-                    "Brand.UsernameNavigation," +
-                    "Membership");
+                    "VoucherGroup.Brand.UsernameNavigation," +
+                    "Membership," +
+                    "VoucherGroup.Action," +
+                    "VoucherGroup.PostAction");
                 var voucher = new Voucher();
                 if (vouchers.Count() > 0)
                 {
@@ -257,7 +260,7 @@ namespace ApplicationCore.Services
                     await SendEmailSmtp(param, voucher);
 
                     //Update voucher vừa lấy
-                    await UpdateVoucherRedemped(voucher, param, storeCode);
+                    await UpdateVoucherRedemped(voucher, param);
                 }
                 else
                 {
@@ -335,11 +338,12 @@ namespace ApplicationCore.Services
             string voucherCode = promotion.PromotionCode + "-" + voucher.VoucherCode;
             string QrCode = AppConstant.Url_Gen_QR + voucherCode;
             string body = string.Format("<p>Promotion Code: <b>{0}</b></p>" +
+                "<p>Voucher: <b>{3}</b></p>" +
                 "<p>Voucher Code: <b>{1}</b></p>" +
                 "<p>Description:</p>" +
                 "<p>{2}</p>" +
                 "<p>Or you can use the code below:</p>" +
-                "<img src={3}><br>", promotion.PromotionCode, voucherCode, promotion.Description, QrCode);
+                "<img src={4}><br>", promotion.PromotionCode, voucherCode, promotion.Description, voucher.VoucherGroup.Action.Name, QrCode);
             //Note
             string note = string.Format("<p>Note:</p>" +
                 "<ul>" +
@@ -354,20 +358,20 @@ namespace ApplicationCore.Services
 
             return emailContent;
         }
-        public async Task UpdateVoucherRedemped(Voucher voucher, VoucherForCustomerModel param, string storeCode)
+        public async Task UpdateVoucherRedemped(Voucher voucher, VoucherForCustomerModel param)
         {
-            if (!string.IsNullOrEmpty(storeCode))
-            {
-                //Update store
-                var store = voucher.Promotion.PromotionStoreMapping.FirstOrDefault(w => w.Store.StoreCode == storeCode).Store;
-                voucher.Store = store;
-            }
-            else
-            {
-                //Update channel
-                var channel = voucher.Promotion.PromotionChannelMapping.FirstOrDefault(w => w.Channel.ChannelCode == param.ChannelCode).Channel;
-                voucher.Channel = channel;
-            }
+            /*  if (!string.IsNullOrEmpty(storeCode))
+              {
+                  //Update store
+                  var store = voucher.Promotion.PromotionStoreMapping.FirstOrDefault(w => w.Store.StoreCode == storeCode).Store;
+                  voucher.Store = store;
+              }
+              else
+              {*/
+            //Update channel
+            var channel = voucher.Promotion.PromotionChannelMapping.FirstOrDefault(w => w.Channel.ChannelCode == param.ChannelCode).Channel;
+            voucher.Channel = channel;
+            //}
 
             //Update membership
             MembershipDto membership = new MembershipDto
@@ -387,7 +391,8 @@ namespace ApplicationCore.Services
             voucher.UpdDate = now;
             //Update voucher group
             voucher.VoucherGroup.RedempedQuantity += 1;
-            voucher.VoucherGroup.UpdDate = now;
+            _voucherGroupRepos.Update(voucher.VoucherGroup);
+            voucher.VoucherGroup.UpdDate = DateTime.Now;
 
             _repository.Update(voucher);
             await _unitOfWork.SaveAsync();

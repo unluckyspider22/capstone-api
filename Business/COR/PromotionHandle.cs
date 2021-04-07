@@ -94,19 +94,19 @@ namespace ApplicationCore.Chain
             //Nếu như có voucher mới handle Exclusive, còn auto apply thì không check mà trả về cho user chọn
             if (orderInfo.Vouchers != null && orderInfo.Vouchers.Count() > 0)
             {
-                if (_promotions.Any(w => w.Exclusive.Equals(AppConstant.EnvVar.Exclusive.GlobalExclusive)) && _promotions.Count() > 1)
+                if (_promotions.Any(w => w.Exclusive == (int)AppConstant.EnvVar.Exclusive.GlobalExclusive) && _promotions.Count() > 1)
                 {
                     throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Exclusive_Promotion);
                 }
-                if (_promotions.Where(w => w.Exclusive.Equals(AppConstant.EnvVar.Exclusive.ClassExclusiveOrder)).Count() > 1)
+                if (_promotions.Where(w => w.Exclusive == (int)AppConstant.EnvVar.Exclusive.ClassExclusiveOrder).Count() > 1)
                 {
                     throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Exclusive_Promotion);
                 }
-                if (_promotions.Where(w => w.Exclusive.Equals(AppConstant.EnvVar.Exclusive.ClassExclusiveProduct)).Count() > 1)
+                if (_promotions.Where(w => w.Exclusive == (int)AppConstant.EnvVar.Exclusive.ClassExclusiveProduct).Count() > 1)
                 {
                     throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Exclusive_Promotion);
                 }
-                if (_promotions.Where(w => w.Exclusive.Equals(AppConstant.EnvVar.Exclusive.ClassExclusiveShipping)).Count() > 1)
+                if (_promotions.Where(w => w.Exclusive == (int)AppConstant.EnvVar.Exclusive.ClassExclusiveShipping).Count() > 1)
                 {
                     throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Exclusive_Promotion);
                 }

@@ -19,6 +19,7 @@ namespace Infrastructure.Models
         public bool DelFlg { get; set; }
         public DateTime InsDate { get; set; }
         public DateTime UpdDate { get; set; }
+        public int? ProductType { get; set; }
 
         public virtual ProductCategory ProductCate { get; set; }
         public virtual ICollection<ActionProductMapping> ActionProductMapping { get; set; }

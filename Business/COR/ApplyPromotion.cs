@@ -39,7 +39,12 @@ namespace ApplicationCore.Chain
                         order.Effects.Any(a => a.PromotionTierId == el.PromotionTierId)
                 ).ToList();
 
-                PromotionTier applyTier = FilterTier(promotionTiers, promotion);
+                PromotionTier applyTier = null;
+                if (promotionTiers != null && promotionTiers.Count > 0)
+                {
+                    applyTier = promotionTiers.FirstOrDefault(w => w.Priority == promotionTiers.Max(m => m.Priority));
+                }
+                //FilterTier(promotionTiers, promotion);
                 if (applyTier != null)
                 {
                     var action = applyTier.Action;
@@ -57,15 +62,7 @@ namespace ApplicationCore.Chain
                     }
                     if (postAction != null)
                     {
-                        if (postAction.PostActionType >= 1 && postAction.PostActionType <= 2)
-                        {
-                            AddGift(order, postAction, promotion, applyTier);
-
-                        }
-                        else
-                        {
-                            AddPoint(order, postAction, promotion, applyTier);
-                        }
+                        AddGift(order, postAction, promotion, applyTier);
                     }
                 }
                 SetFinalAmountApply(order);
@@ -116,58 +113,6 @@ namespace ApplicationCore.Chain
 
             return result;
         }
-        private PostAction FilterPostAction(List<PromotionTier> tiers)
-        {
-            PostAction result = null;
-            if (tiers.Count() > 0 && tiers.Count() == 1)
-            {
-                return tiers.First().PostAction;
-            }
-            else
-            {
-                result = tiers.Where(w =>
-                    w.TierIndex == tiers.Max(m => m.TierIndex))
-                    .SingleOrDefault().PostAction;
-            }
-            return result;
-        }
-        private Infrastructure.Models.Action FilterAction(List<Infrastructure.Models.Action> actions, Promotion promotion)
-        {
-            Infrastructure.Models.Action result = null;
-            if (actions.Count() > 0 && actions.Count() == 1)
-            {
-                return actions.First();
-            }
-            else
-            {
-                switch (promotion.ActionType)
-                {
-                    case (int)AppConstant.EnvVar.ActionType.Amount_Order:
-                        result = actions
-                        .Where(w =>
-                            w.ActionType == (int)AppConstant.EnvVar.ActionType.Amount_Order
-                            && w.DiscountAmount > 0
-                            && w.DiscountAmount == actions.Max(m => m.DiscountAmount))
-                        .SingleOrDefault();
-                        break;
-                    case (int)AppConstant.EnvVar.ActionType.Percentage_Order:
-                        result = actions.Where(w =>
-                                w.ActionType == (int)AppConstant.EnvVar.ActionType.Percentage_Order &&
-                                w.DiscountPercentage > 0 &&
-                                w.DiscountPercentage == actions.Max(m => m.DiscountPercentage))
-                        .SingleOrDefault();
-                        break;
-                    case (int)AppConstant.EnvVar.ActionType.Shipping:
-                        result = actions.Where(w =>
-                                w.ActionType == (int)AppConstant.EnvVar.ActionType.Shipping &&
-                                w.DiscountAmount > 0 &&
-                                w.DiscountAmount == actions.Max(m => m.DiscountAmount))
-                        .SingleOrDefault();
-                        break;
-                }
-            }
-            return result;
-        }
         #endregion
         #region Post action
         public void AddGift(OrderResponseModel order, PostAction postAction, Promotion promotion, PromotionTier promotionTier)
@@ -210,8 +155,21 @@ namespace ApplicationCore.Chain
                     effectType = AppConstant.EffectMessage.AddGiftPoint;
                     AddPoint(order, postAction, promotion, promotionTier);
                     break;
+                case (int)AppConstant.EnvVar.PostActionType.Gift_GameCode:
+                    effectType = AppConstant.EffectMessage.AddGiftGameCode;
+                    AddGiftGameCode(order, postAction, promotion, promotionTier);
+                    break;
             }
 
+            SetEffect(order, promotion, 0, effectType, promotionTier);
+        }
+        public void AddGiftGameCode(OrderResponseModel order, PostAction postAction, Promotion promotion, PromotionTier promotionTier)
+        {
+            string effectType = AppConstant.EffectMessage.AddGiftGameCode;
+            order.Gift.Add(new Gift
+            {
+                ProductCode = ""
+            });
             SetEffect(order, promotion, 0, effectType, promotionTier);
         }
 
@@ -316,9 +274,9 @@ namespace ApplicationCore.Chain
         private void DiscountProduct(OrderResponseModel order, Infrastructure.Models.Action action, Promotion promotion, PromotionTier promotionTier)
         {
             var actionProducts = action.ActionProductMapping;
-            string effectType ="";
+            string effectType = "";
             decimal discount = 0;
-            if (!action.ActionType.Equals(AppConstant.EnvVar.ActionType.Bundle))
+            if (action.ActionType != (int)AppConstant.EnvVar.ActionType.Bundle)
             {
                 foreach (var product in order.CustomerOrderInfo.CartItems)
                 {
@@ -361,7 +319,6 @@ namespace ApplicationCore.Chain
                                 SetDiscountProduct(product, action, discount);
                                 // DiscountProductLadderPrice(product, action, effectType);
                                 break;
-
                         }
                     }
                     product.FinalAmount = product.TotalAmount - product.Discount;
@@ -481,11 +438,11 @@ namespace ApplicationCore.Chain
         private void SetDiscountProduct(Item product, Infrastructure.Models.Action action, decimal discount)
         {
             product.Discount += discount;
-            if (action.ActionType.Equals(AppConstant.EnvVar.ActionType.Amount_Product))
+            if (action.ActionType == (int)AppConstant.EnvVar.ActionType.Amount_Product)
             {
                 product.Discount = product.Discount < action.MinPriceAfter ? (decimal)action.MinPriceAfter : product.Discount;
             }
-            else if (action.ActionType.Equals(AppConstant.EnvVar.ActionType.Percentage_Product))
+            else if (action.ActionType == (int)AppConstant.EnvVar.ActionType.Percentage_Product)
             {
                 product.Discount = (decimal)(product.Discount > action.MaxAmount ? action.MaxAmount : product.Discount);
             }

@@ -93,7 +93,7 @@ namespace Infrastructure.Repository
 
             return pageIndex != 0 && pageSize != 0
                 ? await PaginatedList<TEntity>.CreateAsync(query.AsNoTracking(), pageIndex, pageSize)
-                : await query.ToListAsync();
+                : await query.AsNoTracking().ToListAsync();
         }
 
         public async Task<TEntity> GetById(Guid id)

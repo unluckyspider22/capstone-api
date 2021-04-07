@@ -527,8 +527,7 @@ namespace Infrastructure.Models
                 entity.Property(e => e.AmountOperator)
                     .IsRequired()
                     .HasMaxLength(2)
-                    .IsUnicode(false)
-                    .IsFixedLength();
+                    .IsUnicode(false);
 
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
@@ -537,8 +536,7 @@ namespace Infrastructure.Models
                 entity.Property(e => e.QuantityOperator)
                     .IsRequired()
                     .HasMaxLength(2)
-                    .IsUnicode(false)
-                    .IsFixedLength();
+                    .IsUnicode(false);
 
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
@@ -666,8 +664,7 @@ namespace Infrastructure.Models
                 entity.Property(e => e.QuantityOperator)
                     .IsRequired()
                     .HasMaxLength(2)
-                    .IsUnicode(false)
-                    .IsFixedLength();
+                    .IsUnicode(false);
 
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
@@ -996,11 +993,6 @@ namespace Infrastructure.Models
                     .HasForeignKey(d => d.BrandId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_VoucherGroup_Brand");
-
-                entity.HasOne(d => d.ConditionRule)
-                    .WithMany(p => p.VoucherGroup)
-                    .HasForeignKey(d => d.ConditionRuleId)
-                    .HasConstraintName("FK_VoucherGroup_ConditionRule");
 
                 entity.HasOne(d => d.PostAction)
                     .WithMany(p => p.VoucherGroup)

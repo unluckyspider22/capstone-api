@@ -37,8 +37,8 @@ namespace Infrastructure.DTOs
 
     public class VoucherIndexInfo
     {
-        public int FromIndex { get; set; }
-        public int MaxIndex { get; set; }
+        public int Total { get; set; }
+        public int Remain { get; set; }
         public bool Available { get; set; }
     }
 
@@ -51,7 +51,6 @@ namespace Infrastructure.DTOs
         public int UsedQuantity { get; set; }
         public int RedempedQuantity { get; set; }
         public int Remain { get; set; }
-        public Guid? ConditionRuleId { get; set; }
         public Guid? ActionId { get; set; }
         public int ActionType { get; set; } = 0;
         public Guid? PostActionId { get; set; }
@@ -63,5 +62,6 @@ namespace Infrastructure.DTOs
     {
         public Guid PromotionId { get; set; }
         public string PromoName { get; set; }
+        public string PromoCode { get; set; }
     }
 }

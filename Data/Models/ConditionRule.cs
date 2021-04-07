@@ -9,7 +9,6 @@ namespace Infrastructure.Models
         {
             ConditionGroup = new HashSet<ConditionGroup>();
             PromotionTier = new HashSet<PromotionTier>();
-            VoucherGroup = new HashSet<VoucherGroup>();
         }
 
         public Guid ConditionRuleId { get; set; }
@@ -23,6 +22,5 @@ namespace Infrastructure.Models
         public virtual Brand Brand { get; set; }
         public virtual ICollection<ConditionGroup> ConditionGroup { get; set; }
         public virtual ICollection<PromotionTier> PromotionTier { get; set; }
-        public virtual ICollection<VoucherGroup> VoucherGroup { get; set; }
     }
 }

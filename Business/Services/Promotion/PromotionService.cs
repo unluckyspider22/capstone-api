@@ -39,7 +39,6 @@ namespace ApplicationCore.Services
             _holidayService = holidayService;
             _timeframeHandle = timeframeHandle;
         }
-
         protected override IGenericRepository<Promotion> _repository => _unitOfWork.PromotionRepository;
 
         public void SetPromotions(List<Promotion> promotions)
@@ -583,6 +582,7 @@ namespace ApplicationCore.Services
 
 
                 var entity = _mapper.Map<Promotion>(dto);
+                entity = await MapEntityForUpdate(entity, dto);
                 _repository.Update(entity);
                 await _unitOfWork.SaveAsync();
                 return _mapper.Map<PromotionDto>(entity);
@@ -591,6 +591,78 @@ namespace ApplicationCore.Services
             {
                 throw new ErrorObj(code: 500, message: ex.Message);
             }
+        }
+        private async Task<Promotion> MapEntityForUpdate(Promotion dto, PromotionDto param)
+        {
+            try
+            {
+                var entity = await _repository.GetFirst(filter: o => o.PromotionId.Equals(dto.PromotionId));
+                if (entity != null)
+                {
+                    if (dto.Status == 0)
+                    {
+                        dto.Status = entity.Status;
+                    }
+
+                    if (dto.ApplyBy == 0)
+                    {
+                        dto.ApplyBy = entity.ApplyBy;
+                    }
+                    if (dto.SaleMode == 0)
+                    {
+                        dto.SaleMode = entity.SaleMode;
+                    }
+                    if (dto.Gender == 0)
+                    {
+                        dto.Gender = entity.Gender;
+                    }
+                    if (dto.PaymentMethod == 0)
+                    {
+                        dto.PaymentMethod = entity.PaymentMethod;
+                    }
+                    if (dto.ForHoliday == 0)
+                    {
+                        dto.ForHoliday = entity.ForHoliday;
+                    }
+                    if (dto.ForMembership == 0)
+                    {
+                        dto.ForMembership = entity.ForMembership;
+                    }
+                    if (dto.DayFilter == 0)
+                    {
+                        dto.DayFilter = entity.DayFilter;
+                    }
+                    if (dto.HourFilter == 0)
+                    {
+                        dto.HourFilter = entity.HourFilter;
+                    }
+                    if (dto.PostActionType == 0)
+                    {
+                        dto.PostActionType = entity.PostActionType;
+                    }
+                    if (dto.ActionType == 0)
+                    {
+                        dto.ActionType = entity.ActionType;
+                    }
+                    if (param.StartDate == null)
+                    {
+                        dto.StartDate = entity.StartDate;
+                    }
+                    if (param.EndDate == null)
+                    {
+                        dto.EndDate = entity.EndDate;
+                    }
+                    dto.HasVoucher = entity.HasVoucher;
+                    dto.IsAuto = entity.IsAuto;
+                    
+                }
+                return dto;
+            }
+            catch (Exception ex)
+            {
+                throw new ErrorObj(code: 500, message: ex.Message);
+            }
+
         }
         private async Task<bool> DeleteAndAddMemberLevelMapp(Guid promotionId, List<MemberLevelMappingDto> levels)
         {
@@ -1071,16 +1143,16 @@ namespace ApplicationCore.Services
                     Total = await _repository.CountAsync(filter: o => o.BrandId.Equals(brandId)
                                 && !o.DelFlg),
                     Draft = await _repository.CountAsync(filter: o => o.BrandId.Equals(brandId)
-                                && o.Status.Equals(AppConstant.EnvVar.PromotionStatus.DRAFT)
+                                && o.Status == (int)AppConstant.EnvVar.PromotionStatus.DRAFT
                                 && !o.DelFlg),
                     Publish = await _repository.CountAsync(filter: o => o.BrandId.Equals(brandId)
-                                && o.Status.Equals(AppConstant.EnvVar.PromotionStatus.PUBLISH)
+                                && o.Status == (int)AppConstant.EnvVar.PromotionStatus.PUBLISH
                                 && !o.DelFlg),
                     Unpublish = await _repository.CountAsync(filter: o => o.BrandId.Equals(brandId)
-                                && o.Status.Equals(AppConstant.EnvVar.PromotionStatus.UNPUBLISH)
+                                && o.Status == (int)AppConstant.EnvVar.PromotionStatus.UNPUBLISH
                                 && !o.DelFlg),
                     Expired = await _repository.CountAsync(filter: o => o.BrandId.Equals(brandId)
-                                && o.Status.Equals(AppConstant.EnvVar.PromotionStatus.EXPIRED)
+                                && o.Status == (int)AppConstant.EnvVar.PromotionStatus.EXPIRED
                                 && !o.DelFlg)
                 };
 
@@ -1195,7 +1267,7 @@ namespace ApplicationCore.Services
                     && el.Brand.BrandCode.Equals(orderInfo.Attributes.StoreInfo.BrandCode)
                     && el.StartDate <= orderInfo.BookingDate
                     && (el.EndDate != null ? (el.EndDate >= orderInfo.BookingDate) : true)
-                    && el.Status.Equals(AppConstant.EnvVar.PromotionStatus.PUBLISH)
+                    && el.Status == (int)AppConstant.EnvVar.PromotionStatus.PUBLISH
                     && !el.DelFlg,
                         includeProperties:
                         "PromotionTier.Action.ActionProductMapping.Product," +
@@ -1217,7 +1289,7 @@ namespace ApplicationCore.Services
                         o => o.PromotionCode.ToLower().Equals(promoCode.ToLower())
                        && !o.DelFlg
                        && o.BrandId.Equals(brandId)
-                       && !o.Status.Equals(AppConstant.EnvVar.PromotionStatus.EXPIRED));
+                       && o.Status != (int)AppConstant.EnvVar.PromotionStatus.EXPIRED);
                 return promo != null;
             }
             catch (Exception e)
@@ -1233,14 +1305,15 @@ namespace ApplicationCore.Services
             try
             {
                 #region Tìm promotion
-                var existPromo = await _repository.GetById(promotionId) != null;
+
+                var existPromo = await _repository.GetFirst(filter: el => el.PromotionId == promotionId) != null;
                 if (!existPromo)
                 {
                     throw new ErrorObj(code: 400, message: "Promotion is not exist", description: "Bad request");
                 }
                 #endregion
                 #region Update DelFlag của promotion
-                var promo = await _repository.GetFirst(filter: o => o.PromotionId.Equals(promotionId));
+                var promo = await _repository.GetFirst(filter: o => o.PromotionId.Equals(promotionId), includeProperties: "Voucher");
                 promo.DelFlg = true;
                 _repository.Update(promo);
                 //await _unitOfWork.SaveAsync();
@@ -1259,19 +1332,6 @@ namespace ApplicationCore.Services
                 IGenericRepository<MemberLevelMapping> memberMappRepo = _unitOfWork.MemberLevelMappingRepository;
                 memberMappRepo.Delete(id: Guid.Empty, filter: o => o.PromotionId.Equals(promotionId));
                 #endregion
-                #region Update DelFlg của Voucher group
-                IGenericRepository<VoucherGroup> voucherGroupRepo = _unitOfWork.VoucherGroupRepository;
-                /* var voucherGroup = await voucherGroupRepo.GetFirst(filter: o => o.PromotionId.Equals(promotionId));
-                 if (voucherGroup != null)
-                 {
-                     voucherGroup.DelFlg = true;
-                     #region Xóa voucher
-                     IGenericRepository<Voucher> voucherRepo = _unitOfWork.VoucherRepository;
-                     voucherRepo.Delete(id: Guid.Empty, filter: o => o.VoucherGroupId.Equals(voucherGroup.VoucherGroupId));
-                     #endregion
-                 }*/
-                //await _unitOfWork.SaveAsync();
-                #endregion
                 #region Xóa tier
                 IGenericRepository<PromotionTier> tierRepo = _unitOfWork.PromotionTierRepository;
                 var tierList = (await tierRepo.Get(filter: o => o.PromotionId.Equals(promotionId))).ToList();
@@ -1285,6 +1345,18 @@ namespace ApplicationCore.Services
                     }
                 }
                 #endregion
+                #region Xóa voucher và tierId
+                foreach (var voucher in promo.Voucher)
+                {
+                    if (!voucher.IsRedemped && !voucher.IsUsed)
+                    {
+                        voucher.PromotionTierId = null;
+                        voucher.PromotionId = null;
+                    }
+                }
+                
+                //promo.Voucher = null;
+                #endregion
                 return await _unitOfWork.SaveAsync() > 0;
             }
             catch (Exception e)
@@ -1294,7 +1366,7 @@ namespace ApplicationCore.Services
             }
         }
 
-      
+
         #region create promotion
         public async Task<PromotionDto> CreatePromotion(PromotionDto dto)
         {
@@ -1306,7 +1378,7 @@ namespace ApplicationCore.Services
                 var promoEntity = _mapper.Map<Promotion>(dto);
                 _repository.Add(promoEntity);
                 var voucherGroupId = dto.VoucherGroupId;
-                if (voucherGroupId != null && !voucherGroupId.Equals(Guid.Empty))
+                if ((bool)dto.HasVoucher)
                 {
                     await CreateTier(voucherGroupId, dto);
                 }
@@ -1332,13 +1404,15 @@ namespace ApplicationCore.Services
                 {
                     var tier = new PromotionTier()
                     {
+                        ConditionRuleId = dto.ConditionRuleId,
+                        PromotionTierId = Guid.NewGuid(),
                         VoucherGroupId = group.VoucherGroupId,
                         PromotionId = dto.PromotionId,
                         InsDate = DateTime.Now,
                         UpdDate = DateTime.Now,
-                        FromIndex = dto.FromIndex,
-                        ToIndex = dto.ToIndex,
                         TierIndex = 0,
+                        Priority = 10,
+                        VoucherQuantity = dto.VoucherQuantity,
                         Summary = "",
                     };
                     if (group.ActionId != null)
@@ -1349,25 +1423,41 @@ namespace ApplicationCore.Services
                     {
                         tier.PostActionId = group.PostActionId;
                     }
-                    if (group.ConditionRuleId != null)
-                    {
-                        tier.ConditionRuleId = group.ConditionRuleId;
-                    }
-                    tierRepo.Add(tier);
-                    var vouchers = await voucherRepo.Get(filter: o => o.VoucherGroupId.Equals(group.VoucherGroupId)
-                                   && o.Index >= dto.FromIndex
-                                   && o.Index <= dto.ToIndex);
-                    if (vouchers.Count() > 0)
-                    {
-                        foreach (var voucher in vouchers)
-                        {
-                            voucher.PromotionId = dto.PromotionId;
-                            voucherRepo.Update(voucher);
-                        }
-                        //await _unitOfWork.SaveAsync();
-                    }
-                }
 
+                    tierRepo.Add(tier);
+                    if (dto.VoucherGroupId != null && !dto.VoucherGroupId.Equals(Guid.Empty))
+                    {
+                        var vouchers = await voucherRepo.Get(filter: o => o.VoucherGroupId.Equals(group.VoucherGroupId)
+                                                              && (o.PromotionTierId == null || o.PromotionTierId.Equals(Guid.Empty))
+                                                              && (o.PromotionId == null || o.PromotionId.Equals(Guid.Empty)));
+                        if (vouchers.Count() > 0 && dto.VoucherQuantity > 0)
+                        {
+                            var remain = dto.VoucherQuantity;
+                            while (remain > 0)
+                            {
+                                var voucher = vouchers.Where(o => (o.PromotionTierId == null || o.PromotionTierId.Equals(Guid.Empty))
+                                                    && (o.PromotionId == null || o.PromotionId.Equals(Guid.Empty))).First();
+                                if (voucher != null)
+                                {
+                                    voucher.PromotionTierId = tier.PromotionTierId;
+                                    voucher.PromotionId = tier.PromotionId;
+                                    voucher.UpdDate = DateTime.Now;
+                                    voucherRepo.Update(voucher);
+                                }
+                                if (voucher == null && remain > 0)
+                                {
+                                    remain = 0;
+                                }
+                                else
+                                {
+                                    remain--;
+                                }
+                            }
+
+                        }
+                    }
+
+                }
             }
             catch (Exception e)
             {

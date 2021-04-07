@@ -320,7 +320,6 @@ namespace ApplicationCore.Services
                 dto.Voucher = null;
                 dto.Quantity = quantityParam;
                 var newVouchers = _voucherWorker.GenerateVoucher(dto);
-
                 int quantity = vouchers.Count() + (int)dto.Quantity;
                 //Gộp 2 mảng [đã có dưới DB] + [voucher code mới gen]
                 var totalVouchers = newVouchers.Concat(vouchers);
@@ -336,11 +335,11 @@ namespace ApplicationCore.Services
                 }
                 newVouchers = totalVouchers.Except(vouchers).ToList();
                 _voucherWorker.InsertVouchers(dto, true, newVouchers);
-
                 //Update lại quantity
                 //var voucherGroup = await _repository.GetById(dto.VoucherGroupId);
                 voucherGroup.Quantity = quantity;
                 _repository.Update(voucherGroup);
+
                 return await _unitOfWork.SaveAsync() > 0;
             }
             catch (Exception e)
@@ -394,7 +393,7 @@ namespace ApplicationCore.Services
                     && o.Quantity > o.RedempedQuantity
                     && o.Quantity > o.UsedQuantity
                     && !o.DelFlg,
-                    includeProperties: "Action,ConditionRule,PostAction")).ToList();
+                    includeProperties: "Action,PostAction")).ToList();
                 if (groups.Count > 0)
                 {
                     foreach (var group in groups)
@@ -434,42 +433,27 @@ namespace ApplicationCore.Services
                 var result = new VoucherIndexInfo()
                 {
                     Available = false,
-                    FromIndex = 0,
-                    MaxIndex = 0,
+                    Total = 0,
+                    Remain = 0,
                 };
-                var maxIndex = 0;
-                var group = await _repository.GetFirst(filter: o => o.VoucherGroupId.Equals(voucherGroupId) && !o.DelFlg);
+                var group = await _repository.GetFirst(filter: o => o.VoucherGroupId.Equals(voucherGroupId) && !o.DelFlg, includeProperties: "Voucher");
                 if (group != null)
                 {
-                    IGenericRepository<PromotionTier> tierRepo = _unitOfWork.PromotionTierRepository;
-                    var quantity = group.Quantity;
-                    var tiers = await tierRepo.Get(filter: o => o.VoucherGroupId.Equals(voucherGroupId));
-                    if (tiers.Count() > 0)
+                    var vouchers = group.Voucher;
+                    if (vouchers.Count() > 0)
                     {
-                        tiers = tiers.OrderByDescending(o => o.ToIndex);
-                        maxIndex = (int)tiers.First().ToIndex;
-                        if (maxIndex != quantity)
-                        {
-                            result = new VoucherIndexInfo()
-                            {
-                                Available = true,
-                                FromIndex = maxIndex + 1,
-                                MaxIndex = quantity,
-                            };
-                        }
-
-                    }
-                    else
-                    {
+                        var remainVouchers = vouchers.Where(o => (o.PromotionTierId == null || o.PromotionTierId.Equals(Guid.Empty))
+                                                                  && (o.PromotionId == null || o.PromotionId.Equals(Guid.Empty)));
+                        var remain = remainVouchers.Count();
+                        var total = vouchers.Count();
+                        var avail = total - remain == 0;
                         result = new VoucherIndexInfo()
                         {
-                            Available = true,
-                            FromIndex = 1,
-                            MaxIndex = group.Quantity,
+                            Available = avail,
+                            Total = total,
+                            Remain = remain,
                         };
-
                     }
-
                 }
                 return result;
             }
@@ -497,7 +481,7 @@ namespace ApplicationCore.Services
                         BrandId = group.BrandId,
                         ActionId = group.ActionId,
                         PostActionId = group.PostActionId,
-                        ConditionRuleId = group.ConditionRuleId,
+
                         RedempedQuantity = group.RedempedQuantity,
                         Total = group.Quantity,
                         UsedQuantity = group.UsedQuantity,
@@ -539,15 +523,16 @@ namespace ApplicationCore.Services
                 {
                     foreach (var tier in tiers)
                     {
-                        var exist = result.Any(o => o.Equals(tier.PromotionId));
+                        var exist = result.Any(o => o.PromotionId.Equals(tier.PromotionId));
                         if (!exist)
                         {
-                            if (tier.PromotionId != null && !tier.PromotionId.Equals(Guid.Empty))
+                            if (tier.PromotionId != null && !tier.PromotionId.Equals(Guid.Empty) && !tier.Promotion.DelFlg)
                             {
                                 var dto = new PromoOfVoucher()
                                 {
                                     PromotionId = (Guid)tier.PromotionId,
                                     PromoName = tier.Promotion.PromotionName,
+                                    PromoCode = tier.Promotion.PromotionCode,
                                 };
                                 result.Add(dto);
                             }
