@@ -1,4 +1,5 @@
 ﻿using Infrastructure.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,5 +33,11 @@ namespace Infrastructure.DTOs
         public int Unused { get; set; } = 0;
         public int Redemped { get; set; } = 0;
         public int Used { get; set; } = 0;
+    }
+
+    public class CheckVoucherDto
+    {
+        public VoucherDto Voucher { get; set; } = new VoucherDto();
+        public dynamic Order { get; set; }
     }
 }

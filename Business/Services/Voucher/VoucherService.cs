@@ -11,6 +11,7 @@ using Infrastructure.Repository;
 using Infrastructure.UnitOrWork;
 using MailKit.Net.Smtp;
 using MimeKit;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -32,7 +33,7 @@ namespace ApplicationCore.Services
         }
         protected override IGenericRepository<Voucher> _repository => _unitOfWork.VoucherRepository;
         protected IGenericRepository<VoucherGroup> _voucherGroupRepos => _unitOfWork.VoucherGroupRepository;
-
+        protected IGenericRepository<Transaction> _transRepos => _unitOfWork.TransactionRepository;
 
         public async Task<List<Promotion>> CheckVoucher(CustomerOrderInfo order)
         {
@@ -197,11 +198,11 @@ namespace ApplicationCore.Services
                 {
                     var voucherFilter = await _repository.Get(
                         filter: el => el.VoucherCode.Equals(voucherInReq.VoucherCode)
-                        && el.Promotion.PromotionCode.Equals(voucherInReq.PromotionCode),includeProperties:"VoucherGroup");
+                        && el.Promotion.PromotionCode.Equals(voucherInReq.PromotionCode), includeProperties: "VoucherGroup");
                     if (voucherFilter != null && voucherFilter.Count() > 0)
                     {
                         DateTime now = DateTime.Now;
-                        var voucher = voucherFilter.ToList().First();                       
+                        var voucher = voucherFilter.ToList().First();
                         voucher.IsUsed = AppConstant.EnvVar.Voucher.USED;
                         voucher.UsedDate = now;
                         voucher.UpdDate = now;
@@ -428,6 +429,40 @@ namespace ApplicationCore.Services
             }
             return result;
 
+        }
+
+        public async Task<CheckVoucherDto> GetCheckVoucherInfo(string searchCode, Guid voucherGroupId)
+        {
+            var result = new CheckVoucherDto();
+            var voucher = await _repository.GetFirst(filter: el => el.VoucherGroupId.Equals(voucherGroupId)
+                                                    && el.VoucherCode.ToUpper().Equals(searchCode.ToUpper()),
+                                                    includeProperties: "Promotion," +
+                                                                        "Channel," +
+                                                                        "GameCampaign," +
+                                                                        "Membership," +
+                                                                        "Store");
+            if (voucher != null)
+            {
+                var voucherId = voucher.VoucherId;
+                var trans = await _transRepos.GetFirst(filter: o => o.VoucherId.Equals(voucherId));
+                if (trans != null)
+                {
+                    result = new CheckVoucherDto()
+                    {
+                        Voucher = _mapper.Map<VoucherDto>(voucher),
+                        Order = JsonConvert.DeserializeObject(trans.TransactionJson),
+                    };
+                }
+                else
+                {
+                    result = new CheckVoucherDto()
+                    {
+                        Voucher = _mapper.Map<VoucherDto>(voucher),
+                    };
+                };
+            }
+
+            return result;
         }
     }
 }

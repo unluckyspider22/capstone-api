@@ -1,6 +1,4 @@
-﻿
-using ApplicationCore.Request;
-using ApplicationCore.Services;
+﻿using ApplicationCore.Services;
 using Infrastructure.DTOs;
 using Infrastructure.DTOs.Voucher;
 using Infrastructure.Helper;
@@ -114,14 +112,7 @@ namespace PromotionEngineAPI.Controllers
                                                     && el.VoucherCode.ToUpper().Equals(SearchCode.ToUpper());
             try
             {
-                return Ok(await _service.GetFirst(
-                            filter: filter,
-                            includeProperties:
-                            "Promotion," +
-                            "Channel," +
-                            "GameCampaign," +
-                            "Membership," +
-                            "Store"));
+                return Ok(await _service.GetCheckVoucherInfo(searchCode: SearchCode, voucherGroupId: VoucherGroupId));
             }
             catch (ErrorObj e)
             {
