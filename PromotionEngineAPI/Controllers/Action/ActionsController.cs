@@ -60,7 +60,7 @@ namespace PromotionEngineAPI.Controllers
             }
             try
             {
-                return Ok(await _service.GetByIdAsync(id));
+                return Ok(await _service.GetActionDetail(id));
             }
             catch (ErrorObj e)
             {

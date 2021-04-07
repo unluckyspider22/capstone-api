@@ -648,8 +648,13 @@ namespace ApplicationCore.Services
                     {
                         dto.StartDate = entity.StartDate;
                     }
+                    if (param.EndDate == null)
+                    {
+                        dto.EndDate = entity.EndDate;
+                    }
                     dto.HasVoucher = entity.HasVoucher;
                     dto.IsAuto = entity.IsAuto;
+                    
                 }
                 return dto;
             }
