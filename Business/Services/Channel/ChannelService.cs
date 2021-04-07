@@ -43,6 +43,7 @@ namespace ApplicationCore.Services
             {
                 var promotions = (await _promotionService.GetAsync(filter: el =>
                 el.Status == (int)AppConstant.EnvVar.PromotionStatus.PUBLISH
+                && el.Brand.BrandCode == channelParam.BrandCode
                 && !el.IsAuto
                 && !el.DelFlg,
                 includeProperties:
@@ -54,7 +55,7 @@ namespace ApplicationCore.Services
                 w.PromotionChannelMapping.Select(vc =>
                     vc.Channel).Any(a =>
                         a.ChannelCode.Equals(channelParam.ChannelCode)
-                        && a.Brand.BrandCode.Equals(channelParam.BrandCode)
+                        && a.BrandId == w.BrandId
                         && !a.DelFlg)).ToList();
                 foreach (var promotion in promotions)
                 {
