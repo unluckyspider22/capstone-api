@@ -337,7 +337,7 @@ namespace ApplicationCore.Services
                 "<p>Description:</p>" +
                 "<p>{2}</p>" +
                 "<p>Or you can use the code below:</p>" +
-                "<img src={4}><br>", promotion.PromotionCode, voucherCode, promotion.Description, voucher.VoucherGroup.Action.Name, QrCode);
+                "<img src={4}><br>", promotion.PromotionCode, voucherCode, promotion.Description, voucher.VoucherGroup.VoucherName, QrCode);
             //Note
             string note = string.Format("<p>Note:</p>" +
                 "<ul>" +
@@ -407,11 +407,11 @@ namespace ApplicationCore.Services
         public async Task<PromotionVoucherCount> PromoVoucherCount(Guid promotionId)
         {
             var result = new PromotionVoucherCount();
-            var vouchers =await _repository.Get(filter: o => o.PromotionId.Equals(promotionId));
+            var vouchers = await _repository.Get(filter: o => o.PromotionId.Equals(promotionId));
             if (vouchers.Count() > 0)
             {
                 result.Total = vouchers.Count();
-                result.Unused = vouchers.Where(o=>!o.IsUsed).Count();
+                result.Unused = vouchers.Where(o => !o.IsUsed).Count();
                 result.Used = vouchers.Where(o => o.IsUsed).Count();
                 result.Redemped = vouchers.Where(o => o.IsRedemped).Count();
             }
