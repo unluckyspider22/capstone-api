@@ -168,32 +168,13 @@ namespace ApplicationCore.Services
 
         #endregion
         #region Update voucher đã applied
-        public async Task<List<Voucher>> UpdateVoucherApplied(Guid transactionId, CustomerOrderInfo order)
+        public async Task<List<Voucher>> UpdateVoucherApplied(Guid transactionId, CustomerOrderInfo order,Guid storeId)
         {
 
             try
             {
                 List<Voucher> result = new List<Voucher>();
                 List<VoucherGroup> voucherGroups = new List<VoucherGroup>();
-                //foreach (var promotionTierId in promotionTierIdList)
-                //{
-                //    if (promotionTierId != null)
-                //    {
-                //        var voucherGroup = await _voucherGroupService.GetFirst(filter: el => el.PromotionTier.Any(w => w.PromotionTierId.Equals(promotionTierId)), includeProperties: "Voucher");
-                //        if (voucherGroup != null)
-                //        {
-
-                //            voucherGroups.Add(voucherGroup);
-                //        }
-                //    }
-                //}
-                //foreach(var voucherGroup in voucherGroups)
-                //{
-                //    voucherGroup.UpdDate = DateTime.Now;
-                //    voucherGroup.UsedQuantity += 1;
-                //    _voucherGroupRepos.Update(voucherGroup);
-                //}
-                //var promotions = await CheckVoucher(order);
                 foreach (var voucherInReq in order.Vouchers)
                 {
                     var voucherFilter = await _repository.Get(
@@ -207,6 +188,7 @@ namespace ApplicationCore.Services
                         voucher.UsedDate = now;
                         voucher.UpdDate = now;
                         voucher.OrderId = order.Id.ToString();
+                        voucher.TransactionId = transactionId;
                         //var voucherGroup = await _voucherGroupRepos.GetById(voucher.VoucherGroupId);
                         voucher.VoucherGroup.UsedQuantity += 1;
                         voucher.VoucherGroup.UpdDate = now;
