@@ -123,8 +123,8 @@ namespace PromotionEngineAPI.Controllers
         }
 
         [HttpGet]
-        [Route("promotion-voucher-count/{PromotionId}")]
-        public async Task<IActionResult> CountPromotionVoucher([FromRoute] Guid PromotionId)
+        [Route("promotion-voucher-count")]
+        public async Task<IActionResult> CountPromotionVoucher([FromQuery] Guid PromotionId, [FromQuery] Guid VoucherGroupId)
         {
             if (PromotionId.Equals(Guid.Empty))
             {
@@ -132,7 +132,7 @@ namespace PromotionEngineAPI.Controllers
             }
             try
             {
-                return Ok(await _service.PromoVoucherCount(promotionId: PromotionId));
+                return Ok(await _service.PromoVoucherCount(promotionId: PromotionId, voucherGroupId: VoucherGroupId));
             }
             catch (ErrorObj e)
             {

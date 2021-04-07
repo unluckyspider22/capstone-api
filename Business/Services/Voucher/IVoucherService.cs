@@ -25,7 +25,7 @@ namespace ApplicationCore.Services
 
         public string Decrypt(string DecryptText);
 
-        public Task<PromotionVoucherCount> PromoVoucherCount(Guid promotionId);
+        public Task<PromotionVoucherCount> PromoVoucherCount(Guid promotionId, Guid voucherGroupId);
     }
 
 }

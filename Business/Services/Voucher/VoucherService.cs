@@ -10,14 +10,11 @@ using Infrastructure.Models;
 using Infrastructure.Repository;
 using Infrastructure.UnitOrWork;
 using MailKit.Net.Smtp;
-using Microsoft.Extensions.Configuration;
 using MimeKit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ApplicationCore.Services
@@ -404,14 +401,14 @@ namespace ApplicationCore.Services
             return Common.DecodeFromBase64(DecryptText);
         }
 
-        public async Task<PromotionVoucherCount> PromoVoucherCount(Guid promotionId)
+        public async Task<PromotionVoucherCount> PromoVoucherCount(Guid promotionId, Guid voucherGroupId)
         {
             var result = new PromotionVoucherCount();
-            var vouchers =await _repository.Get(filter: o => o.PromotionId.Equals(promotionId));
+            var vouchers = await _repository.Get(filter: o => o.PromotionId.Equals(promotionId) && o.VoucherGroupId.Equals(voucherGroupId));
             if (vouchers.Count() > 0)
             {
                 result.Total = vouchers.Count();
-                result.Unused = vouchers.Where(o=>!o.IsUsed).Count();
+                result.Unused = vouchers.Where(o => !o.IsUsed).Count();
                 result.Used = vouchers.Where(o => o.IsUsed).Count();
                 result.Redemped = vouchers.Where(o => o.IsRedemped).Count();
             }
