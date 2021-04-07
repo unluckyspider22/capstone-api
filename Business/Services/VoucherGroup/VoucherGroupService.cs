@@ -320,7 +320,6 @@ namespace ApplicationCore.Services
                 dto.Voucher = null;
                 dto.Quantity = quantityParam;
                 var newVouchers = _voucherWorker.GenerateVoucher(dto);
-
                 int quantity = vouchers.Count() + (int)dto.Quantity;
                 //Gộp 2 mảng [đã có dưới DB] + [voucher code mới gen]
                 var totalVouchers = newVouchers.Concat(vouchers);
@@ -336,11 +335,11 @@ namespace ApplicationCore.Services
                 }
                 newVouchers = totalVouchers.Except(vouchers).ToList();
                 _voucherWorker.InsertVouchers(dto, true, newVouchers);
-
                 //Update lại quantity
                 //var voucherGroup = await _repository.GetById(dto.VoucherGroupId);
                 voucherGroup.Quantity = quantity;
                 _repository.Update(voucherGroup);
+
                 return await _unitOfWork.SaveAsync() > 0;
             }
             catch (Exception e)

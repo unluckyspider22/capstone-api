@@ -32,6 +32,10 @@ namespace PromotionEngineAPI.Controllers
             [FromQuery] string SearchCode = "",
             [FromQuery] int VoucherStatus = 1)
         {
+            if (SearchCode.Contains("-"))
+            {
+                SearchCode = SearchCode.Split("-").Last();
+            }
             Expression<Func<Voucher, bool>> filter = el => el.VoucherGroupId.Equals(VoucherGroupId)
                                                     && el.VoucherCode.ToUpper().Contains(SearchCode.ToUpper());
             Expression<Func<Voucher, bool>> filter2;
@@ -74,7 +78,7 @@ namespace PromotionEngineAPI.Controllers
                 pageIndex: param.PageIndex,
                 pageSize: param.PageSize,
                 filter: filter,
-                includeProperties: "Promotion,Channel",
+                includeProperties: "Promotion,Channel,Store,Membership",
                 orderBy: el => el.OrderBy(obj => obj.Index)
                 ));
             }
@@ -90,6 +94,10 @@ namespace PromotionEngineAPI.Controllers
          [Required][FromQuery] Guid VoucherGroupId,
             [FromQuery] string SearchCode = "")
         {
+            if (SearchCode.Contains("-"))
+            {
+                SearchCode = SearchCode.Split("-").Last();
+            }
             Expression<Func<Voucher, bool>> filter = el => el.VoucherGroupId.Equals(VoucherGroupId)
                                                     && el.VoucherCode.ToUpper().Equals(SearchCode.ToUpper());
             try

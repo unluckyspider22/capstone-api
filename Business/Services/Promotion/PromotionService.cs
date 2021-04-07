@@ -649,8 +649,8 @@ namespace ApplicationCore.Services
                     {
                         dto.StartDate = entity.StartDate;
                     }
-
-
+                    dto.HasVoucher = entity.HasVoucher;
+                    dto.IsAuto = entity.IsAuto;
                 }
                 return dto;
             }
