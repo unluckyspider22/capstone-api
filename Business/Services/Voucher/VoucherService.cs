@@ -251,7 +251,7 @@ namespace ApplicationCore.Services
                 if (vouchers.Count() > 0)
                 {
                     voucher = vouchers.FirstOrDefault();
-                    // await SendEmailSmtp(param, voucher);
+                    await SendEmailSmtp(param, voucher);
 
                     //Update voucher vừa lấy
                     await UpdateVoucherRedemped(voucher, param);
