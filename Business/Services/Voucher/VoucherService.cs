@@ -14,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using MimeKit;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
@@ -81,10 +82,13 @@ namespace ApplicationCore.Services
             }
             catch (ErrorObj e1)
             {
+                Debug.WriteLine("\n\nError at CheckVoucher: \n" + e1.Message);
+
                 throw e1;
             }
             catch (Exception e)
             {
+                Debug.WriteLine("\n\nError at CheckVoucher: \n" + e.Message);
 
                 throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
             }
@@ -209,6 +213,8 @@ namespace ApplicationCore.Services
             }
             catch (Exception e)
             {
+                Debug.WriteLine("\n\nError at CheckVoucher: \n" + e.Message);
+
                 throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
         }
