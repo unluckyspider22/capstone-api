@@ -70,7 +70,8 @@ namespace ApplicationCore.Services
                     {
                         throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_VoucherCode, description: AppConstant.ErrMessage.Invalid_VoucherCode);
                     }
-                    var promotion = voucher.First().Promotion;
+                    var promotion = voucher.FirstOrDefault().Promotion;
+                    promotion.PromotionTier = promotion.PromotionTier.Where(w => w.PromotionTierId == voucher.First().PromotionTierId).ToList();
                     promotions.Add(promotion);
                 }
                 if (promotions.Select(s => s.PromotionId).Distinct().Count() < promotions.Select(s => s.PromotionId).Count())

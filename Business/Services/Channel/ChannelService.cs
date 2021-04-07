@@ -17,21 +17,13 @@ namespace ApplicationCore.Services
 {
     public class ChannelService : BaseService<Channel, ChannelDto>, IChannelService
     {
-        private readonly IVoucherService _voucherService;
         private readonly IPromotionService _promotionService;
-        private readonly IVoucherGroupService _voucherGroupService;
-        private readonly IStoreService _storeService;
 
         public ChannelService(IUnitOfWork unitOfWork, IMapper mapper,
-            IVoucherService voucherService,
-            IPromotionService promotionService,
-            IVoucherGroupService voucherGroupService,
-            IStoreService storeService) : base(unitOfWork, mapper)
+            IPromotionService promotionService
+           ) : base(unitOfWork, mapper)
         {
-            _voucherService = voucherService;
             _promotionService = promotionService;
-            _voucherGroupService = voucherGroupService;
-            _storeService = storeService;
         }
 
         protected override IGenericRepository<Channel> _repository => _unitOfWork.ChannelRepository;
@@ -43,6 +35,7 @@ namespace ApplicationCore.Services
             {
                 var promotions = (await _promotionService.GetAsync(filter: el =>
                 el.Status == (int)AppConstant.EnvVar.PromotionStatus.PUBLISH
+                && el.Brand.BrandCode == channelParam.BrandCode
                 && !el.IsAuto
                 && !el.DelFlg,
                 includeProperties:
@@ -54,7 +47,7 @@ namespace ApplicationCore.Services
                 w.PromotionChannelMapping.Select(vc =>
                     vc.Channel).Any(a =>
                         a.ChannelCode.Equals(channelParam.ChannelCode)
-                        && a.Brand.BrandCode.Equals(channelParam.BrandCode)
+                        && a.BrandId == w.BrandId
                         && !a.DelFlg)).ToList();
                 foreach (var promotion in promotions)
                 {
