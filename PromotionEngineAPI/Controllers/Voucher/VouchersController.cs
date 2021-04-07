@@ -74,7 +74,7 @@ namespace PromotionEngineAPI.Controllers
                 pageIndex: param.PageIndex,
                 pageSize: param.PageSize,
                 filter: filter,
-                includeProperties: "Promotion",
+                includeProperties: "Promotion,Channel",
                 orderBy: el => el.OrderBy(obj => obj.Index)
                 ));
             }
