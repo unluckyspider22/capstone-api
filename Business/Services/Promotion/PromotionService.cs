@@ -39,7 +39,6 @@ namespace ApplicationCore.Services
             _holidayService = holidayService;
             _timeframeHandle = timeframeHandle;
         }
-
         protected override IGenericRepository<Promotion> _repository => _unitOfWork.PromotionRepository;
 
         public void SetPromotions(List<Promotion> promotions)
@@ -1344,9 +1343,14 @@ namespace ApplicationCore.Services
                 #region Xóa voucher và tierId
                 foreach (var voucher in promo.Voucher)
                 {
-                    voucher.PromotionTierId = null;
+                    if (!voucher.IsRedemped && !voucher.IsUsed)
+                    {
+                        voucher.PromotionTierId = null;
+                        voucher.PromotionId = null;
+                    }
                 }
-                promo.Voucher = null;
+                
+                //promo.Voucher = null;
                 #endregion
                 return await _unitOfWork.SaveAsync() > 0;
             }
