@@ -285,7 +285,7 @@ namespace PromotionEngineAPI.Controllers
         {
             try
             {
-              
+
                 var result = await _promotionService.CreatePromotion(dto);
                 return Ok(result);
             }
@@ -425,14 +425,14 @@ namespace PromotionEngineAPI.Controllers
         {
             try
             {
-                return Ok(await _promotionService.ExistPromoCode(promoCode: promoCode, brandId:brandId));
+                return Ok(await _promotionService.ExistPromoCode(promoCode: promoCode, brandId: brandId));
             }
             catch (ErrorObj e)
             {
                 return StatusCode(statusCode: e.Code, e);
             }
         }
-       
+
         [HttpGet]
         [Route("for-game-campaign/{brandId}")]
         public async Task<IActionResult> GetPromotionGameConfig([FromRoute] Guid brandId)
@@ -443,7 +443,7 @@ namespace PromotionEngineAPI.Controllers
                                 && o.Status != (int)AppConstant.EnvVar.PromotionStatus.EXPIRED
                                 && !o.IsAuto
                                 && !o.DelFlg,
-                                includeProperties:"PromotionTier.Action"));
+                                includeProperties: "PromotionTier.Action"));
             }
             catch (ErrorObj e)
             {
