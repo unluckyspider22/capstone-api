@@ -155,8 +155,21 @@ namespace ApplicationCore.Chain
                     effectType = AppConstant.EffectMessage.AddGiftPoint;
                     AddPoint(order, postAction, promotion, promotionTier);
                     break;
+                case (int)AppConstant.EnvVar.PostActionType.Gift_GameCode:
+                    effectType = AppConstant.EffectMessage.AddGiftGameCode;
+                    AddGiftGameCode(order, postAction, promotion, promotionTier);
+                    break;
             }
 
+            SetEffect(order, promotion, 0, effectType, promotionTier);
+        }
+        public void AddGiftGameCode(OrderResponseModel order, PostAction postAction, Promotion promotion, PromotionTier promotionTier)
+        {
+            string effectType = AppConstant.EffectMessage.AddGiftGameCode;
+            order.Gift.Add(new Gift
+            {
+                ProductCode = ""
+            });
             SetEffect(order, promotion, 0, effectType, promotionTier);
         }
 

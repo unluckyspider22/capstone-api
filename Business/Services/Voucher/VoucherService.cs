@@ -251,7 +251,7 @@ namespace ApplicationCore.Services
                 if (vouchers.Count() > 0)
                 {
                     voucher = vouchers.FirstOrDefault();
-                    await SendEmailSmtp(param, voucher);
+                    // await SendEmailSmtp(param, voucher);
 
                     //Update voucher vừa lấy
                     await UpdateVoucherRedemped(voucher, param);
@@ -385,7 +385,8 @@ namespace ApplicationCore.Services
             voucher.UpdDate = now;
             //Update voucher group
             voucher.VoucherGroup.RedempedQuantity += 1;
-            voucher.VoucherGroup.UpdDate = now;
+            _voucherGroupRepos.Update(voucher.VoucherGroup);
+            voucher.VoucherGroup.UpdDate = DateTime.Now;
 
             _repository.Update(voucher);
             await _unitOfWork.SaveAsync();
