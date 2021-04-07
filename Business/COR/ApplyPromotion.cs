@@ -205,9 +205,17 @@ namespace ApplicationCore.Chain
                     SetDiscountFromOrder(order, discount, final, promotion);
                     break;
                 case (int)AppConstant.EnvVar.ActionType.Shipping:
-                    discount = (decimal)action.DiscountAmount;
-                    effectType = AppConstant.EffectMessage.SetShippingFee;
+                    if (action.DiscountAmount > 0)
+                    {
+                        discount = (decimal)action.DiscountAmount;
+                    }
+                    if (action.DiscountPercentage > 0)
+                    {
+                        discount = (decimal)final * (decimal)action.DiscountPercentage / 100;
+                        discount = discount > (decimal)action.MaxAmount ? (decimal)action.MaxAmount : discount;
+                    }
                     order.CustomerOrderInfo.ShippingFee -= discount;
+                    effectType = AppConstant.EffectMessage.SetShippingFee;
                     order.CustomerOrderInfo.ShippingFee = order.CustomerOrderInfo.ShippingFee > 0 ? order.CustomerOrderInfo.ShippingFee : 0;
                     break;
             }
