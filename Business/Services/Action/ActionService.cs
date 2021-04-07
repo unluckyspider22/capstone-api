@@ -46,12 +46,16 @@ namespace ApplicationCore.Services
             if (entity != null)
             {
                 result = _mapper.Map<ActionDto>(entity);
-                result.ListProduct = new List<Guid>();
+                result.ListProductMapp = new List<ActionProductMap>();
                 if (entity.ActionProductMapping.Count > 0)
                 {
                     foreach (var product in entity.ActionProductMapping)
                     {
-                        result.ListProduct.Add(product.ProductId);
+                        var dto = new ActionProductMap()
+                        {
+                            ProductId = product.ProductId,
+                        };
+                        result.ListProductMapp.Add(dto);
                     }
                 }
 
