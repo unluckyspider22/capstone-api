@@ -334,7 +334,7 @@ namespace ApplicationCore.Services
                 "<p>Description:</p>" +
                 "<p>{2}</p>" +
                 "<p>Or you can use the code below:</p>" +
-                "<img src={4}><br>", promotion.PromotionCode, voucherCode, promotion.Description, voucher.VoucherGroup.Action.Name, QrCode);
+                "<img src={4}><br>", promotion.PromotionCode, voucherCode, promotion.Description, voucher.VoucherGroup.VoucherName, QrCode);
             //Note
             string note = string.Format("<p>Note:</p>" +
                 "<ul>" +
