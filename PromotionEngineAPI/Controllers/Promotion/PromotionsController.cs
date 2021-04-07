@@ -230,7 +230,7 @@ namespace PromotionEngineAPI.Controllers
         {
             try
             {
-                return Ok(await _promotionService.GetFirst(filter: el => el.PromotionId.Equals(id) && !el.DelFlg,
+                var result = await _promotionService.GetFirst(filter: el => el.PromotionId.Equals(id) && !el.DelFlg,
                     includeProperties: "PromotionChannelMapping," +
                                         "PromotionStoreMapping," +
                                         "MemberLevelMapping," +
@@ -238,7 +238,13 @@ namespace PromotionEngineAPI.Controllers
                                         "PromotionTier.Action," +
                                         "PromotionTier.PostAction," +
                                         "PromotionTier.ConditionRule," +
-                                        "PromotionTier.VoucherGroup"));
+                                        "PromotionTier.VoucherGroup");
+                var tiers = result.PromotionTier;
+                if (tiers != null && tiers.Count > 0)
+                {
+                    tiers = tiers.OrderBy(el => el.TierIndex).ToList();
+                }
+                return Ok(result);
             }
             catch (ErrorObj e)
             {

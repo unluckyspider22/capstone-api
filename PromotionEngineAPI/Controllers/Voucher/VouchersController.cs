@@ -29,6 +29,7 @@ namespace PromotionEngineAPI.Controllers
             [FromQuery] PagingRequestParam param,
             [FromQuery] Guid VoucherGroupId,
             [FromQuery] Guid PromotionId,
+            [FromQuery] Guid PromotionTierId,
             [FromQuery] string SearchCode = "",
             [FromQuery] int VoucherStatus = 1)
         {
@@ -45,8 +46,12 @@ namespace PromotionEngineAPI.Controllers
                 filter2 = el => el.PromotionId.Equals(PromotionId);
                 filter = filter.And(filter2);
             }
+            if (!PromotionTierId.Equals(Guid.Empty))
+            {
 
-
+                filter2 = el => el.PromotionTierId.Equals(PromotionTierId);
+                filter = filter.And(filter2);
+            }
             if (VoucherStatus > AppConstant.VoucherStatus.ALL)
             {
                 switch (VoucherStatus)
@@ -116,6 +121,25 @@ namespace PromotionEngineAPI.Controllers
                 return StatusCode(statusCode: e.Code, e);
             }
         }
+
+        [HttpGet]
+        [Route("promotion-voucher-count/{PromotionId}")]
+        public async Task<IActionResult> CountPromotionVoucher([FromRoute] Guid PromotionId)
+        {
+            if (PromotionId.Equals(Guid.Empty))
+            {
+                return StatusCode(statusCode: 400, new ErrorObj(400, "Required Promotion Id"));
+            }
+            try
+            {
+                return Ok(await _service.PromoVoucherCount(promotionId: PromotionId));
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
+
 
         [HttpPost]
         [Route("voucher-on-site/{promotionId}/{tierId}")]
