@@ -61,7 +61,8 @@ namespace Infrastructure.Helper
             {
                 Gift_Product = 1,
                 Gift_Voucher = 2,
-                Gift_Point = 3
+                Gift_Point = 3,
+                Gift_GameCode = 4
             }
 
             public enum ActionType
@@ -199,6 +200,7 @@ namespace Infrastructure.Helper
             public const string AddGiftProduct = "addGiftProduct";
             public const string AddGiftVoucher = "addGiftVoucher";
             public const string AddGiftPoint = "addGiftPoint";
+            public const string AddGiftGameCode = "addGiftGameCode";
             //Không có automatic promotion nào cả
             public const string NoAutoPromotion = "noAutoPromotion";
 

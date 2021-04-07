@@ -116,58 +116,58 @@ namespace ApplicationCore.Chain
 
             return result;
         }
-        private PostAction FilterPostAction(List<PromotionTier> tiers)
-        {
-            PostAction result = null;
-            if (tiers.Count() > 0 && tiers.Count() == 1)
-            {
-                return tiers.First().PostAction;
-            }
-            else
-            {
-                result = tiers.Where(w =>
-                    w.TierIndex == tiers.Max(m => m.TierIndex))
-                    .SingleOrDefault().PostAction;
-            }
-            return result;
-        }
-        private Infrastructure.Models.Action FilterAction(List<Infrastructure.Models.Action> actions, Promotion promotion)
-        {
-            Infrastructure.Models.Action result = null;
-            if (actions.Count() > 0 && actions.Count() == 1)
-            {
-                return actions.First();
-            }
-            else
-            {
-                switch (promotion.ActionType)
-                {
-                    case (int)AppConstant.EnvVar.ActionType.Amount_Order:
-                        result = actions
-                        .Where(w =>
-                            w.ActionType == (int)AppConstant.EnvVar.ActionType.Amount_Order
-                            && w.DiscountAmount > 0
-                            && w.DiscountAmount == actions.Max(m => m.DiscountAmount))
-                        .SingleOrDefault();
-                        break;
-                    case (int)AppConstant.EnvVar.ActionType.Percentage_Order:
-                        result = actions.Where(w =>
-                                w.ActionType == (int)AppConstant.EnvVar.ActionType.Percentage_Order &&
-                                w.DiscountPercentage > 0 &&
-                                w.DiscountPercentage == actions.Max(m => m.DiscountPercentage))
-                        .SingleOrDefault();
-                        break;
-                    case (int)AppConstant.EnvVar.ActionType.Shipping:
-                        result = actions.Where(w =>
-                                w.ActionType == (int)AppConstant.EnvVar.ActionType.Shipping &&
-                                w.DiscountAmount > 0 &&
-                                w.DiscountAmount == actions.Max(m => m.DiscountAmount))
-                        .SingleOrDefault();
-                        break;
-                }
-            }
-            return result;
-        }
+        /*  private PostAction FilterPostAction(List<PromotionTier> tiers)
+          {
+              PostAction result = null;
+              if (tiers.Count() > 0 && tiers.Count() == 1)
+              {
+                  return tiers.First().PostAction;
+              }
+              else
+              {
+                  result = tiers.Where(w =>
+                      w.TierIndex == tiers.Max(m => m.TierIndex))
+                      .SingleOrDefault().PostAction;
+              }
+              return result;
+          }
+          private Infrastructure.Models.Action FilterAction(List<Infrastructure.Models.Action> actions, Promotion promotion)
+          {
+              Infrastructure.Models.Action result = null;
+              if (actions.Count() > 0 && actions.Count() == 1)
+              {
+                  return actions.First();
+              }
+              else
+              {
+                  switch (promotion.ActionType)
+                  {
+                      case (int)AppConstant.EnvVar.ActionType.Amount_Order:
+                          result = actions
+                          .Where(w =>
+                              w.ActionType == (int)AppConstant.EnvVar.ActionType.Amount_Order
+                              && w.DiscountAmount > 0
+                              && w.DiscountAmount == actions.Max(m => m.DiscountAmount))
+                          .SingleOrDefault();
+                          break;
+                      case (int)AppConstant.EnvVar.ActionType.Percentage_Order:
+                          result = actions.Where(w =>
+                                  w.ActionType == (int)AppConstant.EnvVar.ActionType.Percentage_Order &&
+                                  w.DiscountPercentage > 0 &&
+                                  w.DiscountPercentage == actions.Max(m => m.DiscountPercentage))
+                          .SingleOrDefault();
+                          break;
+                      case (int)AppConstant.EnvVar.ActionType.Shipping:
+                          result = actions.Where(w =>
+                                  w.ActionType == (int)AppConstant.EnvVar.ActionType.Shipping &&
+                                  w.DiscountAmount > 0 &&
+                                  w.DiscountAmount == actions.Max(m => m.DiscountAmount))
+                          .SingleOrDefault();
+                          break;
+                  }
+              }
+              return result;
+          }*/
         #endregion
         #region Post action
         public void AddGift(OrderResponseModel order, PostAction postAction, Promotion promotion, PromotionTier promotionTier)
@@ -210,8 +210,21 @@ namespace ApplicationCore.Chain
                     effectType = AppConstant.EffectMessage.AddGiftPoint;
                     AddPoint(order, postAction, promotion, promotionTier);
                     break;
+                case (int)AppConstant.EnvVar.PostActionType.Gift_GameCode:
+                    effectType = AppConstant.EffectMessage.AddGiftGameCode;
+                    AddGiftGameCode(order, postAction, promotion, promotionTier);
+                    break;
             }
 
+            SetEffect(order, promotion, 0, effectType, promotionTier);
+        }
+        public void AddGiftGameCode(OrderResponseModel order, PostAction postAction, Promotion promotion, PromotionTier promotionTier)
+        {
+            string effectType = AppConstant.EffectMessage.AddGiftGameCode;
+            order.Gift.Add(new Gift
+            {
+                ProductCode = ""
+            });
             SetEffect(order, promotion, 0, effectType, promotionTier);
         }
 
