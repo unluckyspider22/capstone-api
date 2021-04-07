@@ -403,6 +403,21 @@ namespace ApplicationCore.Services
         {
             return Common.DecodeFromBase64(DecryptText);
         }
+
+        public async Task<PromotionVoucherCount> PromoVoucherCount(Guid promotionId)
+        {
+            var result = new PromotionVoucherCount();
+            var vouchers =await _repository.Get(filter: o => o.PromotionId.Equals(promotionId));
+            if (vouchers.Count() > 0)
+            {
+                result.Total = vouchers.Count();
+                result.Unused = vouchers.Where(o=>!o.IsUsed).Count();
+                result.Used = vouchers.Where(o => o.IsUsed).Count();
+                result.Redemped = vouchers.Where(o => o.IsRedemped).Count();
+            }
+            return result;
+
+        }
     }
 }
 

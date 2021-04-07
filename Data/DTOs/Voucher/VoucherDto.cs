@@ -23,4 +23,12 @@ namespace Infrastructure.DTOs
         public Guid? PromotionTierId { get; set; }
         public virtual VoucherGroup VoucherGroup { get; set; }
     }
+
+    public class PromotionVoucherCount
+    {
+        public int Total { get; set; } = 0;
+        public int Unused { get; set; } = 0;
+        public int Redemped { get; set; } = 0;
+        public int Used { get; set; } = 0;
+    }
 }

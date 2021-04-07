@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 namespace ApplicationCore.Services
 {
     public class VoucherGroupService : BaseService<VoucherGroup, VoucherGroupDto>, IVoucherGroupService
+
     {
         private readonly IVoucherWorker _voucherWorker;
         public VoucherGroupService(IUnitOfWork unitOfWork, IMapper mapper, IVoucherWorker voucherWorker) : base(unitOfWork, mapper)
@@ -481,7 +482,6 @@ namespace ApplicationCore.Services
                         BrandId = group.BrandId,
                         ActionId = group.ActionId,
                         PostActionId = group.PostActionId,
-
                         RedempedQuantity = group.RedempedQuantity,
                         Total = group.Quantity,
                         UsedQuantity = group.UsedQuantity,
@@ -549,6 +549,8 @@ namespace ApplicationCore.Services
             }
         }
         #endregion
+
+
 
     }
 }
