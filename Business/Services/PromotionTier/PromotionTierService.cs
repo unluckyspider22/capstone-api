@@ -77,19 +77,39 @@ namespace ApplicationCore.Services
             try
             {
                 IGenericRepository<Voucher> voucherRepo = _unitOfWork.VoucherRepository;
+                IGenericRepository<Promotion> promotionRepo = _unitOfWork.PromotionRepository;
                 var voucherGroupId = dto.VoucherGroupId;
 
                 var vouchers = await voucherRepo.Get(filter: o => o.VoucherGroupId.Equals(voucherGroupId));
-                if (vouchers.Count() > 0)
+                if (vouchers.Count() > 0 && dto.VoucherQuantity > 0)
                 {
-                    foreach (var voucher in vouchers)
+                    var promotion = await promotionRepo.GetFirst(filter: o => o.PromotionId.Equals(dto.PromotionId) && !o.DelFlg);
+                    var remain = dto.VoucherQuantity;
+                    while (remain > 0)
                     {
-                        voucher.PromotionTierId = dto.PromotionTierId;
-                        voucher.PromotionId = dto.PromotionId;
-                        voucherRepo.Update(voucher);
+                        var voucher = vouchers.Where(o => (o.PromotionTierId == null || o.PromotionTierId.Equals(Guid.Empty))
+                                            && (o.PromotionId == null || o.PromotionId.Equals(Guid.Empty))).First();
+                        if (voucher != null)
+                        {
+                            voucher.PromotionTierId = dto.PromotionTierId;
+                            voucher.PromotionId = dto.PromotionId;
+                            voucher.Promotion = promotion;
+                            voucher.UpdDate = DateTime.Now;
+                            promotion.Voucher.Add(voucher);
+                            voucherRepo.Update(voucher);
+                        }
+                        if (voucher == null && remain > 0)
+                        {
+                            remain = 0;
+                        }
+                        else
+                        {
+                            remain--;
+                        }
                     }
-                    await _unitOfWork.SaveAsync();
+
                 }
+
             }
             catch (Exception e)
             {
