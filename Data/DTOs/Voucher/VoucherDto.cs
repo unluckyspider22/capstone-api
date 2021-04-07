@@ -21,6 +21,8 @@ namespace Infrastructure.DTOs
         public int Index { get; set; }
         public Guid? PromotionId { get; set; }
         public Guid? PromotionTierId { get; set; }
+        public String OrderId { get; set; }
+        public Guid TransactionId { get; set; }
         public virtual VoucherGroup VoucherGroup { get; set; }
     }
 

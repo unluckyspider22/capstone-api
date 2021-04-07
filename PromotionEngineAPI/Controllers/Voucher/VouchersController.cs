@@ -260,20 +260,20 @@ namespace PromotionEngineAPI.Controllers
         }
 
         // PUT: api/Vouchers/active
-        [HttpPut]
-        [Route("update-voucher-applied")]
-        public async Task<IActionResult> UpdateVoucherApplied([FromBody] CustomerOrderInfo order)
-        {
-            try
-            {
-                return Ok(await _service.UpdateVoucherApplied(order));
-            }
-            catch (ErrorObj e)
-            {
-                return StatusCode(statusCode: e.Code, e);
-            }
+        //[HttpPut]
+        //[Route("update-voucher-applied")]
+        //public async Task<IActionResult> UpdateVoucherApplied([FromBody] CustomerOrderInfo order)
+        //{
+        //    try
+        //    {
+        //        return Ok(await _service.UpdateVoucherApplied(order));
+        //    }
+        //    catch (ErrorObj e)
+        //    {
+        //        return StatusCode(statusCode: e.Code, e);
+        //    }
 
-        }
+        //}
 
         // POST: api/Vouchers
         [HttpPost]
