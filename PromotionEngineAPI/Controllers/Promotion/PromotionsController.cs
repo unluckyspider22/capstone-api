@@ -33,7 +33,7 @@ namespace PromotionEngineAPI.Controllers
             _voucherService = voucherService;
             _memberLevelService = memberLevelService;
         }
-
+/*
         [HttpPost]
         [Route("check-voucher")]
         public async Task<IActionResult> CheckVoucher([FromBody] CustomerOrderInfo orderInfo)
@@ -77,12 +77,6 @@ namespace PromotionEngineAPI.Controllers
                     //Check promotion
                     prepareModel = await _promotionService.HandlePromotion(prepareModel);
 
-                    /*  promotions = _promotionService.GetPromotions();
-
-                      if (promotions.Count > 1)
-                      {
-                          return Ok(promotions);
-                      }*/
 
                 }
                 else return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, orderInfo);
@@ -92,7 +86,7 @@ namespace PromotionEngineAPI.Controllers
                 return StatusCode(statusCode: e.Code, orderInfo);
             }
             return Ok(prepareModel);
-        }
+        }*/
         [HttpPost]
         [Route("check-promotion")]
         public async Task<IActionResult> CheckPromotion([FromBody] CustomerOrderInfo orderInfo, [FromQuery] Guid promotionId)
@@ -443,7 +437,7 @@ namespace PromotionEngineAPI.Controllers
                                 && o.Status != (int)AppConstant.EnvVar.PromotionStatus.EXPIRED
                                 && !o.IsAuto
                                 && !o.DelFlg,
-                                includeProperties: "PromotionTier.Action"));
+                                includeProperties: "PromotionTier.Action,PromotionTier.PostAction"));
             }
             catch (ErrorObj e)
             {

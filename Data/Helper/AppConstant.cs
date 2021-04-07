@@ -144,7 +144,7 @@ namespace Infrastructure.Helper
             public const string Invalid_Require = "Đơn hàng chưa có sản phẩm bắt buộc";
             public const string Invalid_Group = "Sản phẩm chưa được chọn nhóm";
             public const string Duplicate_VoucherCode = "Trùng mã voucher.";
-            public const string Invalid_VoucherCode = "Mã voucher không tồn tại.";
+            public const string Invalid_VoucherCode = "Không có chương trình khuyến mãi phù hợp với mã voucher này.";
             public const string Expire_Promotion = "Khuyến mãi tạm dừng.";
             public const string Exclusive_Promotion = "Khuyến mãi không dùng chung với các khuyến mãi khác";
             public const string Invalid_Gender = "Giới tính không phù hợp với khuyến mãi";
