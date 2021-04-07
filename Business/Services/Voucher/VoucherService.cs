@@ -170,46 +170,54 @@ namespace ApplicationCore.Services
 
         #endregion
         #region Update voucher đã applied
-        public async Task<List<Voucher>> UpdateVoucherApplied(CustomerOrderInfo order)
+        public async Task<List<Voucher>> UpdateVoucherApplied(Guid transactionId, CustomerOrderInfo order)
         {
 
             try
             {
-                List<Voucher> result = null;
-                if (order != null)
+                List<Voucher> result = new List<Voucher>();
+                List<VoucherGroup> voucherGroups = new List<VoucherGroup>();
+                //foreach (var promotionTierId in promotionTierIdList)
+                //{
+                //    if (promotionTierId != null)
+                //    {
+                //        var voucherGroup = await _voucherGroupService.GetFirst(filter: el => el.PromotionTier.Any(w => w.PromotionTierId.Equals(promotionTierId)), includeProperties: "Voucher");
+                //        if (voucherGroup != null)
+                //        {
+
+                //            voucherGroups.Add(voucherGroup);
+                //        }
+                //    }
+                //}
+                //foreach(var voucherGroup in voucherGroups)
+                //{
+                //    voucherGroup.UpdDate = DateTime.Now;
+                //    voucherGroup.UsedQuantity += 1;
+                //    _voucherGroupRepos.Update(voucherGroup);
+                //}
+                //var promotions = await CheckVoucher(order);
+                foreach (var voucherInReq in order.Vouchers)
                 {
-                    var promotions = await CheckVoucher(order);
-                    result = new List<Voucher>();
-                    foreach (var voucherParam in order.Vouchers)
+                    var voucherFilter = await _repository.Get(
+                        filter: el => el.VoucherCode.Equals(voucherInReq.VoucherCode)
+                        && el.Promotion.PromotionCode.Equals(voucherInReq.PromotionCode),includeProperties:"VoucherGroup");
+                    if (voucherFilter != null && voucherFilter.Count() > 0)
                     {
-                        foreach (var promotion in promotions)
-                        {
-                            if (voucherParam.PromotionCode.Equals(promotion.PromotionCode))
-                            {
-                                var voucherGroup = (await _voucherGroupService.
-                                    GetAsync(/*filter: el => el.PromotionId.Equals(promotion.PromotionId), */includeProperties: "Voucher")).Data.First();
-                                if (voucherGroup.Voucher.Where(el => el.VoucherCode.Equals(voucherParam.VoucherCode)).Distinct().Count()
-                                < voucherGroup.Voucher.Where(w => w.VoucherCode.Equals(voucherParam.VoucherCode)).Count())
-                                {
-                                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Duplicate_VoucherCode,
-                                        description: AppConstant.ErrMessage.Duplicate_VoucherCode);
-                                }
-                                var vouchers = voucherGroup.Voucher.Where(w => w.VoucherCode.Equals(voucherParam.VoucherCode)).First();
-                                //if (voucherGroup.VoucherType.Equals(AppConstant.EnvVar.VoucherType.STANDALONE_CODE))
-                                //{
-                                //    await UpdateVoucherGroupAfterApplied(voucherGroup);
-                                //}
-                                //else
-                                //{
-                                //    await UpdateVoucherGroupAfterApplied(voucherGroup);
-                                //    await UpdateVoucherAfterApplied(vouchers, order);
-                                //}
-                                result.Add(vouchers);
-                                return result;
-                            }
-                        }
+                        DateTime now = DateTime.Now;
+                        var voucher = voucherFilter.ToList().First();                       
+                        voucher.IsUsed = AppConstant.EnvVar.Voucher.USED;
+                        voucher.UsedDate = now;
+                        voucher.UpdDate = now;
+                        voucher.OrderId = order.Id.ToString();
+                        //var voucherGroup = await _voucherGroupRepos.GetById(voucher.VoucherGroupId);
+                        voucher.VoucherGroup.UsedQuantity += 1;
+                        voucher.VoucherGroup.UpdDate = now;
+                        _repository.Update(voucher);
+                        _voucherGroupRepos.Update(voucher.VoucherGroup);
+                        result.Add(voucher);
                     }
                 }
+                await _unitOfWork.SaveAsync();
                 return result;
             }
             catch (Exception e)

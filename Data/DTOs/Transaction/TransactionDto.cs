@@ -11,6 +11,7 @@ namespace Infrastructure.DTOs
         public Guid Id { get; set; }
         public Guid BrandId { get; set; }
         public string TransactionJson { get; set; }
+        public Guid VoucherId { get; set; }
 
         public virtual Brand Brand { get; set; }
     }
