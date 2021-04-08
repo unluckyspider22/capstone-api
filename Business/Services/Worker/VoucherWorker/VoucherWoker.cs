@@ -18,7 +18,7 @@ namespace ApplicationCore.Worker
     {
         public void InsertVouchers(VoucherGroupDto voucherDto, bool isAddMore = false, List<Voucher> vouchersAdd = null);
         public void DeleteVouchers(Guid voucherGroupId);
-        public List<Voucher> GenerateVoucher(VoucherGroupDto dto);
+        public List<Voucher> GenerateVoucher(VoucherGroupDto dto, bool isAddMore = false);
     }
     public class VoucherWorker : IVoucherWorker
     {
@@ -90,10 +90,6 @@ namespace ApplicationCore.Worker
             Guid? promotionId = dto.PromotionId;
 
             // Tạo voucher
-            //if (!promotionCode.Trim().Equals(""))
-            //{
-            //    promotionCode += "-";
-            //}
 
             // Task item để notify cho client
             var item = new VoucherNotiObj()
@@ -111,7 +107,7 @@ namespace ApplicationCore.Worker
             List<Voucher> vouchers = vouchersAdd;
             if (!isAddMore && vouchersAdd == null)
             {
-                vouchers = GenerateVoucher(dto);
+                vouchers = GenerateDistinctVoucher(dto);
             }
             _logger.LogInformation(">>>>>>End generate: " + DateTime.Now.ToString("HH:mm:ss"));
             item.Message = AppConstant.NotiMess.VOUCHER_GENERATE_MESS + " " + AppConstant.NotiMess.PROCESSED_MESS;
@@ -150,32 +146,43 @@ namespace ApplicationCore.Worker
                 }
             });
         }
-        #region generate voucher
-        public List<Voucher> GenerateVoucher(VoucherGroupDto dto)
+
+        private List<Voucher> GenerateDistinctVoucher(VoucherGroupDto dto)
         {
-            //if (dto.VoucherType.Equals(AppConstant.EnvVar.VoucherType.BULK_CODE))
-            //{
+            var now = Common.GetCurrentDatetime();
+            var vouchers = new List<Voucher>();
+            var quantity = dto.Quantity;
+            var codes = GenerateVoucher(dto).Select(el => el.VoucherCode).Distinct(StringComparer.CurrentCulture);
 
-            //}
-            //else
-            //{
-            //    return _mapper.Map<List<Voucher>>(GenerateStandaloneVoucher(dto));
-            //}
-            return _mapper.Map<List<Voucher>>(GenerateBulkCodeVoucher(dto));
+            while (codes.Count() < quantity)
+            {
+                var remainQuantity = quantity - codes.Count();
+                dto.Quantity = remainQuantity;
+                var temp = GenerateVoucher(dto).Select(el => el.VoucherCode).Distinct(StringComparer.CurrentCulture);
+                codes = codes.Union(temp);
+            }
+            for (int i = 0; i < codes.Count(); i++)
+            {
+                var v = new Voucher()
+                {
+                    VoucherGroupId = dto.VoucherGroupId,
+                    VoucherCode = codes.ElementAt(i),
+                    InsDate = now,
+                    UpdDate = now,
+                    Index = i,
+                };
+                vouchers.Add(v);
+            }
+            return vouchers;
+
         }
-        //private List<VoucherDto> GenerateStandaloneVoucher(VoucherGroupDto dto)
-        //{
-        //    List<VoucherDto> result = new List<VoucherDto>();
-        //    VoucherDto voucher = new VoucherDto
-        //    {
-        //        VoucherCode = dto.Prefix + dto.CustomCode + dto.Postfix,
-        //        VoucherGroupId = dto.VoucherGroupId
-        //    };
-        //    result.Add(voucher);
-        //    return result;
-        //}
+        #region generate voucher
+        public List<Voucher> GenerateVoucher(VoucherGroupDto dto, bool isAddMore = false)
+        {
+            return _mapper.Map<List<Voucher>>(GenerateBulkCodeVoucher(dto, isAddMore));
+        }
 
-        private List<VoucherDto> GenerateBulkCodeVoucher(VoucherGroupDto dto)
+        private List<VoucherDto> GenerateBulkCodeVoucher(VoucherGroupDto dto, bool isAddMore = false)
         {
             List<VoucherDto> result = new List<VoucherDto>();
             var now = Common.GetCurrentDatetime();
@@ -185,34 +192,19 @@ namespace ApplicationCore.Worker
                 string randomVoucher = RandomString(dto.Charset, dto.CustomCharset, dto.CodeLength);
                 voucher.VoucherCode = dto.Prefix + randomVoucher + dto.Postfix;
                 voucher.VoucherGroupId = dto.VoucherGroupId;
-                voucher.Index = i + 1;
+                if (isAddMore)
+                {
+                    voucher.Index = -1;
+                }
+                else
+                {
+                    voucher.Index = i + 1;
+                }
+
                 voucher.InsDate = now;
                 voucher.UpdDate = now;
                 result.Add(voucher);
             }
-            //if (!dto.IsLimit)
-            //{
-            //    var now = Common.GetCurrentDatetime();
-            //    for (var i = 0; i < dto.Quantity; i++)
-            //    {
-            //        VoucherDto voucher = new VoucherDto();
-            //        string randomVoucher = RandomString(dto.Charset, dto.CustomCharset, dto.CodeLength);
-            //        voucher.VoucherCode = dto.Prefix + randomVoucher + dto.Postfix;
-            //        voucher.VoucherGroupId = dto.VoucherGroupId;
-            //        voucher.InsDate = now;
-            //        voucher.UpdDate = now;
-            //        result.Add(voucher);
-            //    }
-            //}
-            //else
-            //{
-            //    VoucherDto voucher = new VoucherDto();
-            //    string randomVoucher = RandomString(dto.Charset, dto.CustomCharset, dto.CodeLength);
-            //    voucher.VoucherCode = dto.Prefix + randomVoucher + dto.Postfix;
-            //    voucher.VoucherGroupId = dto.VoucherGroupId;
-            //    result.Add(voucher);
-            //}
-
             return result;
         }
         private Random Random = new Random();

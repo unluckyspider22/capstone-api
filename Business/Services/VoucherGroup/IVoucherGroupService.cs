@@ -38,5 +38,6 @@ namespace ApplicationCore.Services
         public Task<VoucherIndexInfo> CheckAvailableIndex(Guid voucherGroupId);
 
         public Task<VoucherGroupDetailDto> GetDetail(Guid id);
+        public Task<CheckAddMoreDto> GetAddMoreInfo(Guid id);
     }
 }

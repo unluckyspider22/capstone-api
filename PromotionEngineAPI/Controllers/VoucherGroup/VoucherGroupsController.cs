@@ -179,6 +179,25 @@ namespace PromotionEngineAPI.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("check-before-add-more/{voucherGroupId}")]
+        public async Task<IActionResult> CheckBeforeAddMoreVoucher([FromRoute] Guid voucherGroupId)
+        {
+            try
+            {
+                if (voucherGroupId.Equals(Guid.Empty))
+                {
+                    return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+
+                }
+
+                return Ok(await _service.GetAddMoreInfo(id: voucherGroupId));
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
         // DELETE: api/VoucherGroups/5
         [HttpDelete]
         public async Task<IActionResult> DeleteVoucherGroup([FromQuery] Guid voucherGroupId)

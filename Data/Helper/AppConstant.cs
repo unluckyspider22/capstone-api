@@ -8,6 +8,7 @@ namespace Infrastructure.Helper
 {
     public static class AppConstant
     {
+        public const int MAX_VOUCHER_QUANTITY = 10000;
         public struct DelFlg
         {
             public const string HIDE = "1";

@@ -64,4 +64,8 @@ namespace Infrastructure.DTOs
         public string PromoName { get; set; }
         public string PromoCode { get; set; }
     }
+    public class CheckAddMoreDto
+    {
+        public int AvailableQuantity { get; set; } = 0;
+    }
 }

@@ -315,29 +315,30 @@ namespace ApplicationCore.Services
         {
             try
             {
-                var voucherGroup = await _repository.GetFirst(filter: el => el.VoucherGroupId == voucherGroupId, includeProperties: "Voucher");
+                var voucherGroup = await _repository.GetFirst(filter: el => el.VoucherGroupId.Equals(voucherGroupId), includeProperties: "Voucher");
                 var vouchers = voucherGroup.Voucher;
                 var dto = _mapper.Map<VoucherGroupDto>(voucherGroup);
                 dto.Voucher = null;
                 dto.Quantity = quantityParam;
-                var newVouchers = _voucherWorker.GenerateVoucher(dto);
+                var newVouchers = _voucherWorker.GenerateVoucher(dto, isAddMore: true);
                 int quantity = vouchers.Count() + (int)dto.Quantity;
                 //Gộp 2 mảng [đã có dưới DB] + [voucher code mới gen]
                 var totalVouchers = newVouchers.Concat(vouchers);
                 //Kiểm tra có trùng voucher code với những cái cũ hay không
-                while (totalVouchers.Select(el => el.VoucherCode).Distinct().Count() < totalVouchers.Select(el => el.VoucherCode).Count())
+                while (totalVouchers.Select(el => el.VoucherCode).Distinct(StringComparer.CurrentCulture).Count() < totalVouchers.Select(el => el.VoucherCode).Count())
                 {
-                    int remainVoucher = totalVouchers.Select(el => el.VoucherCode).Count() - totalVouchers.Select(el => el.VoucherCode).Distinct().Count();
+                    var totalWithDuplidate = totalVouchers.Select(el => el.VoucherCode).Count();
+                    var totalWithoutDuplidate = totalVouchers.Select(el => el.VoucherCode).Distinct(StringComparer.CurrentCulture).Count();
+                    int remainVoucher = totalWithDuplidate - totalWithoutDuplidate;
                     totalVouchers = totalVouchers.Union(newVouchers);
                     dto.Quantity = remainVoucher;
                     //Gen lại số lượng voucher
-                    var remainVouchers = _voucherWorker.GenerateVoucher(dto);
+                    var remainVouchers = _voucherWorker.GenerateVoucher(dto: dto, isAddMore: true);
                     totalVouchers.ToList().AddRange(remainVouchers);
                 }
                 newVouchers = totalVouchers.Except(vouchers).ToList();
                 _voucherWorker.InsertVouchers(dto, true, newVouchers);
                 //Update lại quantity
-                //var voucherGroup = await _repository.GetById(dto.VoucherGroupId);
                 voucherGroup.Quantity = quantity;
                 _repository.Update(voucherGroup);
 
@@ -548,9 +549,76 @@ namespace ApplicationCore.Services
                 throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
         }
+
+
         #endregion
 
+        public async Task<CheckAddMoreDto> GetAddMoreInfo(Guid id)
+        {
+            var MAX = AppConstant.MAX_VOUCHER_QUANTITY;
+            var result = new CheckAddMoreDto();
+            var group = await _repository.GetFirst(filter: o => o.VoucherGroupId.Equals(id));
+            if (group != null)
+            {
+                var quantity = group.Quantity;
+                if (quantity < MAX)
+                {
+                    var codeLength = group.CodeLength;
+                    var charset = group.Charset;
+                    var charsetChars = "";
+                    switch (charset)
+                    {
+                        case AppConstant.EnvVar.CharsetType.ALPHABETIC:
+                            {
+                                charsetChars = AppConstant.EnvVar.CharsetChars.ALPHABETIC;
+                                break;
+                            }
+                        case AppConstant.EnvVar.CharsetType.ALPHABETIC_LOWERCASE:
+                            {
+                                charsetChars = AppConstant.EnvVar.CharsetChars.ALPHABETIC_LOWERCASE;
+                                break;
+                            }
+                        case AppConstant.EnvVar.CharsetType.ALPHABETIC_UPERCASE:
+                            {
+                                charsetChars = AppConstant.EnvVar.CharsetChars.ALPHABETIC_UPERCASE;
+                                break;
+                            }
+                        case AppConstant.EnvVar.CharsetType.ALPHANUMERIC:
+                            {
+                                charsetChars = AppConstant.EnvVar.CharsetChars.ALPHANUMERIC;
+                                break;
+                            }
+                        case AppConstant.EnvVar.CharsetType.NUMBERS:
+                            {
+                                charsetChars = AppConstant.EnvVar.CharsetChars.NUMBERS;
+                                break;
+                            }
+                        case AppConstant.EnvVar.CharsetType.CUSTOM:
+                            {
+                                charsetChars = group.CustomCharset;
+                                break;
+                            }
+                    }
+                    int generateQuantity = (int)Math.Ceiling(Math.Pow(charsetChars.Length, (int)codeLength));
+                    if (generateQuantity < MAX)
+                    {
+                        result = new CheckAddMoreDto()
+                        {
+                            AvailableQuantity = generateQuantity - quantity,
+                        };
+                    }
+                    else
+                    {
+                        result = new CheckAddMoreDto()
+                        {
+                            AvailableQuantity = MAX - quantity,
+                        };
+                    }
 
+                }
+            }
+            return result;
+        }
 
     }
 }
