@@ -1,6 +1,4 @@
-﻿
-using ApplicationCore.Request;
-using ApplicationCore.Services;
+﻿using ApplicationCore.Services;
 using Infrastructure.DTOs;
 using Infrastructure.DTOs.Voucher;
 using Infrastructure.Helper;
@@ -29,6 +27,7 @@ namespace PromotionEngineAPI.Controllers
             [FromQuery] PagingRequestParam param,
             [FromQuery] Guid VoucherGroupId,
             [FromQuery] Guid PromotionId,
+            [FromQuery] Guid ChannelId,
             [FromQuery] Guid PromotionTierId,
             [FromQuery] string SearchCode = "",
             [FromQuery] int VoucherStatus = 1)
@@ -50,6 +49,12 @@ namespace PromotionEngineAPI.Controllers
             {
 
                 filter2 = el => el.PromotionTierId.Equals(PromotionTierId);
+                filter = filter.And(filter2);
+            }
+            if (!ChannelId.Equals(Guid.Empty))
+            {
+
+                filter2 = el => el.ChannelId.Equals(ChannelId);
                 filter = filter.And(filter2);
             }
             if (VoucherStatus > AppConstant.VoucherStatus.ALL)
@@ -107,14 +112,7 @@ namespace PromotionEngineAPI.Controllers
                                                     && el.VoucherCode.ToUpper().Equals(SearchCode.ToUpper());
             try
             {
-                return Ok(await _service.GetFirst(
-                            filter: filter,
-                            includeProperties:
-                            "Promotion," +
-                            "Channel," +
-                            "GameCampaign," +
-                            "Membership," +
-                            "Store"));
+                return Ok(await _service.GetCheckVoucherInfo(searchCode: SearchCode, voucherGroupId: VoucherGroupId));
             }
             catch (ErrorObj e)
             {
@@ -260,20 +258,20 @@ namespace PromotionEngineAPI.Controllers
         }
 
         // PUT: api/Vouchers/active
-        [HttpPut]
-        [Route("update-voucher-applied")]
-        public async Task<IActionResult> UpdateVoucherApplied([FromBody] CustomerOrderInfo order)
-        {
-            try
-            {
-                return Ok(await _service.UpdateVoucherApplied(order));
-            }
-            catch (ErrorObj e)
-            {
-                return StatusCode(statusCode: e.Code, e);
-            }
+        //[HttpPut]
+        //[Route("update-voucher-applied")]
+        //public async Task<IActionResult> UpdateVoucherApplied([FromBody] CustomerOrderInfo order)
+        //{
+        //    try
+        //    {
+        //        return Ok(await _service.UpdateVoucherApplied(order));
+        //    }
+        //    catch (ErrorObj e)
+        //    {
+        //        return StatusCode(statusCode: e.Code, e);
+        //    }
 
-        }
+        //}
 
         // POST: api/Vouchers
         [HttpPost]

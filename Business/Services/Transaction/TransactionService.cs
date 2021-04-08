@@ -6,6 +6,7 @@ using Infrastructure.Models;
 using Infrastructure.Repository;
 using Infrastructure.UnitOrWork;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -28,31 +29,39 @@ namespace ApplicationCore.Services
         public async Task<OrderResponseModel> Checkout(Guid brandId, OrderResponseModel order)
         {
             var brand = await _brandService.GetByIdAsync(id: brandId);
+            List<Guid> promotionTierIdList = new List<Guid>();
             if (brand != null)
             {
+                var transactionId = Guid.NewGuid();
                 if (order != null)
                 {
                     if (order.Effects != null)
                     {
+
                         foreach (var effect in order.Effects)
                         {
-                            var promotion = await _promotionService.GetByIdAsync(effect.PromotionId);
-                            if (promotion == null || promotion.Status != (int)AppConstant.EnvVar.PromotionStatus.PUBLISH)
+                            if (effect.EffectType.Equals("setDiscount"))
                             {
-                                throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Expire_Promotion, description: AppConstant.ErrMessage.Expire_Promotion);
+                                var promotion = await _promotionService.GetByIdAsync(effect.PromotionId);
+                                if (promotion == null || promotion.Status != (int)AppConstant.EnvVar.PromotionStatus.PUBLISH)
+                                {
+                                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Expire_Promotion, description: AppConstant.ErrMessage.Expire_Promotion);
+                                }
                             }
+                           
                         }
                         try
                         {
-                            var appliedVoucher = await _voucherService.UpdateVoucherApplied(order: order.CustomerOrderInfo);
+
+                            var appliedVoucher = await _voucherService.UpdateVoucherApplied(transactionId: transactionId, order: order.CustomerOrderInfo);
                         }
                         catch (ErrorObj e)
                         {
                             throw e;
                         }
-                        return await AddTransaction(order: order, brandId: brandId);
+                        return await AddTransaction(order: order, brandId: brandId, transactionId: transactionId);
                     }
-                    else return await AddTransaction(order: order, brandId: brandId);
+                    else return await AddTransaction(order: order, brandId: brandId, transactionId: transactionId);
 
                 }
             }
@@ -60,11 +69,11 @@ namespace ApplicationCore.Services
                 throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: "Brand does not exist !", description: "Brand does not exist !");
             return null;
         }
-        private async Task<OrderResponseModel> AddTransaction(OrderResponseModel order, Guid brandId)
+        private async Task<OrderResponseModel> AddTransaction(OrderResponseModel order, Guid brandId, Guid transactionId)
         {
             var jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(order);
             var transaction = new Transaction()
-            { BrandId = brandId, Id = Guid.NewGuid(), InsDate = DateTime.Now, UpdDate = DateTime.Now, TransactionJson = jsonString };
+            { BrandId = brandId, Id = transactionId, InsDate = DateTime.Now, UpdDate = DateTime.Now, TransactionJson = jsonString };
             _repository.Add(transaction);
             if (await _unitOfWork.SaveAsync() > 0)
             {
