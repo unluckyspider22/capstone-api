@@ -182,15 +182,15 @@ namespace ApplicationCore.Services
 
                     if (voucher != null)
                     {
-                        var existGroup = voucherGroups.Count > 0;
+                        //var existGroup = voucherGroups.Count > 0;
 
-                        var voucherGroup = existGroup ? voucherGroups.Where(el => el.VoucherGroupId.Equals(voucher.VoucherGroupId)).First() : new VoucherGroup();
-                        existGroup = voucherGroup != null;
-                        if (!existGroup)
-                        {
-                            voucherGroup = await _voucherGroupRepos.GetFirst(filter: el => el.VoucherGroupId.Equals(voucher.VoucherGroupId));
+                        //var voucherGroup = existGroup ? voucherGroups.Where(el => el.VoucherGroupId.Equals(voucher.VoucherGroupId)).First() : new VoucherGroup();
+                        //existGroup = voucherGroup != null;
+                        //if (!existGroup)
+                        //{
+                            var voucherGroup = await _voucherGroupRepos.GetFirst(filter: el => el.VoucherGroupId.Equals(voucher.VoucherGroupId));
                             voucherGroups.Add(voucherGroup);
-                        }
+                        //}
                         DateTime now = DateTime.Now;
                         voucher.IsUsed = AppConstant.EnvVar.Voucher.USED;
                         voucher.UsedDate = now;
