@@ -21,14 +21,14 @@ namespace PromotionEngineAPI.Controllers
         {
             _service = service;
         }
-        [Authorize]
+        //[Authorize]
         [HttpPost]
         [Route("check-out")]
-        public async Task<IActionResult> Checkout([FromBody] OrderResponseModel order,[FromQuery] Guid brandId)
+        public async Task<IActionResult> Checkout([FromBody] OrderResponseModel order,[FromQuery] Guid brandId,[FromQuery] Guid deviceId)
         {
             try
             {
-                return Ok(await _service.Checkout(order: order, brandId: brandId));
+                return Ok(await _service.Checkout(order: order, brandId: brandId, deviceId: deviceId));
             }
             catch (ErrorObj e)
             {

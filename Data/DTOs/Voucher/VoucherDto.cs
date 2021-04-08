@@ -1,9 +1,5 @@
 ﻿using Infrastructure.Models;
-using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Infrastructure.DTOs
 {
@@ -37,7 +33,7 @@ namespace Infrastructure.DTOs
 
     public class CheckVoucherDto
     {
-        public VoucherDto Voucher { get; set; } = new VoucherDto();
+        public Models.Voucher VoucherInfo { get; set; } = new Models.Voucher();
         public dynamic Order { get; set; }
     }
 }
