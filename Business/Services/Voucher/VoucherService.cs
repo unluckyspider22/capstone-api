@@ -425,13 +425,13 @@ namespace ApplicationCore.Services
                                                                         "Store");
             if (voucher != null)
             {
-                var voucherId = voucher.VoucherId;
-                var trans = await _transRepos.GetFirst(filter: o => o.VoucherId.Equals(voucherId));
+                var transactionId = voucher.TransactionId;
+                var trans = await _transRepos.GetFirst(filter: o => o.Id.Equals(transactionId));
                 if (trans != null)
                 {
                     result = new CheckVoucherDto()
                     {
-                        Voucher = _mapper.Map<VoucherDto>(voucher),
+                        VoucherInfo = voucher,
                         Order = JsonConvert.DeserializeObject(trans.TransactionJson),
                     };
                 }
@@ -439,7 +439,7 @@ namespace ApplicationCore.Services
                 {
                     result = new CheckVoucherDto()
                     {
-                        Voucher = _mapper.Map<VoucherDto>(voucher),
+                        VoucherInfo = voucher,
                     };
                 };
             }
