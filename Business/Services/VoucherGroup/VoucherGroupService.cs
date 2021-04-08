@@ -315,32 +315,33 @@ namespace ApplicationCore.Services
         {
             try
             {
-                var voucherGroup = await _repository.GetFirst(filter: el => el.VoucherGroupId.Equals(voucherGroupId), includeProperties: "Voucher");
-                var vouchers = voucherGroup.Voucher;
-                var dto = _mapper.Map<VoucherGroupDto>(voucherGroup);
-                dto.Voucher = null;
-                dto.Quantity = quantityParam;
-                var newVouchers = _voucherWorker.GenerateVoucher(dto, isAddMore: true);
-                int quantity = vouchers.Count() + (int)dto.Quantity;
-                //Gộp 2 mảng [đã có dưới DB] + [voucher code mới gen]
-                var totalVouchers = newVouchers.Concat(vouchers);
-                //Kiểm tra có trùng voucher code với những cái cũ hay không
-                while (totalVouchers.Select(el => el.VoucherCode).Distinct(StringComparer.CurrentCulture).Count() < totalVouchers.Select(el => el.VoucherCode).Count())
-                {
-                    var totalWithDuplidate = totalVouchers.Select(el => el.VoucherCode).Count();
-                    var totalWithoutDuplidate = totalVouchers.Select(el => el.VoucherCode).Distinct(StringComparer.CurrentCulture).Count();
-                    int remainVoucher = totalWithDuplidate - totalWithoutDuplidate;
-                    totalVouchers = totalVouchers.Union(newVouchers);
-                    dto.Quantity = remainVoucher;
-                    //Gen lại số lượng voucher
-                    var remainVouchers = _voucherWorker.GenerateVoucher(dto: dto, isAddMore: true);
-                    totalVouchers.ToList().AddRange(remainVouchers);
-                }
-                newVouchers = totalVouchers.Except(vouchers).ToList();
-                _voucherWorker.InsertVouchers(dto, true, newVouchers);
-                //Update lại quantity
-                voucherGroup.Quantity = quantity;
-                _repository.Update(voucherGroup);
+                //var voucherGroup = await _repository.GetFirst(filter: el => el.VoucherGroupId.Equals(voucherGroupId), includeProperties: "Voucher");
+                //var vouchers = voucherGroup.Voucher;
+
+                //var dto = _mapper.Map<VoucherGroupDto>(voucherGroup);
+                //dto.Voucher = null;
+                //dto.Quantity = quantityParam;
+                //var newVouchers = _voucherWorker.GenerateVoucher(dto, isAddMore: true).Select(el => el.VoucherCode);
+                //int quantity = vouchers.Count() + (int)dto.Quantity;
+                ////Gộp 2 mảng [đã có dưới DB] + [voucher code mới gen]
+                //var totalVouchers = newVouchers.Concat(vouchers.Select(el => el.VoucherCode));
+                ////Kiểm tra có trùng voucher code với những cái cũ hay không
+                //while (totalVouchers.Distinct(StringComparer.CurrentCulture).Count() < totalVouchers.Count())
+                //{
+                //    var totalWithDuplidate = totalVouchers.Count();
+                //    var totalWithoutDuplidate = totalVouchers.Distinct(StringComparer.CurrentCulture).Count();
+                //    int remainVoucher = totalWithDuplidate - totalWithoutDuplidate;
+                //    totalVouchers = totalVouchers.Union(newVouchers);
+                //    dto.Quantity = remainVoucher;
+                //    //Gen lại số lượng voucher
+                //    var remainVouchers = _voucherWorker.GenerateVoucher(dto: dto, isAddMore: true);
+                //    totalVouchers.ToList().AddRange(remainVouchers);
+                //}
+                //newVouchers = totalVouchers.Except(vouchers).ToList();
+                //_voucherWorker.InsertVouchers(dto, true, newVouchers);
+                ////Update lại quantity
+                //voucherGroup.Quantity = quantity;
+                //_repository.Update(voucherGroup);
 
                 return await _unitOfWork.SaveAsync() > 0;
             }
