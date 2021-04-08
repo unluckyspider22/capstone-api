@@ -41,6 +41,7 @@ namespace ApplicationCore.Services
                 includeProperties:
                 "Brand,PromotionChannelMapping.Channel," +
                 "PromotionTier.Action," +
+                "PromotionTier.PostAction," +
                 "PromotionTier.VoucherGroup")).Data; ;
 
                 promotions = promotions.Where(w =>
@@ -57,7 +58,7 @@ namespace ApplicationCore.Services
                         {
                             PromotionId = promotion.PromotionId,
                             PromotionName = promotion.PromotionName,
-                            ActionName = promotionTier.Action.Name,
+                            ActionName = promotionTier.Action != null ? promotionTier.Action.Name : promotionTier.PostAction.Name,
                             ImgUrl = promotion.ImgUrl,
                             PromotionCode = promotion.PromotionCode,
                             PromotionTierId = promotionTier.PromotionTierId,
@@ -65,9 +66,6 @@ namespace ApplicationCore.Services
                         };
                         result.Add(tier);
                     }
-                    /*var promotionInfomation = _mapper.Map<PromotionInfomation>(promotion);
-
-                    result.Add(promotionInfomation);*/
                 }
                 return result;
             }
