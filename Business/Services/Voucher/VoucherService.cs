@@ -10,15 +10,12 @@ using Infrastructure.Models;
 using Infrastructure.Repository;
 using Infrastructure.UnitOrWork;
 using MailKit.Net.Smtp;
-using Microsoft.Extensions.Configuration;
 using MimeKit;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ApplicationCore.Services
@@ -170,7 +167,7 @@ namespace ApplicationCore.Services
 
         #endregion
         #region Update voucher đã applied
-        public async Task<List<Voucher>> UpdateVoucherApplied(Guid transactionId, CustomerOrderInfo order,Guid storeId)
+        public async Task<List<Voucher>> UpdateVoucherApplied(Guid transactionId, CustomerOrderInfo order, Guid storeId)
         {
 
             try
@@ -179,24 +176,39 @@ namespace ApplicationCore.Services
                 List<VoucherGroup> voucherGroups = new List<VoucherGroup>();
                 foreach (var voucherInReq in order.Vouchers)
                 {
-                    var voucherFilter = await _repository.Get(
+                    var voucher = await _repository.GetFirst(
                         filter: el => el.VoucherCode.Equals(voucherInReq.VoucherCode)
-                        && el.Promotion.PromotionCode.Equals(voucherInReq.PromotionCode),includeProperties:"VoucherGroup");
-                    if (voucherFilter != null && voucherFilter.Count() > 0)
+                        && el.Promotion.PromotionCode.Equals(voucherInReq.PromotionCode));
+
+                    if (voucher != null)
                     {
+                        var existGroup = voucherGroups.Count > 0;
+
+                        var voucherGroup = existGroup ? voucherGroups.Where(el => el.VoucherGroupId.Equals(voucher.VoucherGroupId)).First() : new VoucherGroup();
+                        existGroup = voucherGroup != null;
+                        if (!existGroup)
+                        {
+                            voucherGroup = await _voucherGroupRepos.GetFirst(filter: el => el.VoucherGroupId.Equals(voucher.VoucherGroupId));
+                            voucherGroups.Add(voucherGroup);
+                        }
                         DateTime now = DateTime.Now;
-                        var voucher = voucherFilter.ToList().First();                       
                         voucher.IsUsed = AppConstant.EnvVar.Voucher.USED;
                         voucher.UsedDate = now;
                         voucher.UpdDate = now;
                         voucher.OrderId = order.Id.ToString();
                         voucher.TransactionId = transactionId;
                         //var voucherGroup = await _voucherGroupRepos.GetById(voucher.VoucherGroupId);
-                        voucher.VoucherGroup.UsedQuantity += 1;
-                        voucher.VoucherGroup.UpdDate = now;
+                        voucherGroup.UsedQuantity += 1;
+                        voucherGroup.UpdDate = now;
                         _repository.Update(voucher);
-                        _voucherGroupRepos.Update(voucher.VoucherGroup);
                         result.Add(voucher);
+                    }
+                }
+                if (voucherGroups.Count > 0)
+                {
+                    foreach (var group in voucherGroups)
+                    {
+                        _voucherGroupRepos.Update(group);
                     }
                 }
                 await _unitOfWork.SaveAsync();
