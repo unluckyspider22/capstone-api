@@ -15,8 +15,10 @@ namespace ApplicationCore.Services
 {
     public class GameCampaignService : BaseService<GameCampaign, GameCampaignDto>, IGameCampaignService
     {
-        public GameCampaignService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
+        private readonly IDeviceService _deviceService;
+        public GameCampaignService(IUnitOfWork unitOfWork, IMapper mapper, IDeviceService deviceService) : base(unitOfWork, mapper)
         {
+            _deviceService = deviceService;
         }
 
         protected override IGenericRepository<GameCampaign> _repository => _unitOfWork.GameConfigRepository;
@@ -102,39 +104,47 @@ namespace ApplicationCore.Services
                 throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
         }
-        public async Task<GameCampaignDto> CreateGameCampaign(GameCampaignDto dto)
+        public async Task<bool> CreateGameCampaign(GameCampaignDto dto, List<Guid> storeIdList)
         {
             try
             {
-                var now = Common.GetCurrentDatetime();
-                dto.UpdDate = now;
-                dto.InsDate = now;
-
+                dto.SecretCode = _deviceService.GenerateCode(dto.Id);
                 var gameCampaign = _mapper.Map<GameCampaign>(dto);
                 _repository.Add(gameCampaign);
-                await _unitOfWork.SaveAsync();
-
-                var store = await GetStore(dto.StoreId);
-
-                var mapping = new StoreGameCampaignMapping
+                foreach (var storeId in storeIdList)
                 {
-                    GameCampaign = gameCampaign,
-                    Store = store
-                };
-                await AddMappingStoreCampaign(mapping);
+                    await AddStoreGameMapping(storeId, gameCampaign);
+                }
 
-                return dto;
+                return await _unitOfWork.SaveAsync() > 0;
             }
             catch (Exception e)
             {
                 throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, e.Message);
             }
         }
+        private async Task AddStoreGameMapping(Guid storeId, GameCampaign gameCampaign)
+        {
+            IGenericRepository<Store> storeRepo = _unitOfWork.StoreRepository;
+            var storeEntity = await storeRepo.GetById(storeId);
+            var now = Common.GetCurrentDatetime();
+
+            IGenericRepository<StoreGameCampaignMapping> storeGameRepo = _unitOfWork.StoreGameCampaignMappingRepository;
+
+            storeGameRepo.Add(new StoreGameCampaignMapping
+            {
+                GameCampaign = gameCampaign,
+                Store = storeEntity,
+                InsDate = now,
+                UpdDate = now
+            });
+        }
         public async Task<GameCampaignDto> UpdateGameCampaign(GameCampaignDto dto)
         {
             try
             {
                 dto.UpdDate = DateTime.Now;
+
                 var entity = _mapper.Map<GameCampaign>(dto);
                 var gameMaster = await GetGameMaster(dto.GameMasterId);
                 if (gameMaster != null)
@@ -149,6 +159,7 @@ namespace ApplicationCore.Services
                 }
                 var items = entity.GameItems.ToList();
                 await UpdateGameItem(items, dto.Id);
+                await UpdateStores(dto.StoreIdList, entity);
                 _repository.Update(entity);
                 await _unitOfWork.SaveAsync();
                 return _mapper.Map<GameCampaignDto>(entity);
@@ -159,14 +170,8 @@ namespace ApplicationCore.Services
                 Debug.WriteLine(e.InnerException);
                 throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
             }
+        }
 
-        }
-        private async Task<Store> GetStore(Guid storeId)
-        {
-            IGenericRepository<Store> storeRepo = _unitOfWork.StoreRepository;
-            var store = await storeRepo.GetById(storeId);
-            return store;
-        }
         private async Task<GameMaster> GetGameMaster(Guid gameMasterId)
         {
             IGenericRepository<GameMaster> masterRepo = _unitOfWork.GameMasterRepository;
@@ -179,10 +184,17 @@ namespace ApplicationCore.Services
             var promotion = await promotionRepo.GetById(promotionId);
             return promotion;
         }
-        private async Task<bool> AddMappingStoreCampaign(StoreGameCampaignMapping mapping)
+        private async Task<bool> UpdateStores(List<Guid> storeIdList, GameCampaign gameCampaign)
         {
-            IGenericRepository<StoreGameCampaignMapping> storeGameRepo = _unitOfWork.StoreGameCampaignMappingRepository;
-            storeGameRepo.Add(mapping);
+            IGenericRepository<StoreGameCampaignMapping> storeMappingRepo = _unitOfWork.StoreGameCampaignMappingRepository;
+            storeMappingRepo.Delete(id: Guid.Empty, filter: o => o.GameCampaignId == gameCampaign.Id);
+            if (storeIdList.Count > 0)
+            {
+                foreach (var storeId in storeIdList)
+                {
+                    await AddStoreGameMapping(storeId, gameCampaign);
+                }
+            }
             return await _unitOfWork.SaveAsync() > 0;
         }
         private async Task<bool> UpdateGameItem(List<GameItems> list, Guid gameCampaignId)

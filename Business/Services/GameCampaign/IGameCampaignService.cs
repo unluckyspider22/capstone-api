@@ -12,6 +12,6 @@ namespace ApplicationCore.Services
         public Task<GameCampaignDto> UpdateGameCampaign(GameCampaignDto dto);
         public Task<List<GameItemDto>> GetGameCampaignItems(Guid deviceId, string gameCode);
 
-        public Task<GameCampaignDto> CreateGameCampaign(GameCampaignDto dto);
+        public Task<bool> CreateGameCampaign(GameCampaignDto dto, List<Guid> storeIdList);
     }
 }

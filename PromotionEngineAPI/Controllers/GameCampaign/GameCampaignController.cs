@@ -1,7 +1,9 @@
 ﻿using ApplicationCore.Services;
+using ApplicationCore.Utils;
 using Infrastructure.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers
@@ -22,7 +24,9 @@ namespace PromotionEngineAPI.Controllers
             try
             {
                 var result = await _service.GetAsync(pageIndex: param.PageIndex, pageSize: param.PageSize,
-                    filter: o => o.BrandId.Equals(brandId) && !o.DelFlg);
+                    filter: o => o.BrandId.Equals(brandId) && !o.DelFlg,
+                      orderBy: el => el.OrderByDescending(b => b.InsDate)
+                    );
                 return Ok(result);
             }
             catch (ErrorObj e)
@@ -59,7 +63,7 @@ namespace PromotionEngineAPI.Controllers
 
             try
             {
-                var result = await _service.CreateGameCampaign(dto);
+                var result = await _service.CreateGameCampaign(dto, dto.StoreIdList);
                 return Ok(result);
             }
             catch (ErrorObj e)
@@ -98,7 +102,7 @@ namespace PromotionEngineAPI.Controllers
             try
             {
                 var result = await _service.GetFirst(filter: o => o.Id.Equals(gameConfigId) && o.BrandId.Equals(brandId) && !o.DelFlg,
-                    includeProperties: "GameItems");
+                    includeProperties: "StoreGameCampaignMapping,GameItems");
                 return Ok(result);
             }
             catch (ErrorObj e)

@@ -26,7 +26,7 @@ namespace Infrastructure.Models
         public Guid? PromotionId { get; set; }
         public string SecretCode { get; set; }
         public bool HasCode { get; set; }
-        public TimeSpan? ExpiredDuration { get; set; }
+        public int? ExpiredDuration { get; set; }
 
         public virtual Brand Brand { get; set; }
         public virtual GameMaster GameMaster { get; set; }

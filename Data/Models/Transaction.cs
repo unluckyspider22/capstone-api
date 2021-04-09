@@ -12,6 +12,7 @@ namespace Infrastructure.Models
         public DateTime UpdDate { get; set; }
         public Guid? VoucherId { get; set; }
         public Guid? PromotionId { get; set; }
+
         public virtual Brand Brand { get; set; }
     }
 }
