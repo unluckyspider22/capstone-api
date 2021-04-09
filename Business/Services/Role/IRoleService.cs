@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace ApplicationCore.Services
 {
-    public interface IRoleService : IBaseService<RoleEntity, RoleDto>
+    public interface IRoleService : IBaseService<Role, RoleDto>
     {
       
     }

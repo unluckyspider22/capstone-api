@@ -230,7 +230,7 @@ namespace PromotionEngineAPI.Controllers
                                         "MemberLevelMapping," +
                                         "PromotionTier," +
                                         "PromotionTier.Action," +
-                                        "PromotionTier.PostAction," +
+                                        "PromotionTier.Gift," +
                                         "PromotionTier.ConditionRule," +
                                         "PromotionTier.VoucherGroup");
                 var tiers = result.PromotionTier;
@@ -443,7 +443,7 @@ namespace PromotionEngineAPI.Controllers
                                 && o.Status != (int)AppConstant.EnvVar.PromotionStatus.EXPIRED
                                 && !o.IsAuto
                                 && !o.DelFlg,
-                                includeProperties: "PromotionTier.Action,PromotionTier.PostAction"));
+                                includeProperties: "PromotionTier.Action,PromotionTier.Gift"));
             }
             catch (ErrorObj e)
             {

@@ -17,7 +17,7 @@ namespace Infrastructure.DTOs
         [Required]
         public ActionRequestParam Action { get; set; }
         [Required]
-        public PostActionRequestParam PostAction { get; set; }
+        public GiftRequestParam Gift { get; set; }
         public string Summary { get; set; }
     }
 
@@ -52,7 +52,7 @@ namespace Infrastructure.DTOs
         public List<Guid> ListProduct { get; set; }
     }
 
-    public class PostActionRequestParam
+    public class GiftRequestParam
     {
         [StringLength(1)]
         public string ActionType { get; set; }

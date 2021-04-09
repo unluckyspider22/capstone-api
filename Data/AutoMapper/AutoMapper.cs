@@ -32,8 +32,8 @@ namespace Infrastructure.AutoMapper
             CreateMap<Membership, MembershipDto>();
             CreateMap<MembershipDto, Membership>();
             //MembershipAction
-            CreateMap<PostAction, PostActionDto>();
-            CreateMap<PostActionDto, PostAction>();
+            CreateMap<Gift, GiftDto>();
+            CreateMap<GiftDto, Gift>();
             //OrderCondition
             CreateMap<OrderCondition, OrderConditionDto>();
             CreateMap<OrderConditionDto, OrderCondition>();
@@ -50,8 +50,8 @@ namespace Infrastructure.AutoMapper
             CreateMap<PromotionTier, PromotionTierDto>();
             CreateMap<PromotionTierDto, PromotionTier>();
             //RoleEntity
-            CreateMap<RoleEntity, RoleDto>();
-            CreateMap<RoleDto, RoleEntity>();
+            CreateMap<Role, RoleDto>();
+            CreateMap<RoleDto, Role>();
             //Store
             CreateMap<Store, StoreDto>();
             CreateMap<StoreDto, Store>();
@@ -74,8 +74,8 @@ namespace Infrastructure.AutoMapper
             CreateMap<Models.Action, ActionRequestParam>();
             CreateMap<ActionRequestParam, Models.Action>();
             //Membership request param
-            CreateMap<PostAction, PostActionRequestParam>();
-            CreateMap<PostActionRequestParam, PostAction>();
+            CreateMap<Gift, GiftRequestParam>();
+            CreateMap<GiftRequestParam, Gift>();
             //OrderConditionModel
             CreateMap<OrderCondition, OrderConditionModel>();
             CreateMap<OrderConditionModel, OrderCondition>();
@@ -90,8 +90,8 @@ namespace Infrastructure.AutoMapper
             CreateMap<Action, ActionUpdateParam>();
             CreateMap<ActionUpdateParam, Action>();
             // MembershipActionUpdateParam
-            CreateMap<PostAction, PostActionUpdateParam>();
-            CreateMap<PostActionUpdateParam, PostAction>();
+            CreateMap<Gift, GiftUpdateParam>();
+            CreateMap<GiftUpdateParam, Gift>();
 
             // PromotionInfomation
             CreateMap<PromotionInfomation, Promotion>();
@@ -120,16 +120,16 @@ namespace Infrastructure.AutoMapper
             CreateMap<Action, ActionTierDto>();
             CreateMap<ActionTierDto, Action>();
 
-            CreateMap<PostAction, PostActionTierDto>();
-            CreateMap<PostActionTierDto, PostAction>();
+            CreateMap<Gift, GiftTierDto>();
+            CreateMap<GiftTierDto, Gift>();
 
             CreateMap<ProductCondition, ProductConditionTierDto>();
             CreateMap<ProductConditionTierDto, ProductCondition>();
 
             CreateMap<MemberLevelMapping, MemberLevelMappingDto>();
             CreateMap<MemberLevelMappingDto, MemberLevelMapping>();
-            CreateMap<GameCampaign, GameConfigDto>();
-            CreateMap<GameConfigDto, GameCampaign>();
+            CreateMap<GameCampaign, GameCampaignDto>();
+            CreateMap<GameCampaignDto, GameCampaign>();
             CreateMap<GameItemDto, GameItems>();
             CreateMap<GameItems, GameItemDto>();
             CreateMap<GameMasterDto, GameMaster>();

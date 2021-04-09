@@ -3,16 +3,16 @@ using System.Collections.Generic;
 
 namespace Infrastructure.Models
 {
-    public partial class PostAction
+    public partial class Gift
     {
-        public PostAction()
+        public Gift()
         {
-            PostActionProductMapping = new HashSet<PostActionProductMapping>();
+            GiftProductMapping = new HashSet<GiftProductMapping>();
             PromotionTier = new HashSet<PromotionTier>();
             VoucherGroup = new HashSet<VoucherGroup>();
         }
 
-        public Guid PostActionId { get; set; }
+        public Guid GiftId { get; set; }
         public int PostActionType { get; set; }
         public decimal? BonusPoint { get; set; }
         public bool DelFlg { get; set; }
@@ -25,7 +25,7 @@ namespace Infrastructure.Models
 
         public virtual Brand Brand { get; set; }
         public virtual GameCampaign GameCampaign { get; set; }
-        public virtual ICollection<PostActionProductMapping> PostActionProductMapping { get; set; }
+        public virtual ICollection<GiftProductMapping> GiftProductMapping { get; set; }
         public virtual ICollection<PromotionTier> PromotionTier { get; set; }
         public virtual ICollection<VoucherGroup> VoucherGroup { get; set; }
     }

@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace ApplicationCore.Services
 {
-    public interface IPostActionService : IBaseService<PostAction, PostActionDto>
+    public interface IGiftService : IBaseService<Gift, GiftDto>
     {
-        public Task<PostActionDto> MyAddAction(PostActionDto dto);
+        public Task<GiftDto> MyAddAction(GiftDto dto);
         public Task<bool> Delete(Guid id);
     }
 }

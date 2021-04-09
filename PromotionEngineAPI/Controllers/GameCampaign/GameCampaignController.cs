@@ -2,7 +2,6 @@
 using Infrastructure.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers
@@ -33,7 +32,7 @@ namespace PromotionEngineAPI.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateGame([FromBody] GameConfigDto dto, [FromQuery] Guid gameConfigId)
+        public async Task<IActionResult> UpdateGame([FromBody] GameCampaignDto dto, [FromQuery] Guid gameConfigId)
         {
             if (dto.BrandId.Equals(Guid.Empty) || !dto.Id.Equals(gameConfigId) || gameConfigId.Equals(Guid.Empty))
             {
@@ -41,7 +40,7 @@ namespace PromotionEngineAPI.Controllers
             }
             try
             {
-                var result = await _service.UpdateGameConfig(dto);
+                var result = await _service.UpdateGameCampaign(dto);
                 return Ok(result);
             }
             catch (ErrorObj e)
@@ -51,7 +50,7 @@ namespace PromotionEngineAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateGame([FromBody] GameConfigDto dto)
+        public async Task<IActionResult> CreateGame([FromBody] GameCampaignDto dto)
         {
             if (dto.BrandId.Equals(Guid.Empty))
             {
@@ -60,9 +59,7 @@ namespace PromotionEngineAPI.Controllers
 
             try
             {
-                dto.UpdDate = DateTime.Now;
-                dto.InsDate = DateTime.Now;
-                var result = await _service.CreateAsync(dto);
+                var result = await _service.CreateGameCampaign(dto);
                 return Ok(result);
             }
             catch (ErrorObj e)

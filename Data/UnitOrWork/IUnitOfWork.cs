@@ -21,7 +21,7 @@ namespace Infrastructure.UnitOrWork
         //Membership
         IGenericRepository<Membership> MembershipRepository { get; }
         //MembershipAction
-        IGenericRepository<PostAction> PostActionRepository { get; }
+        IGenericRepository<Gift> GiftRepository { get; }
         //OrderCondition
         IGenericRepository<OrderCondition> OrderConditionRepository { get; }
         //ProductCondition
@@ -33,7 +33,7 @@ namespace Infrastructure.UnitOrWork
         //PromotionTier
         IGenericRepository<PromotionTier> PromotionTierRepository { get; }
         //RoleEntity
-        IGenericRepository<RoleEntity> RoleEntityRepository { get; }
+        IGenericRepository<Role> RoleEntityRepository { get; }
         //Store
         IGenericRepository<Store> StoreRepository { get; }
         //Voucher
@@ -52,9 +52,9 @@ namespace Infrastructure.UnitOrWork
         IGenericRepository<ActionProductMapping> ActionProductMappingRepository { get; }
         IGenericRepository<MemberLevelMapping> MemberLevelMappingRepository { get; }
 
-        IGenericRepository<PostActionProductMapping> PostActionProductMappingRepository { get; }
+        IGenericRepository<GiftProductMapping> GiftProductMappingRepository { get; }
         IGenericRepository<ProductConditionMapping> ProductConditionMappingRepository { get; }
-
+        IGenericRepository<StoreGameCampaignMapping> StoreGameCampaignMappingRepository { get; }
         IGenericRepository<GameCampaign> GameConfigRepository { get; }
         IGenericRepository<GameItems> GameItemsRepository { get; }
         IGenericRepository<GameMaster> GameMasterRepository { get; }

@@ -10,13 +10,13 @@ namespace Infrastructure.DTOs
     {
         public ConditionRule conditionRule { get; set; }
         public Action action { get; set; }
-        public PostAction membershipAction { get; set; }
+        public Gift gift { get; set; }
 
-        public PromotionTierResponse(ConditionRule conditionRule, Action action, PostAction membershipAction)
+        public PromotionTierResponse(ConditionRule conditionRule, Action action, Gift membershipAction)
         {
             this.conditionRule = conditionRule;
             this.action = action;
-            this.membershipAction = membershipAction;
+            this.gift = membershipAction;
         }
     }
 }

@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 
 namespace ApplicationCore.Services
 {
-    public interface IGameCampaignService : IBaseService<GameCampaign, GameConfigDto>
+    public interface IGameCampaignService : IBaseService<GameCampaign, GameCampaignDto>
     {
         public Task<bool> DeleteGameConfig(Guid id);
-        public Task<GameConfigDto> UpdateGameConfig(GameConfigDto dto);
+        public Task<GameCampaignDto> UpdateGameCampaign(GameCampaignDto dto);
         public Task<List<GameItemDto>> GetGameCampaignItems(Guid deviceId, string gameCode);
+
+        public Task<GameCampaignDto> CreateGameCampaign(GameCampaignDto dto);
     }
 }

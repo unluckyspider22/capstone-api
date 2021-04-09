@@ -8,7 +8,7 @@ namespace Infrastructure.Models
         public Product()
         {
             ActionProductMapping = new HashSet<ActionProductMapping>();
-            PostActionProductMapping = new HashSet<PostActionProductMapping>();
+            GiftProductMapping = new HashSet<GiftProductMapping>();
             ProductConditionMapping = new HashSet<ProductConditionMapping>();
         }
 
@@ -23,7 +23,7 @@ namespace Infrastructure.Models
 
         public virtual ProductCategory ProductCate { get; set; }
         public virtual ICollection<ActionProductMapping> ActionProductMapping { get; set; }
-        public virtual ICollection<PostActionProductMapping> PostActionProductMapping { get; set; }
+        public virtual ICollection<GiftProductMapping> GiftProductMapping { get; set; }
         public virtual ICollection<ProductConditionMapping> ProductConditionMapping { get; set; }
     }
 }

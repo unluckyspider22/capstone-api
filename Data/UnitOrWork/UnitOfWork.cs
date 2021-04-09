@@ -31,7 +31,7 @@ namespace Infrastructure.UnitOrWork
         //Membership
         public IGenericRepository<Membership> MembershipRepository { get; set; }
         //MembershipAction
-        public IGenericRepository<PostAction> PostActionRepository { get; set; }
+        public IGenericRepository<Gift> GiftRepository { get; set; }
         //OrderCondition
         public IGenericRepository<OrderCondition> OrderConditionRepository { get; set; }
         //ProductCondition
@@ -47,7 +47,7 @@ namespace Infrastructure.UnitOrWork
 
 
         //RoleEntity
-        public IGenericRepository<RoleEntity> RoleEntityRepository { get; set; }
+        public IGenericRepository<Role> RoleEntityRepository { get; set; }
 
 
         //Store
@@ -56,12 +56,8 @@ namespace Infrastructure.UnitOrWork
 
         //Voucher
         public IGenericRepository<Voucher> VoucherRepository { get; set; }
-
-
         //VoucherChannel
         public IGenericRepository<PromotionChannelMapping> VoucherChannelRepository { get; set; }
-
-
         //VoucherGroup
         public IGenericRepository<VoucherGroup> VoucherGroupRepository { get; set; }
 
@@ -77,7 +73,7 @@ namespace Infrastructure.UnitOrWork
         public IGenericRepository<ActionProductMapping> ActionProductMappingRepository { get; set; }
 
         public IGenericRepository<MemberLevelMapping> MemberLevelMappingRepository { get; set; }
-        public IGenericRepository<PostActionProductMapping> PostActionProductMappingRepository { get; set; }
+        public IGenericRepository<GiftProductMapping> GiftProductMappingRepository { get; set; }
         public IGenericRepository<ProductConditionMapping> ProductConditionMappingRepository { get; set; }
 
         public IGenericRepository<GameCampaign> GameConfigRepository { get; set; }
@@ -88,6 +84,7 @@ namespace Infrastructure.UnitOrWork
 
         public IGenericRepository<Transaction> TransactionRepository { get; set; }
 
+        public IGenericRepository<StoreGameCampaignMapping> StoreGameCampaignMappingRepository { get; set; }
 
         private void initRepository()
         {
@@ -106,7 +103,7 @@ namespace Infrastructure.UnitOrWork
             //Membership
             MembershipRepository = new GenericRepository<Membership>(_context);
             //MembershipAction
-            PostActionRepository = new GenericRepository<PostAction>(_context);
+            GiftRepository = new GenericRepository<Gift>(_context);
             //OrderCondition
             OrderConditionRepository = new GenericRepository<OrderCondition>(_context);
             //ProductCondition
@@ -118,7 +115,7 @@ namespace Infrastructure.UnitOrWork
             //PromotionTier
             PromotionTierRepository = new GenericRepository<PromotionTier>(_context);
             //RoleEntity
-            RoleEntityRepository = new GenericRepository<RoleEntity>(_context);
+            RoleEntityRepository = new GenericRepository<Role>(_context);
             //Store
             StoreRepository = new GenericRepository<Store>(_context);
             //Voucher
@@ -135,12 +132,13 @@ namespace Infrastructure.UnitOrWork
             DeviceRepository = new GenericRepository<Device>(_context);
             ActionProductMappingRepository = new GenericRepository<ActionProductMapping>(_context);
             MemberLevelMappingRepository = new GenericRepository<MemberLevelMapping>(_context);
-            PostActionProductMappingRepository = new GenericRepository<PostActionProductMapping>(_context);
+            GiftProductMappingRepository = new GenericRepository<GiftProductMapping>(_context);
             ProductConditionMappingRepository = new GenericRepository<ProductConditionMapping>(_context);
             GameMasterRepository = new GenericRepository<GameMaster>(_context);
             GameConfigRepository = new GenericRepository<GameCampaign>(_context);
             GameItemsRepository = new GenericRepository<GameItems>(_context);
             TransactionRepository = new GenericRepository<Transaction>(_context);
+            StoreGameCampaignMappingRepository = new GenericRepository<StoreGameCampaignMapping>(_context);
 
         }
         public void Dispose()

@@ -61,7 +61,7 @@ namespace ApplicationCore.Request
         public int PaymentMethod { get; set; }
         public StoreInfo StoreInfo { get; set; }
     }
-    public class Gift
+    public class OrderGift
     {
         [StringLength(20)]
 

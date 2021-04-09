@@ -9,6 +9,7 @@ namespace Infrastructure.Models
         {
             Device = new HashSet<Device>();
             PromotionStoreMapping = new HashSet<PromotionStoreMapping>();
+            StoreGameCampaignMapping = new HashSet<StoreGameCampaignMapping>();
             Voucher = new HashSet<Voucher>();
         }
 
@@ -24,6 +25,7 @@ namespace Infrastructure.Models
         public virtual Brand Brand { get; set; }
         public virtual ICollection<Device> Device { get; set; }
         public virtual ICollection<PromotionStoreMapping> PromotionStoreMapping { get; set; }
+        public virtual ICollection<StoreGameCampaignMapping> StoreGameCampaignMapping { get; set; }
         public virtual ICollection<Voucher> Voucher { get; set; }
     }
 }

@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace Infrastructure.Models
 {
-    public partial class RoleEntity
+    public partial class Role
     {
-        public RoleEntity()
+        public Role()
         {
             Account = new HashSet<Account>();
         }
-        [Key]
+
         public int RoleId { get; set; }
         public string Name { get; set; }
         public bool DelFlg { get; set; }

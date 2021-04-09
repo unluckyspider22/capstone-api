@@ -10,20 +10,20 @@ using System.Threading.Tasks;
 
 namespace ApplicationCore.Services
 {
-    public class PostActionService : BaseService<PostAction, PostActionDto>, IPostActionService
+    public class GiftService : BaseService<Gift, GiftDto>, IGiftService
     {
-        public PostActionService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
+        public GiftService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
         {
         }
 
-        protected override IGenericRepository<PostAction> _repository => _unitOfWork.PostActionRepository;
+        protected override IGenericRepository<Gift> _repository => _unitOfWork.GiftRepository;
 
         public async Task<bool> Delete(Guid id)
         {
             try
             {
-                IGenericRepository<PostActionProductMapping> mappRepo = _unitOfWork.PostActionProductMappingRepository;
-                mappRepo.Delete(id: Guid.Empty, filter: o => o.PostActionId.Equals(id));
+                IGenericRepository<GiftProductMapping> mappRepo = _unitOfWork.GiftProductMappingRepository;
+                mappRepo.Delete(id: Guid.Empty, filter: o => o.GiftId.Equals(id));
                 _repository.Delete(id: id);
                 return await _unitOfWork.SaveAsync() > 0;
             }
@@ -36,24 +36,24 @@ namespace ApplicationCore.Services
             }
         }
 
-        public async Task<PostActionDto> MyAddAction(PostActionDto dto)
+        public async Task<GiftDto> MyAddAction(GiftDto dto)
         {
             try
             {
-                dto.PostActionId = Guid.NewGuid();
+                dto.GiftId = Guid.NewGuid();
                 dto.InsDate = DateTime.Now;
                 dto.UpdDate = DateTime.Now;
-                var entity = _mapper.Map<PostAction>(dto);
+                var entity = _mapper.Map<Gift>(dto);
                 _repository.Add(entity);
                 if (dto.PostActionType == (int)AppConstant.EnvVar.PostActionType.Gift_Product && dto.ListProduct.Count > 0)
                 {
-                    IGenericRepository<PostActionProductMapping> mappRepo = _unitOfWork.PostActionProductMappingRepository;
+                    IGenericRepository<GiftProductMapping> mappRepo = _unitOfWork.GiftProductMappingRepository;
                     foreach (var product in dto.ListProduct)
                     {
-                        var mapp = new PostActionProductMapping()
+                        var mapp = new GiftProductMapping()
                         {
                             Id = Guid.NewGuid(),
-                            PostActionId = dto.PostActionId,
+                            GiftId = dto.GiftId,
                             ProductId = product.ProductId,
                             InsDate = DateTime.Now,
                             UpdDate = DateTime.Now,
@@ -64,7 +64,7 @@ namespace ApplicationCore.Services
                     }
                 }
                 await _unitOfWork.SaveAsync();
-                return _mapper.Map<PostActionDto>(entity);
+                return _mapper.Map<GiftDto>(entity);
             }
             catch (System.Exception e)
             {

@@ -394,7 +394,7 @@ namespace ApplicationCore.Services
                     && o.Quantity > o.RedempedQuantity
                     && o.Quantity > o.UsedQuantity
                     && !o.DelFlg,
-                    includeProperties: "Action,PostAction")).ToList();
+                    includeProperties: "Action,Gift")).ToList();
                 if (groups.Count > 0)
                 {
                     foreach (var group in groups)
@@ -410,10 +410,10 @@ namespace ApplicationCore.Services
                             dto.ActionType = group.Action.ActionType;
                             dto.ActionId = group.ActionId;
                         }
-                        else if (group.PostAction != null)
+                        else if (group.Gift != null)
                         {
-                            dto.PostActionType = group.PostAction.PostActionType;
-                            dto.PostActionId = group.PostActionId;
+                            dto.PostActionType = group.Gift.PostActionType;
+                            dto.GiftId = group.GiftId;
                         }
                         result.Add(dto);
                     }
@@ -472,7 +472,7 @@ namespace ApplicationCore.Services
             {
                 var result = new VoucherGroupDetailDto();
                 var group = await _repository.GetFirst(filter: o => o.VoucherGroupId.Equals(id) && !o.DelFlg,
-                                                        includeProperties: "Action,PostAction");
+                                                        includeProperties: "Action,Gift");
                 if (group != null)
                 {
                     result = new VoucherGroupDetailDto()
@@ -481,7 +481,7 @@ namespace ApplicationCore.Services
                         VoucherName = group.VoucherName,
                         BrandId = group.BrandId,
                         ActionId = group.ActionId,
-                        PostActionId = group.PostActionId,
+                        GiftId = group.GiftId,
                         RedempedQuantity = group.RedempedQuantity,
                         Total = group.Quantity,
                         UsedQuantity = group.UsedQuantity,
@@ -491,9 +491,9 @@ namespace ApplicationCore.Services
                     {
                         result.ActionType = group.Action.ActionType;
                     }
-                    if (group.PostAction != null)
+                    if (group.Gift != null)
                     {
-                        result.PostActionType = group.PostAction.PostActionType;
+                        result.PostActionType = group.Gift.PostActionType;
                     }
                     if (result.UsedQuantity > result.RedempedQuantity)
                     {

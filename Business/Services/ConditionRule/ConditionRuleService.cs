@@ -14,8 +14,8 @@ namespace ApplicationCore.Services
     public class ConditionRuleService : BaseService<ConditionRule, ConditionRuleDto>, IConditionRuleService
     {
         private readonly IActionService _actionService;
-        private readonly IPostActionService _postActionService;
-        public ConditionRuleService(IUnitOfWork unitOfWork, IMapper mapper, IActionService actionService, IPostActionService postActionService) : base(unitOfWork, mapper)
+        private readonly IGiftService _postActionService;
+        public ConditionRuleService(IUnitOfWork unitOfWork, IMapper mapper, IActionService actionService, IGiftService postActionService) : base(unitOfWork, mapper)
         {
             _actionService = actionService;
             _postActionService = postActionService;
@@ -38,7 +38,7 @@ namespace ApplicationCore.Services
                     "ConditionGroup.OrderCondition," +
                     "PromotionTier," +
                     "PromotionTier.Action," +
-                    "PromotionTier.PostAction");
+                    "PromotionTier.Gift");
                 var groups = conditionRule.ConditionGroup.ToList();
                 if (groups != null && groups.Count > 0)
                 {
@@ -72,9 +72,9 @@ namespace ApplicationCore.Services
                  {
                      await _actionService.Delete((Guid)promotionTier.ActionId);
                  }
-                 else if (promotionTier.PostAction != null)
+                 else if (promotionTier.Gift != null)
                  {
-                     await _postActionService.Delete((Guid)promotionTier.PostActionId);
+                     await _postActionService.Delete((Guid)promotionTier.GiftId);
                  }
                  tierRepo.Delete(id: promotionTier.PromotionTierId);
                  _repository.Delete(id: conditionRuleId);*/

@@ -18,7 +18,7 @@ namespace Infrastructure.DTOs
         public string CustomCharset { get; set; }
         public Guid? ConditionRuleId { get; set; }
         public Guid? ActionId { get; set; }
-        public Guid? PostActionId { get; set; }
+        public Guid? GiftId { get; set; }
         public int CodeLength { get; set; }
         public virtual ICollection<VoucherDto> Voucher { get; set; }
         public virtual ICollection<VoucherChannelDto> VoucherChannel { get; set; }
@@ -30,7 +30,7 @@ namespace Infrastructure.DTOs
         public decimal? Quantity { get; set; }
         public string VoucherName { get; set; }
         public Guid? ActionId { get; set; }
-        public Guid? PostActionId { get; set; }
+        public Guid? GiftId { get; set; }
         public int ActionType { get; set; }
         public int PostActionType { get; set; }
     }
@@ -53,7 +53,7 @@ namespace Infrastructure.DTOs
         public int Remain { get; set; }
         public Guid? ActionId { get; set; }
         public int ActionType { get; set; } = 0;
-        public Guid? PostActionId { get; set; }
+        public Guid? GiftId { get; set; }
         public int PostActionType { get; set; } = 0;
         public List<PromoOfVoucher> PromoList { get; set; } = new List<PromoOfVoucher>();
     }

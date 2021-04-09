@@ -52,7 +52,7 @@ namespace PromotionEngineAPI.Controllers
                 else if (PostActionType > 0)
                 {
                     myFilter = el => !el.DelFlg
-                  && el.PostAction.PostActionType == PostActionType
+                  && el.Gift.PostActionType == PostActionType
                                       && el.BrandId.Equals(BrandId)
                                       && el.VoucherName.ToLower().Contains(param.SearchContent.ToLower().Trim());
                 }
