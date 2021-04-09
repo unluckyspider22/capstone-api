@@ -12,7 +12,7 @@ namespace Infrastructure.DTOs
         public ConditionRequestParam ConditionRule { get; set; }
         public List<ConditionGroupDto> ConditionGroups { get; set; }
         public ActionUpdateParam Action { get; set; }
-        public PostActionUpdateParam PostAction { get; set; }
+        public GiftUpdateParam Gift { get; set; }
         public Guid PromotionTierId { get; set; }
         public string Summary { get; set; }
     }
@@ -49,9 +49,9 @@ namespace Infrastructure.DTOs
         public List<Guid> ListProduct { get; set; }
     }
 
-    public class PostActionUpdateParam
+    public class GiftUpdateParam
     {
-        public Guid PostActionId { get; set; }
+        public Guid GiftId { get; set; }
         [StringLength(1)]
         public string ActionType { get; set; }
         [StringLength(2)]

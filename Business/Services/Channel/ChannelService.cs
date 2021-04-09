@@ -41,7 +41,7 @@ namespace ApplicationCore.Services
                 includeProperties:
                 "Brand,PromotionChannelMapping.Channel," +
                 "PromotionTier.Action," +
-                "PromotionTier.PostAction," +
+                "PromotionTier.Gift," +
                 "PromotionTier.VoucherGroup")).Data; ;
 
                 promotions = promotions.Where(w =>
@@ -58,7 +58,7 @@ namespace ApplicationCore.Services
                         {
                             PromotionId = promotion.PromotionId,
                             PromotionName = promotion.PromotionName,
-                            ActionName = promotionTier.Action != null ? promotionTier.Action.Name : promotionTier.PostAction.Name,
+                            ActionName = promotionTier.Action != null ? promotionTier.Action.Name : promotionTier.Gift.Name,
                             ImgUrl = promotion.ImgUrl,
                             PromotionCode = promotion.PromotionCode,
                             PromotionTierId = promotionTier.PromotionTierId,

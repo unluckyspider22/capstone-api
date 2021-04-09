@@ -26,13 +26,13 @@ namespace Infrastructure.Models
         public virtual DbSet<GameCampaign> GameCampaign { get; set; }
         public virtual DbSet<GameItems> GameItems { get; set; }
         public virtual DbSet<GameMaster> GameMaster { get; set; }
+        public virtual DbSet<Gift> Gift { get; set; }
+        public virtual DbSet<GiftProductMapping> GiftProductMapping { get; set; }
         public virtual DbSet<Holiday> Holiday { get; set; }
         public virtual DbSet<MemberLevel> MemberLevel { get; set; }
         public virtual DbSet<MemberLevelMapping> MemberLevelMapping { get; set; }
         public virtual DbSet<Membership> Membership { get; set; }
         public virtual DbSet<OrderCondition> OrderCondition { get; set; }
-        public virtual DbSet<PostAction> PostAction { get; set; }
-        public virtual DbSet<PostActionProductMapping> PostActionProductMapping { get; set; }
         public virtual DbSet<Product> Product { get; set; }
         public virtual DbSet<ProductCategory> ProductCategory { get; set; }
         public virtual DbSet<ProductCondition> ProductCondition { get; set; }
@@ -41,8 +41,9 @@ namespace Infrastructure.Models
         public virtual DbSet<PromotionChannelMapping> PromotionChannelMapping { get; set; }
         public virtual DbSet<PromotionStoreMapping> PromotionStoreMapping { get; set; }
         public virtual DbSet<PromotionTier> PromotionTier { get; set; }
-        public virtual DbSet<RoleEntity> Role { get; set; }
+        public virtual DbSet<Role> Role { get; set; }
         public virtual DbSet<Store> Store { get; set; }
+        public virtual DbSet<StoreGameCampaignMapping> StoreGameCampaignMapping { get; set; }
         public virtual DbSet<Transaction> Transaction { get; set; }
         public virtual DbSet<Voucher> Voucher { get; set; }
         public virtual DbSet<VoucherGroup> VoucherGroup { get; set; }
@@ -316,11 +317,6 @@ namespace Infrastructure.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.HasOne(d => d.GameCampaign)
-                    .WithMany(p => p.Device)
-                    .HasForeignKey(d => d.GameCampaignId)
-                    .HasConstraintName("FK_Device_GameCampaign");
-
                 entity.HasOne(d => d.Store)
                     .WithMany(p => p.Device)
                     .HasForeignKey(d => d.StoreId)
@@ -341,6 +337,10 @@ namespace Infrastructure.Models
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(50);
+
+                entity.Property(e => e.SecretCode)
+                    .HasMaxLength(6)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.StartGame).HasColumnType("datetime");
 
@@ -422,6 +422,54 @@ namespace Infrastructure.Models
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
+            });
+
+            modelBuilder.Entity<Gift>(entity =>
+            {
+                entity.Property(e => e.GiftId).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.BonusPoint).HasColumnType("decimal(10, 2)");
+
+                entity.Property(e => e.InsDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.Name).HasMaxLength(100);
+
+                entity.Property(e => e.UpdDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.HasOne(d => d.Brand)
+                    .WithMany(p => p.Gift)
+                    .HasForeignKey(d => d.BrandId)
+                    .HasConstraintName("FK_Gift_Brand");
+
+                entity.HasOne(d => d.GameCampaign)
+                    .WithMany(p => p.Gift)
+                    .HasForeignKey(d => d.GameCampaignId)
+                    .HasConstraintName("FK_Gift_GameCampaign");
+            });
+
+            modelBuilder.Entity<GiftProductMapping>(entity =>
+            {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.InsDate).HasColumnType("datetime");
+
+                entity.Property(e => e.UpdDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.Gift)
+                    .WithMany(p => p.GiftProductMapping)
+                    .HasForeignKey(d => d.GiftId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_GiftProductMapping_Gift");
+
+                entity.HasOne(d => d.Product)
+                    .WithMany(p => p.GiftProductMapping)
+                    .HasForeignKey(d => d.ProductId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_GiftProductMapping_Product");
             });
 
             modelBuilder.Entity<Holiday>(entity =>
@@ -547,54 +595,6 @@ namespace Infrastructure.Models
                     .HasForeignKey(d => d.ConditionGroupId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_OrderCondition_ConditionGroup1");
-            });
-
-            modelBuilder.Entity<PostAction>(entity =>
-            {
-                entity.Property(e => e.PostActionId).HasDefaultValueSql("(newid())");
-
-                entity.Property(e => e.BonusPoint).HasColumnType("decimal(10, 2)");
-
-                entity.Property(e => e.InsDate)
-                    .HasColumnType("datetime")
-                    .HasDefaultValueSql("(getdate())");
-
-                entity.Property(e => e.Name).HasMaxLength(100);
-
-                entity.Property(e => e.UpdDate)
-                    .HasColumnType("datetime")
-                    .HasDefaultValueSql("(getdate())");
-
-                entity.HasOne(d => d.Brand)
-                    .WithMany(p => p.PostAction)
-                    .HasForeignKey(d => d.BrandId)
-                    .HasConstraintName("FK_PostAction_Brand");
-
-                entity.HasOne(d => d.GameCampaign)
-                    .WithMany(p => p.PostAction)
-                    .HasForeignKey(d => d.GameCampaignId)
-                    .HasConstraintName("FK_PostAction_GameCampaign");
-            });
-
-            modelBuilder.Entity<PostActionProductMapping>(entity =>
-            {
-                entity.Property(e => e.Id).ValueGeneratedNever();
-
-                entity.Property(e => e.InsDate).HasColumnType("datetime");
-
-                entity.Property(e => e.UpdDate).HasColumnType("datetime");
-
-                entity.HasOne(d => d.PostAction)
-                    .WithMany(p => p.PostActionProductMapping)
-                    .HasForeignKey(d => d.PostActionId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_PostActionProductMapping_PostAction");
-
-                entity.HasOne(d => d.Product)
-                    .WithMany(p => p.PostActionProductMapping)
-                    .HasForeignKey(d => d.ProductId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_PostActionProductMapping_Product");
             });
 
             modelBuilder.Entity<Product>(entity =>
@@ -817,9 +817,9 @@ namespace Infrastructure.Models
                     .HasForeignKey(d => d.ConditionRuleId)
                     .HasConstraintName("FK_PromotionTier_ConditionRule");
 
-                entity.HasOne(d => d.PostAction)
+                entity.HasOne(d => d.Gift)
                     .WithMany(p => p.PromotionTier)
-                    .HasForeignKey(d => d.PostActionId)
+                    .HasForeignKey(d => d.GiftId)
                     .HasConstraintName("PromotionTier_FK");
 
                 entity.HasOne(d => d.Promotion)
@@ -833,7 +833,7 @@ namespace Infrastructure.Models
                     .HasConstraintName("FK_PromotionTier_VoucherGroup");
             });
 
-            modelBuilder.Entity<RoleEntity>(entity =>
+            modelBuilder.Entity<Role>(entity =>
             {
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
@@ -877,6 +877,30 @@ namespace Infrastructure.Models
                     .HasConstraintName("FK_Store_Brand");
             });
 
+            modelBuilder.Entity<StoreGameCampaignMapping>(entity =>
+            {
+                entity.HasKey(e => e.StoreGameCampaignId)
+                    .HasName("StoreGameCampaignMapping_PK");
+
+                entity.Property(e => e.StoreGameCampaignId).ValueGeneratedNever();
+
+                entity.Property(e => e.InsDate).HasColumnType("datetime");
+
+                entity.Property(e => e.UpdDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.GameCampaign)
+                    .WithMany(p => p.StoreGameCampaignMapping)
+                    .HasForeignKey(d => d.GameCampaignId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("StoreGameCampaignMapping_FK_1");
+
+                entity.HasOne(d => d.Store)
+                    .WithMany(p => p.StoreGameCampaignMapping)
+                    .HasForeignKey(d => d.StoreId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("StoreGameCampaignMapping_FK");
+            });
+
             modelBuilder.Entity<Transaction>(entity =>
             {
                 entity.Property(e => e.Id).ValueGeneratedNever();
@@ -910,6 +934,10 @@ namespace Infrastructure.Models
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.OrderId)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.RedempedDate).HasColumnType("datetime");
 
@@ -994,10 +1022,10 @@ namespace Infrastructure.Models
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_VoucherGroup_Brand");
 
-                entity.HasOne(d => d.PostAction)
+                entity.HasOne(d => d.Gift)
                     .WithMany(p => p.VoucherGroup)
-                    .HasForeignKey(d => d.PostActionId)
-                    .HasConstraintName("FK_VoucherGroup_PostAction");
+                    .HasForeignKey(d => d.GiftId)
+                    .HasConstraintName("FK_VoucherGroup_Gift");
             });
 
             OnModelCreatingPartial(modelBuilder);

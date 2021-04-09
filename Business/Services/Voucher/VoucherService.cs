@@ -48,13 +48,15 @@ namespace ApplicationCore.Services
                 foreach (var voucherModel in vouchers)
                 {
                     var voucher = await _repository.Get(filter: el =>
-                    el.VoucherCode.Equals(voucherModel.VoucherCode)
+                    (!string.IsNullOrEmpty(voucherModel.VoucherCode) ?
+                        (el.VoucherCode.Equals(voucherModel.VoucherCode) && el.Promotion.PromotionCode.Equals(voucherModel.PromotionCode)) :
+                        el.Promotion.PromotionCode.Equals(voucherModel.PromotionCode))
                     && el.Promotion.Brand.BrandCode.Equals(order.Attributes.StoreInfo.BrandCode)
-                    && el.Promotion.PromotionCode.Equals(voucherModel.PromotionCode)
                     && !el.IsUsed,
                     includeProperties:
                     "Promotion.PromotionTier.Action.ActionProductMapping.Product," +
-                    "Promotion.PromotionTier.PostAction.PostActionProductMapping.Product," +
+                    "Promotion.PromotionTier.Gift.GiftProductMapping.Product," +
+                    "Promotion.PromotionTier.Gift.GameCampaign.GameMaster," +
                     "Promotion.PromotionTier.Action.ActionProductMapping.Product," +
                     "Promotion.PromotionTier.ConditionRule.ConditionGroup.OrderCondition," +
                     "Promotion.PromotionTier.ConditionRule.ConditionGroup.ProductCondition.ProductConditionMapping.Product," +
@@ -255,7 +257,7 @@ namespace ApplicationCore.Services
                     "VoucherGroup.Brand.UsernameNavigation," +
                     "Membership," +
                     "VoucherGroup.Action," +
-                    "VoucherGroup.PostAction");
+                    "VoucherGroup.Gift");
                 var voucher = new Voucher();
                 if (vouchers.Count() > 0)
                 {

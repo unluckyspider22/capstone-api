@@ -12,12 +12,12 @@ namespace Infrastructure.DTOs
         public Guid? ConditionRuleId { get; set; }
         public Guid? ActionId { get; set; }
         public Guid? PromotionId { get; set; }
-        public Guid? PostActionId { get; set; }
+        public Guid? GiftId { get; set; }
         public string Summary { get; set; }
 
         public ConditionRuleResponse ConditionRule { get; set; }
         public virtual ActionTierDto Action { get; set; }
-        public virtual PostActionTierDto PostAction { get; set; }
+        public virtual GiftTierDto Gift { get; set; }
     }
 
     public class ActionTierDto
@@ -40,9 +40,9 @@ namespace Infrastructure.DTOs
         public List<ProductDto> productList { get; set; }
     }
 
-    public class PostActionTierDto
+    public class GiftTierDto
     {
-        public Guid PostActionId { get; set; }
+        public Guid GiftId { get; set; }
         public Guid PromotionTierId { get; set; }
         public string ActionType { get; set; }
         public string DiscountType { get; set; }

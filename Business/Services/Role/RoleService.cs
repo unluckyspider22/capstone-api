@@ -12,13 +12,13 @@ using System.Linq;
 
 namespace ApplicationCore.Services
 {
-    public class RoleService : BaseService<RoleEntity, RoleDto>, IRoleService
+    public class RoleService : BaseService<Role, RoleDto>, IRoleService
     {
         public RoleService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
         {
 
         }
 
-        protected override IGenericRepository<RoleEntity> _repository => _unitOfWork.RoleEntityRepository;
+        protected override IGenericRepository<Role> _repository => _unitOfWork.RoleEntityRepository;
     }
 }

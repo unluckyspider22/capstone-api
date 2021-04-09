@@ -59,7 +59,7 @@ namespace ApplicationCore.Services
                 IGenericRepository<ProductCondition> productConditionRepo = _unitOfWork.ProductConditionRepository;
                 IGenericRepository<OrderCondition> orderConditionRepo = _unitOfWork.OrderConditionRepository;
                 IGenericRepository<PromotionTier> promotionTierRepo = _unitOfWork.PromotionTierRepository;
-                IGenericRepository<PostAction> postActionRepo = _unitOfWork.PostActionRepository;
+                IGenericRepository<Gift> postActionRepo = _unitOfWork.GiftRepository;
                 IGenericRepository<Infrastructure.Models.Action> actionRepo = _unitOfWork.ActionRepository;
                 // Create condition rule
                 var conditionRuleEntity = _mapper.Map<ConditionRule>(param.ConditionRule);
@@ -136,35 +136,35 @@ namespace ApplicationCore.Services
                     param.Action = _mapper.Map<ActionRequestParam>(actionEntity);
                 }
                 else
-                if (param.PostAction.ActionType != null)
+                if (param.Gift.ActionType != null)
                 {
                     // Create membership action
 
                     var countTier = await promotionTierRepo.CountAsync(filter: o => o.PromotionId.Equals(promotionTier.ActionId));
-                    var postAction = _mapper.Map<PostAction>(param.PostAction);
-                    postAction.PostActionId = Guid.NewGuid();
+                    var postAction = _mapper.Map<Gift>(param.Gift);
+                    postAction.GiftId = Guid.NewGuid();
                     //postAction.PromotionTierId = promotionTier.PromotionTierId;
                     postAction.PostActionType = postAction.PostActionType;
                     //promotionTier.Summary = CreateSummarypostAction(postAction);
                     promotionTier.Summary = "";
                     promotionTier.TierIndex = countTier;
-                    promotionTier.PostActionId = postAction.PostActionId;
+                    promotionTier.GiftId = postAction.GiftId;
 
                     promotionTierRepo.Add(promotionTier);
                     postActionRepo.Add(postAction);
 
                     // Create action product mapping
-                    IGenericRepository<PostActionProductMapping> mapRepo = _unitOfWork.PostActionProductMappingRepository;
-                    /* if (param.PostAction.ActionType.Equals(AppConstant.EnvVar.ActionType.Gift)
-                         && param.PostAction.DiscountType.Equals(AppConstant.EnvVar.DiscountType.GiftProduct)
-                         && param.PostAction.ListProduct.Count > 0)
+                    IGenericRepository<GiftProductMapping> mapRepo = _unitOfWork.GiftProductMappingRepository;
+                    /* if (param.Gift.ActionType.Equals(AppConstant.EnvVar.ActionType.Gift)
+                         && param.Gift.DiscountType.Equals(AppConstant.EnvVar.DiscountType.GiftProduct)
+                         && param.Gift.ListProduct.Count > 0)
                      {
-                         foreach (var product in param.PostAction.ListProduct)
+                         foreach (var product in param.Gift.ListProduct)
                          {
-                             var mappEntity = new PostActionProductMapping()
+                             var mappEntity = new GiftProductMapping()
                              {
                                  Id = Guid.NewGuid(),
-                                 PostActionId = postAction.PostActionId,
+                                 GiftId = postAction.GiftId,
                                  ProductId = product,
                                  InsDate = DateTime.Now,
                                  UpdDate = DateTime.Now,
@@ -173,7 +173,7 @@ namespace ApplicationCore.Services
                          }
                          //await _unitOfWork.SaveAsync();
                      }*/
-                    param.PostAction = _mapper.Map<PostActionRequestParam>(postAction);
+                    param.Gift = _mapper.Map<GiftRequestParam>(postAction);
                 }
                 else
                 {
@@ -234,7 +234,7 @@ namespace ApplicationCore.Services
             IGenericRepository<PromotionTier> _tierRepo = _unitOfWork.PromotionTierRepository;
             IGenericRepository<ActionProductMapping> actionMappRepo = _unitOfWork.ActionProductMappingRepository;
             IGenericRepository<ProductCategory> cateRepo = _unitOfWork.ProductCategoryRepository;
-            IGenericRepository<PostActionProductMapping> postActionMappRepo = _unitOfWork.PostActionProductMappingRepository;
+            IGenericRepository<GiftProductMapping> postActionMappRepo = _unitOfWork.GiftProductMappingRepository;
             try
             {
                 // Lấy danh sách promotion tier
@@ -246,7 +246,7 @@ namespace ApplicationCore.Services
                     "ConditionRule.ConditionGroup," +
                     "ConditionRule.ConditionGroup.OrderCondition," +
                     "ConditionRule.ConditionGroup.ProductCondition," +
-                    "PostAction," +
+                    "Gift," +
                     "Action"))
                     .ToList();
                 // Reorder các condition trong group
@@ -257,8 +257,8 @@ namespace ApplicationCore.Services
                 //    {
                 //        Action = _mapper.Map<ActionTierDto>(tier.Action),
                 //        ActionId = tier.ActionId,
-                //        PostAction = _mapper.Map<PostActionTierDto>(tier.PostAction),
-                //        PostActionId = tier.PostActionId,
+                //        Gift = _mapper.Map<GiftTierDto>(tier.Gift),
+                //        GiftId = tier.GiftId,
                 //        PromotionId = tier.PromotionId,
                 //        PromotionTierId = tier.PromotionTierId,
                 //        ConditionRuleId = tier.ConditionRuleId,
@@ -294,10 +294,10 @@ namespace ApplicationCore.Services
                 //            responseParam.Action.productList = new List<ProductDto>();
                 //        }
                 //    }
-                //    else if (responseParam.PostAction != null)
+                //    else if (responseParam.Gift != null)
                 //    {
-                //        responseParam.PostAction.productList = new List<ProductDto>();
-                //        var mapps = (await postActionMappRepo.Get(filter: o => o.PostActionId.Equals(responseParam.PostActionId),
+                //        responseParam.Gift.productList = new List<ProductDto>();
+                //        var mapps = (await postActionMappRepo.Get(filter: o => o.GiftId.Equals(responseParam.GiftId),
                 //            includeProperties: "Product")).ToList();
                 //        if (mapps != null && mapps.Count > 0)
                 //        {
@@ -314,13 +314,13 @@ namespace ApplicationCore.Services
                 //                    Code = product.Code,
                 //                    ProductId = product.ProductId
                 //                };
-                //                responseParam.PostAction.productList.Add(dto);
+                //                responseParam.Gift.productList.Add(dto);
                 //            }
 
                 //        }
                 //        else
                 //        {
-                //            responseParam.PostAction.productList = new List<ProductDto>();
+                //            responseParam.Gift.productList = new List<ProductDto>();
                 //        }
                 //    }
                 //    result.Add(responseParam);
@@ -371,29 +371,29 @@ namespace ApplicationCore.Services
                         actMapp.Add(mapp);
                     }
                 }
-                else if (!updateParam.PostAction.PostActionId.Equals(Guid.Empty))
+                else if (!updateParam.Gift.GiftId.Equals(Guid.Empty))
                 {
-                    var postActionEntity = _mapper.Map<PostAction>(updateParam.PostAction);
-                    IGenericRepository<PostAction> postActionRepo = _unitOfWork.PostActionRepository;
+                    var postActionEntity = _mapper.Map<Gift>(updateParam.Gift);
+                    IGenericRepository<Gift> postActionRepo = _unitOfWork.GiftRepository;
                     postActionEntity.UpdDate = DateTime.Now;
                     //  postActionEntity.InsDate = null;
                     //postActionEntity.PromotionTierId = updateParam.PromotionTierId;
                     postActionRepo.Update(postActionEntity);
-                    var tier = await promotionTierRepo.GetFirst(filter: el => el.PostActionId.Equals(postActionEntity.PostActionId));
-                    //tier.Summary = CreateSummaryPostAction(postActionEntity);
+                    var tier = await promotionTierRepo.GetFirst(filter: el => el.GiftId.Equals(postActionEntity.GiftId));
+                    //tier.Summary = CreateSummaryGift(postActionEntity);
                     tier.UpdDate = DateTime.Now;
                     promotionTierRepo.Update(tier);
                     // Update danh sách các product trong bảng map
-                    IGenericRepository<PostActionProductMapping> actMapp = _unitOfWork.PostActionProductMappingRepository;
-                    actMapp.Delete(Guid.Empty, filter: o => o.PostActionId.Equals(postActionEntity.PostActionId));
+                    IGenericRepository<GiftProductMapping> actMapp = _unitOfWork.GiftProductMappingRepository;
+                    actMapp.Delete(Guid.Empty, filter: o => o.GiftId.Equals(postActionEntity.GiftId));
                     await _unitOfWork.SaveAsync();
-                    var productIds = updateParam.PostAction.ListProduct;
+                    var productIds = updateParam.Gift.ListProduct;
                     foreach (var productId in productIds)
                     {
-                        var mapp = new PostActionProductMapping()
+                        var mapp = new GiftProductMapping()
                         {
                             Id = Guid.NewGuid(),
-                            PostActionId = postActionEntity.PostActionId,
+                            GiftId = postActionEntity.GiftId,
                             ProductId = productId,
                             InsDate = DateTime.Now,
                             UpdDate = DateTime.Now,
@@ -1072,7 +1072,7 @@ namespace ApplicationCore.Services
             return result;
         }
 
-        /*   private string CreateSummarypostAction(PostAction entity)
+        /*   private string CreateSummarypostAction(Gift entity)
            {
                var result = "";
                var actionType = entity.ActionType;
@@ -1271,7 +1271,8 @@ namespace ApplicationCore.Services
                     && !el.DelFlg,
                         includeProperties:
                         "PromotionTier.Action.ActionProductMapping.Product," +
-                        "PromotionTier.PostAction.PostActionProductMapping.Product," +
+                        "PromotionTier.Gift.GiftProductMapping.Product," +
+                        "PromotionTier.Gift.GameCampaign.GameMaster," +
                         "PromotionTier.ConditionRule.ConditionGroup.OrderCondition," +
                         "PromotionTier.ConditionRule.ConditionGroup.ProductCondition.ProductConditionMapping.Product," +
                         "PromotionStoreMapping.Store," +
@@ -1419,9 +1420,9 @@ namespace ApplicationCore.Services
                     {
                         tier.ActionId = group.ActionId;
                     }
-                    if (group.PostActionId != null)
+                    if (group.GiftId != null)
                     {
-                        tier.PostActionId = group.PostActionId;
+                        tier.GiftId = group.GiftId;
                     }
 
                     tierRepo.Add(tier);

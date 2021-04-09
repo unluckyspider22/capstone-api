@@ -7,9 +7,9 @@ namespace Infrastructure.Models
     {
         public GameCampaign()
         {
-            Device = new HashSet<Device>();
             GameItems = new HashSet<GameItems>();
-            PostAction = new HashSet<PostAction>();
+            Gift = new HashSet<Gift>();
+            StoreGameCampaignMapping = new HashSet<StoreGameCampaignMapping>();
             Voucher = new HashSet<Voucher>();
         }
 
@@ -24,13 +24,16 @@ namespace Infrastructure.Models
         public DateTime? StartGame { get; set; }
         public DateTime? EndGame { get; set; }
         public Guid? PromotionId { get; set; }
+        public string SecretCode { get; set; }
+        public bool HasCode { get; set; }
+        public TimeSpan? ExpiredDuration { get; set; }
 
         public virtual Brand Brand { get; set; }
         public virtual GameMaster GameMaster { get; set; }
         public virtual Promotion Promotion { get; set; }
-        public virtual ICollection<Device> Device { get; set; }
         public virtual ICollection<GameItems> GameItems { get; set; }
-        public virtual ICollection<PostAction> PostAction { get; set; }
+        public virtual ICollection<Gift> Gift { get; set; }
+        public virtual ICollection<StoreGameCampaignMapping> StoreGameCampaignMapping { get; set; }
         public virtual ICollection<Voucher> Voucher { get; set; }
     }
 }

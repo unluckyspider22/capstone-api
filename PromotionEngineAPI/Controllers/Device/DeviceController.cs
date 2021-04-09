@@ -39,22 +39,22 @@ namespace PromotionEngineAPI.Controllers
         }
         [HttpGet]
         [Route("game-item")]
-        public async Task<IActionResult> GetGameItem(string deviceCode, string brandCode)
+        public async Task<IActionResult> GetGameItem(string deviceCode, string brandCode, Guid gameCampaignId)
         {
             try
             {
-                var result = await _service.GetFirst(filter: el =>
+                var device = await _service.GetFirst(filter: el =>
                             !el.DelFlg
                             && el.Store.Brand.BrandCode == brandCode
                             && el.Code != deviceCode,
                             includeProperties:
                             "Store.Brand," +
-                            "GameCampaign.GameItems");
+                            "Store.StoreGameCampaignMapping.GameCampaign.GameItems");
 
-                var campaign = result.GameCampaign;
-                if(campaign != null)
+                var campaign = device.Store.StoreGameCampaignMapping.Select(s => s.GameCampaign);
+                if (campaign != null)
                 {
-                    return Ok(campaign.GameItems);
+                    return Ok(campaign.FirstOrDefault(f => f.Id == gameCampaignId).GameItems);
                 }
                 return StatusCode(statusCode: (int)HttpStatusCode.NotFound);
             }

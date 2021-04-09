@@ -11,12 +11,12 @@ namespace ApplicationCore.Request
     {
         public OrderResponseModel()
         {
-            Gift = new List<Gift>();
+            Gift = new List<Object>();
         }
         public List<Effect> Effects { get; set; }
         public CustomerOrderInfo CustomerOrderInfo { get; set; }
 
-        public List<Gift> Gift { get; set; }
+        public List<Object> Gift { get; set; }
         public decimal? TotalAmount { get; set; }
         public decimal? Discount { get; set; }
         public decimal? DiscountOrderDetail { get; set; }
@@ -61,12 +61,17 @@ namespace ApplicationCore.Request
         public int PaymentMethod { get; set; }
         public StoreInfo StoreInfo { get; set; }
     }
-    public class Gift
+    public class OrderGift
     {
         [StringLength(20)]
 
         public string ProductCode { get; set; }
+        [StringLength(20)]
 
+        public string VoucherCode { get; set; }
+        [StringLength(20)]
+
+        public string GameCode { get; set; }
         public int Quantity { get; set; }
         [StringLength(100)]
 

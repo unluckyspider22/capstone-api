@@ -93,7 +93,7 @@ namespace PromotionEngineAPI.Controllers
             }
         }
         [HttpPost]
-        public async Task<IActionResult> PostAction([FromBody] ActionDto dto)
+        public async Task<IActionResult> Gift([FromBody] ActionDto dto)
         {
             if (dto.BrandId.Equals(Guid.Empty))
             {

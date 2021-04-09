@@ -167,10 +167,10 @@ namespace ApplicationCore.Services
                      //tiers = (await _repository.Get(pageIndex: pageIndex, pageSize: pageSize,
                      //    filter: o => o.PromotionId.Equals(Guid.Empty)
                      //        || o.PromotionId == null,
-                     //    includeProperties: "ConditionRule,PostAction"
-                     // )).Where(o => o.PostAction != null
-                     //        && o.PostAction.ActionType.Equals(actionType.ToString())
-                     //        && o.PostAction.DiscountType.Equals(discountType.ToString())
+                     //    includeProperties: "ConditionRule,Gift"
+                     // )).Where(o => o.Gift != null
+                     //        && o.Gift.ActionType.Equals(actionType.ToString())
+                     //        && o.Gift.DiscountType.Equals(discountType.ToString())
                      //        && o.ConditionRule.BrandId.Equals(brandId)).ToList();
                      //foreach (var tier in tiers)
                      //{
@@ -179,8 +179,8 @@ namespace ApplicationCore.Services
                      //        PromotionTierId = tier.PromotionTierId,
                      //        RuleName = tier.ConditionRule.RuleName,
                      //        Description = tier.ConditionRule.Description,
-                     //        ActionType = tier.PostAction.ActionType,
-                     //        DiscountType = tier.PostAction.DiscountType,
+                     //        ActionType = tier.Gift.ActionType,
+                     //        DiscountType = tier.Gift.DiscountType,
                      //    };
                      //    result.Add(obj);
 
@@ -188,10 +188,10 @@ namespace ApplicationCore.Services
                      //}
                      //var totalItem = (await _repository.Get(filter: o => o.PromotionId.Equals(Guid.Empty)
                      //        || o.PromotionId == null,
-                     //    includeProperties: "ConditionRule,PostAction"
-                     // )).Where(o => o.PostAction != null 
-                     //        && o.PostAction.ActionType.Equals(actionType.ToString())
-                     //        && o.PostAction.DiscountType.Equals(discountType.ToString())
+                     //    includeProperties: "ConditionRule,Gift"
+                     // )).Where(o => o.Gift != null 
+                     //        && o.Gift.ActionType.Equals(actionType.ToString())
+                     //        && o.Gift.DiscountType.Equals(discountType.ToString())
                      //        && o.ConditionRule.BrandId.Equals(brandId)).ToList().Count();
                      //MetaData metadata = new MetaData(pageIndex: pageIndex, pageSize: pageSize, totalItems: totalItem);
                      //GenericRespones<AvailableDto> response = new GenericRespones<AvailableDto>(data: result, metadata: metadata);

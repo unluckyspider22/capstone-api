@@ -11,17 +11,17 @@ namespace PromotionEngineAPI.Controllers
 {
     [Route("api/post-actions")]
     [ApiController]
-    public class PostActionsController : ControllerBase
+    public class GiftsController : ControllerBase
     {
-        private readonly IPostActionService _service;
+        private readonly IGiftService _service;
 
-        public PostActionsController(IPostActionService service)
+        public GiftsController(IGiftService service)
         {
             _service = service;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetPostAction(
+        public async Task<IActionResult> GetGift(
             [FromQuery] PagingRequestParam param,
             [FromQuery] Guid brandId,
             [FromQuery] int PostActionType = 0)
@@ -32,7 +32,7 @@ namespace PromotionEngineAPI.Controllers
                 {
                     return StatusCode(statusCode: 400, new ErrorObj(400, "Required Brand Id"));
                 }
-                Expression<Func<PostAction, bool>> myFilter = el => !el.DelFlg && el.BrandId.Equals(brandId);
+                Expression<Func<Gift, bool>> myFilter = el => !el.DelFlg && el.BrandId.Equals(brandId);
                 if (PostActionType > 0)
                 {
                     myFilter = el => !el.DelFlg
@@ -52,7 +52,7 @@ namespace PromotionEngineAPI.Controllers
 
         }
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetPostAction([FromRoute] Guid id)
+        public async Task<IActionResult> GetGift([FromRoute] Guid id)
         {
             if (id.Equals(Guid.Empty))
             {
@@ -69,13 +69,13 @@ namespace PromotionEngineAPI.Controllers
 
         }
         [HttpPut("{postActionId}")]
-        public async Task<IActionResult> PutPostAction([FromRoute] Guid postActionId, [FromBody] PostActionDto dto)
+        public async Task<IActionResult> PutGift([FromRoute] Guid postActionId, [FromBody] GiftDto dto)
         {
-            if (!postActionId.Equals(dto.PostActionId) || dto.PostActionId.Equals(Guid.Empty))
+            if (!postActionId.Equals(dto.GiftId) || dto.GiftId.Equals(Guid.Empty))
             {
                 return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
             }
-            var exist = (await _service.GetFirst(filter: o => o.PostActionId.Equals(postActionId) && !o.DelFlg));
+            var exist = (await _service.GetFirst(filter: o => o.GiftId.Equals(postActionId) && !o.DelFlg));
             if (exist == null)
             {
                 return StatusCode(statusCode: 400, new ErrorObj(400, "Post Action not exist"));
@@ -93,7 +93,7 @@ namespace PromotionEngineAPI.Controllers
             }
         }
         [HttpPost]
-        public async Task<IActionResult> PostAction([FromBody] PostActionDto dto)
+        public async Task<IActionResult> Gift([FromBody] GiftDto dto)
         {
 
             if (dto.BrandId.Equals(Guid.Empty))
@@ -113,7 +113,7 @@ namespace PromotionEngineAPI.Controllers
 
         [HttpDelete]
         [Route("{postActionId}")]
-        public async Task<IActionResult> DeletePostAction([FromRoute] Guid postActionId)
+        public async Task<IActionResult> DeleteGift([FromRoute] Guid postActionId)
         {
             if (postActionId.Equals(Guid.Empty))
             {

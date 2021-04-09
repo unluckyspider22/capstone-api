@@ -8,7 +8,7 @@ namespace Infrastructure.DTOs
         public Guid? ConditionRuleId { get; set; }
         public Guid? ActionId { get; set; }
         public Guid? PromotionId { get; set; }
-        public Guid? PostActionId { get; set; }
+        public Guid? GiftId { get; set; }
         public string Summary { get; set; } = "";
         public int TierIndex { get; set; } = 0;
         public Guid? VoucherGroupId { get; set; }

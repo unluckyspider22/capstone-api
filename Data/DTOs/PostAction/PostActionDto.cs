@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace Infrastructure.DTOs
 {
-    public class PostActionDto : BaseDto
+    public class GiftDto : BaseDto
     {
-        public Guid PostActionId { get; set; }
+        public Guid GiftId { get; set; }
         public Guid? PromotionTierId { get; set; }
         public int PostActionType { get; set; }
         public decimal? BonusPoint { get; set; }
@@ -13,10 +13,10 @@ namespace Infrastructure.DTOs
         public Guid? GameCampaignId { get; set; }
         public string Name { get; set; }
         public Guid BrandId { get; set; }
-        public List<PostActionProductMapp> ListProduct { get; set; }
+        public List<GiftProductMapp> ListProduct { get; set; }
     }
 
-    public class PostActionProductMapp
+    public class GiftProductMapp
     {
         public Guid ProductId { get; set; }
         public int Quantity { get; set; }

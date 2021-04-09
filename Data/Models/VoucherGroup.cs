@@ -25,12 +25,12 @@ namespace Infrastructure.Models
         public string Prefix { get; set; }
         public string CustomCharset { get; set; }
         public Guid? ActionId { get; set; }
-        public Guid? PostActionId { get; set; }
+        public Guid? GiftId { get; set; }
         public int? CodeLength { get; set; }
 
         public virtual Action Action { get; set; }
         public virtual Brand Brand { get; set; }
-        public virtual PostAction PostAction { get; set; }
+        public virtual Gift Gift { get; set; }
         public virtual ICollection<PromotionTier> PromotionTier { get; set; }
         public virtual ICollection<Voucher> Voucher { get; set; }
     }
