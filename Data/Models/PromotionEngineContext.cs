@@ -332,6 +332,10 @@ namespace Infrastructure.Models
             {
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
+                entity.Property(e => e.Code)
+                    .HasMaxLength(4)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.EndGame).HasColumnType("datetime");
 
                 entity.Property(e => e.InsDate)
@@ -910,6 +914,10 @@ namespace Infrastructure.Models
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.OrderId)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.RedempedDate).HasColumnType("datetime");
 

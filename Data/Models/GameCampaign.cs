@@ -24,6 +24,7 @@ namespace Infrastructure.Models
         public DateTime? StartGame { get; set; }
         public DateTime? EndGame { get; set; }
         public Guid? PromotionId { get; set; }
+        public string Code { get; set; }
 
         public virtual Brand Brand { get; set; }
         public virtual GameMaster GameMaster { get; set; }

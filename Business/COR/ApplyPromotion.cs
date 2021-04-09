@@ -1,9 +1,11 @@
 ﻿using ApplicationCore.Request;
 using ApplicationCore.Services;
+using ApplicationCore.Utils;
 using Infrastructure.Helper;
 using Infrastructure.Models;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace ApplicationCore.Chain
@@ -119,7 +121,7 @@ namespace ApplicationCore.Chain
         {
             if (order.Gift == null)
             {
-                order.Gift = new List<Gift>();
+                order.Gift = new List<Object>();
             }
             string effectType = "";
             switch (postAction.PostActionType)
@@ -130,7 +132,7 @@ namespace ApplicationCore.Chain
                     var gifts = postAction.PostActionProductMapping.Select(el => el.Product);
                     foreach (var gift in gifts)
                     {
-                        order.Gift.Add(new Gift
+                        order.Gift.Add(new
                         {
                             ProductCode = gift.Code,
                             ProductName = gift.Name
@@ -145,7 +147,7 @@ namespace ApplicationCore.Chain
                                 && !el.IsUsed,
                                 includeProperties: "Promotion").Result;
 
-                    order.Gift.Add(new Gift
+                    order.Gift.Add(new
                     {
                         ProductCode = voucher.Promotion.PromotionCode + "-" + voucher.VoucherCode,
                         ProductName = voucher.VoucherGroup.VoucherName
@@ -157,20 +159,24 @@ namespace ApplicationCore.Chain
                     break;
                 case (int)AppConstant.EnvVar.PostActionType.Gift_GameCode:
                     effectType = AppConstant.EffectMessage.AddGiftGameCode;
-                    AddGiftGameCode(order, postAction, promotion, promotionTier);
+                    AddGiftGameCode(order, promotionTier.PostAction);
                     break;
             }
 
-            SetEffect(order, promotion, 0, effectType, promotionTier);
+            SetEffect(order, promotion, 0, effectType, promotionTier, gifts: order.Gift);
         }
-        public void AddGiftGameCode(OrderResponseModel order, PostAction postAction, Promotion promotion, PromotionTier promotionTier)
+        public void AddGiftGameCode(OrderResponseModel order, PostAction postAction)
         {
-            string effectType = AppConstant.EffectMessage.AddGiftGameCode;
-            order.Gift.Add(new Gift
+            var now = Common.GetCurrentDatetime();
+            if (now < postAction.GameCampaign.StartGame)
             {
-                ProductCode = ""
+                now = (DateTime)postAction.GameCampaign.StartGame;
+            }
+            order.Gift.Add(new
+            {
+                GameName = postAction.GameCampaign.GameMaster.Name,
+                GameCode = postAction.GameCampaign.Code + '-' + now.ToString("ddMMyy")
             });
-            SetEffect(order, promotion, 0, effectType, promotionTier);
         }
 
         public void AddPoint(OrderResponseModel order, PostAction postAction, Promotion promotion, PromotionTier promotionTier)
@@ -222,7 +228,7 @@ namespace ApplicationCore.Chain
             SetEffect(order, promotion, discount, effectType, promotionTier);
         }
 
-        public void SetEffect(OrderResponseModel order, Promotion promotion, decimal discount, string effectType, PromotionTier promotionTier)
+        public void SetEffect(OrderResponseModel order, Promotion promotion, decimal discount, string effectType, PromotionTier promotionTier, List<Object> gifts = null)
         {
             if (order.Effects == null)
             {
@@ -243,21 +249,27 @@ namespace ApplicationCore.Chain
                     name = promotionTier.Summary,
                     value = discount
                 };
-                order.Effects.Add(effect);
             }
             if (promotionTier.PostAction != null)
             {
-                effect.Prop = new
+                if (gifts != null)
                 {
-                    gifts = promotionTier.PostAction.PostActionProductMapping.Select(s =>
+                    effect.Prop = gifts;
+                }
+                /*else
+                {
+                    effect.Prop = new
                     {
-                        string listProduct = "";
-                        listProduct += s.Product.Name;
-                        return listProduct;
-                    })
-                };
-                order.Effects.Add(effect);
+                        gifts = promotionTier.PostAction.PostActionProductMapping.Select(s =>
+                        {
+                            string listProduct = "";
+                            listProduct += s.Product.Name;
+                            return listProduct;
+                        })
+                    };
+                }*/
             }
+            order.Effects.Add(effect);
             if (order.Effects.Count() == 0)
             {
                 order.Effects = null;

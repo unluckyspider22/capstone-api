@@ -31,7 +31,7 @@ namespace PromotionEngineAPI.Controllers
                 return StatusCode(statusCode: e.Code, e);
             }
         }
-        
+
         [HttpPut]
         public async Task<IActionResult> UpdateGame([FromBody] GameConfigDto dto, [FromQuery] Guid gameConfigId)
         {
@@ -110,8 +110,8 @@ namespace PromotionEngineAPI.Controllers
             }
         }
         [HttpGet]
-        [Route("device/{deviceId}/game-campaign")]
-        public async Task<IActionResult> GetGameCampaignDevice([FromRoute] Guid deviceId)
+        [Route("device/{deviceId}/game-campaign/{gameCode}")]
+        public async Task<IActionResult> GetGameCampaignDevice([FromRoute] Guid deviceId, [FromRoute]string gameCode)
         {
             if (deviceId.Equals(Guid.Empty))
             {
@@ -119,7 +119,7 @@ namespace PromotionEngineAPI.Controllers
             }
             try
             {
-                var result = await _service.GetGameCampaignItems(deviceId);
+                var result = await _service.GetGameCampaignItems(deviceId, gameCode);
                 return Ok(result);
             }
             catch (ErrorObj e)

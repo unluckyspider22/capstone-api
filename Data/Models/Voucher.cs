@@ -21,8 +21,9 @@ namespace Infrastructure.Models
         public int? Index { get; set; }
         public Guid? GameCampaignId { get; set; }
         public Guid? PromotionTierId { get; set; }
-        public string? OrderId { get; set; }
+        public string OrderId { get; set; }
         public Guid? TransactionId { get; set; }
+
         public virtual Channel Channel { get; set; }
         public virtual GameCampaign GameCampaign { get; set; }
         public virtual Membership Membership { get; set; }

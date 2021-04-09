@@ -1272,6 +1272,7 @@ namespace ApplicationCore.Services
                         includeProperties:
                         "PromotionTier.Action.ActionProductMapping.Product," +
                         "PromotionTier.PostAction.PostActionProductMapping.Product," +
+                        "PromotionTier.PostAction.GameCampaign.GameMaster," +
                         "PromotionTier.ConditionRule.ConditionGroup.OrderCondition," +
                         "PromotionTier.ConditionRule.ConditionGroup.ProductCondition.ProductConditionMapping.Product," +
                         "PromotionStoreMapping.Store," +
