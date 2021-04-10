@@ -168,14 +168,15 @@ namespace ApplicationCore.Chain
         public void AddGiftGameCode(OrderResponseModel order, Gift postAction)
         {
             var now = Common.GetCurrentDatetime();
-            if (now < postAction.GameCampaign.StartGame)
-            {
-                now = (DateTime)postAction.GameCampaign.StartGame;
-            }
+            var firstDayOfTYear = new DateTime(2021, 01, 01);
+
+            string nowStr = new DateTime((now - firstDayOfTYear).Ticks).ToString("HHddyyMMmm");
+
+            int gameCode = int.Parse(nowStr) + int.Parse(postAction.GameCampaign.SecretCode);
             order.Gift.Add(new
             {
-                GameName = postAction.GameCampaign.GameMaster.Name,
-                GameCode = postAction.GameCampaign.SecretCode + '-' + now.ToString("ddMMyy")
+                GameName = postAction.GameCampaign.Name,
+                GameCode = gameCode
             });
         }
 
@@ -244,11 +245,27 @@ namespace ApplicationCore.Chain
             };
             if (promotionTier.Action != null)
             {
-                effect.Prop = new
+                if (order.CustomerOrderInfo.Vouchers.Count > 0)
                 {
-                    name = promotionTier.Summary,
-                    value = discount
-                };
+                    effect.Prop = new
+                    {
+                        name = promotionTier.VoucherGroup.VoucherName,
+                        value = discount,
+                        imgUrl = promotion.ImgUrl,
+                        description = promotion.Description
+                    };
+                }
+                else
+                {
+                    effect.Prop = new
+                    {
+                        name = promotion.PromotionName,
+                        value = discount,
+                        imgUrl = promotion.ImgUrl,
+                        description = promotion.Description
+                    };
+                }
+
             }
             if (promotionTier.Gift != null)
             {

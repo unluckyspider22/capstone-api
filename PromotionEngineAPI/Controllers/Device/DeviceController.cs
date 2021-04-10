@@ -1,9 +1,11 @@
 ﻿using ApplicationCore.Services;
+using ApplicationCore.Utils;
 using Infrastructure.DTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -16,10 +18,12 @@ namespace PromotionEngineAPI.Controllers
     {
 
         private readonly IDeviceService _service;
+        private readonly IGameCampaignService _gameCampaignService;
 
-        public DeviceController(IDeviceService service)
+        public DeviceController(IDeviceService service, IGameCampaignService gameCampaignService)
         {
             _service = service;
+            _gameCampaignService = gameCampaignService;
         }
 
         [HttpGet]
@@ -181,5 +185,27 @@ namespace PromotionEngineAPI.Controllers
                 return StatusCode(statusCode: e.Code, e);
             }
         }
+        [HttpGet]
+        [Route("checkGameCode")]
+        public async Task<IActionResult> CheckGameCode([FromQuery] int code, [FromQuery] Guid gameCampaignId)
+        {
+            var firstDayOfTYear = new DateTime(2021, 01, 01);
+
+            var gameCampaign = await _gameCampaignService.GetByIdAsync(gameCampaignId);
+
+            bool isValidGameCd = false;
+            if (gameCampaign != null)
+            {
+                var now = Common.GetCurrentDatetime();
+
+                var dateRedemped = code - int.Parse(gameCampaign.SecretCode);
+                var minus = DateTime.ParseExact(dateRedemped.ToString(), "HHddyyMMmm", CultureInfo.InvariantCulture);
+                var dateStr = new DateTime(minus.Year - 2000, minus.Month, minus.Day, minus.Hour, minus.Minute, 0).Add(new TimeSpan(firstDayOfTYear.Ticks));
+                isValidGameCd = dateStr.AddMinutes(gameCampaign.ExpiredDuration) >= now;
+            }
+            return Ok(isValidGameCd);
+
+        }
+
     }
 }

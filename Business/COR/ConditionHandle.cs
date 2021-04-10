@@ -122,8 +122,9 @@ namespace ApplicationCore.Chain
                     EffectType = effectType,
                     Prop = new
                     {
-                        promotionName = promotion.PromotionName,
-                        ruleName = promotionTier.ConditionRule.RuleName
+                        name = promotion.PromotionName,
+                        imgUrl = promotion.ImgUrl,
+                        description = promotion.Description
                     }
                 };
                 if (order.Effects == null)
