@@ -19,7 +19,7 @@ namespace ApplicationCore.Services
         private readonly IVoucherService _voucherService;
         private readonly IBrandService _brandService;
         private readonly IDeviceService _deviceService;
-        public TransactionService(IUnitOfWork unitOfWork, IMapper mapper,IDeviceService deviceService, IPromotionService promotionService, IVoucherService voucherService, IBrandService brandService) : base(unitOfWork, mapper)
+        public TransactionService(IUnitOfWork unitOfWork, IMapper mapper, IDeviceService deviceService, IPromotionService promotionService, IVoucherService voucherService, IBrandService brandService) : base(unitOfWork, mapper)
         {
             _promotionService = promotionService;
             _voucherService = voucherService;
@@ -28,7 +28,7 @@ namespace ApplicationCore.Services
         }
         protected override IGenericRepository<Transaction> _repository => _unitOfWork.TransactionRepository;
 
-        public async Task<OrderResponseModel> Checkout(Guid brandId, OrderResponseModel order,Guid deviceId)
+        public async Task<OrderResponseModel> Checkout(Guid brandId, OrderResponseModel order, Guid deviceId)
         {
             var brand = await _brandService.GetByIdAsync(id: brandId);
             List<Promotion> promotionSetDiscounts = new List<Promotion>();
@@ -53,23 +53,23 @@ namespace ApplicationCore.Services
                                 promotionSetDiscounts.Add(_mapper.Map<Promotion>(promotion));
                             }
                         }
+                        // neu co setDiscount nhung ko them ap dung effect nao het
+
                         if (promotionSetDiscounts.Count < 1)
                         {
-                            // neu co effect nhung ko them ap dung effect nao het
+                            //kiem tra co apply voucher nao ko
+                            var listVoucher = checkVoucher(order: order, deviceId: deviceId, transactionId: transactionId);
+                            if(listVoucher.Result!= null)
                             return await AddTransaction(order: order, brandId: brandId, transactionId: transactionId);
+                            else
+                            return await AddTransaction(order: order, brandId: brandId, transactionId: transactionId);
+
                         }
                         else
                         {
                             try
                             {
-                                if (order.CustomerOrderInfo.Vouchers != null)
-                                {
-                                    var device = await _deviceService.GetByIdAsync(deviceId);
-                                    if(device != null)
-                                    {
-                                        var appliedVoucher = await _voucherService.UpdateVoucherApplied(transactionId: transactionId, order: order.CustomerOrderInfo, storeId: device.StoreId);
-                                    }
-                                }
+                                var listVoucher = checkVoucher(order: order, deviceId: deviceId, transactionId: transactionId);
                             }
                             catch (ErrorObj e)
                             {
@@ -78,12 +78,11 @@ namespace ApplicationCore.Services
                             foreach (var promotionSetDiscount in promotionSetDiscounts)
                             {
                                 if (promotionSetDiscount.IsAuto)
-                                    await AddTransactionWithPromo(order: order, brandId: brandId, transactionId: transactionId, promotionId: promotionSetDiscount.PromotionId);
+                                 return await AddTransactionWithPromo(order: order, brandId: brandId, transactionId: transactionId, promotionId: promotionSetDiscount.PromotionId);
                                 if (!promotionSetDiscount.HasVoucher && !promotionSetDiscount.IsAuto)
-                                    await AddTransactionWithPromo(order: order, brandId: brandId, transactionId: transactionId, promotionId: promotionSetDiscount.PromotionId);
+                                return await AddTransactionWithPromo(order: order, brandId: brandId, transactionId: transactionId, promotionId: promotionSetDiscount.PromotionId);
 
                             }
-                            return await AddTransaction(order: order, brandId: brandId, transactionId: transactionId);
                         }
                     }
                     //neu ko co effect nao thi add transaction with no promotion
@@ -93,6 +92,7 @@ namespace ApplicationCore.Services
             }
             else
                 throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: "Brand does not exist !", description: "Brand does not exist !");
+            return null;
         }
         private async Task<OrderResponseModel> AddTransaction(OrderResponseModel order, Guid brandId, Guid transactionId)
         {
@@ -121,6 +121,19 @@ namespace ApplicationCore.Services
             }
             else
                 throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: "Order failed !", description: "Order failed !");
+        }
+        private async Task<List<Voucher>> checkVoucher(OrderResponseModel order, Guid deviceId, Guid transactionId)
+        {
+            if (order.CustomerOrderInfo.Vouchers.Count > 0)
+            {
+                var device = await _deviceService.GetByIdAsync(deviceId);
+                if (device != null)
+                {
+                    var appliedVoucher = await _voucherService.UpdateVoucherApplied(transactionId: transactionId, order: order.CustomerOrderInfo, storeId: device.StoreId);
+                    return appliedVoucher;
+                }
+            }
+            return null;
         }
     }
 }
