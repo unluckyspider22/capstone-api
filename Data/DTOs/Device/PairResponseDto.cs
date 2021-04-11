@@ -12,5 +12,6 @@ namespace Infrastructure.DTOs
         public string StoreCode { get; set; }
         public string DeviceCode { get; set; }
         public Guid DeviceId { get; set; }
+        public Guid BrandId { get; set; }
     }
 }
