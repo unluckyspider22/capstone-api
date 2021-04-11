@@ -1,4 +1,5 @@
 ﻿using ApplicationCore.Request;
+using ApplicationCore.Utils;
 using AutoMapper;
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
@@ -110,10 +111,10 @@ namespace ApplicationCore.Services
         }
         private async Task<OrderResponseModel> AddTransactionWithPromo(OrderResponseModel order, Guid brandId, Guid transactionId, Guid promotionId)
         {
-
+            var now = Common.GetCurrentDatetime();
             var jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(order);
             var transaction = new Transaction()
-            { BrandId = brandId, Id = transactionId, InsDate = DateTime.Now, UpdDate = DateTime.Now, TransactionJson = jsonString, PromotionId = promotionId };
+            { BrandId = brandId, Id = transactionId, InsDate = now, UpdDate = now, TransactionJson = jsonString, PromotionId = promotionId };
             _repository.Add(transaction);
             if (await _unitOfWork.SaveAsync() > 0)
             {
