@@ -195,7 +195,7 @@ namespace ApplicationCore.Services
                             var voucherGroup = await _voucherGroupRepos.GetFirst(filter: el => el.VoucherGroupId.Equals(voucher.VoucherGroupId));
                             voucherGroups.Add(voucherGroup);
                         //}
-                        DateTime now = DateTime.Now;
+                        DateTime now = Common.GetCurrentDatetime(); 
                         voucher.IsUsed = AppConstant.EnvVar.Voucher.USED;
                         voucher.UsedDate = now;
                         voucher.UpdDate = now;

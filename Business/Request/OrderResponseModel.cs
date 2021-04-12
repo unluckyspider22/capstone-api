@@ -41,7 +41,7 @@ namespace ApplicationCore.Request
             CartItems = new List<Item>();
             Customer = new Customer();
         }
-        public int? Id { get; set; }
+        public string? Id { get; set; }
         public DateTime BookingDate { get; set; }
 
         public Attribute Attributes { get; set; }
