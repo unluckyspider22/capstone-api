@@ -61,6 +61,7 @@ namespace ApplicationCore.Services
                     "Promotion.PromotionTier.ConditionRule.ConditionGroup.OrderCondition," +
                     "Promotion.PromotionTier.ConditionRule.ConditionGroup.ProductCondition.ProductConditionMapping.Product," +
                     "Promotion.PromotionStoreMapping.Store," +
+                    "Promotion.PromotionTier.VoucherGroup," +
                     "Promotion.Brand," +
                     "Promotion.MemberLevelMapping.MemberLevel");
                     if (voucher.Count() > 1)

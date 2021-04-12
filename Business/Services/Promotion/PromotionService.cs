@@ -1275,6 +1275,7 @@ namespace ApplicationCore.Services
                         "PromotionTier.Gift.GameCampaign.GameMaster," +
                         "PromotionTier.ConditionRule.ConditionGroup.OrderCondition," +
                         "PromotionTier.ConditionRule.ConditionGroup.ProductCondition.ProductConditionMapping.Product," +
+                        "PromotionTier.VoucherGroup," +
                         "PromotionStoreMapping.Store," +
                         "Brand," +
                         "MemberLevelMapping.MemberLevel"
