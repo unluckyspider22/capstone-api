@@ -299,9 +299,9 @@ namespace ApplicationCore.Chain
 
             order.CustomerOrderInfo.CartItems = order.CustomerOrderInfo.CartItems.Select(el =>
             {
-                var finalAmount = el.TotalAmount - el.Discount;
+                var finalAmount = el.SubTotal - el.Discount;
                 el.DiscountFromOrder += Math.Round((finalAmount - el.DiscountFromOrder) * discountPercent, 2);
-                el.FinalAmount = finalAmount;
+                el.Total = finalAmount;
                 return el;
             }).ToList();
         }
@@ -329,7 +329,7 @@ namespace ApplicationCore.Chain
                                 break;
                             case (int)AppConstant.EnvVar.ActionType.Percentage_Product:
                                 effectType = AppConstant.EffectMessage.SetDiscount;
-                                discount = product.TotalAmount * (decimal)action.DiscountPercentage / 100;
+                                discount = product.SubTotal * (decimal)action.DiscountPercentage / 100;
                                 SetDiscountProduct(product, action, discount);
                                 //  DiscountProductPercentage(product, action, effectType);
                                 break;
@@ -343,7 +343,7 @@ namespace ApplicationCore.Chain
                                 break;
                             case (int)AppConstant.EnvVar.ActionType.Fixed:
                                 effectType = AppConstant.EffectMessage.SetFixed;
-                                discount = (decimal)(product.TotalAmount - action.FixedPrice * product.Quantity);
+                                discount = (decimal)(product.SubTotal - action.FixedPrice * product.Quantity);
                                 SetDiscountProduct(product, action, discount);
                                 //  DiscountProductFixedPrice(product, action, effectType);
                                 break;
@@ -358,7 +358,7 @@ namespace ApplicationCore.Chain
                                 break;
                         }
                     }
-                    product.FinalAmount = product.TotalAmount - product.Discount;
+                    product.Total = product.SubTotal - product.Discount;
                 }
             }
             else
@@ -392,7 +392,7 @@ namespace ApplicationCore.Chain
                         if (actionProducts.Any(a => a.Product.Code.Equals(product.ProductCode)))
                         {
                             discountedProduct = product.Quantity > bundleQuantity ? bundleQuantity : product.Quantity;
-                            discount += (decimal)(product.TotalAmount - discountedProduct * action.BundlePrice);
+                            discount += (decimal)(product.SubTotal - discountedProduct * action.BundlePrice);
 
                             bundleQuantity -= discountedProduct;
                             SetDiscountProduct(product, action, discount);

@@ -103,10 +103,10 @@ namespace ApplicationCore.Request
         public string ProductName { get; set; }
         public decimal UnitPrice { get; set; }
         public int Quantity { get; set; }
-        public decimal TotalAmount { get; set; }
+        public decimal SubTotal { get; set; }
         public decimal Discount { get; set; }
         public decimal DiscountFromOrder { get; set; }
-        public decimal FinalAmount { get; set; }
+        public decimal Total { get; set; }
         [StringLength(1000)]
         public string UrlImg { get; set; }
     }
