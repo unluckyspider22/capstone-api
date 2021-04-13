@@ -201,6 +201,8 @@ namespace ApplicationCore.Services
                         voucher.UpdDate = now;
                         voucher.OrderId = order.Id.ToString();
                         voucher.TransactionId = transactionId;
+                        voucher.StoreId = storeId;
+                        
                         //var voucherGroup = await _voucherGroupRepos.GetById(voucher.VoucherGroupId);
                         voucherGroup.UsedQuantity += 1;
                         voucherGroup.UpdDate = now;
