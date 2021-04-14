@@ -250,6 +250,7 @@ namespace ApplicationCore.Chain
                     effect.Prop = new
                     {
                         name = promotionTier.VoucherGroup.VoucherName,
+                        code = promotion.PromotionCode,
                         value = discount,
                         imgUrl = promotion.ImgUrl,
                         description = promotion.Description
