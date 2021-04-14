@@ -9,11 +9,11 @@ using System.Net;
 
 namespace ApplicationCore.Chain
 {
-    public interface IPromotionHandle : IHandler<OrderResponseModel>
+    public interface IPromotionHandle : IHandler<Order>
     {
         void SetPromotions(List<Promotion> promotions);
     }
-    public class PromotionHandle : Handler<OrderResponseModel>, IPromotionHandle
+    public class PromotionHandle : Handler<Order>, IPromotionHandle
     {
         private readonly ITimeframeHandle _timeframeHandle;
 
@@ -28,7 +28,7 @@ namespace ApplicationCore.Chain
         {
             _promotions = promotions;
         }
-        public override void Handle(OrderResponseModel order)
+        public override void Handle(Order order)
         {
             HandleExclusive(order.CustomerOrderInfo);
             //Trường hợp auto apply
@@ -114,7 +114,7 @@ namespace ApplicationCore.Chain
         }
         #endregion
         #region Handle Store
-        private void HandleStore(Promotion promotion, OrderResponseModel order)
+        private void HandleStore(Promotion promotion, Order order)
         {
             if (promotion.PromotionStoreMapping.Where(w => w.Store.StoreCode.Equals(order.CustomerOrderInfo.Attributes.StoreInfo.StoreId)).Count() == 0)
             {
@@ -123,7 +123,7 @@ namespace ApplicationCore.Chain
         }
         #endregion
         #region Handle Sales Mode
-        private void HandleSalesMode(Promotion promotion, OrderResponseModel order)
+        private void HandleSalesMode(Promotion promotion, Order order)
         {
             if (!Common.CompareBinary(order.CustomerOrderInfo.Attributes.SalesMode, promotion.SaleMode))
             {
@@ -132,7 +132,7 @@ namespace ApplicationCore.Chain
         }
         #endregion
         #region Handle Payment
-        private void HandlePayment(Promotion promotion, OrderResponseModel order)
+        private void HandlePayment(Promotion promotion, Order order)
         {
             if (!Common.CompareBinary(order.CustomerOrderInfo.Attributes.PaymentMethod, promotion.PaymentMethod))
             {
@@ -142,7 +142,7 @@ namespace ApplicationCore.Chain
         #endregion
 
         #region Handle Gender
-        private void HandleGender(Promotion promotion, OrderResponseModel order)
+        private void HandleGender(Promotion promotion, Order order)
         {
             if (!Common.CompareBinary(order.CustomerOrderInfo.Customer.CustomerGender, promotion.Gender))
             {
@@ -151,7 +151,7 @@ namespace ApplicationCore.Chain
         }
         #endregion
         #region Handle Member Level
-        private void HandleMemberLevel(Promotion promotion, OrderResponseModel order)
+        private void HandleMemberLevel(Promotion promotion, Order order)
         {
             if (promotion.MemberLevelMapping != null && promotion.MemberLevelMapping.Count > 0)
             {

@@ -10,15 +10,15 @@ using System.Threading.Tasks;
 
 namespace ApplicationCore.Chain
 {
-    public interface IMembershipConditionHandle : IHandler<OrderResponseModel>
+    public interface IMembershipConditionHandle : IHandler<Order>
     {
         void SetConditionModel(ConditionModel conditions);
     }
-    public class MembershipConditionHandle : Handler<OrderResponseModel>, IMembershipConditionHandle
+    public class MembershipConditionHandle : Handler<Order>, IMembershipConditionHandle
     {
         private ConditionModel _condition;
 
-        public override void Handle(OrderResponseModel order)
+        public override void Handle(Order order)
         {
             if (_condition is MembershipConditionModel)
             {

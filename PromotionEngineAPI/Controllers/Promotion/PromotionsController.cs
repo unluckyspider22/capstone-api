@@ -33,66 +33,66 @@ namespace PromotionEngineAPI.Controllers
             _voucherService = voucherService;
             _memberLevelService = memberLevelService;
         }
-/*
-        [HttpPost]
-        [Route("check-voucher")]
-        public async Task<IActionResult> CheckVoucher([FromBody] CustomerOrderInfo orderInfo)
-        {
-            //Lấy promotion bởi voucher code
-            OrderResponseModel responseModel = new OrderResponseModel();
-            try
-            {
-                var promotions = await _voucherService.CheckVoucher(orderInfo);
-                if (promotions != null && promotions.Count() > 0)
+        /*
+                [HttpPost]
+                [Route("check-voucher")]
+                public async Task<IActionResult> CheckVoucher([FromBody] CustomerOrderInfo orderInfo)
                 {
-                    responseModel.CustomerOrderInfo = orderInfo;
+                    //Lấy promotion bởi voucher code
+                    OrderResponseModel responseModel = new OrderResponseModel();
+                    try
+                    {
+                        var promotions = await _voucherService.CheckVoucher(orderInfo);
+                        if (promotions != null && promotions.Count() > 0)
+                        {
+                            responseModel.CustomerOrderInfo = orderInfo;
 
-                    _promotionService.SetPromotions(promotions);
-                    //Check promotion
-                    responseModel = await _promotionService.HandlePromotion(responseModel);
+                            _promotionService.SetPromotions(promotions);
+                            //Check promotion
+                            responseModel = await _promotionService.HandlePromotion(responseModel);
 
 
+                        }
+                        else throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Unmatch_Promotion);
+                    }
+                    catch (ErrorObj e)
+                    {
+                        return StatusCode(statusCode: e.Code, e);
+                    }
+                    return Ok(responseModel);
                 }
-                else throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Unmatch_Promotion);
-            }
-            catch (ErrorObj e)
-            {
-                return StatusCode(statusCode: e.Code, e);
-            }
-            return Ok(responseModel);
-        }
-        [HttpPost]
-        [Route("check-auto-promotion")]
-        public async Task<IActionResult> CheckAutoPromotion([FromBody] CustomerOrderInfo orderInfo, [FromQuery] Guid promotionId)
-        {
-            //Lấy promotion bởi voucher code
-            OrderResponseModel prepareModel = new OrderResponseModel();
-            try
-            {
-                var promotions = await _promotionService.GetAutoPromotions(orderInfo, promotionId);
-                if (promotions != null && promotions.Count() > 0)
+                [HttpPost]
+                [Route("check-auto-promotion")]
+                public async Task<IActionResult> CheckAutoPromotion([FromBody] CustomerOrderInfo orderInfo, [FromQuery] Guid promotionId)
                 {
-                    prepareModel.CustomerOrderInfo = orderInfo;
-                    _promotionService.SetPromotions(promotions);
-                    //Check promotion
-                    prepareModel = await _promotionService.HandlePromotion(prepareModel);
+                    //Lấy promotion bởi voucher code
+                    OrderResponseModel prepareModel = new OrderResponseModel();
+                    try
+                    {
+                        var promotions = await _promotionService.GetAutoPromotions(orderInfo, promotionId);
+                        if (promotions != null && promotions.Count() > 0)
+                        {
+                            prepareModel.CustomerOrderInfo = orderInfo;
+                            _promotionService.SetPromotions(promotions);
+                            //Check promotion
+                            prepareModel = await _promotionService.HandlePromotion(prepareModel);
 
 
-                }
-                else return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, orderInfo);
-            }
-            catch (ErrorObj e)
-            {
-                return StatusCode(statusCode: e.Code, orderInfo);
-            }
-            return Ok(prepareModel);
-        }*/
+                        }
+                        else return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, orderInfo);
+                    }
+                    catch (ErrorObj e)
+                    {
+                        return StatusCode(statusCode: e.Code, orderInfo);
+                    }
+                    return Ok(prepareModel);
+                }*/
         [HttpPost]
         [Route("check-promotion")]
         public async Task<IActionResult> CheckPromotion([FromBody] CustomerOrderInfo orderInfo, [FromQuery] Guid promotionId)
         {
             //Lấy promotion bởi voucher code
-            OrderResponseModel responseModel = new OrderResponseModel();
+            Order responseModel = new Order();
             var vouchers = orderInfo.Vouchers;
             try
             {
@@ -128,8 +128,13 @@ namespace PromotionEngineAPI.Controllers
             }
             catch (ErrorObj e)
             {
-                e.Data.Add("order", responseModel);
-                return StatusCode(statusCode: e.Code, e);
+                OrderResponseModel orderResponse = new OrderResponseModel
+                {
+                    Code = "E-" + e.Code,
+                    Message = e.Message,
+                    Order = responseModel
+                };
+                return StatusCode(statusCode: e.Code, orderResponse);
             }
             return Ok(responseModel);
         }

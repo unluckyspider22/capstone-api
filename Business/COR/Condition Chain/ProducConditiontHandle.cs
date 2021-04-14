@@ -10,16 +10,16 @@ using System.Threading.Tasks;
 
 namespace ApplicationCore.Chain
 {
-    public interface IProductConditionHandle : IHandler<OrderResponseModel>
+    public interface IProductConditionHandle : IHandler<Order>
     {
         void SetConditionModel(ConditionModel condition);
 
     }
-    public class ProducConditiontHandle : Handler<OrderResponseModel>, IProductConditionHandle
+    public class ProducConditiontHandle : Handler<Order>, IProductConditionHandle
     {
         private ConditionModel _condition;
 
-        public override void Handle(OrderResponseModel order)
+        public override void Handle(Order order)
         {
             if (_condition is ProductConditionModel)
             {

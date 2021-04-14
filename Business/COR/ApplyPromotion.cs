@@ -12,7 +12,7 @@ namespace ApplicationCore.Chain
 {
     public interface IApplyPromotion
     {
-        void Apply(OrderResponseModel order);
+        void Apply(Order order);
         void SetPromotions(List<Promotion> promotions);
 
     }
@@ -30,7 +30,7 @@ namespace ApplicationCore.Chain
             _voucherService = voucherService;
         }
 
-        public void Apply(OrderResponseModel order)
+        public void Apply(Order order)
         {
             order.TotalAmount = order.CustomerOrderInfo.Amount + order.CustomerOrderInfo.ShippingFee;
             foreach (var promotion in _promotions)
@@ -117,7 +117,7 @@ namespace ApplicationCore.Chain
         }
         #endregion
         #region Post action
-        public void AddGift(OrderResponseModel order, Gift giftAction, Promotion promotion, PromotionTier promotionTier)
+        public void AddGift(Order order, Gift giftAction, Promotion promotion, PromotionTier promotionTier)
         {
             if (order.Gift == null)
             {
@@ -165,7 +165,7 @@ namespace ApplicationCore.Chain
 
             SetEffect(order, promotion, 0, effectType, promotionTier, gifts: order.Gift);
         }
-        public void AddGiftGameCode(OrderResponseModel order, Gift postAction)
+        public void AddGiftGameCode(Order order, Gift postAction)
         {
             var now = Common.GetCurrentDatetime();
             var firstDayOfTYear = new DateTime(2021, 01, 01);
@@ -180,7 +180,7 @@ namespace ApplicationCore.Chain
             });
         }
 
-        public void AddPoint(OrderResponseModel order, Gift postAction, Promotion promotion, PromotionTier promotionTier)
+        public void AddPoint(Order order, Gift postAction, Promotion promotion, PromotionTier promotionTier)
         {
             string effectType = AppConstant.EffectMessage.AddGiftPoint;
             order.BonusPoint = postAction.BonusPoint;
@@ -188,7 +188,7 @@ namespace ApplicationCore.Chain
         }
         #endregion
         #region Discount Order
-        private void DiscountOrder(OrderResponseModel order, Infrastructure.Models.Action action, Promotion promotion, PromotionTier promotionTier)
+        private void DiscountOrder(Order order, Infrastructure.Models.Action action, Promotion promotion, PromotionTier promotionTier)
         {
             decimal discount = 0;
             var final = (decimal)order.CustomerOrderInfo.Amount - (order.CustomerOrderInfo.CartItems.Sum(s => s.Discount)
@@ -229,7 +229,7 @@ namespace ApplicationCore.Chain
             SetEffect(order, promotion, discount, effectType, promotionTier);
         }
 
-        public void SetEffect(OrderResponseModel order, Promotion promotion, decimal discount, string effectType, PromotionTier promotionTier, List<Object> gifts = null)
+        public void SetEffect(Order order, Promotion promotion, decimal discount, string effectType, PromotionTier promotionTier, List<Object> gifts = null)
         {
             if (order.Effects == null)
             {
@@ -294,7 +294,7 @@ namespace ApplicationCore.Chain
             }
 
         }
-        private void SetDiscountFromOrder(OrderResponseModel order, decimal discount, decimal final, Promotion promotion)
+        private void SetDiscountFromOrder(Order order, decimal discount, decimal final, Promotion promotion)
         {
             var discountPercent = discount / final;
 
@@ -309,7 +309,7 @@ namespace ApplicationCore.Chain
 
         #endregion
         #region Discount for item
-        private void DiscountProduct(OrderResponseModel order, Infrastructure.Models.Action action, Promotion promotion, PromotionTier promotionTier)
+        private void DiscountProduct(Order order, Infrastructure.Models.Action action, Promotion promotion, PromotionTier promotionTier)
         {
             var actionProducts = action.ActionProductMapping;
             string effectType = "";
@@ -487,7 +487,7 @@ namespace ApplicationCore.Chain
         }
 
         #endregion
-        private void SetFinalAmountApply(OrderResponseModel order)
+        private void SetFinalAmountApply(Order order)
         {
             order.DiscountOrderDetail = order.CustomerOrderInfo.CartItems.Sum(s => s.Discount);
             order.Discount = (decimal)order.CustomerOrderInfo.CartItems.Sum(s => s.DiscountFromOrder)

@@ -11,12 +11,12 @@ using System.Net;
 
 namespace ApplicationCore.Chain
 {
-    public interface IConditionHandle : IHandler<OrderResponseModel>
+    public interface IConditionHandle : IHandler<Order>
     {
         void SetPromotions(List<Promotion> promotions);
         public List<Promotion> GetPromotions();
     }
-    public class ConditionHandle : Handler<OrderResponseModel>, IConditionHandle
+    public class ConditionHandle : Handler<Order>, IConditionHandle
     {
         private readonly IOrderConditionHandle _orderConditionHandle;
         private readonly IProductConditionHandle _productConditionHandle;
@@ -40,7 +40,7 @@ namespace ApplicationCore.Chain
         {
             _promotions = promotions;
         }
-        public override void Handle(OrderResponseModel order)
+        public override void Handle(Order order)
         {
 
             #region Trường hợp có voucher
@@ -90,7 +90,7 @@ namespace ApplicationCore.Chain
             }
             base.Handle(order);
         }
-        public void HandlePromotionCondition(Promotion promotion, OrderResponseModel order)
+        public void HandlePromotionCondition(Promotion promotion, Order order)
         {
             int invalidPromotionDetails = 0;
             foreach (var promotionTier in promotion.PromotionTier)
@@ -141,7 +141,7 @@ namespace ApplicationCore.Chain
 
 
         }
-        private int HandleConditionGroup(PromotionTier promotionTier, OrderResponseModel order)
+        private int HandleConditionGroup(PromotionTier promotionTier, Order order)
         {
             int invalidPromotionDetails = 0;
             var conditionGroupModels = new List<ConditionGroupModel>();

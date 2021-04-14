@@ -535,7 +535,7 @@ namespace ApplicationCore.Services
         }
         #endregion
         #region check voucher
-        public async Task<OrderResponseModel> HandlePromotion(OrderResponseModel orderResponse)
+        public async Task<Order> HandlePromotion(Order orderResponse)
         {
             var listPublicHoliday = await _holidayService.GetHolidays();
             _timeframeHandle.SetHolidays(listPublicHoliday);

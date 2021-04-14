@@ -9,16 +9,16 @@ using System.Linq;
 
 namespace ApplicationCore.Chain
 {
-    public interface IOrderConditionHandle : IHandler<OrderResponseModel>
+    public interface IOrderConditionHandle : IHandler<Order>
     {
         void SetConditionModel(ConditionModel conditions);
 
     }
-    public class OrderConditionHandle : Handler<OrderResponseModel>, IOrderConditionHandle
+    public class OrderConditionHandle : Handler<Order>, IOrderConditionHandle
     {
         private ConditionModel _condition;
 
-        public override void Handle(OrderResponseModel order)
+        public override void Handle(Order order)
         {
             if (_condition is OrderConditionModel)
             {
@@ -34,7 +34,7 @@ namespace ApplicationCore.Chain
             }
         }
 
-        private void HandleMinAmount(OrderConditionModel orderCondition, OrderResponseModel order)
+        private void HandleMinAmount(OrderConditionModel orderCondition, Order order)
         {
             /*throw new ErrorObj(code: 400, message:"Compare: "+ Common.Compare<decimal>(orderCondition.AmountOperator, order.OrderDetail.Amount, orderCondition.Amount));*/
             if (!Common.Compare<decimal>(orderCondition.AmountOperator, order.CustomerOrderInfo.Amount, orderCondition.Amount))
@@ -42,7 +42,7 @@ namespace ApplicationCore.Chain
                 orderCondition.IsMatch = false;
             }
         }
-        private void HandleMinQuantity(OrderConditionModel orderCondition, OrderResponseModel order)
+        private void HandleMinQuantity(OrderConditionModel orderCondition, Order order)
         {
             if (!Common.Compare<decimal>(orderCondition.QuantityOperator, order.CustomerOrderInfo.CartItems.Count(), orderCondition.Quantity))
             {

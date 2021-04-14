@@ -9,7 +9,14 @@ namespace ApplicationCore.Request
 {
     public class OrderResponseModel
     {
-        public OrderResponseModel()
+        public string Code { get; set; }
+        public string Message { get; set; }
+        public Order Order { get; set; }
+
+    }
+    public class Order
+    {
+        public Order()
         {
             Gift = new List<Object>();
         }

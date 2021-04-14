@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace ApplicationCore.Chain
 {
-    public interface IApplyPromotionHandler : IHandler<OrderResponseModel>
+    public interface IApplyPromotionHandler : IHandler<Order>
     {
         void SetPromotions(List<Promotion> promotions);
         List<Promotion> GetPromotions();
     }
-    public class ApplyPromotionHandler : Handler<OrderResponseModel>, IApplyPromotionHandler
+    public class ApplyPromotionHandler : Handler<Order>, IApplyPromotionHandler
     {
         private readonly IPromotionHandle _promotionHandle;
         private readonly IConditionHandle _conditionHandle;
@@ -38,7 +38,7 @@ namespace ApplicationCore.Chain
         {
             return _promotions;
         }
-        public override void Handle(OrderResponseModel order)
+        public override void Handle(Order order)
         {
             Setorder(order);
             #region Check condition
@@ -68,7 +68,7 @@ namespace ApplicationCore.Chain
             #endregion
             /*base.Handle(order);*/
         }
-        private void Setorder(OrderResponseModel order)
+        private void Setorder(Order order)
         {
             order.Discount ??= 0;
             order.DiscountOrderDetail ??= 0;

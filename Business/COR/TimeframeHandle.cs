@@ -19,13 +19,13 @@ using System.Collections.Generic;
 
 namespace ApplicationCore.Chain
 {
-    public interface ITimeframeHandle : IHandler<OrderResponseModel>
+    public interface ITimeframeHandle : IHandler<Order>
     {
         void SetHolidays(List<Holiday> holidays);
         void SetPromotions(List<Promotion> promotions);
 
     }
-    public class TimeframeHandle : Handler<OrderResponseModel>, ITimeframeHandle
+    public class TimeframeHandle : Handler<Order>, ITimeframeHandle
     {
         private readonly IConditionHandle _conditionHandle;
 
@@ -40,7 +40,7 @@ namespace ApplicationCore.Chain
         {
             _promotions = promotions;
         }
-        public override void Handle(OrderResponseModel order)
+        public override void Handle(Order order)
         {
 
             //Trường hợp auto apply
@@ -91,7 +91,7 @@ namespace ApplicationCore.Chain
             base.Handle(order);
         }
 
-        public void HandleHolidayAsync(OrderResponseModel order)
+        public void HandleHolidayAsync(Order order)
         {
             if (_listPublicHoliday != null && _listPublicHoliday.Count() > 0)
             {

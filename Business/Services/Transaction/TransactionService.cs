@@ -29,7 +29,7 @@ namespace ApplicationCore.Services
         }
         protected override IGenericRepository<Transaction> _repository => _unitOfWork.TransactionRepository;
 
-        public async Task<OrderResponseModel> Checkout(Guid brandId, OrderResponseModel order, Guid deviceId)
+        public async Task<Order> Checkout(Guid brandId, Order order, Guid deviceId)
         {
             var brand = await _brandService.GetByIdAsync(id: brandId);
             List<Promotion> promotionSetDiscounts = new List<Promotion>();
@@ -95,7 +95,7 @@ namespace ApplicationCore.Services
                 throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: "Brand does not exist !", description: "Brand does not exist !");
             return null;
         }
-        private async Task<OrderResponseModel> AddTransaction(OrderResponseModel order, Guid brandId, Guid transactionId)
+        private async Task<Order> AddTransaction(Order order, Guid brandId, Guid transactionId)
         {
 
             var jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(order);
@@ -109,7 +109,7 @@ namespace ApplicationCore.Services
             else
                 throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: "Order failed !", description: "Order failed !");
         }
-        private async Task<OrderResponseModel> AddTransactionWithPromo(OrderResponseModel order, Guid brandId, Guid transactionId, Guid promotionId)
+        private async Task<Order> AddTransactionWithPromo(Order order, Guid brandId, Guid transactionId, Guid promotionId)
         {
             var now = Common.GetCurrentDatetime();
             var jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(order);
@@ -123,7 +123,7 @@ namespace ApplicationCore.Services
             else
                 throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: "Order failed !", description: "Order failed !");
         }
-        private async Task<List<Voucher>> checkVoucher(OrderResponseModel order, Guid deviceId, Guid transactionId)
+        private async Task<List<Voucher>> checkVoucher(Order order, Guid deviceId, Guid transactionId)
         {
             if (order.CustomerOrderInfo.Vouchers.Count > 0)
             {
