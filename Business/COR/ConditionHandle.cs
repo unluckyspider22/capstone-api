@@ -70,10 +70,7 @@ namespace ApplicationCore.Chain
                             }
                             order.Effects.Add(new Effect
                             {
-                                Prop = new
-                                {
-                                    value = AppConstant.EffectMessage.NoAutoPromotion
-                                }
+                                EffectType = AppConstant.EffectMessage.NoAutoPromotion
                             });
                         }
                     }
