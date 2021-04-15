@@ -488,14 +488,17 @@ namespace ApplicationCore.Services
                         Total = group.Quantity,
                         UsedQuantity = group.UsedQuantity,
                         Remain = 0,
+
                     };
                     if (group.Action != null)
                     {
                         result.ActionType = group.Action.ActionType;
+                        result.Action = group.Action;
                     }
                     if (group.Gift != null)
                     {
                         result.PostActionType = group.Gift.PostActionType;
+                        result.Gift = group.Gift;
                     }
                     if (result.UsedQuantity > result.RedempedQuantity)
                     {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Infrastructure.Models;
+using System;
 using System.Collections.Generic;
 
 namespace Infrastructure.DTOs
@@ -55,6 +56,8 @@ namespace Infrastructure.DTOs
         public int ActionType { get; set; } = 0;
         public Guid? GiftId { get; set; }
         public int PostActionType { get; set; } = 0;
+        public Models.Action Action { get; set; } = null;
+        public Gift Gift { get; set; } = null;
         public List<PromoOfVoucher> PromoList { get; set; } = new List<PromoOfVoucher>();
     }
 
