@@ -42,7 +42,6 @@ namespace ApplicationCore.Chain
         }
         public override void Handle(Order order)
         {
-
             #region Trường hợp có voucher
             if (order.CustomerOrderInfo.Vouchers == null || order.CustomerOrderInfo.Vouchers.Count == 0)
             {
@@ -87,7 +86,7 @@ namespace ApplicationCore.Chain
             }
             base.Handle(order);
         }
-        public void HandlePromotionCondition(Promotion promotion, Order order)
+        private void HandlePromotionCondition(Promotion promotion, Order order)
         {
             int invalidPromotionDetails = 0;
             foreach (var promotionTier in promotion.PromotionTier)
@@ -135,8 +134,6 @@ namespace ApplicationCore.Chain
             {
                 throw new ErrorObj((int)HttpStatusCode.BadRequest, AppConstant.ErrMessage.NotMatchCondition);
             }
-
-
         }
         private int HandleConditionGroup(PromotionTier promotionTier, Order order)
         {
@@ -237,8 +234,6 @@ namespace ApplicationCore.Chain
                         {
                             result = result || conditions[nextIndex].IsMatch;
                         }
-
-
                     }
 
                 }
