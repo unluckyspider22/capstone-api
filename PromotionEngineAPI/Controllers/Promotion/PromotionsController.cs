@@ -241,7 +241,7 @@ namespace PromotionEngineAPI.Controllers
                 var tiers = result.PromotionTier;
                 if (tiers != null && tiers.Count > 0)
                 {
-                    tiers = tiers.OrderBy(el => el.TierIndex).ToList();
+                    result.PromotionTier = tiers.OrderBy(el => el.TierIndex).ToList();
                 }
                 return Ok(result);
             }

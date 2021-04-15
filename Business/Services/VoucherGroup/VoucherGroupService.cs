@@ -449,7 +449,7 @@ namespace ApplicationCore.Services
                                                                   && (o.PromotionId == null || o.PromotionId.Equals(Guid.Empty)));
                         var remain = remainVouchers.Count();
                         var total = vouchers.Count();
-                        var avail = total - remain == 0;
+                        var avail = total - remain > 0;
                         result = new VoucherIndexInfo()
                         {
                             Available = avail,

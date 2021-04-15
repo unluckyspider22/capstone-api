@@ -1,5 +1,6 @@
 ﻿
 using ApplicationCore.Services;
+using ApplicationCore.Utils;
 using ApplicationCore.Worker;
 using Infrastructure.DTOs;
 using Infrastructure.Models;
@@ -132,7 +133,7 @@ namespace PromotionEngineAPI.Controllers
             {
                 if (id != dto.VoucherGroupId)
                     return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
-                dto.UpdDate = DateTime.Now;
+                dto.UpdDate = Common.GetCurrentDatetime();
                 return Ok(await _service.UpdateAsync(dto));
             }
             catch (ErrorObj e)

@@ -1,6 +1,7 @@
 ﻿
 using ApplicationCore.Chain;
 using ApplicationCore.Request;
+using ApplicationCore.Utils;
 using AutoMapper;
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
@@ -568,7 +569,7 @@ namespace ApplicationCore.Services
         {
             try
             {
-                dto.UpdDate = DateTime.Now;
+                dto.UpdDate = Common.GetCurrentDatetime();
                 if (dto.EndDate == null)
                 {
                     IPromotionRepository promotionRepo = new PromotionRepositoryImp();
@@ -1372,18 +1373,19 @@ namespace ApplicationCore.Services
         #region create promotion
         public async Task<PromotionDto> CreatePromotion(PromotionDto dto)
         {
+            var now = Common.GetCurrentDatetime();
             try
             {
                 dto.PromotionId = Guid.NewGuid();
-                dto.InsDate = DateTime.Now;
-                dto.UpdDate = DateTime.Now;
+                dto.InsDate = now;
+                dto.UpdDate = now;
                 var promoEntity = _mapper.Map<Promotion>(dto);
                 _repository.Add(promoEntity);
                 var voucherGroupId = dto.VoucherGroupId;
-                if ((bool)dto.HasVoucher)
-                {
-                    await CreateTier(voucherGroupId, dto);
-                }
+                //if ((bool)dto.HasVoucher)
+                //{
+                //    await CreateTier(voucherGroupId, dto);
+                //}
                 await _unitOfWork.SaveAsync();
                 return _mapper.Map<PromotionDto>(promoEntity);
             }
