@@ -134,6 +134,8 @@ namespace ApplicationCore.Chain
                     {
                         order.Gift.Add(new
                         {
+                            promotion.PromotionName,
+                            code = promotion.PromotionCode,
                             ProductCode = gift.Code,
                             ProductName = gift.Name
                         });
@@ -149,6 +151,8 @@ namespace ApplicationCore.Chain
 
                     order.Gift.Add(new
                     {
+                        promotion.PromotionName,
+                        code = promotion.PromotionCode,
                         ProductCode = voucher.Promotion.PromotionCode + "-" + voucher.VoucherCode,
                         ProductName = voucher.VoucherGroup.VoucherName
                     });
@@ -159,13 +163,12 @@ namespace ApplicationCore.Chain
                     break;
                 case (int)AppConstant.EnvVar.PostActionType.Gift_GameCode:
                     effectType = AppConstant.EffectMessage.AddGiftGameCode;
-                    AddGiftGameCode(order, promotionTier.Gift);
+                    AddGiftGameCode(order, promotionTier.Gift, promotion);
                     break;
             }
-
             SetEffect(order, promotion, 0, effectType, promotionTier, gifts: order.Gift);
         }
-        public void AddGiftGameCode(Order order, Gift postAction)
+        public void AddGiftGameCode(Order order, Gift postAction, Promotion promotion)
         {
             var now = Common.GetCurrentDatetime();
             var firstDayOfTYear = new DateTime(2021, 01, 01);
@@ -175,6 +178,8 @@ namespace ApplicationCore.Chain
             int gameCode = int.Parse(nowStr) + int.Parse(postAction.GameCampaign.SecretCode);
             order.Gift.Add(new
             {
+                promotion.PromotionName,
+                code = promotion.PromotionCode,
                 GameName = postAction.GameCampaign.Name,
                 GameCode = gameCode
             });
@@ -229,7 +234,7 @@ namespace ApplicationCore.Chain
             SetEffect(order, promotion, discount, effectType, promotionTier);
         }
 
-        public void SetEffect(Order order, Promotion promotion, decimal discount, string effectType, PromotionTier promotionTier, List<Object> gifts = null)
+        public void SetEffect(Order order, Promotion promotion, decimal discount, string effectType, PromotionTier promotionTier, Object gifts = null)
         {
             if (order.Effects == null)
             {
