@@ -720,7 +720,7 @@ namespace Infrastructure.Models
 
                 entity.Property(e => e.PromotionCode)
                     .IsRequired()
-                    .HasMaxLength(6)
+                    .HasMaxLength(20)
                     .IsUnicode(false);
 
                 entity.Property(e => e.PromotionName)
