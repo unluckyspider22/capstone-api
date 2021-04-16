@@ -257,7 +257,7 @@ namespace ApplicationCore.Services
                     && el.Promotion.Status == (int)AppConstant.EnvVar.PromotionStatus.PUBLISH,
                     includeProperties:
                     "Promotion.PromotionChannelMapping.Channel," +
-                    "VoucherGroup.Brand.UsernameNavigation," +
+                    "VoucherGroup.Brand," +
                     "Membership," +
                     "VoucherGroup.Action," +
                     "VoucherGroup.Gift");
@@ -266,7 +266,6 @@ namespace ApplicationCore.Services
                 {
                     voucher = vouchers.FirstOrDefault();
                     await SendEmailSmtp(param, voucher);
-
                     //Update voucher vừa lấy
                     await UpdateVoucherRedemped(voucher, param);
                 }
@@ -357,8 +356,7 @@ namespace ApplicationCore.Services
                 "<ul>" +
                 "<li>This promotion may end before the duration</li>" +
                 "<li>If have any questions, please call the hotline <b>{0}</b> or email <a href=\"mailto: {1}\" target=\"_blank\">{1}</a></li>" +
-                "</ul>", brand.PhoneNumber, brand.UsernameNavigation.Email);
-
+                "</ul>", brand.PhoneNumber, brand.BrandEmail);
             //Footer
             string footer = "<p>Regards,</p>" +
                 "<p>PMSR Team</p>";

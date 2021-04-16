@@ -17,8 +17,9 @@ namespace Infrastructure.Models
         public DateTime UpdDate { get; set; }
         public string ImgUrl { get; set; }
         public bool IsActive { get; set; }
+        public Guid? BrandId { get; set; }
 
-        public virtual Role Role { get; set; }
         public virtual Brand Brand { get; set; }
+        public virtual Role Role { get; set; }
     }
 }

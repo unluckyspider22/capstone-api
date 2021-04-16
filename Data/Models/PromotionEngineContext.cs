@@ -103,6 +103,11 @@ namespace Infrastructure.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.HasOne(d => d.Brand)
+                    .WithMany(p => p.Account)
+                    .HasForeignKey(d => d.BrandId)
+                    .HasConstraintName("FK_Account_Brand");
+
                 entity.HasOne(d => d.Role)
                     .WithMany(p => p.Account)
                     .HasForeignKey(d => d.RoleId)
@@ -171,10 +176,6 @@ namespace Infrastructure.Models
                     .HasName("Brand_UN")
                     .IsUnique();
 
-                entity.HasIndex(e => e.Username)
-                    .HasName("UNIQUE_Brand")
-                    .IsUnique();
-
                 entity.Property(e => e.BrandId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.Address).HasMaxLength(100);
@@ -182,6 +183,10 @@ namespace Infrastructure.Models
                 entity.Property(e => e.BrandCode)
                     .IsRequired()
                     .HasMaxLength(30)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BrandEmail)
+                    .HasMaxLength(62)
                     .IsUnicode(false);
 
                 entity.Property(e => e.BrandName)
@@ -210,17 +215,6 @@ namespace Infrastructure.Models
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
-
-                entity.Property(e => e.Username)
-                    .IsRequired()
-                    .HasMaxLength(25)
-                    .IsUnicode(false);
-
-                entity.HasOne(d => d.UsernameNavigation)
-                    .WithOne(p => p.Brand)
-                    .HasForeignKey<Brand>(d => d.Username)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Brand_Account");
             });
 
             modelBuilder.Entity<Channel>(entity =>
