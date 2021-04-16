@@ -29,6 +29,7 @@ namespace PromotionEngineAPI.Controllers
             [FromQuery] Guid PromotionId,
             [FromQuery] Guid ChannelId,
             [FromQuery] Guid PromotionTierId,
+            [FromQuery] Guid StoreId,
             [FromQuery] string SearchCode = "",
             [FromQuery] int VoucherStatus = 1)
         {
@@ -60,6 +61,12 @@ namespace PromotionEngineAPI.Controllers
             {
 
                 filter2 = el => el.ChannelId.Equals(ChannelId);
+                filter = filter.And(filter2);
+            }
+            if (!StoreId.Equals(Guid.Empty))
+            {
+
+                filter2 = el => el.StoreId.Equals(StoreId);
                 filter = filter.And(filter2);
             }
             if (VoucherStatus > AppConstant.VoucherStatus.ALL)
