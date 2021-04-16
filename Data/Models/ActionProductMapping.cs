@@ -10,6 +10,7 @@ namespace Infrastructure.Models
         public Guid ProductId { get; set; }
         public DateTime InsDate { get; set; }
         public DateTime UpdDate { get; set; }
+        public int? Quantity { get; set; }
 
         public virtual Action Action { get; set; }
         public virtual Product Product { get; set; }

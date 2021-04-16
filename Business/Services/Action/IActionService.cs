@@ -12,5 +12,7 @@ namespace ApplicationCore.Services
         public Task<ActionDto> MyAddAction(ActionDto dto);
         public Task<ActionDto> GetActionDetail(Guid id);
         public Task<bool> Delete(Guid id);
+
+        //public Task<ActionDto> UpdateAction(ActionDto dto);
     }
 }

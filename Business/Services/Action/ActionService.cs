@@ -46,7 +46,7 @@ namespace ApplicationCore.Services
             if (entity != null)
             {
                 result = _mapper.Map<ActionDto>(entity);
-                result.ListProductMapp = new List<ActionProductMap>();
+                result.ListProduct = new List<ActionProductMap>();
                 if (entity.ActionProductMapping.Count > 0)
                 {
                     foreach (var product in entity.ActionProductMapping)
@@ -54,8 +54,9 @@ namespace ApplicationCore.Services
                         var dto = new ActionProductMap()
                         {
                             ProductId = product.ProductId,
+                            Quantity = (int)product.Quantity,
                         };
-                        result.ListProductMapp.Add(dto);
+                        result.ListProduct.Add(dto);
                     }
                 }
 
@@ -76,7 +77,7 @@ namespace ApplicationCore.Services
                 if (dto.ListProduct.Count > 0 && dto.ActionType > (int)AppConstant.EnvVar.ActionType.Shipping)
                 {
                     IGenericRepository<ActionProductMapping> mappRepo = _unitOfWork.ActionProductMappingRepository;
-                    foreach (var productId in dto.ListProduct)
+                    foreach (var product in dto.ListProduct)
                     {
                         var mapp = new ActionProductMapping()
                         {
@@ -84,7 +85,8 @@ namespace ApplicationCore.Services
                             Id = Guid.NewGuid(),
                             InsDate = DateTime.Now,
                             UpdDate = DateTime.Now,
-                            ProductId = productId,
+                            ProductId = product.ProductId,
+                            Quantity = product.Quantity,
                         };
                         mappRepo.Add(mapp);
                     }
@@ -101,5 +103,10 @@ namespace ApplicationCore.Services
             }
 
         }
+
+        //public Task<ActionDto> UpdateAction(ActionDto dto)
+        //{
+
+        //}
     }
 }

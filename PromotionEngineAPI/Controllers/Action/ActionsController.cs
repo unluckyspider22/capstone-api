@@ -1,4 +1,5 @@
 ﻿using ApplicationCore.Services;
+using ApplicationCore.Utils;
 using Infrastructure.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -82,7 +83,8 @@ namespace PromotionEngineAPI.Controllers
             }
             try
             {
-                dto.UpdDate = DateTime.Now;
+                var now = Common.GetCurrentDatetime();
+                dto.UpdDate = now;
                 dto.InsDate = exist.InsDate;
                 var result = await _service.UpdateAsync(dto);
                 return Ok(result);

@@ -26,14 +26,14 @@ namespace Infrastructure.DTOs
         public decimal? BundlePrice { get; set; }
         public int? BundleQuantity { get; set; }
         public int? BundleStrategy { get; set; }
-        public List<Guid> ListProduct { get; set; }
-        public List<ActionProductMap> ListProductMapp { get; set; }
+        public List<ActionProductMap> ListProduct { get; set; }
     }
 
 
     public class ActionProductMap
     {
         public Guid ProductId { get; set; }
+        public int Quantity { get; set; }
 
     }
 
