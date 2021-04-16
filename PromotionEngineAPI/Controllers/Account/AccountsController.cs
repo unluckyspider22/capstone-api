@@ -105,10 +105,6 @@ namespace PromotionEngineAPI.Controllers
                 dto.IsActive = false;
                 dto.Brand.InsDate = now;
                 dto.Brand.UpdDate = now;
-                if (string.IsNullOrEmpty(dto.Brand.Username))
-                {
-                    dto.Brand.Username = dto.Username;
-                }
                 var result = await _service.CreateAsync(dto);
                 return Ok(result);
             }

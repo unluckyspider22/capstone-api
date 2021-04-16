@@ -7,6 +7,7 @@ namespace Infrastructure.Models
     {
         public Brand()
         {
+            Account = new HashSet<Account>();
             Action = new HashSet<Action>();
             Channel = new HashSet<Channel>();
             ConditionRule = new HashSet<ConditionRule>();
@@ -21,7 +22,6 @@ namespace Infrastructure.Models
         }
 
         public Guid BrandId { get; set; }
-        public string Username { get; set; }
         public string BrandCode { get; set; }
         public string PhoneNumber { get; set; }
         public string ImgUrl { get; set; }
@@ -32,8 +32,9 @@ namespace Infrastructure.Models
         public bool DelFlg { get; set; }
         public DateTime InsDate { get; set; }
         public DateTime UpdDate { get; set; }
+        public string BrandEmail { get; set; }
 
-        public virtual Account UsernameNavigation { get; set; }
+        public virtual ICollection<Account> Account { get; set; }
         public virtual ICollection<Action> Action { get; set; }
         public virtual ICollection<Channel> Channel { get; set; }
         public virtual ICollection<ConditionRule> ConditionRule { get; set; }
