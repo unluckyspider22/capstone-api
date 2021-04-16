@@ -36,9 +36,14 @@ namespace PromotionEngineAPI.Controllers
             {
                 SearchCode = SearchCode.Split("-").Last();
             }
-            Expression<Func<Voucher, bool>> filter = el => el.VoucherGroupId.Equals(VoucherGroupId)
-                                                    && el.VoucherCode.ToUpper().Contains(SearchCode.ToUpper());
+
+            Expression<Func<Voucher, bool>> filter = el => el.VoucherCode.ToUpper().Contains(SearchCode.ToUpper());
             Expression<Func<Voucher, bool>> filter2;
+            if (!VoucherGroupId.Equals(Guid.Empty))
+            {
+                filter2 = el => el.VoucherGroupId.Equals(VoucherGroupId);
+                filter = filter.And(filter2);
+            }
             if (!PromotionId.Equals(Guid.Empty))
             {
 
@@ -84,13 +89,14 @@ namespace PromotionEngineAPI.Controllers
 
             try
             {
-                return Ok(await _service.GetAsync(
+                var result = await _service.GetAsync(
                 pageIndex: param.PageIndex,
                 pageSize: param.PageSize,
                 filter: filter,
-                includeProperties: "Promotion,Channel,Store,Membership",
+                includeProperties: "Promotion,Channel,Store,Membership,GameCampaign",
                 orderBy: el => el.OrderBy(obj => obj.Index)
-                ));
+                );
+                return Ok(result);
             }
             catch (ErrorObj e)
             {
