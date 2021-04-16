@@ -84,7 +84,7 @@ namespace PromotionEngineAPI.Controllers
             {
                 dto.UpdDate = DateTime.Now;
                 dto.InsDate = exist.InsDate;
-                var result = await _service.UpdateAsync(dto);
+                var result = await _service.UpdateGift(dto);
                 return Ok(result);
             }
             catch (ErrorObj e)

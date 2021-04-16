@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using ApplicationCore.Utils;
+using AutoMapper;
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
 using Infrastructure.Models;
@@ -92,5 +93,81 @@ namespace ApplicationCore.Services
             }
 
         }
+
+        public async Task<GiftDto> UpdateGift(GiftDto dto)
+        {
+            try
+            {
+                var result = new GiftDto();
+                var id = dto.GiftId;
+                var listProduct = dto.ListProduct;
+                if (listProduct != null && listProduct.Count() > 0)
+                {
+                    await UpdateGiftMapp(listMapp: listProduct, giftId: dto.GiftId);
+                }
+
+                dto.ListProduct = null;
+                dto.ListProductMapp = null;
+                var entityMapp = _mapper.Map<Gift>(dto);
+                if (!dto.GameCampaignId.Equals(Guid.Empty))
+                {
+                    IGenericRepository<GameCampaign> gameRepo = _unitOfWork.GameConfigRepository;
+                    var game = await gameRepo.GetFirst(filter: el => el.Id.Equals(dto.GameCampaignId));
+                    if (game != null)
+                    {
+                        entityMapp.GameCampaign = game;
+                    }
+                }
+
+                entityMapp.UpdDate = Common.GetCurrentDatetime();
+                _repository.Update(entityMapp);
+                await _unitOfWork.SaveAsync();
+                result = _mapper.Map<GiftDto>(entityMapp);
+                return result;
+            }
+            catch (System.Exception e)
+            {
+                Debug.WriteLine(e.StackTrace);
+                Debug.WriteLine(e.InnerException);
+                throw new ErrorObj(code: 500, message: "Error when update gift action", description: "Cannot update gift action");
+            }
+
+        }
+
+        private async Task<bool> UpdateGiftMapp(List<GiftProductMapp> listMapp, Guid giftId)
+        {
+            try
+            {
+                IGenericRepository<GiftProductMapping> mappRepo = _unitOfWork.GiftProductMappingRepository;
+                mappRepo.Delete(id: Guid.Empty, filter: el => el.GiftId.Equals(giftId));
+                await _unitOfWork.SaveAsync();
+                if (listMapp.Count > 0)
+                {
+                    var now = Common.GetCurrentDatetime();
+                    foreach (var mapp in listMapp)
+                    {
+                        var entity = new GiftProductMapping()
+                        {
+                            Id = Guid.NewGuid(),
+                            GiftId = giftId,
+                            ProductId = mapp.ProductId,
+                            Quantity = mapp.Quantity,
+                            InsDate = now,
+                            UpdDate = now,
+                        };
+                        mappRepo.Add(entity);
+                    }
+                }
+                return await _unitOfWork.SaveAsync() > 0;
+            }
+            catch (System.Exception e)
+            {
+                Debug.WriteLine(e.StackTrace);
+                Debug.WriteLine(e.InnerException);
+                throw new ErrorObj(code: 500, message: "Error when update gift action", description: "Cannot update product of gift action");
+            }
+
+        }
+
     }
 }
