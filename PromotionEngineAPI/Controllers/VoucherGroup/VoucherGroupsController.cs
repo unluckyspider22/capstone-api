@@ -7,6 +7,7 @@ using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
@@ -29,7 +30,6 @@ namespace PromotionEngineAPI.Controllers
         public async Task<IActionResult> GetVoucherGroup(
             [FromQuery] SearchPagingRequestParam param,
             [FromQuery] Guid BrandId,
-            [FromQuery] string voucherType,
             [FromQuery] int ActionType = 0,
             [FromQuery] int PostActionType = 0)
         {
@@ -57,7 +57,10 @@ namespace PromotionEngineAPI.Controllers
                                       && el.BrandId.Equals(BrandId)
                                       && el.VoucherName.ToLower().Contains(param.SearchContent.ToLower().Trim());
                 }
-                var result = await _service.GetAsync(pageIndex: param.PageIndex, pageSize: param.PageSize, filter: myFilter, includeProperties: myInclude);
+                var result = await _service.GetAsync(
+                    pageIndex: param.PageIndex, pageSize: param.PageSize, filter: myFilter, 
+                    includeProperties: myInclude, 
+                    orderBy: el => el.OrderByDescending(b => b.InsDate));
 
                 return Ok(result);
             }
