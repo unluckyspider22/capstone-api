@@ -653,6 +653,10 @@ namespace ApplicationCore.Services
                     {
                         dto.EndDate = entity.EndDate;
                     }
+                    if (dto.Exclusive == -1)
+                    {
+                        dto.Exclusive = entity.Exclusive;
+                    }
                     dto.HasVoucher = entity.HasVoucher;
                     dto.IsAuto = entity.IsAuto;
                     

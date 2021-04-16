@@ -15,7 +15,7 @@ namespace Infrastructure.DTOs
         public string Description { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
-        public int Exclusive { get; set; }
+        public int Exclusive { get; set; } = -1;
         public int ApplyBy { get; set; }
         public int SaleMode { get; set; }
         public int Gender { get; set; }
