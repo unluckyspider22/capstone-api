@@ -5,7 +5,9 @@ using Infrastructure.Models;
 using Infrastructure.Repository;
 using Infrastructure.UnitOrWork;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ApplicationCore.Services
@@ -34,6 +36,22 @@ namespace ApplicationCore.Services
                 Debug.WriteLine(e.InnerException);
                 throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
             }
+        }
+
+        public async Task<GiftDto> GetGiftDetail(Guid id)
+        {
+            var result = new GiftDto();
+            var entity = await _repository.GetFirst(filter: o => o.GiftId.Equals(id), includeProperties: "GiftProductMapping");
+            if (entity != null)
+            {
+                result = _mapper.Map<GiftDto>(entity);
+                result.ListProductMapp = new List<GiftProductMapping>();
+                if (entity.GiftProductMapping.Count > 0)
+                {
+                    result.ListProductMapp = entity.GiftProductMapping.ToList();
+                }
+            }
+            return result;
         }
 
         public async Task<GiftDto> MyAddAction(GiftDto dto)

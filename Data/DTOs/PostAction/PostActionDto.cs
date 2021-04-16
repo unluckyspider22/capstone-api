@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Infrastructure.Models;
+using System;
 using System.Collections.Generic;
 
 namespace Infrastructure.DTOs
@@ -14,6 +15,8 @@ namespace Infrastructure.DTOs
         public string Name { get; set; }
         public Guid BrandId { get; set; }
         public List<GiftProductMapp> ListProduct { get; set; }
+        public List<GiftProductMapping> ListProductMapp { get; set; }
+
     }
 
     public class GiftProductMapp
