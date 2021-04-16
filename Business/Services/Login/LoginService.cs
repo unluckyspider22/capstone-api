@@ -40,7 +40,7 @@ namespace ApplicationCore.Services
                     result = new LoginResponse();
                     string message;
                     int status;
-                    if(account.Role.RoleId != AppConstant.EnvVar.AdminId)
+                    if (account.Role.RoleId != AppConstant.EnvVar.AdminId)
                     {
                         account.Password = Common.DecodeFromBase64(account.Password);
                     }
@@ -55,7 +55,8 @@ namespace ApplicationCore.Services
                                 {
                                     Username = account.Username,
                                     Token = token,
-                                    RoleName = account.Role.Name
+                                    RoleName = account.Role.Name,
+                                    FullName = account.FirstName + " " + account.LastName
                                 };
                                 break;
                             case AppConstant.EnvVar.BrandId:
@@ -65,7 +66,9 @@ namespace ApplicationCore.Services
                                     BrandCode = account.Brand.BrandCode,
                                     BrandId = account.Brand.BrandId,
                                     Token = token,
-                                    RoleName = account.Role.Name
+                                    RoleName = account.Role.Name,
+                                    FullName = account.FirstName + " " + account.LastName
+
                                 };
                                 break;
                         }
@@ -82,11 +85,12 @@ namespace ApplicationCore.Services
                     result.Status = status;
                 }
                 return result;
-            } catch(ErrorObj e)
+            }
+            catch (ErrorObj e)
             {
                 throw e;
             }
-            
+
         }
         private string GenerateJSONWebToken(Account account)
         {
@@ -116,6 +120,6 @@ namespace ApplicationCore.Services
             /*return new JwtSecurityTokenHandler().WriteToken(token);*/
             return token;
         }
-        
+
     }
 }

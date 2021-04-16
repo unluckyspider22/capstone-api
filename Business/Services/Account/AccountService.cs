@@ -49,7 +49,7 @@ namespace ApplicationCore.Services
             return await _unitOfWork.SaveAsync() > 0;
         }
 
-        public async Task<bool> RegisterAccount(AccountDto dto)
+       /* public async Task<bool> AddAccount(AccountDto dto)
         {
             DateTime now = Common.GetCurrentDatetime();
             dto.InsDate = now;
@@ -72,6 +72,6 @@ namespace ApplicationCore.Services
                 }
             }
             return await _unitOfWork.SaveAsync() > 0;
-        }
+        }*/
     }
 }
