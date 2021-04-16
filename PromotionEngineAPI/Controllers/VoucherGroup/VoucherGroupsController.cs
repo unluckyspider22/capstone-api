@@ -3,6 +3,7 @@ using ApplicationCore.Services;
 using ApplicationCore.Utils;
 using ApplicationCore.Worker;
 using Infrastructure.DTOs;
+using Infrastructure.Helper;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -37,29 +38,33 @@ namespace PromotionEngineAPI.Controllers
             {
 
 
-                if (String.IsNullOrWhiteSpace(param.SearchContent)) param.SearchContent = "";
+                if (String.IsNullOrWhiteSpace(param.SearchContent))
+                {
+                    param.SearchContent = "";
+                }
+
                 var myInclude = "";
+
                 Expression<Func<VoucherGroup, bool>> myFilter = el => !el.DelFlg
                                                              && el.BrandId.Equals(BrandId)
                                                              && el.VoucherName.ToLower().Contains(param.SearchContent.ToLower().Trim());
-                var compiled = myFilter.Compile();
+                Expression<Func<VoucherGroup, bool>> filter2;
                 if (ActionType > 0)
                 {
-                    myFilter = el => !el.DelFlg
-                    && el.Action.ActionType == ActionType
-                                        && el.BrandId.Equals(BrandId)
-                                        && el.VoucherName.ToLower().Contains(param.SearchContent.ToLower().Trim());
+                    filter2 = el => el.Action.ActionType == ActionType;
+                    myFilter = myFilter.And(filter2);
+                    myInclude = "Action";
+
                 }
                 else if (PostActionType > 0)
                 {
-                    myFilter = el => !el.DelFlg
-                  && el.Gift.PostActionType == PostActionType
-                                      && el.BrandId.Equals(BrandId)
-                                      && el.VoucherName.ToLower().Contains(param.SearchContent.ToLower().Trim());
+                    filter2 = el => el.Gift.PostActionType == PostActionType;
+                    myFilter = myFilter.And(filter2);
+                    myInclude = "Gift";
                 }
                 var result = await _service.GetAsync(
-                    pageIndex: param.PageIndex, pageSize: param.PageSize, filter: myFilter, 
-                    includeProperties: myInclude, 
+                    pageIndex: param.PageIndex, pageSize: param.PageSize, filter: myFilter,
+                    includeProperties: myInclude,
                     orderBy: el => el.OrderByDescending(b => b.InsDate));
 
                 return Ok(result);
