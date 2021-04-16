@@ -55,7 +55,7 @@ namespace PromotionEngineAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetBrand([FromRoute]Guid id)
         {
-            var result = await _service.GetByIdAsync(id);
+            var result = await _service.GetFirst(filter: el => el.BrandId == id, includeProperties:"Account");
             if (result == null)
             {
                 return NotFound();

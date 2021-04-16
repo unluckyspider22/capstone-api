@@ -18,8 +18,5 @@ namespace Infrastructure.DTOs
         public string ImgUrl { get; set; }
         public bool IsActive { get; set; }
         public virtual BrandDto Brand { get; set; }
-
-        public bool HasBrand { get; set; }
-
     }
 }
