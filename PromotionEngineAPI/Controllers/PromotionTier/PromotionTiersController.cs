@@ -4,6 +4,7 @@ using ApplicationCore.Services;
 using Infrastructure.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers
@@ -125,7 +126,7 @@ namespace PromotionEngineAPI.Controllers
         {
             if (promotionId.Equals(Guid.Empty) || promotionTierId.Equals(Guid.Empty))
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
             try
             {

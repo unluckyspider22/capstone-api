@@ -148,7 +148,6 @@ namespace ApplicationCore.Chain
                                              && !el.IsRedemped
                                 && !el.IsUsed,
                                 includeProperties: "Promotion").Result;
-
                     order.Gift.Add(new
                     {
                         promotion.PromotionName,

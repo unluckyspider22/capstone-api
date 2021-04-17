@@ -49,7 +49,7 @@ namespace ApplicationCore.Services
                                 if (promotion == null || promotion.Status != (int)AppConstant.EnvVar.PromotionStatus.PUBLISH)
                                 {
                                     //neu voucher dang apply vao order ma brand manager xoa promotion hoac change promotion status
-                                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Expire_Promotion, description: AppConstant.ErrMessage.Expire_Promotion);
+                                    throw new ErrorObj(code: (int)AppConstant.ErrCode.Expire_Promotion, message: AppConstant.ErrMessage.Expire_Promotion, description: AppConstant.ErrMessage.Expire_Promotion);
                                 }
                                 promotionSetDiscounts.Add(_mapper.Map<Promotion>(promotion));
                             }
@@ -89,10 +89,10 @@ namespace ApplicationCore.Services
                     //neu ko co effect nao thi add transaction with no promotion
                     else return await AddTransaction(order: order, brandId: brandId, transactionId: transactionId);
                 }
-                else throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: "Order failed !", description: "Order failed !");
+                else throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: AppConstant.ErrMessage.Order_Fail, description: AppConstant.ErrMessage.Order_Fail);
             }
             else
-                throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: "Brand does not exist !", description: "Brand does not exist !");
+                throw new ErrorObj(code: (int)HttpStatusCode.NotFound, message: AppConstant.ErrMessage.Not_Found_Resource);
             return null;
         }
         private async Task<Order> AddTransaction(Order order, Guid brandId, Guid transactionId)
@@ -107,7 +107,7 @@ namespace ApplicationCore.Services
                 return order;
             }
             else
-                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: "Order failed !", description: "Order failed !");
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: AppConstant.ErrMessage.Order_Fail, description: AppConstant.ErrMessage.Order_Fail);
         }
         private async Task<Order> AddTransactionWithPromo(Order order, Guid brandId, Guid transactionId, Guid promotionId)
         {
@@ -121,7 +121,7 @@ namespace ApplicationCore.Services
                 return order;
             }
             else
-                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: "Order failed !", description: "Order failed !");
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: AppConstant.ErrMessage.Order_Fail, description: AppConstant.ErrMessage.Order_Fail);
         }
         private async Task<List<Voucher>> checkVoucher(Order order, Guid deviceId, Guid transactionId)
         {

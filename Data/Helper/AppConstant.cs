@@ -24,14 +24,19 @@ namespace Infrastructure.Helper
         {
             public const string ALL = "0";
         }
-
+       
         public const string Sender = "Promotion Engine";
         public const string Sender_Email = "promotion.engine.fpt@gmail.com";
         public const string Sender_Email_Pwd = "promotionengine";
         public const string Subject = "Promotion Engine send you a voucher. Enjoy it!";
         public const string Url_Gen_QR = "http://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=";
         public const string Url_Get_Voucher = "https://promotion-engine.netlify.app/#/";
+        public class SmtpHostAddress
+        {
+            public const string Host = "smtp.gmail.com";
+            public const int Port = 465;
 
+        }
         public struct EnvVar
         {
             public const int SUCCESS = 1;
@@ -133,6 +138,58 @@ namespace Infrastructure.Helper
                 SUNDAY = 0,
             }
         }
+        public enum ErrCode
+        {
+            Invalid_Product = 101,
+            Invalid_Quantity = 102,
+            Invalid_Min_Quantity = 103,
+            Invalid_Max_Quantity = 104,
+            Invalid_Extra = 105,
+            Invalid_NotExtra = 106,
+            Invalid_Parent = 107,
+            Invalid_Require = 108,
+            Invalid_Group = 109,
+            Duplicate_VoucherCode = 110,
+            Invalid_VoucherCode = 111,
+            Expire_Promotion = 112,
+            Exclusive_Promotion = 113,
+            Invalid_Gender = 114,
+            InActive_Promotion = 115,
+            Unmatch_Promotion = 116,
+            Invalid_Holiday = 117,
+            Invalid_SaleMode = 118,
+            Invalid_MinAmount = 119,
+            Invalid_Time = 120,
+            Invalid_Early = 121,
+            Invalid_HourFrame = 122,
+            Invalid_DayInWeek = 123,
+            Invalid_PaymentType = 124,
+            NotExisted_Product = 125,
+            Quantity_Product = 126,
+            NotMatchCondition = 127,
+            Invalid_Store = 128,
+            Invalid_MemberLevel = 129,
+            Duplicate_Promotion = 130,
+            Invalid_TimeFrame = 131,
+            Invalid_Operator = 132,
+            Invalid_CustomerLevel = 133,
+            Invalid_Effect = 134,
+            Invalid_ProductCondition = 135,
+            Invalid_ProductAction = 136,
+            Invalid_VoucherQuantity = 137,
+            Voucher_OutOfStock = 138,
+            Login_Success = 139,
+            Login_Fail = 140,
+            Device_Access_Fail = 141,
+            Device_Access_Server_Fail = 142,
+            Exist_ProductCategory=143,
+            MemberLevel_Exist = 144,
+            Product_Exist = 145,
+            Product_Cate_NotFound=146,
+            MemberLevel_NotFound=147,
+            Order_Fail=148,
+            Internal_Server_Error = 500
+        }
         public class ErrMessage
         {
             public const string Invalid_Product = "Sản phẩm không tồn tại!";
@@ -165,10 +222,8 @@ namespace Infrastructure.Helper
             public const string Invalid_Store = "Đơn hàng không áp dụng tại cửa hàng này.";
             public const string Invalid_MemberLevel = "Đơn hàng không áp dụng cho loại khách hàng này.";
             public const string Duplicate_Promotion = "Khuyến mãi không áp dụng cho các voucher thuộc cùng một chương trình khuyến mãi.";
-
             public const string Invalid_TimeFrame = "Khuyến mãi không áp dụng vào thời gian này.";
             public const string Invalid_Operator = "Invalid Logic Operator";
-
             public const string Invalid_CustomerLevel = "Khuyến mãi không áp dụng cho loại khách hàng này";
             public const string Invalid_Effect = "Khuyến mãi không ảnh hưởng";
             public const string Invalid_ProductCondition = "Điều kiện sản phẩm không hợp lệ, xin hãy kiểm tra lại điều kiện lúc tạo";
@@ -177,11 +232,27 @@ namespace Infrastructure.Helper
             public const string Voucher_OutOfStock = "Voucher đã được phát hết";
             public const string Login_Success = "Success";
             public const string Login_Fail = "Unauthorized";
-
             public const string Device_Access_Fail = "Không tìm thấy thiết bị, vui lòng thử lại";
             public const string Device_Access_Server_Fail = "Hệ thống xảy ra lỗi, vui lòng thử lại";
+            public const string Internal_Server_Error = "Hệ thống xảy ra lỗi, vui lòng thử lại";
+            public const string Opps = "Oops !!! Something Wrong. Try Again.";
+            public const string Not_Found_Resource = "The server can not find the requested resource.";
+            public const string Bad_Request = "The server could not understand the request due to invalid syntax.";
+            public const string Unauthorized = "Unauthorized.";
+            public const string Order_Fail = "Order failed !.";
+            public const string MemberLevel_Exist = "MemberLevel exist.";
+            public const string MemberLevel_NotFound = "MemberLevel notfound.";
+            public const string Product_Exist = "Product exist.";
+            public const string Product_Cate_NotFound = "Product category not found";
+            public const string Exist_ProductCategory = "ProductCategory exist";
         }
+        public class QueueMessage
+        {
+            public const string Running = "Queued Hosted Service is running.";
+            public const string Stopping = "Queued Hosted Service is stopping.";
+            public const string Error_Excuting = "Error occurred executing {WorkItem}.";
 
+        }
         public class EffectMessage
         {
             //Khi tier thỏa hết điều kiện

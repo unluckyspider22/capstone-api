@@ -175,7 +175,7 @@ namespace ApplicationCore.Services
                 }
                 else
                 {
-                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: "Action or Membership action is not null", description: "Invalid param");
+                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Bad_Request);
                 }
                 await _unitOfWork.SaveAsync();
                 return param;
@@ -188,7 +188,7 @@ namespace ApplicationCore.Services
             {
                 Debug.WriteLine(e.StackTrace);
                 Debug.WriteLine(e.InnerException);
-                throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message, description: AppConstant.ErrMessage.Internal_Server_Error);
             }
         }
 
@@ -223,7 +223,7 @@ namespace ApplicationCore.Services
             {
                 Debug.WriteLine(e.StackTrace);
                 Debug.WriteLine(e.InnerException);
-                throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message, description: AppConstant.ErrMessage.Internal_Server_Error);
             }
         }
 
@@ -329,7 +329,7 @@ namespace ApplicationCore.Services
             {
                 Debug.WriteLine(e.StackTrace);
                 Debug.WriteLine(e.InnerException);
-                throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message, description: AppConstant.ErrMessage.Internal_Server_Error);
             }
         }
         public async Task<PromotionTierUpdateParam> UpdatePromotionTier(PromotionTierUpdateParam updateParam)
@@ -401,7 +401,7 @@ namespace ApplicationCore.Services
                 }
                 else
                 {
-                    throw new ErrorObj(code: 400, message: "Action or Membership action is not null", description: "Invalid param");
+                    throw new ErrorObj(code:(int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Bad_Request);
                 }
                 //await _unitOfWork.SaveAsync();
                 // update condition rule
@@ -428,7 +428,7 @@ namespace ApplicationCore.Services
                 Debug.WriteLine(e.InnerException);
                 Debug.WriteLine(e.ToString());
                 Debug.WriteLine(e.Message);
-                throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message, description: AppConstant.ErrMessage.Internal_Server_Error);
             }
         }
         async Task<bool> DeleteOldGroups(ConditionRule conditionRuleEntity)
@@ -542,17 +542,17 @@ namespace ApplicationCore.Services
                 //Check promotion is active
                 if (promotion.Status != (int)AppConstant.EnvVar.PromotionStatus.PUBLISH)
                 {
-                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.InActive_Promotion, description: AppConstant.ErrMessage.InActive_Promotion);
+                    throw new ErrorObj(code: (int)AppConstant.ErrCode.InActive_Promotion, message: AppConstant.ErrMessage.InActive_Promotion, description: AppConstant.ErrMessage.InActive_Promotion);
                 }
                 //Check promotion is time 
                 if (promotion.StartDate >= orderResponse.CustomerOrderInfo.BookingDate)
                 {
-                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_Time, description: AppConstant.ErrMessage.Invalid_Early);
+                    throw new ErrorObj(code: (int)AppConstant.ErrCode.Invalid_Early, message: AppConstant.ErrMessage.Invalid_Time, description: AppConstant.ErrMessage.Invalid_Early);
                 }
                 //Check promotion is expired
                 if (promotion.EndDate <= orderResponse.CustomerOrderInfo.BookingDate)
                 {
-                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Expire_Promotion, description: AppConstant.ErrMessage.Expire_Promotion);
+                    throw new ErrorObj(code: (int)AppConstant.ErrCode.Expire_Promotion, message: AppConstant.ErrMessage.Expire_Promotion, description: AppConstant.ErrMessage.Expire_Promotion);
                 }
             }
             _applyPromotionHandler.SetPromotions(_promotions);
@@ -587,7 +587,7 @@ namespace ApplicationCore.Services
             }
             catch (Exception ex)
             {
-                throw new ErrorObj(code: 500, message: ex.Message);
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: ex.Message);
             }
         }
         private async Task<Promotion> MapEntityForUpdate(Promotion dto, PromotionDto param)
@@ -662,7 +662,7 @@ namespace ApplicationCore.Services
             }
             catch (Exception ex)
             {
-                throw new ErrorObj(code: 500, message: ex.Message);
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: ex.Message);
             }
 
         }
@@ -684,7 +684,7 @@ namespace ApplicationCore.Services
             }
             catch (Exception ex)
             {
-                throw new ErrorObj(code: 500, message: ex.Message);
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: ex.Message);
             }
 
         }
@@ -1136,7 +1136,7 @@ namespace ApplicationCore.Services
         {
             if (brandId.Equals(Guid.Empty))
             {
-                throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.StatisticMessage.BRAND_ID_INVALID, description: "Internal Server Error");
+                throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.StatisticMessage.BRAND_ID_INVALID, description: AppConstant.ErrMessage.Internal_Server_Error);
             }
             try
             {
@@ -1163,7 +1163,7 @@ namespace ApplicationCore.Services
             catch (Exception e)
             {
                 Debug.WriteLine(e.StackTrace);
-                throw new ErrorObj(code: 500, message: AppConstant.StatisticMessage.PROMO_COUNT_ERR, description: "Internal Server Error");
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: AppConstant.StatisticMessage.PROMO_COUNT_ERR, description: AppConstant.ErrMessage.Internal_Server_Error);
             }
 
         }
@@ -1254,7 +1254,7 @@ namespace ApplicationCore.Services
             catch (Exception e)
             {
                 Debug.WriteLine(e.StackTrace);
-                throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message, description: AppConstant.ErrMessage.Internal_Server_Error);
             }
 
         }
@@ -1299,7 +1299,7 @@ namespace ApplicationCore.Services
             catch (Exception e)
             {
                 Debug.WriteLine(e.InnerException);
-                throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message, description: AppConstant.ErrMessage.Internal_Server_Error);
             }
 
         }
@@ -1313,7 +1313,7 @@ namespace ApplicationCore.Services
                 var existPromo = await _repository.GetFirst(filter: el => el.PromotionId == promotionId) != null;
                 if (!existPromo)
                 {
-                    throw new ErrorObj(code: 400, message: "Promotion is not exist", description: "Bad request");
+                    throw new ErrorObj(code: (int)HttpStatusCode.NotFound, message: AppConstant.ErrMessage.Not_Found_Resource);
                 }
                 #endregion
                 #region Update DelFlag của promotion
@@ -1366,7 +1366,7 @@ namespace ApplicationCore.Services
             catch (Exception e)
             {
                 Debug.WriteLine(e.InnerException);
-                throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message, description: AppConstant.ErrMessage.Internal_Server_Error);
             }
         }
 
@@ -1393,7 +1393,7 @@ namespace ApplicationCore.Services
             catch (Exception e)
             {
                 Debug.WriteLine(e.InnerException);
-                throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message, description: AppConstant.ErrMessage.Internal_Server_Error);
             }
 
         }
@@ -1467,7 +1467,7 @@ namespace ApplicationCore.Services
             catch (Exception e)
             {
                 Debug.WriteLine(e.InnerException);
-                throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message, description: AppConstant.ErrMessage.Internal_Server_Error);
             }
         }
         #endregion

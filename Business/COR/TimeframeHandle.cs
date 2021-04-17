@@ -99,7 +99,8 @@ namespace ApplicationCore.Chain
                 {
                     if (order.CustomerOrderInfo.BookingDate.Day == ((DateTime)holiday.Date).Day && order.CustomerOrderInfo.BookingDate.Month == ((DateTime)holiday.Date).Month)
                     {
-                        throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_Holiday);
+                        throw new ErrorObj(code: (int)AppConstant.ErrCode.Invalid_Holiday, message:
+                           AppConstant.ErrMessage.Invalid_Holiday);
                     }
                 }
             }
@@ -108,14 +109,14 @@ namespace ApplicationCore.Chain
         {
             if (!Common.CompareBinary((int)(Math.Pow(2, (int)dayOfWeek)), promotion.DayFilter))
             {
-                throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_DayInWeek);
+                throw new ErrorObj(code: (int)AppConstant.ErrCode.Invalid_DayInWeek, message: AppConstant.ErrMessage.Invalid_DayInWeek);
             }
         }
         public void HandleHour(Promotion promotion, int hourOfDay)
         {
             if (!Common.CompareBinary((int)Math.Pow(2, hourOfDay), promotion.HourFilter))
             {
-                throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_HourFrame);
+                throw new ErrorObj(code: (int)AppConstant.ErrCode.Invalid_HourFrame, message: AppConstant.ErrMessage.Invalid_HourFrame);
             }
         }
 

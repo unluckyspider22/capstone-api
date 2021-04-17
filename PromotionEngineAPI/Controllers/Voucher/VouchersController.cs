@@ -8,6 +8,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net;
 using System.Threading.Tasks;
 using static Infrastructure.Helper.AppConstant;
 
@@ -139,7 +140,7 @@ namespace PromotionEngineAPI.Controllers
         {
             if (PromotionId.Equals(Guid.Empty))
             {
-                return StatusCode(statusCode: 400, new ErrorObj(400, "Required Promotion Id"));
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorObj((int)HttpStatusCode.BadRequest, AppConstant.ErrMessage.Bad_Request));
             }
             try
             {
@@ -242,7 +243,7 @@ namespace PromotionEngineAPI.Controllers
             try
             {
                 if (id != dto.VoucherId)
-                    return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                    return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
                 dto.UpdDate = DateTime.Now;
                 return Ok(await _service.UpdateAsync(dto));
             }

@@ -13,6 +13,7 @@ using Infrastructure.Helper;
 using ApplicationCore.Utils;
 using System.Text;
 using System.Security.Cryptography;
+using System.Net;
 
 namespace PromotionEngineAPI.Controllers
 {
@@ -74,7 +75,7 @@ namespace PromotionEngineAPI.Controllers
 
             if (!username.Equals(dto.Username))
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
             try
             {

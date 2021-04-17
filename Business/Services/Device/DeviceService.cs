@@ -76,7 +76,7 @@ namespace ApplicationCore.Services
             }
             catch (Exception e)
             {
-                throw new ErrorObj(code: 500, message: e.Message);
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
 
         }
@@ -95,7 +95,7 @@ namespace ApplicationCore.Services
             }
             catch (Exception e)
             {
-                throw new ErrorObj(code: 500, message: e.Message);
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
 
         }
@@ -129,14 +129,14 @@ namespace ApplicationCore.Services
                 }
                 else
                 {
-                    throw new ErrorObj(code: 500, message: "Device not found");
+                    throw new ErrorObj(code: (int)HttpStatusCode.NotFound, message: AppConstant.ErrMessage.Not_Found_Resource);
                 }
             }
             catch (Exception e)
             {
                 //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.Message);
-                throw new ErrorObj(code: 500, message: e.Message);
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
 
 
@@ -151,7 +151,7 @@ namespace ApplicationCore.Services
                     filter: o => o.Code.Equals(deviceCode) && !o.DelFlg) != null;
                 if (!isExist)
                 {
-                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Device_Access_Fail);
+                    throw new ErrorObj(code: (int)AppConstant.ErrCode.Device_Access_Fail, message: AppConstant.ErrMessage.Device_Access_Fail);
                 }
                 else
                 {
@@ -175,7 +175,7 @@ namespace ApplicationCore.Services
                     }
                     else
                     {
-                        throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Device_Access_Fail);
+                        throw new ErrorObj(code: (int)AppConstant.ErrCode.Device_Access_Fail, message: AppConstant.ErrMessage.Device_Access_Fail);
                     }
                 }
             }
@@ -183,7 +183,7 @@ namespace ApplicationCore.Services
             {
                 if (e.GetType() != typeof(ErrorObj))
                 {
-                    throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: AppConstant.ErrMessage.Device_Access_Server_Fail);
+                    throw new ErrorObj(code: (int)AppConstant.ErrCode.Device_Access_Server_Fail, message: AppConstant.ErrMessage.Device_Access_Server_Fail);
                 }
                 else
                 {
@@ -237,7 +237,7 @@ namespace ApplicationCore.Services
             {
                 //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.InnerException);
-                throw new ErrorObj(code: 500, message: e.Message);
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
 
         }

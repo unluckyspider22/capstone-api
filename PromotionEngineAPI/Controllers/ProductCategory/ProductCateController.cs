@@ -1,10 +1,12 @@
 ﻿using ApplicationCore.Services;
 using Infrastructure.DTOs;
+using Infrastructure.Helper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers.ProductCategory
@@ -74,7 +76,7 @@ namespace PromotionEngineAPI.Controllers.ProductCategory
         {
             if (BrandId.Equals(Guid.Empty) || String.IsNullOrEmpty(CateId))
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
             try
             {
@@ -107,7 +109,7 @@ namespace PromotionEngineAPI.Controllers.ProductCategory
         {
             if (id != dto.ProductCateId || id.Equals(Guid.Empty))
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
             try
             {
@@ -125,7 +127,7 @@ namespace PromotionEngineAPI.Controllers.ProductCategory
         {
             if (await _service.CheckExistin(dto.CateId, dto.BrandId, Guid.Empty))
             {
-                return StatusCode(statusCode: 500, new ErrorObj(500, "ProductCategory exist"));
+                return StatusCode(statusCode: (int)HttpStatusCode.InternalServerError, new ErrorObj((int)AppConstant.ErrCode.Exist_ProductCategory, AppConstant.ErrMessage.Exist_ProductCategory));
             }
             try
             {
@@ -148,7 +150,7 @@ namespace PromotionEngineAPI.Controllers.ProductCategory
         {
             if (id.Equals(Guid.Empty))
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
             try
             {

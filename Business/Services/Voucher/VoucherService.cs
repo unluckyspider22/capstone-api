@@ -42,7 +42,7 @@ namespace ApplicationCore.Services
                 var vouchers = order.Vouchers;
                 if (vouchers.Select(el => new { el.VoucherCode, el.PromotionCode }).Distinct().Count() < vouchers.Select(el => new { el.VoucherCode, el.PromotionCode }).Count())
                 {
-                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Duplicate_VoucherCode, description: AppConstant.ErrMessage.Duplicate_VoucherCode);
+                    throw new ErrorObj(code: (int)AppConstant.ErrCode.Duplicate_VoucherCode, message: AppConstant.ErrMessage.Duplicate_VoucherCode, description: AppConstant.ErrMessage.Duplicate_VoucherCode);
                 }
                 var promotions = new List<Promotion>();
                 foreach (var voucherModel in vouchers)
@@ -66,11 +66,11 @@ namespace ApplicationCore.Services
                     "Promotion.MemberLevelMapping.MemberLevel");
                     if (voucher.Count() > 1)
                     {
-                        throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Duplicate_VoucherCode, description: AppConstant.ErrMessage.Duplicate_VoucherCode);
+                        throw new ErrorObj(code: (int)AppConstant.ErrCode.Duplicate_VoucherCode, message: AppConstant.ErrMessage.Duplicate_VoucherCode, description: AppConstant.ErrMessage.Duplicate_VoucherCode);
                     }
                     if (voucher.Count() == 0)
                     {
-                        throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_VoucherCode, description: AppConstant.ErrMessage.Invalid_VoucherCode);
+                        throw new ErrorObj(code: (int)AppConstant.ErrCode.Invalid_VoucherCode, message: AppConstant.ErrMessage.Invalid_VoucherCode, description: AppConstant.ErrMessage.Invalid_VoucherCode);
                     }
                     var promotion = voucher.FirstOrDefault().Promotion;
                     promotion.PromotionTier = promotion.PromotionTier.Where(w => w.PromotionTierId == voucher.First().PromotionTierId).ToList();
@@ -78,7 +78,7 @@ namespace ApplicationCore.Services
                 }
                 if (promotions.Select(s => s.PromotionId).Distinct().Count() < promotions.Select(s => s.PromotionId).Count())
                 {
-                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Duplicate_Promotion);
+                    throw new ErrorObj(code: (int)AppConstant.ErrCode.Duplicate_Promotion, message: AppConstant.ErrMessage.Duplicate_Promotion);
                 }
                 return promotions;
             }
@@ -92,7 +92,7 @@ namespace ApplicationCore.Services
             {
                 Debug.WriteLine("\n\nError at CheckVoucher: \n" + e.Message);
 
-                throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message, description: AppConstant.ErrMessage.Internal_Server_Error);
             }
 
 
@@ -104,11 +104,11 @@ namespace ApplicationCore.Services
             int remainVoucher = (int)(voucherGroup.Quantity - voucherGroup.RedempedQuantity);
             if (remainVoucher == 0)
             {
-                throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Voucher_OutOfStock);
+                throw new ErrorObj(code: (int)AppConstant.ErrCode.Voucher_OutOfStock, message: AppConstant.ErrMessage.Voucher_OutOfStock);
             }
             if (channelParam.Quantity > remainVoucher)
             {
-                throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_VoucherQuantity + remainVoucher);
+                throw new ErrorObj(code: (int)AppConstant.ErrCode.Invalid_VoucherQuantity, message: AppConstant.ErrMessage.Invalid_VoucherQuantity + remainVoucher);
             }
 
             var vouchers = await _repository.Get(
@@ -192,17 +192,17 @@ namespace ApplicationCore.Services
                         //existGroup = voucherGroup != null;
                         //if (!existGroup)
                         //{
-                            var voucherGroup = await _voucherGroupRepos.GetFirst(filter: el => el.VoucherGroupId.Equals(voucher.VoucherGroupId));
-                            voucherGroups.Add(voucherGroup);
+                        var voucherGroup = await _voucherGroupRepos.GetFirst(filter: el => el.VoucherGroupId.Equals(voucher.VoucherGroupId));
+                        voucherGroups.Add(voucherGroup);
                         //}
-                        DateTime now = Common.GetCurrentDatetime(); 
+                        DateTime now = Common.GetCurrentDatetime();
                         voucher.IsUsed = AppConstant.EnvVar.Voucher.USED;
                         voucher.UsedDate = now;
                         voucher.UpdDate = now;
                         voucher.OrderId = order.Id.ToString();
                         voucher.TransactionId = transactionId;
                         voucher.StoreId = storeId;
-                        
+
                         //var voucherGroup = await _voucherGroupRepos.GetById(voucher.VoucherGroupId);
                         voucherGroup.UsedQuantity += 1;
                         voucherGroup.UpdDate = now;
@@ -271,7 +271,7 @@ namespace ApplicationCore.Services
                 }
                 else
                 {
-                    throw new ErrorObj(code: (int)HttpStatusCode.Gone, message: AppConstant.ErrMessage.Voucher_OutOfStock);
+                    throw new ErrorObj(code: (int)AppConstant.ErrCode.Voucher_OutOfStock, message: AppConstant.ErrMessage.Voucher_OutOfStock);
                 }
                 return param;
             }
@@ -310,7 +310,7 @@ namespace ApplicationCore.Services
             SmtpClient client = new SmtpClient();
             try
             {
-                client.Connect("smtp.gmail.com", 465, true);
+                client.Connect(AppConstant.SmtpHostAddress.Host, AppConstant.SmtpHostAddress.Port, true);
                 client.Authenticate(AppConstant.Sender_Email, AppConstant.Sender_Email_Pwd);
                 await client.SendAsync(message);
 

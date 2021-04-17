@@ -138,7 +138,7 @@ namespace PromotionEngineAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetPromotion([FromQuery] PagingRequestParam param, [FromQuery] Guid BrandId, [FromQuery] string status)
         {
-            if (status == null) return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+            if (status == null) return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             try
             {
                 var result = await _promotionService.GetAsync(
@@ -257,11 +257,11 @@ namespace PromotionEngineAPI.Controllers
             {
                 if (id != dto.PromotionId || id.Equals(Guid.Empty) || dto.PromotionId.Equals(Guid.Empty))
                 {
-                    return StatusCode(statusCode: 400, new ErrorObj(400, "Id should not be empty"));
+                    return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorObj((int)HttpStatusCode.BadRequest, AppConstant.ErrMessage.Bad_Request));
                 }
                 if (await _promotionService.GetFirst(filter: o => o.PromotionId.Equals(dto.PromotionId) && !o.DelFlg) == null)
                 {
-                    return StatusCode(statusCode: 400, new ErrorObj(400, "Promotion Not Found"));
+                    return StatusCode(statusCode: (int)HttpStatusCode.NotFound, new ErrorObj((int)HttpStatusCode.NotFound, AppConstant.ErrMessage.Not_Found_Resource));
                 }
                 if (dto.PromotionStoreMapping != null)
                 {
@@ -303,7 +303,7 @@ namespace PromotionEngineAPI.Controllers
         {
             if (id == null)
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
             try
             {
@@ -359,7 +359,7 @@ namespace PromotionEngineAPI.Controllers
         {
             if (!promotionId.Equals(promotionTierParam.PromotionId))
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
             try
             {
@@ -391,7 +391,7 @@ namespace PromotionEngineAPI.Controllers
         {
             if (!promotionId.Equals(deleteTierRequestParam.PromotionId))
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
             try
             {
@@ -408,7 +408,7 @@ namespace PromotionEngineAPI.Controllers
         {
             if (!promotionId.Equals(updateParam.PromotionId))
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
             try
             {
