@@ -52,29 +52,31 @@ namespace PromotionEngineAPI.Controllers
         //    return Ok(result);
         //}
 
-        // PUT: api/PromotionTiers/5
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> PutPromotionTier([FromRoute] Guid id, [FromBody] PromotionTierDto dto)
-        //{
-        //    if (id != dto.PromotionTierId)
-        //    {
-        //        return BadRequest();
-        //    }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutPromotionTier([FromRoute] Guid id, [FromBody] PromotionTierDto dto)
+        {
+            if (!id.Equals(dto.PromotionTierId) || id.Equals(Guid.Empty))
+            {
+                return StatusCode(statusCode: 400, new ErrorObj(400, "Required promotion tier id"));
+            }
+            var exist = await _service.GetFirst(filter: el => el.PromotionTierId.Equals(id));
+            if (exist == null)
+            {
+                return StatusCode(statusCode: 400, new ErrorObj(400, "Promotion tier is not exist"));
+            }
+            try
+            {
+                var result = await _service.UpdateTier(dto: dto, entity: exist);
+                return Ok(result);
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
 
-        //    dto.UpdDate = DateTime.Now;
 
-        //    var result = await _service.UpdateAsync(dto);
 
-        //    if (result == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return Ok(result);
-
-        //}
-
-        // POST: api/PromotionTiers
+        }
         [HttpPost]
         public async Task<IActionResult> PostPromotionTier([FromBody] PromotionTierDto dto)
         {
@@ -89,21 +91,23 @@ namespace PromotionEngineAPI.Controllers
             }
         }
 
-        // DELETE: api/PromotionTiers/5
-        //[HttpDelete]
-        //public async Task<IActionResult> DeletePromotionTier([FromQuery] Guid id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return BadRequest();
-        //    }
-        //    var result = await _service.DeleteAsync(id);
-        //    if (result == false)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return Ok();
-        //}
+        [HttpDelete]
+        [Route("{id}")]
+        public async Task<IActionResult> DeletePromotionTier([FromRoute] Guid id)
+        {
+            if (id.Equals(Guid.Empty))
+            {
+                return StatusCode(statusCode: 400, new ErrorObj(400, "Required promotion tier id"));
+            }
+            try
+            {
+                return Ok(await _service.DeleteTier(id));
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
 
         [HttpGet]
         [Route("available")]

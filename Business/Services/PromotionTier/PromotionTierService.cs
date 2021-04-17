@@ -208,6 +208,48 @@ namespace ApplicationCore.Services
             }
 
         }
+
+        public async Task<bool> DeleteTier(Guid id)
+        {
+            try
+            {
+                IVoucherRepository myRepo = new VoucherRepositoryImp();
+                IGenericRepository<VoucherGroup> groupRepo = _unitOfWork.VoucherGroupRepository;
+                var tierEntity = await _repository.GetFirst(filter: el => el.PromotionTierId.Equals(id));
+                if (tierEntity != null)
+                {
+                    var groupId = tierEntity.VoucherGroupId;
+                    if (groupId != null && !groupId.Equals(Guid.Empty))
+                    {
+                        await myRepo.UpdateVoucherGroupWhenDeletetier(voucherGroupId: (Guid)groupId, tierId: tierEntity.PromotionTierId);
+                    }
+                }
+                _repository.Delete(id: id);
+                return await _unitOfWork.SaveAsync() > 0;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                throw new ErrorObj(code: 500, message: e.Message);
+            }
+
+        }
+
+        public async Task<PromotionTierDto> UpdateTier(PromotionTierDto dto, PromotionTier entity)
+        {
+            try
+            {
+                //var entity = _mapper.Map<PromotionTierDto>(dto);
+                //return _mapper.Map<PromotionTierDto>(entity);
+                return dto;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                throw new ErrorObj(code: 500, message: e.Message);
+            }
+
+        }
     }
 
 }
