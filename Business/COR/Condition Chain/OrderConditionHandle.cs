@@ -37,7 +37,7 @@ namespace ApplicationCore.Chain
         private void HandleMinAmount(OrderConditionModel orderCondition, Order order)
         {
             /*throw new ErrorObj(code: 400, message:"Compare: "+ Common.Compare<decimal>(orderCondition.AmountOperator, order.OrderDetail.Amount, orderCondition.Amount));*/
-            if (!Common.Compare<decimal>(orderCondition.AmountOperator, order.CustomerOrderInfo.Amount, orderCondition.Amount))
+            if (!Common.Compare<decimal>(orderCondition.AmountOperator, (decimal)order.FinalAmount, orderCondition.Amount))
             {
                 orderCondition.IsMatch = false;
             }
