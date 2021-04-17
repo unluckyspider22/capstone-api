@@ -21,13 +21,12 @@ namespace ApplicationCore.Services
 
         protected override IGenericRepository<Gift> _repository => _unitOfWork.GiftRepository;
 
-        public async Task<bool> Delete(Guid id)
+        public async Task<bool> Delete(Gift entity)
         {
             try
             {
-                IGenericRepository<GiftProductMapping> mappRepo = _unitOfWork.GiftProductMappingRepository;
-                mappRepo.Delete(id: Guid.Empty, filter: o => o.GiftId.Equals(id));
-                _repository.Delete(id: id);
+                entity.DelFlg = true;
+                _repository.Update(entity);
                 return await _unitOfWork.SaveAsync() > 0;
             }
 

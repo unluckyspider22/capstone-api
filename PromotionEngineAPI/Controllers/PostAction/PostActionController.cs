@@ -119,9 +119,14 @@ namespace PromotionEngineAPI.Controllers
             {
                 return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
             }
+            var exist = (await _service.GetFirst(filter: o => o.GiftId.Equals(postActionId) && !o.DelFlg));
+            if (exist == null)
+            {
+                return StatusCode(statusCode: 400, new ErrorObj(400, "Post Action not exist"));
+            }
             try
             {
-                var result = await _service.DeleteAsync(postActionId);
+                var result = await _service.Delete(exist);
                 return Ok(result);
             }
             catch (ErrorObj e)
