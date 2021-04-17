@@ -86,7 +86,7 @@ namespace PromotionEngineAPI.Controllers
                 var now = Common.GetCurrentDatetime();
                 dto.UpdDate = now;
                 dto.InsDate = exist.InsDate;
-                var result = await _service.UpdateAsync(dto);
+                var result = await _service.UpdateAction(dto);
                 return Ok(result);
             }
             catch (ErrorObj e)
@@ -121,9 +121,14 @@ namespace PromotionEngineAPI.Controllers
             {
                 return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
             }
+            var exist = (await _service.GetFirst(filter: o => o.ActionId.Equals(actionId) && !o.DelFlg));
+            if (exist == null)
+            {
+                return StatusCode(statusCode: 400, new ErrorObj(400, "Action not exist"));
+            }
             try
             {
-                var result = await _service.DeleteAsync(actionId);
+                var result = await _service.Delete(entity: exist);
                 return Ok(result);
             }
             catch (ErrorObj e)

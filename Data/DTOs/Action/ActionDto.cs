@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Infrastructure.Models;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -27,6 +28,7 @@ namespace Infrastructure.DTOs
         public int? BundleQuantity { get; set; }
         public int? BundleStrategy { get; set; }
         public List<ActionProductMap> ListProduct { get; set; }
+        public List<ActionProductMapping> ListProductMapp { get; set; }
     }
 
 
@@ -34,6 +36,7 @@ namespace Infrastructure.DTOs
     {
         public Guid ProductId { get; set; }
         public int Quantity { get; set; }
+        public Guid Id { get; set; }
 
     }
 

@@ -1,5 +1,6 @@
 ﻿
 
+using ApplicationCore.Utils;
 using AutoMapper;
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
@@ -9,6 +10,7 @@ using Infrastructure.UnitOrWork;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ApplicationCore.Services
@@ -21,13 +23,12 @@ namespace ApplicationCore.Services
 
         protected override IGenericRepository<Infrastructure.Models.Action> _repository => _unitOfWork.ActionRepository;
 
-        public async Task<bool> Delete(System.Guid id)
+        public async Task<bool> Delete(Infrastructure.Models.Action entity)
         {
             try
             {
-                IGenericRepository<ActionProductMapping> mappRepo = _unitOfWork.ActionProductMappingRepository;
-                mappRepo.Delete(id: Guid.Empty, filter: o => o.ActionId.Equals(id));
-                _repository.Delete(id: id);
+                entity.DelFlg = true;
+               _repository.Update(entity);
                 return await _unitOfWork.SaveAsync() > 0;
             }
 
@@ -55,9 +56,11 @@ namespace ApplicationCore.Services
                         {
                             ProductId = product.ProductId,
                             Quantity = (int)product.Quantity,
+                            Id = product.Id,
                         };
                         result.ListProduct.Add(dto);
                     }
+                    result.ListProductMapp = entity.ActionProductMapping.ToList();
                 }
 
             }
@@ -104,9 +107,57 @@ namespace ApplicationCore.Services
 
         }
 
-        //public Task<ActionDto> UpdateAction(ActionDto dto)
-        //{
+        public async Task<ActionDto> UpdateAction(ActionDto dto)
+        {
+            var result = new ActionDto();
+            var listProduct = dto.ListProduct;
+            if (listProduct != null && listProduct.Count() > 0)
+            {
+                await UpdateActionMapp(listMapp: listProduct, actionId: dto.ActionId);
+            }
+            dto.ListProduct = null;
+            dto.ListProductMapp = null;
+            var entityMapp = _mapper.Map<Infrastructure.Models.Action>(dto);
+            entityMapp.UpdDate = Common.GetCurrentDatetime();
+            _repository.Update(entityMapp);
+            await _unitOfWork.SaveAsync();
+            result = _mapper.Map<ActionDto>(entityMapp);
+            return result;
+        }
 
-        //}
+        private async Task<bool> UpdateActionMapp(List<ActionProductMap> listMapp, Guid actionId)
+        {
+            try
+            {
+                IGenericRepository<ActionProductMapping> mappRepo = _unitOfWork.ActionProductMappingRepository;
+                mappRepo.Delete(id: Guid.Empty, filter: el => el.ActionId.Equals(actionId));
+                await _unitOfWork.SaveAsync();
+                if (listMapp.Count > 0)
+                {
+                    var now = Common.GetCurrentDatetime();
+                    foreach (var mapp in listMapp)
+                    {
+                        var entity = new ActionProductMapping()
+                        {
+                            Id = Guid.NewGuid(),
+                            ActionId = actionId,
+                            ProductId = mapp.ProductId,
+                            Quantity = mapp.Quantity,
+                            InsDate = now,
+                            UpdDate = now,
+                        };
+                        mappRepo.Add(entity);
+                    }
+                }
+                return await _unitOfWork.SaveAsync() > 0;
+            }
+            catch (System.Exception e)
+            {
+                Debug.WriteLine(e.StackTrace);
+                Debug.WriteLine(e.InnerException);
+                throw new ErrorObj(code: 500, message: "Error when update action", description: "Cannot update product of action");
+            }
+
+        }
     }
 }

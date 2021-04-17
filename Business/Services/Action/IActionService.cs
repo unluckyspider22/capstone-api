@@ -11,8 +11,8 @@ namespace ApplicationCore.Services
     {
         public Task<ActionDto> MyAddAction(ActionDto dto);
         public Task<ActionDto> GetActionDetail(Guid id);
-        public Task<bool> Delete(Guid id);
+        public Task<bool> Delete(Infrastructure.Models.Action entity);
 
-        //public Task<ActionDto> UpdateAction(ActionDto dto);
+        public Task<ActionDto> UpdateAction(ActionDto dto);
     }
 }

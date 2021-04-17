@@ -1007,7 +1007,7 @@ namespace Infrastructure.Models
 
                 entity.Property(e => e.VoucherName)
                     .IsRequired()
-                    .HasMaxLength(50);
+                    .HasMaxLength(100);
 
                 entity.HasOne(d => d.Action)
                     .WithMany(p => p.VoucherGroup)
