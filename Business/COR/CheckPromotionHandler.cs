@@ -1,19 +1,15 @@
 ﻿using ApplicationCore.Request;
-using Infrastructure.DTOs;
 using Infrastructure.Models;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ApplicationCore.Chain
 {
-    public interface IApplyPromotionHandler : IHandler<Order>
+    public interface ICheckPromotionHandler : IHandler<Order>
     {
         void SetPromotions(List<Promotion> promotions);
         List<Promotion> GetPromotions();
     }
-    public class ApplyPromotionHandler : Handler<Order>, IApplyPromotionHandler
+    public class CheckPromotionHandler : Handler<Order>, ICheckPromotionHandler
     {
         private readonly IPromotionHandle _promotionHandle;
         private readonly IConditionHandle _conditionHandle;
@@ -21,7 +17,7 @@ namespace ApplicationCore.Chain
         private readonly ITimeframeHandle _timeframeHandle;
         private List<Promotion> _promotions;
 
-        public ApplyPromotionHandler(IPromotionHandle promotionHandle, IConditionHandle conditionHandle,
+        public CheckPromotionHandler(IPromotionHandle promotionHandle, IConditionHandle conditionHandle,
             IApplyPromotion applyPromotion, ITimeframeHandle timeframeHandle)
         {
             _promotionHandle = promotionHandle;
@@ -46,7 +42,6 @@ namespace ApplicationCore.Chain
 
             _promotionHandle.SetNext(_timeframeHandle).SetNext(_conditionHandle);
             _promotionHandle.SetPromotions(_promotions);
-
             _promotionHandle.Handle(order);
 
             #endregion
