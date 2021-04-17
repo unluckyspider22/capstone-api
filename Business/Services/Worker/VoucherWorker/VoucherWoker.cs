@@ -200,7 +200,6 @@ namespace ApplicationCore.Worker
                 {
                     voucher.Index = i + 1;
                 }
-
                 voucher.InsDate = now;
                 voucher.UpdDate = now;
                 result.Add(voucher);

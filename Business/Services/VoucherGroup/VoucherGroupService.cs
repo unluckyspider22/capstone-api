@@ -1,4 +1,5 @@
 ﻿
+using ApplicationCore.Utils;
 using ApplicationCore.Worker;
 using AutoMapper;
 using Infrastructure.DTOs;
@@ -315,33 +316,63 @@ namespace ApplicationCore.Services
         {
             try
             {
-                //var voucherGroup = await _repository.GetFirst(filter: el => el.VoucherGroupId.Equals(voucherGroupId), includeProperties: "Voucher");
-                //var vouchers = voucherGroup.Voucher;
+                var voucherGroup = await _repository.GetFirst(filter: el => el.VoucherGroupId.Equals(voucherGroupId), includeProperties: "Voucher");
+                IGenericRepository<Voucher> voucherRepo = _unitOfWork.VoucherRepository;
+                // Voucher cũ
+                var oldVouchers = voucherGroup.Voucher;
+                var oldVoucherCode = oldVouchers.Select(el => el.VoucherCode);
 
-                //var dto = _mapper.Map<VoucherGroupDto>(voucherGroup);
-                //dto.Voucher = null;
-                //dto.Quantity = quantityParam;
-                //var newVouchers = _voucherWorker.GenerateVoucher(dto, isAddMore: true).Select(el => el.VoucherCode);
-                //int quantity = vouchers.Count() + (int)dto.Quantity;
-                ////Gộp 2 mảng [đã có dưới DB] + [voucher code mới gen]
-                //var totalVouchers = newVouchers.Concat(vouchers.Select(el => el.VoucherCode));
-                ////Kiểm tra có trùng voucher code với những cái cũ hay không
-                //while (totalVouchers.Distinct(StringComparer.CurrentCulture).Count() < totalVouchers.Count())
-                //{
-                //    var totalWithDuplidate = totalVouchers.Count();
-                //    var totalWithoutDuplidate = totalVouchers.Distinct(StringComparer.CurrentCulture).Count();
-                //    int remainVoucher = totalWithDuplidate - totalWithoutDuplidate;
-                //    totalVouchers = totalVouchers.Union(newVouchers);
-                //    dto.Quantity = remainVoucher;
-                //    //Gen lại số lượng voucher
-                //    var remainVouchers = _voucherWorker.GenerateVoucher(dto: dto, isAddMore: true);
-                //    totalVouchers.ToList().AddRange(remainVouchers);
-                //}
-                //newVouchers = totalVouchers.Except(vouchers).ToList();
-                //_voucherWorker.InsertVouchers(dto, true, newVouchers);
-                ////Update lại quantity
-                //voucherGroup.Quantity = quantity;
-                //_repository.Update(voucherGroup);
+                // Tổng voucher sau khi tạo xong
+                var completeTotal = voucherGroup.Quantity + quantityParam;
+
+                // DTO tạo voucher mới
+                var dto = _mapper.Map<VoucherGroupDto>(voucherGroup);
+                dto.Voucher = null;
+                dto.Quantity = quantityParam;
+
+                // Voucher mới
+                var newVoucherCodes = _voucherWorker.GenerateVoucher(dto, isAddMore: true).Select(el => el.VoucherCode);
+
+                // Combine voucher cũ và mới
+                var combineList = oldVoucherCode.Concat(newVoucherCodes).Distinct(StringComparer.CurrentCulture).ToList();
+                var currentTotal = combineList.Count();
+
+                while (currentTotal < completeTotal)
+                {
+                    // Số lượng còn lại
+                    var remainTotal = completeTotal - currentTotal;
+                    dto.Voucher = null;
+                    dto.Quantity = remainTotal;
+
+                    // Voucher mới
+                    newVoucherCodes = _voucherWorker.GenerateVoucher(dto, isAddMore: true).Select(el => el.VoucherCode);
+
+                    // Combine voucher cũ và mới
+                    combineList = combineList.Concat(newVoucherCodes).Distinct(StringComparer.CurrentCulture).ToList();
+                    currentTotal = combineList.Count();
+                }
+
+                // Danh sách voucher mới
+                newVoucherCodes = combineList.Where(el => !oldVoucherCode.Any(code => code.IndexOf(el, StringComparison.CurrentCultureIgnoreCase) >= 0));
+                var now = Common.GetCurrentDatetime();
+                for (int i = 1; i <= newVoucherCodes.Count(); i++)
+                {
+                    var code = newVoucherCodes.ElementAt(i-1);
+                    var startIndex = oldVoucherCode.Count();
+                    var voucherEntity = new Voucher()
+                    {
+                        VoucherId = Guid.NewGuid(),
+                        VoucherCode = code,
+                        InsDate = now,
+                        UpdDate = now,
+                        Index = startIndex + i,
+                    };
+                    voucherRepo.Add(voucherEntity);
+                    voucherGroup.Voucher.Add(voucherEntity);
+                }
+                voucherGroup.UpdDate = now;
+                voucherGroup.Quantity = completeTotal;
+                _repository.Update(voucherGroup);
 
                 return await _unitOfWork.SaveAsync() > 0;
             }
