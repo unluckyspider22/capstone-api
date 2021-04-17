@@ -121,7 +121,6 @@ namespace PromotionEngineAPI.Controllers
                         responseModel = await _promotionService.HandlePromotion(responseModel);
                     }
                 }
-
             }
             catch (ErrorObj e)
             {

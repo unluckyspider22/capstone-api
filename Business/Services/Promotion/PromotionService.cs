@@ -21,8 +21,7 @@ namespace ApplicationCore.Services
 {
     public class PromotionService : BaseService<Promotion, PromotionDto>, IPromotionService
     {
-        private readonly IApplyPromotionHandler _applyPromotionHandler;
-        private readonly IConditionRuleService _conditionRuleService;
+        private readonly ICheckPromotionHandler _applyPromotionHandler;
         private readonly IHolidayService _holidayService;
         private readonly ITimeframeHandle _timeframeHandle;
         private List<Promotion> _promotions;
@@ -30,13 +29,11 @@ namespace ApplicationCore.Services
         public PromotionService(
             IUnitOfWork unitOfWork,
             IMapper mapper,
-            IApplyPromotionHandler promotionHandle,
-            IConditionRuleService conditionRuleService,
+            ICheckPromotionHandler promotionHandle,
             IHolidayService holidayService,
             ITimeframeHandle timeframeHandle) : base(unitOfWork, mapper)
         {
             _applyPromotionHandler = promotionHandle;
-            _conditionRuleService = conditionRuleService;
             _holidayService = holidayService;
             _timeframeHandle = timeframeHandle;
         }
@@ -659,7 +656,7 @@ namespace ApplicationCore.Services
                     }
                     dto.HasVoucher = entity.HasVoucher;
                     dto.IsAuto = entity.IsAuto;
-                    
+
                 }
                 return dto;
             }
@@ -1361,7 +1358,7 @@ namespace ApplicationCore.Services
                         voucher.PromotionId = null;
                     }
                 }
-                
+
                 //promo.Voucher = null;
                 #endregion
                 return await _unitOfWork.SaveAsync() > 0;

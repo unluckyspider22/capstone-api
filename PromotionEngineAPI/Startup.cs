@@ -141,7 +141,7 @@ namespace PromotionEngineAPI
         private void ChainOfResponsibilityServices(IServiceCollection services)
         {
             //ApplyPromotionHandler
-            services.AddScoped<IApplyPromotionHandler, ApplyPromotionHandler>();
+            services.AddScoped<ICheckPromotionHandler, CheckPromotionHandler>();
             //PromotionHandle
             services.AddScoped<IPromotionHandle, PromotionHandle>();
             //TimeframeHandle

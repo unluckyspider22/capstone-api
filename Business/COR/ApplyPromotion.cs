@@ -246,7 +246,7 @@ namespace ApplicationCore.Chain
                 PromotionTierId = promotionTier.PromotionTierId,
                 ConditionRuleName = promotionTier.ConditionRule.RuleName,
                 TierIndex = promotionTier.TierIndex,
-                EffectType = effectType,
+                EffectType = discount > 0 ? effectType : AppConstant.EffectMessage.NoProductMatch,
             };
             if (promotionTier.Action != null)
             {
@@ -260,6 +260,7 @@ namespace ApplicationCore.Chain
                         imgUrl = promotion.ImgUrl,
                         description = promotion.Description
                     };
+                  
                 }
                 else
                 {
@@ -367,45 +368,73 @@ namespace ApplicationCore.Chain
             }
             else
             {
-                var products = order.CustomerOrderInfo.CartItems;
-                int countProductMatch = 0;
+                /*   #region bundle
+                   var products = order.CustomerOrderInfo.CartItems;
+                   int countProductMatch = 0;
+                   effectType = AppConstant.EffectMessage.SetBundle;
+                   foreach (var product in products)
+                   {
+                       if (actionProducts.Any(a => a.Product.Code.Equals(product.ProductCode)))
+                       {
+                           countProductMatch += (int)(product.Quantity > action.BundleQuantity ? action.BundleQuantity : product.Quantity);
+                       }
+                   }
+                   if (countProductMatch >= action.BundleQuantity)
+                   {
+                       int bundleQuantity = (int)action.BundleQuantity;
+                       int discountedProduct = 0;
+                       switch (action.BundleStrategy)
+                       {
+                           case (int)AppConstant.BundleStrategy.CHEAPEST:
+                               products = products.OrderBy(e => e.UnitPrice).ToList();
+                               break;
+                           case (int)AppConstant.BundleStrategy.MOST_EXPENSIVE:
+                               products = products.OrderByDescending(e => e.UnitPrice).ToList();
+                               break;
+                       }
+                       foreach (var product in products)
+                       {
+                           discount = product.Discount;
+                           if (actionProducts.Any(a => a.Product.Code.Equals(product.ProductCode)))
+                           {
+                               discountedProduct = product.Quantity > bundleQuantity ? bundleQuantity : product.Quantity;
+                               discount += (decimal)(product.SubTotal - discountedProduct * action.BundlePrice);
+
+                               bundleQuantity -= discountedProduct;
+                               SetDiscountProduct(product, action, discount);
+                           }
+                           if (bundleQuantity <= 0)
+                           {
+                               break;
+                           }
+                       }
+                   }
+                   #endregion*/
+                var cartItems = order.CustomerOrderInfo.CartItems;
                 effectType = AppConstant.EffectMessage.SetBundle;
-                foreach (var product in products)
+
+                int totalBundleProduct = action.ActionProductMapping.Count();
+                int matchProduct = 0;
+                foreach (var product in cartItems)
                 {
-                    if (actionProducts.Any(a => a.Product.Code.Equals(product.ProductCode)))
+                    bool isMatchProduct = 
+                            action.ActionProductMapping
+                            .Any(el => el.Product.Code == product.ProductCode 
+                                    && product.Quantity >= el.Quantity);
+                    if (isMatchProduct)
                     {
-                        countProductMatch += (int)(product.Quantity > action.BundleQuantity ? action.BundleQuantity : product.Quantity);
+                        matchProduct++;
                     }
                 }
-                if (countProductMatch >= action.BundleQuantity)
+                if (matchProduct == totalBundleProduct)
                 {
-                    int bundleQuantity = (int)action.BundleQuantity;
-                    int discountedProduct = 0;
-                    switch (action.BundleStrategy)
-                    {
-                        case (int)AppConstant.BundleStrategy.CHEAPEST:
-                            products = products.OrderBy(e => e.UnitPrice).ToList();
-                            break;
-                        case (int)AppConstant.BundleStrategy.MOST_EXPENSIVE:
-                            products = products.OrderByDescending(e => e.UnitPrice).ToList();
-                            break;
-                    }
-                    foreach (var product in products)
-                    {
-                        discount = product.Discount;
-                        if (actionProducts.Any(a => a.Product.Code.Equals(product.ProductCode)))
-                        {
-                            discountedProduct = product.Quantity > bundleQuantity ? bundleQuantity : product.Quantity;
-                            discount += (decimal)(product.SubTotal - discountedProduct * action.BundlePrice);
 
-                            bundleQuantity -= discountedProduct;
-                            SetDiscountProduct(product, action, discount);
-                        }
-                        if (bundleQuantity <= 0)
-                        {
-                            break;
-                        }
+                    foreach (var product in cartItems)
+                    {
+                        var discountProduct = Math.Round((product.SubTotal / (decimal)order.TotalAmount) * (decimal)action.BundlePrice);
+                        SetDiscountProduct(product, action, discountProduct);
                     }
+                    discount = (decimal)action.BundlePrice;
                 }
             }
             SetEffect(order, promotion, discount, effectType, promotionTier);

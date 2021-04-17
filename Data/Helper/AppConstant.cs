@@ -202,6 +202,7 @@ namespace Infrastructure.Helper
             public const string AddGiftVoucher = "addGiftVoucher";
             public const string AddGiftPoint = "addGiftPoint";
             public const string AddGiftGameCode = "addGiftGameCode";
+            public const string NoProductMatch = "actionProductMismatch";
             //Không có automatic promotion nào cả
             public const string NoAutoPromotion = "noAutoPromotion";
 
