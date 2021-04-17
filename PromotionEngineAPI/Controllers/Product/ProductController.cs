@@ -1,7 +1,9 @@
 ﻿using ApplicationCore.Services;
 using Infrastructure.DTOs;
+using Infrastructure.Helper;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers.Product
@@ -100,7 +102,7 @@ namespace PromotionEngineAPI.Controllers.Product
         {
             if (String.IsNullOrEmpty(ProductCode) || BrandId.Equals(Guid.Empty))
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
             try
             {
@@ -119,7 +121,7 @@ namespace PromotionEngineAPI.Controllers.Product
         {
             if (id != dto.ProductId || id.Equals(Guid.Empty))
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
             try
             {
@@ -137,7 +139,7 @@ namespace PromotionEngineAPI.Controllers.Product
         {
             if (await _service.CheckExistin(code: dto.Code, brandId: dto.BrandId, productId: Guid.Empty))
             {
-                return StatusCode(statusCode: 500, new ErrorObj(500, "Product exist"));
+                return StatusCode(statusCode: (int)HttpStatusCode.InternalServerError, new ErrorObj((int)AppConstant.ErrCode.Product_Exist, AppConstant.ErrMessage.Product_Exist));
             }
             try
             {
@@ -176,7 +178,7 @@ namespace PromotionEngineAPI.Controllers.Product
         {
             if (id.Equals(Guid.Empty))
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
             try
             {

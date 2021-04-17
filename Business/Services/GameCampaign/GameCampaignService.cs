@@ -1,6 +1,7 @@
 ﻿using ApplicationCore.Utils;
 using AutoMapper;
 using Infrastructure.DTOs;
+using Infrastructure.Helper;
 using Infrastructure.Models;
 using Infrastructure.Repository;
 using Infrastructure.UnitOrWork;
@@ -53,7 +54,7 @@ namespace ApplicationCore.Services
             {
                 Debug.WriteLine(e.StackTrace);
                 Debug.WriteLine(e.InnerException);
-                throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message, description: AppConstant.ErrMessage.Internal_Server_Error);
             }
 
 
@@ -168,7 +169,7 @@ namespace ApplicationCore.Services
             {
                 Debug.WriteLine(e.StackTrace);
                 Debug.WriteLine(e.InnerException);
-                throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message, description: AppConstant.ErrMessage.Internal_Server_Error);
             }
         }
 

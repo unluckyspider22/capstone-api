@@ -4,6 +4,7 @@ using Infrastructure.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers
@@ -40,7 +41,7 @@ namespace PromotionEngineAPI.Controllers
         {
             if (dto.BrandId.Equals(Guid.Empty) || !dto.Id.Equals(gameConfigId) || gameConfigId.Equals(Guid.Empty))
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
             try
             {
@@ -58,7 +59,7 @@ namespace PromotionEngineAPI.Controllers
         {
             if (dto.BrandId.Equals(Guid.Empty))
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
 
             try
@@ -78,7 +79,7 @@ namespace PromotionEngineAPI.Controllers
         {
             if (id.Equals(Guid.Empty))
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
             try
             {
@@ -97,7 +98,7 @@ namespace PromotionEngineAPI.Controllers
         {
             if (gameConfigId.Equals(Guid.Empty) || brandId.Equals(Guid.Empty))
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
             try
             {
@@ -116,7 +117,7 @@ namespace PromotionEngineAPI.Controllers
         {
             if (deviceId.Equals(Guid.Empty))
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
             try
             {

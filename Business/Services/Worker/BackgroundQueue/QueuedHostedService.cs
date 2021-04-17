@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Infrastructure.Helper;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
@@ -21,7 +22,7 @@ namespace ApplicationCore.Worker
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("Queued Hosted Service is running");
+            _logger.LogInformation(AppConstant.QueueMessage.Running);
             await BackgroundProcessing(stoppingToken);
         }
 
@@ -36,14 +37,14 @@ namespace ApplicationCore.Worker
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex,"Error occurred executing {WorkItem}.", nameof(workItem));
+                    _logger.LogError(ex,AppConstant.QueueMessage.Error_Excuting, nameof(workItem));
                 }
             }
         }
 
         public override async Task StopAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("Queued Hosted Service is stopping.");
+            _logger.LogInformation(AppConstant.QueueMessage.Stopping);
             await base.StopAsync(stoppingToken);
         }
     }

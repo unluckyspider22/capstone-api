@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers.GameItem
@@ -41,12 +42,12 @@ namespace PromotionEngineAPI.Controllers.GameItem
         {
             if (dto.Id.Equals(Guid.Empty) || dto.GameId.Equals(Guid.Empty))
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
             var isExistGame = await _gameService.GetFirst(filter: o => o.Id.Equals(dto.GameId) && !o.DelFlg) != null;
             if (!isExistGame)
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
             try
             {
@@ -65,12 +66,12 @@ namespace PromotionEngineAPI.Controllers.GameItem
         {
             if (dto.GameId.Equals(Guid.Empty))
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
             var isExistGame = await _gameService.GetFirst(filter: o => o.Id.Equals(dto.GameId) && !o.DelFlg) != null;
             if (!isExistGame)
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
             try
             {
@@ -91,7 +92,7 @@ namespace PromotionEngineAPI.Controllers.GameItem
         {
             if (id.Equals(Guid.Empty))
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
             try
             {

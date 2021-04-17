@@ -96,19 +96,19 @@ namespace ApplicationCore.Chain
             {
                 if (_promotions.Any(w => w.Exclusive == (int)AppConstant.EnvVar.Exclusive.GlobalExclusive) && _promotions.Count() > 1)
                 {
-                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Exclusive_Promotion);
+                    throw new ErrorObj(code: (int)AppConstant.ErrCode.Exclusive_Promotion, message: AppConstant.ErrMessage.Exclusive_Promotion);
                 }
                 if (_promotions.Where(w => w.Exclusive == (int)AppConstant.EnvVar.Exclusive.ClassExclusiveOrder).Count() > 1)
                 {
-                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Exclusive_Promotion);
+                    throw new ErrorObj(code: (int)AppConstant.ErrCode.Exclusive_Promotion, message: AppConstant.ErrMessage.Exclusive_Promotion);
                 }
                 if (_promotions.Where(w => w.Exclusive == (int)AppConstant.EnvVar.Exclusive.ClassExclusiveProduct).Count() > 1)
                 {
-                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Exclusive_Promotion);
+                    throw new ErrorObj(code: (int)AppConstant.ErrCode.Exclusive_Promotion, message: AppConstant.ErrMessage.Exclusive_Promotion);
                 }
                 if (_promotions.Where(w => w.Exclusive == (int)AppConstant.EnvVar.Exclusive.ClassExclusiveShipping).Count() > 1)
                 {
-                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Exclusive_Promotion);
+                    throw new ErrorObj(code: (int)AppConstant.ErrCode.Exclusive_Promotion, message: AppConstant.ErrMessage.Exclusive_Promotion);
                 }
             }
         }
@@ -118,7 +118,7 @@ namespace ApplicationCore.Chain
         {
             if (promotion.PromotionStoreMapping.Where(w => w.Store.StoreCode.Equals(order.CustomerOrderInfo.Attributes.StoreInfo.StoreId)).Count() == 0)
             {
-                throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_Store);
+                throw new ErrorObj(code: (int)AppConstant.ErrCode.Invalid_Store, message: AppConstant.ErrMessage.Invalid_Store);
             }
         }
         #endregion
@@ -127,7 +127,7 @@ namespace ApplicationCore.Chain
         {
             if (!Common.CompareBinary(order.CustomerOrderInfo.Attributes.SalesMode, promotion.SaleMode))
             {
-                throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_SaleMode);
+                throw new ErrorObj(code: (int)AppConstant.ErrCode.Invalid_SaleMode, message: AppConstant.ErrMessage.Invalid_SaleMode);
             }
         }
         #endregion
@@ -136,7 +136,7 @@ namespace ApplicationCore.Chain
         {
             if (!Common.CompareBinary(order.CustomerOrderInfo.Attributes.PaymentMethod, promotion.PaymentMethod))
             {
-                throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_PaymentType);
+                throw new ErrorObj(code: (int)AppConstant.ErrCode.Invalid_PaymentType, message: AppConstant.ErrMessage.Invalid_PaymentType);
             }
         }
         #endregion
@@ -146,7 +146,7 @@ namespace ApplicationCore.Chain
         {
             if (!Common.CompareBinary(order.CustomerOrderInfo.Customer.CustomerGender, promotion.Gender))
             {
-                throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_Gender);
+                throw new ErrorObj(code: (int)AppConstant.ErrCode.Invalid_Gender, message: AppConstant.ErrMessage.Invalid_Gender);
             }
         }
         #endregion
@@ -157,7 +157,7 @@ namespace ApplicationCore.Chain
             {
                 if (promotion.MemberLevelMapping.Where(w => w.MemberLevel.Name.Equals(order.CustomerOrderInfo.Customer.CustomerLevel)).Count() == 0)
                 {
-                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_MemberLevel);
+                    throw new ErrorObj(code: (int)AppConstant.ErrCode.Invalid_MemberLevel, message: AppConstant.ErrMessage.Invalid_MemberLevel);
                 }
             }
         }

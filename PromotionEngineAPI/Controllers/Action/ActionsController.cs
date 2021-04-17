@@ -1,10 +1,12 @@
 ﻿using ApplicationCore.Services;
 using ApplicationCore.Utils;
 using Infrastructure.DTOs;
+using Infrastructure.Helper;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers
@@ -30,7 +32,7 @@ namespace PromotionEngineAPI.Controllers
             {
                 if (brandId.Equals(Guid.Empty))
                 {
-                    return StatusCode(statusCode: 400, new ErrorObj(400, "Required Brand Id"));
+                    return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorObj((int)HttpStatusCode.BadRequest, AppConstant.ErrMessage.Not_Found_Resource));
                 }
                 Expression<Func<Infrastructure.Models.Action, bool>> myFilter = el => !el.DelFlg && el.BrandId.Equals(brandId);
                 if (ActionType > 0)
@@ -57,7 +59,7 @@ namespace PromotionEngineAPI.Controllers
         {
             if (id.Equals(Guid.Empty))
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
             try
             {
@@ -74,12 +76,12 @@ namespace PromotionEngineAPI.Controllers
         {
             if (!actionId.Equals(dto.ActionId) || dto.ActionId.Equals(Guid.Empty))
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
             var exist = (await _service.GetFirst(filter: o => o.ActionId.Equals(actionId) && !o.DelFlg));
             if (exist == null)
             {
-                return StatusCode(statusCode: 400, new ErrorObj(400, "Action not exist"));
+                return StatusCode(statusCode: (int)HttpStatusCode.NotFound, new ErrorObj((int)HttpStatusCode.NotFound, AppConstant.ErrMessage.Not_Found_Resource));
             }
             try
             {
@@ -99,7 +101,7 @@ namespace PromotionEngineAPI.Controllers
         {
             if (dto.BrandId.Equals(Guid.Empty))
             {
-                return StatusCode(400, new ErrorObj(400, "Required Brand Id"));
+                return StatusCode((int)HttpStatusCode.BadRequest, new ErrorObj((int)HttpStatusCode.BadRequest, AppConstant.ErrMessage.Bad_Request));
             }
             try
             {
@@ -119,12 +121,12 @@ namespace PromotionEngineAPI.Controllers
         {
             if (actionId.Equals(Guid.Empty))
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
             var exist = (await _service.GetFirst(filter: o => o.ActionId.Equals(actionId) && !o.DelFlg));
             if (exist == null)
             {
-                return StatusCode(statusCode: 400, new ErrorObj(400, "Action not exist"));
+                return StatusCode(statusCode: (int)HttpStatusCode.NotFound, new ErrorObj((int)HttpStatusCode.NotFound, AppConstant.ErrMessage.Not_Found_Resource));
             }
             try
             {

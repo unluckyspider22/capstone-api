@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Infrastructure.DTOs;
+using Infrastructure.Helper;
 using Infrastructure.Models;
 using Infrastructure.Repository;
 using Infrastructure.UnitOrWork;
@@ -7,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace ApplicationCore.Services
@@ -44,7 +46,7 @@ namespace ApplicationCore.Services
             {
                 //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.Message);
-                throw new ErrorObj(code: 500, message: e.Message);
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
 
         }
@@ -65,7 +67,7 @@ namespace ApplicationCore.Services
             {
                 //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.Message);
-                throw new ErrorObj(code: 500, message: e.Message);
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
         }
 
@@ -96,14 +98,14 @@ namespace ApplicationCore.Services
                 }
                 else
                 {
-                    throw new ErrorObj(code: 500, message: "Product category not found");
+                    throw new ErrorObj(code: (int)AppConstant.ErrCode.Product_Cate_NotFound, message: AppConstant.ErrMessage.Product_Cate_NotFound);
                 }
             }
             catch (Exception e)
             {
                 //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.Message);
-                throw new ErrorObj(code: 500, message: e.Message);
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
         }
     }

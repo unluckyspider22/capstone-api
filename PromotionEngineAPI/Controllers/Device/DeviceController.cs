@@ -1,6 +1,7 @@
 ﻿using ApplicationCore.Services;
 using ApplicationCore.Utils;
 using Infrastructure.DTOs;
+using Infrastructure.Helper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -117,7 +118,7 @@ namespace PromotionEngineAPI.Controllers
         {
             if (id != dto.DeviceId || id.Equals(Guid.Empty))
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
             try
             {
@@ -135,7 +136,7 @@ namespace PromotionEngineAPI.Controllers
         {
             if (dto.GameCampaignId.Equals(Guid.Empty))
             {
-                return StatusCode(statusCode: 400, new ErrorObj(400, "Select Game Configuration"));
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorObj((int)HttpStatusCode.BadRequest, AppConstant.ErrMessage.Bad_Request));
             }
             try
             {
@@ -173,7 +174,7 @@ namespace PromotionEngineAPI.Controllers
         {
             if (id.Equals(Guid.Empty))
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
             try
             {

@@ -38,26 +38,6 @@ namespace ApplicationCore.Services
                 voucher.VoucherGroupId = dto.VoucherGroupId;
                 result.Add(voucher);
             }
-            //if (!dto.IsLimit)
-            //{
-            //    for (var i = 0; i < dto.Quantity; i++)
-            //    {
-            //        VoucherDto voucher = new VoucherDto();
-            //        string randomVoucher = RandomString(dto.Charset, dto.CustomCharset, dto.CodeLength);
-            //        voucher.VoucherCode = dto.Prefix + randomVoucher + dto.Postfix;
-            //        voucher.VoucherGroupId = dto.VoucherGroupId;
-            //        result.Add(voucher);
-            //    }
-            //}
-            //else
-            //{
-            //    VoucherDto voucher = new VoucherDto();
-            //    string randomVoucher = RandomString(dto.Charset, dto.CustomCharset, dto.CodeLength);
-            //    voucher.VoucherCode = dto.Prefix + randomVoucher + dto.Postfix;
-            //    voucher.VoucherGroupId = dto.VoucherGroupId;
-            //    result.Add(voucher);
-            //}
-
             return result;
         }
         private Random Random = new Random();
@@ -104,52 +84,9 @@ namespace ApplicationCore.Services
             return randomCode;
         }
 
-        public List<VoucherDto> GenerateStandaloneVoucher(VoucherGroupDto dto)
-        {
-            List<VoucherDto> result = new List<VoucherDto>();
-            //VoucherDto voucher = new VoucherDto
-            //{
-            //    VoucherCode = dto.Prefix + dto.CustomCode + dto.Postfix,
-            //    VoucherGroupId = dto.VoucherGroupId
-            //};
-            //result.Add(voucher);
-            return result;
-        }
+       
 
-        /* public async Task<IEnumerable<VoucherGroup>> GetVoucherGroupForGame(int PageIndex = 0, int PageSize = 0,
-             string BrandCode = null, string StoreCode = null)
-         {
-             try
-             {
-                 var listVoucherGroup = await _repository.Get(pageIndex: PageIndex, pageSize: PageSize
-                    , filter: (el => !el.DelFlg
-                    && el.VoucherType.Equals(AppConstant.EnvVar.VoucherType.BULK_CODE)
-                     && el.RedempedQuantity < el.Quantity
-                     && !el.Promotion.PromotionType.Equals(AppConstant.EnvVar.PromotionType.AUTO_PROMOTION)
-                     && el.Promotion.Status.Equals(AppConstant.EnvVar.PromotionStatus.PUBLISH)
-                     && !el.Promotion.DelFlg
-                         && el.Promotion.StartDate.Value.CompareTo(DateTime.Now) <= 0
-                         && (el.Promotion.EndDate.Value.CompareTo(DateTime.Now) >= 0 || el.Promotion.EndDate.Value == null)
-
-                         //điều kiện tùy chọn để lấy voucher cho game (Brand)
-                         && el.Promotion.Brand.BrandCode.Equals(BrandCode)
-                    //điều kiện tùy chọn để lấy voucher cho game (Store)
-                    && el.Promotion.PromotionStoreMapping.Any(x => x.Store.StoreCode.Equals(StoreCode))));
-                 if (listVoucherGroup != null && listVoucherGroup.Count() > 0)
-                     return listVoucherGroup;
-                 else
-                     throw new ErrorObj(code: 204, message: "No promotion for game exists !!!");
-
-             }
-             catch (Exception e)
-             {
-                 //chạy bằng debug mode để xem log
-                 Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.Message);
-                 throw new ErrorObj(code: 500, message: e.Message);
-             }
-         }*/
-
-        public async Task<bool> DeleteVoucherGroup(Guid id)
+                public async Task<bool> DeleteVoucherGroup(Guid id)
         {
             try
             {
@@ -162,7 +99,7 @@ namespace ApplicationCore.Services
             {
                 //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.Message);
-                throw new ErrorObj(code: 500, message: e.Message);
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
         }
 
@@ -178,7 +115,7 @@ namespace ApplicationCore.Services
             catch (Exception e)
             {
                 Debug.WriteLine(e.InnerException);
-                throw new ErrorObj(code: 500, message: e.Message);
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
         }
 
@@ -212,7 +149,7 @@ namespace ApplicationCore.Services
             catch (Exception e)
             {
                 Debug.WriteLine(e.InnerException);
-                throw new ErrorObj(code: 500, message: e.Message);
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
         }
 
@@ -234,7 +171,7 @@ namespace ApplicationCore.Services
             {
                 //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.Message);
-                throw new ErrorObj(code: 500, message: e.Message);
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
         }
 
@@ -251,7 +188,7 @@ namespace ApplicationCore.Services
             {
                 //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.Message);
-                throw new ErrorObj(code: 500, message: e.Message);
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
 
         }
@@ -270,7 +207,7 @@ namespace ApplicationCore.Services
             }
             catch (Exception e)
             {
-                throw new ErrorObj(code: 500, message: e.Message);
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
         }
 
@@ -378,7 +315,7 @@ namespace ApplicationCore.Services
             }
             catch (Exception e)
             {
-                throw new ErrorObj(code: 500, message: e.Message);
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
 
 

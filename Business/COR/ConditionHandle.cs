@@ -132,7 +132,7 @@ namespace ApplicationCore.Chain
             }
             if (invalidPromotionDetails == promotion.PromotionTier.Count && invalidPromotionDetails > 0)
             {
-                throw new ErrorObj((int)HttpStatusCode.BadRequest, AppConstant.ErrMessage.NotMatchCondition);
+                throw new ErrorObj((int)AppConstant.ErrCode.NotMatchCondition, AppConstant.ErrMessage.NotMatchCondition);
             }
         }
         private int HandleConditionGroup(PromotionTier promotionTier, Order order)
@@ -272,7 +272,7 @@ namespace ApplicationCore.Chain
                 }
                 else
                 {
-                    throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: AppConstant.ErrMessage.Invalid_ProductCondition);
+                    throw new ErrorObj(code: (int)AppConstant.ErrCode.Invalid_ProductCondition, message: AppConstant.ErrMessage.Invalid_ProductCondition);
                 }
 
             }

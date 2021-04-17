@@ -21,7 +21,7 @@ namespace ApplicationCore.Utils
                   AppConstant.Operator.LESS_THAN => a < b,
                   AppConstant.Operator.LESS_THAN_OR_EQUAL => a <= b,
                   AppConstant.Operator.EQUAL => a == b,
-                  _ => throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.Invalid_Operator),
+                  _ => throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_Operator),
               };
 
           }*/
@@ -34,7 +34,7 @@ namespace ApplicationCore.Utils
                 AppConstant.Operator.LESS_THAN => orderAmount.CompareTo(minAmount) < 0,
                 AppConstant.Operator.LESS_THAN_OR_EQUAL => orderAmount.CompareTo(minAmount) <= 0,
                 AppConstant.Operator.EQUAL => orderAmount.CompareTo(minAmount) == 0,
-                _ => throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.Invalid_Operator),
+                _ => throw new ErrorObj(code:(int) AppConstant.ErrCode.Invalid_Operator, message: AppConstant.ErrMessage.Invalid_Operator),
             };
         }
         public static DateTime GetCurrentDatetime()

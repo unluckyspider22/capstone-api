@@ -209,7 +209,7 @@ namespace ApplicationCore.Services
             }
             catch (Exception e)
             {
-                throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message, description: AppConstant.ErrMessage.Internal_Server_Error);
             }
         }
         #endregion

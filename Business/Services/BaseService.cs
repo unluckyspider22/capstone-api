@@ -7,6 +7,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace ApplicationCore.Services
@@ -39,7 +40,7 @@ namespace ApplicationCore.Services
                 //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at CreateAsync: \n" + e.InnerException);
                 Debug.WriteLine("\n\nError at CreateAsync: \n" + e.StackTrace);
-                throw new ErrorObj(code: 500, message: e.Message, description: "Internal Server Error");
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message, description: AppConstant.ErrMessage.Internal_Server_Error);
             }
         }
 
@@ -55,7 +56,7 @@ namespace ApplicationCore.Services
             {
                 //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at DeleteAsync: \n" + e.Message);
-                throw new ErrorObj(code: 500, message: e.Message);
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
 
 
@@ -77,7 +78,7 @@ namespace ApplicationCore.Services
             {
                 //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at GetAsync: \n" + e.InnerException);
-                throw new ErrorObj(code: 500, message: "GetAsync:" + e.Message);
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: "GetAsync:" + e.Message);
             }
         }
 
@@ -91,7 +92,7 @@ namespace ApplicationCore.Services
             {
                 //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at GetByIdAsync: \n" + e.Message);
-                throw new ErrorObj(code: 500, message: e.Message);
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
         }
 
@@ -110,7 +111,7 @@ namespace ApplicationCore.Services
                 Debug.WriteLine("\n\nError at UpdateAsync: \n" + e.Message);
                 Debug.WriteLine("\n\nError at UpdateAsync: \n" + e.InnerException);
                 Debug.WriteLine("\n\nError at UpdateAsync: \n" + e.StackTrace);
-                throw new ErrorObj(code: 500, message: e.Message);
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
         }
 
@@ -129,7 +130,7 @@ namespace ApplicationCore.Services
             {
                 //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at HideAsync: \n" + e.Message);
-                throw new ErrorObj(code: 500, message: e.Message);
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
         }
 
@@ -143,7 +144,7 @@ namespace ApplicationCore.Services
             {
                 //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at CountAsync: \n" + e.Message);
-                throw new ErrorObj(code: 500, message: e.Message);
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
 
         }
@@ -159,7 +160,7 @@ namespace ApplicationCore.Services
             {
                 //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at GetAsync: \n" + e.Message);
-                throw new ErrorObj(code: 500, message: e.Message);
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
         }
     }

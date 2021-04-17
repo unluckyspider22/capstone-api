@@ -1,10 +1,12 @@
 ﻿using ApplicationCore.Services;
 using Infrastructure.DTOs;
+using Infrastructure.Helper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers
@@ -71,7 +73,7 @@ namespace PromotionEngineAPI.Controllers
         {
             if (id != dto.MemberLevelId || id.Equals(Guid.Empty))
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
             try
             {
@@ -81,7 +83,7 @@ namespace PromotionEngineAPI.Controllers
             }
             catch (Exception e)
             {
-                return StatusCode(statusCode: 500, new ErrorObj(500, e.Message));
+                return StatusCode(statusCode: (int)HttpStatusCode.InternalServerError, new ErrorObj(500, e.Message));
             }
             //catch (ErrorObj e)
             //{
@@ -94,7 +96,7 @@ namespace PromotionEngineAPI.Controllers
         {
             if (String.IsNullOrEmpty(Level) || BrandId.Equals(Guid.Empty))
             {
-                return StatusCode(statusCode: 400, value: new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, value: new ErrorResponse().BadRequest);
             }
             try
             {
@@ -111,7 +113,7 @@ namespace PromotionEngineAPI.Controllers
         {
             if (await _service.CheckExistingLevel(name: dto.Name, brandId: dto.BrandId, memberLevelId: Guid.Empty))
             {
-                return StatusCode(statusCode: 500, new ErrorObj(500, "MemberLevel exist"));
+                return StatusCode(statusCode: (int)HttpStatusCode.InternalServerError, new ErrorObj((int)AppConstant.ErrCode.MemberLevel_Exist, AppConstant.ErrMessage.MemberLevel_Exist));
             }
             try
             {
@@ -132,7 +134,7 @@ namespace PromotionEngineAPI.Controllers
         {
             if (id.Equals(Guid.Empty))
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
             try
             {

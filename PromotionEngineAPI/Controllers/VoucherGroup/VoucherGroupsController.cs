@@ -10,6 +10,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers
@@ -90,7 +91,7 @@ namespace PromotionEngineAPI.Controllers
              try
              {
                  if (storeCode == null || brandCode == null)
-                     return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                     return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
                  return Ok(await _service.GetVoucherGroupForGame(PageIndex: param.PageIndex, PageSize: param.PageSize, StoreCode: storeCode, BrandCode: brandCode)); ;
              }
              catch (ErrorObj e)
@@ -121,7 +122,7 @@ namespace PromotionEngineAPI.Controllers
         {
             if (id.Equals(Guid.Empty))
             {
-                return StatusCode(statusCode: 400, new ErrorObj(400, "Required Voucher Group Id"));
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorObj((int)HttpStatusCode.BadRequest, AppConstant.ErrMessage.Bad_Request));
             }
             try
             {
@@ -140,7 +141,7 @@ namespace PromotionEngineAPI.Controllers
             try
             {
                 if (id != dto.VoucherGroupId)
-                    return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                    return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
                 dto.UpdDate = Common.GetCurrentDatetime();
                 return Ok(await _service.UpdateAsync(dto));
             }
@@ -176,7 +177,7 @@ namespace PromotionEngineAPI.Controllers
             {
                 if (voucherGroupId.Equals(Guid.Empty))
                 {
-                    return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                    return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
 
                 }
 
@@ -196,7 +197,7 @@ namespace PromotionEngineAPI.Controllers
             {
                 if (voucherGroupId.Equals(Guid.Empty))
                 {
-                    return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                    return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
 
                 }
 
@@ -213,7 +214,7 @@ namespace PromotionEngineAPI.Controllers
         {
             if (voucherGroupId.Equals(Guid.Empty))
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
             try
             {
@@ -232,7 +233,7 @@ namespace PromotionEngineAPI.Controllers
         {
             if (id.Equals(Guid.Empty))
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
             try
             {
@@ -251,7 +252,7 @@ namespace PromotionEngineAPI.Controllers
         {
             if (voucherGroupId.Equals(Guid.Empty) || promotionId.Equals(Guid.Empty))
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
             try
             {
@@ -270,7 +271,7 @@ namespace PromotionEngineAPI.Controllers
         {
             if (voucherGroupId.Equals(Guid.Empty) || promotionId.Equals(Guid.Empty))
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
             try
             {
@@ -288,7 +289,7 @@ namespace PromotionEngineAPI.Controllers
         {
             if (brandId.Equals(Guid.Empty))
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
             try
             {
@@ -306,7 +307,7 @@ namespace PromotionEngineAPI.Controllers
         {
             if (brandId.Equals(Guid.Empty))
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
             try
             {
@@ -325,7 +326,7 @@ namespace PromotionEngineAPI.Controllers
         {
             if (voucherGroupId.Equals(Guid.Empty))
             {
-                return StatusCode(statusCode: 400, new ErrorResponse().BadRequest);
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             }
             try
             {

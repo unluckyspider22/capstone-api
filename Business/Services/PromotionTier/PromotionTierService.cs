@@ -8,6 +8,7 @@ using Infrastructure.UnitOrWork;
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace ApplicationCore.Services
@@ -52,7 +53,7 @@ namespace ApplicationCore.Services
             catch (Exception e)
             {
                 Debug.WriteLine(e.InnerException);
-                throw new ErrorObj(code: 500, message: e.Message);
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
 
         }
@@ -114,7 +115,7 @@ namespace ApplicationCore.Services
             catch (Exception e)
             {
                 Debug.WriteLine(e.Message);
-                throw new ErrorObj(code: 500, message: e.Message);
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
 
         }
@@ -204,7 +205,7 @@ namespace ApplicationCore.Services
             catch (Exception e)
             {
                 Debug.WriteLine(e.Message);
-                throw new ErrorObj(code: 500, message: e.Message);
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
 
         }
