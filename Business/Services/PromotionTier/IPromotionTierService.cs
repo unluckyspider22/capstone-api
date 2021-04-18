@@ -15,6 +15,6 @@ namespace ApplicationCore.Services
         public Task<bool> AssignTierToPromo(Guid promotionId, Guid promotionTierId);
         public Task<PromotionTierDto> CreateTier(PromotionTierDto dto);
         public Task<bool> DeleteTier(Guid id);
-        public Task<PromotionTierDto> UpdateTier(PromotionTierDto dto, PromotionTier entity);
+        public Task<bool> UpdateTier(PromotionTierDto dto, PromotionTier entity);
     }
 }
