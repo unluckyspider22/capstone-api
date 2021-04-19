@@ -1,6 +1,8 @@
 ﻿using ApplicationCore.Services;
+using ApplicationCore.Utils;
 using Infrastructure.DTOs;
 using Infrastructure.DTOs.VoucherChannel;
+using Infrastructure.Helper;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
@@ -95,6 +97,7 @@ namespace PromotionEngineAPI.Controllers
         {
             dto.ChannelId = Guid.NewGuid();
 
+            dto.ApiKey = Common.CreateApiKey();
             var result = await _service.CreateAsync(dto);
 
             if (result == null)
@@ -148,7 +151,7 @@ namespace PromotionEngineAPI.Controllers
 
         [HttpGet]
         [Route("{channelCode}/brands/{BrandCode}/promotions")]
-        public async Task<IActionResult> GetPromotionForChannel(string channelCode, string BrandCode)
+        public async Task<IActionResult> GetPromotionForChannel(string channelCode, string BrandCode, [FromQuery] string key)
         {
             try
             {
@@ -157,12 +160,25 @@ namespace PromotionEngineAPI.Controllers
                     ChannelCode = channelCode,
                     BrandCode = BrandCode
                 };
-                var result = await _service.GetPromotionsForChannel(param);
-                if (result.Count() == 0)
+                var channel = await _service.GetFirst(filter: el => el.ChannelCode == channelCode);
+                if (channel != null)
                 {
-                    return NoContent();
+                    if (string.IsNullOrEmpty(key))
+                    {
+                        return Unauthorized(new ErrorObj(code: (int)HttpStatusCode.NotFound, message: AppConstant.ErrMessage.ApiKey_Required));
+                    }
+                    if (channel.ApiKey.Equals(key))
+                    {
+                        return Ok(await _service.GetPromotionsForChannel(param));
+                    }
+                    else
+                    {
+                        return Unauthorized(new ErrorObj(code: (int)HttpStatusCode.Unauthorized, message: AppConstant.ErrMessage.ApiKey_Not_Exist));
+                    }
                 }
-                return Ok(result);
+                return StatusCode(statusCode: (int)HttpStatusCode.NotFound,
+                    new ErrorObj(code: (int)HttpStatusCode.NotFound, message: AppConstant.ErrMessage.Not_Found_Resource));
+
             }
             catch (ErrorObj e)
             {

@@ -13,5 +13,7 @@ namespace Infrastructure.DTOs
         public string ChannelCode { get; set; }
         public decimal Group { get; set; }
         public int ChannelType { get; set; }
+        public string ApiKey { get; set; }
+
     }
 }

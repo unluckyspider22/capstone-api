@@ -20,6 +20,7 @@ namespace Infrastructure.Models
         public DateTime UpdDate { get; set; }
         public int? Group { get; set; }
         public int? ChannelType { get; set; }
+        public string ApiKey { get; set; }
 
         public virtual Brand Brand { get; set; }
         public virtual ICollection<PromotionChannelMapping> PromotionChannelMapping { get; set; }

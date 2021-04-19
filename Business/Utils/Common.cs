@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Numerics;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -65,17 +66,6 @@ namespace ApplicationCore.Utils
                 throw ex;
             }
         }
-        public static string DecodeSignData(string encodedData, string secret)
-        {
-            var encoding = new UTF8Encoding();
-            Decoder utf8Decode = encoding.GetDecoder();
-            byte[] todecode_byte = Convert.FromBase64String(encodedData);
-            int charCount = utf8Decode.GetCharCount(todecode_byte, 0, todecode_byte.Length);
-            char[] decoded_char = new char[charCount];
-            utf8Decode.GetChars(todecode_byte, 0, todecode_byte.Length, decoded_char, 0);
-            string result = new String(decoded_char);
-            return result;
-        }
         public static string EncodeToBase64(string plainText)
         {
             try
@@ -90,19 +80,32 @@ namespace ApplicationCore.Utils
                 throw ex;
             }
         }
-
-        public static string SignData(string message, string secret)
+        public static string GenerateAPIKey()
         {
-            var encoding = new UTF8Encoding();
-            var keyBytes = encoding.GetBytes(secret);
-            var messageBytes = encoding.GetBytes(message);
-            using (var hmacsha1 = new HMACSHA1(keyBytes))
-            {
-                var hashMessage = hmacsha1.ComputeHash(messageBytes);
-                return Convert.ToBase64String(hashMessage);
-            }
+            var key = new byte[16];
+            using (var generator = RandomNumberGenerator.Create())
+                generator.GetBytes(key);
+            string apiKey = Convert.ToBase64String(key);
+            return apiKey;
         }
-
-
+        public static string CreateApiKey()
+        {
+            var bytes = new byte[256 / 8];
+            using (var random = RandomNumberGenerator.Create())
+                random.GetBytes(bytes);
+            return ToBase62String(bytes);
+        }
+        private static string ToBase62String(byte[] toConvert)
+        {
+            const string alphabet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            BigInteger dividend = new BigInteger(toConvert);
+            var builder = new StringBuilder();
+            while (dividend != 0)
+            {
+                dividend = BigInteger.DivRem(dividend, alphabet.Length, out BigInteger remainder);
+                builder.Insert(0, alphabet[Math.Abs(((int)remainder))]);
+            }
+            return builder.ToString();
+        }
     }
 }
