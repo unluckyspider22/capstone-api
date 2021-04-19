@@ -292,6 +292,7 @@ namespace ApplicationCore.Services
                         entity.VoucherGroup = voucherGroup;
                         entity.VoucherGroupId = voucherGroup.VoucherGroupId;
                     }
+                    entity.VoucherQuantity = dto.VoucherQuantity;
                 }
                 else
                 {
