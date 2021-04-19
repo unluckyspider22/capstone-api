@@ -247,6 +247,8 @@ namespace Infrastructure.Helper
             public const string Product_Exist = "Product exist.";
             public const string Product_Cate_NotFound = "Product category not found";
             public const string Exist_ProductCategory = "ProductCategory exist";
+            public const string ApiKey_Not_Exist = "APIKey is not exist in the system";
+            public const string ApiKey_Required = "APIKey is not required";
         }
         public class QueueMessage
         {

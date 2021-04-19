@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Numerics;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -81,12 +82,30 @@ namespace ApplicationCore.Utils
         }
         public static string GenerateAPIKey()
         {
-            var key = new byte[32];
+            var key = new byte[16];
             using (var generator = RandomNumberGenerator.Create())
                 generator.GetBytes(key);
             string apiKey = Convert.ToBase64String(key);
             return apiKey;
         }
-
+        public static string CreateApiKey()
+        {
+            var bytes = new byte[256 / 8];
+            using (var random = RandomNumberGenerator.Create())
+                random.GetBytes(bytes);
+            return ToBase62String(bytes);
+        }
+        private static string ToBase62String(byte[] toConvert)
+        {
+            const string alphabet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            BigInteger dividend = new BigInteger(toConvert);
+            var builder = new StringBuilder();
+            while (dividend != 0)
+            {
+                dividend = BigInteger.DivRem(dividend, alphabet.Length, out BigInteger remainder);
+                builder.Insert(0, alphabet[Math.Abs(((int)remainder))]);
+            }
+            return builder.ToString();
+        }
     }
 }

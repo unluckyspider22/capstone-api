@@ -117,6 +117,20 @@ namespace PromotionEngineAPI.Controllers
             return Ok();
         }
 
-        
+        [HttpPost]
+        [Route("sync")]
+        public async Task<IActionResult> SyncHoliday()
+        {
+            var result =  _service.SyncHolidays();
+
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            //var result = dto;
+
+            return Ok(result);
+        }
     }
 }
