@@ -230,6 +230,7 @@ namespace ApplicationCore.Chain
                     order.CustomerOrderInfo.ShippingFee = order.CustomerOrderInfo.ShippingFee > 0 ? order.CustomerOrderInfo.ShippingFee : 0;
                     break;
             }
+            effectType = discount > 0 ? effectType : AppConstant.EffectMessage.NoProductMatch;
             SetEffect(order, promotion, discount, effectType, promotionTier);
         }
 
@@ -245,7 +246,7 @@ namespace ApplicationCore.Chain
                 PromotionTierId = promotionTier.PromotionTierId,
                 ConditionRuleName = promotionTier.ConditionRule.RuleName,
                 TierIndex = promotionTier.TierIndex,
-                EffectType = discount > 0 ? effectType : AppConstant.EffectMessage.NoProductMatch,
+                EffectType = effectType
             };
             if (promotionTier.Action != null)
             {
@@ -259,10 +260,10 @@ namespace ApplicationCore.Chain
                         imgUrl = promotion.ImgUrl,
                         description = promotion.Description
                     };
-                  
                 }
                 else
                 {
+                    effect.EffectType = effectType;
                     effect.Prop = new
                     {
                         name = promotion.PromotionName,
@@ -416,9 +417,9 @@ namespace ApplicationCore.Chain
                 int matchProduct = 0;
                 foreach (var product in cartItems)
                 {
-                    bool isMatchProduct = 
+                    bool isMatchProduct =
                             action.ActionProductMapping
-                            .Any(el => el.Product.Code == product.ProductCode 
+                            .Any(el => el.Product.Code == product.ProductCode
                                     && product.Quantity >= el.Quantity);
                     if (isMatchProduct)
                     {

@@ -17,13 +17,16 @@ namespace ApplicationCore.Services
     public class GameCampaignService : BaseService<GameCampaign, GameCampaignDto>, IGameCampaignService
     {
         private readonly IDeviceService _deviceService;
-        public GameCampaignService(IUnitOfWork unitOfWork, IMapper mapper, IDeviceService deviceService) : base(unitOfWork, mapper)
+        private readonly IBrandService _brandService;
+        public GameCampaignService(IUnitOfWork unitOfWork, IMapper mapper, IDeviceService deviceService, IBrandService brandService
+            ) : base(unitOfWork, mapper)
         {
             _deviceService = deviceService;
+            _brandService = brandService;
         }
 
         protected override IGenericRepository<GameCampaign> _repository => _unitOfWork.GameConfigRepository;
-
+        protected IGenericRepository<StoreGameCampaignMapping> _storeGameCampaignMappingRepos => _unitOfWork.StoreGameCampaignMappingRepository;
 
 
         public async Task<bool> DeleteGameConfig(Guid id)
@@ -60,15 +63,15 @@ namespace ApplicationCore.Services
 
         }
 
-        public async Task<List<GameItemDto>> GetGameCampaignItems(Guid deviceId, string gameCode)
+        public async Task<List<GameItemDto>> GetGameCampaignItems(Guid deviceId, Guid gameCampaignId)
         {
             try
             {
                 List<GameItemDto> gameItemDtos = null;
 
                 var gameConfig = await _repository.GetFirst(filter: o =>
-                    o.StoreGameCampaignMapping.Select(s => s.Store).FirstOrDefault(f => f.Device.Any(a => a.DeviceId == deviceId)) != null
-                    && o.SecretCode == gameCode
+                o.Id == gameCampaignId
+                && o.StoreGameCampaignMapping.Select(s => s.Store).FirstOrDefault(f => f.Device.Any(a => a.DeviceId == deviceId)) != null
                     && !o.DelFlg,
                     includeProperties: "StoreGameCampaignMapping.Store.Device,GameItems");
 
@@ -210,6 +213,49 @@ namespace ApplicationCore.Services
                 }
             }
             return await _unitOfWork.SaveAsync() > 0;
+        }
+
+        public async Task<List<GameCampaign>> GetGameCampaignForDevice(Guid deviceId, Guid brandId)
+        {
+            try
+            {
+                List<GameCampaign> result = new List<GameCampaign>();
+                var brand = await _brandService.GetFirst(filter: el => el.BrandId.Equals(brandId) && !el.DelFlg);
+                if (brand != null)
+                {
+                    var device = await _deviceService.GetFirst(el => el.DeviceId.Equals(deviceId) && !el.DelFlg);
+                    if (device != null)
+                    {
+                        var storeId = device.StoreId;
+                        var listMappingresult = await _storeGameCampaignMappingRepos.Get(filter: el => el.StoreId.Equals(storeId), includeProperties: "GameCampaign.Promotion");
+                        if (listMappingresult != null && listMappingresult.Count() > 0)
+                        {
+                            foreach (var storeGameMapping in listMappingresult)
+                            {
+                                if (storeGameMapping.GameCampaign != null)
+                                {
+                                    result.Add(storeGameMapping.GameCampaign);
+                                }
+                            }
+                            return result;
+                        }
+                        else throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.No_Game_Campaign);
+                    }
+                    else throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Device_Not_Found);
+                }
+                else
+                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Brand_Not_Exist, description: AppConstant.ErrMessage.Brand_Not_Exist);
+            }
+            catch (ErrorObj e)
+            {
+                throw e;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.StackTrace);
+                Debug.WriteLine(e.InnerException);
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message, description: AppConstant.ErrMessage.Internal_Server_Error);
+            }
         }
     }
 }

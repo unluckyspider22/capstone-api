@@ -10,8 +10,9 @@ namespace ApplicationCore.Services
     {
         public Task<bool> DeleteGameConfig(Guid id);
         public Task<GameCampaignDto> UpdateGameCampaign(GameCampaignDto dto);
-        public Task<List<GameItemDto>> GetGameCampaignItems(Guid deviceId, string gameCode);
+        public Task<List<GameItemDto>> GetGameCampaignItems(Guid deviceId, Guid gameCampaignId);
 
         public Task<bool> CreateGameCampaign(GameCampaignDto dto, List<Guid> storeIdList);
+        public Task<List<GameCampaign>> GetGameCampaignForDevice(Guid deviceId,Guid brandId);
     }
 }

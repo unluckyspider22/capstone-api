@@ -43,7 +43,7 @@ namespace ApplicationCore.Services
 
                         foreach (var effect in order.Effects)
                         {
-                            if (effect.EffectType.Equals("setDiscount"))
+                            if (effect.EffectType.Equals("setDiscount") || effect.EffectType.Equals("actionProductMismatch"))
                             {
                                 var promotion = await _promotionService.GetByIdAsync(effect.PromotionId);
                                 if (promotion == null || promotion.Status != (int)AppConstant.EnvVar.PromotionStatus.PUBLISH)
