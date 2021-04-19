@@ -180,7 +180,8 @@ namespace ApplicationCore.Chain
                 promotion.PromotionName,
                 code = promotion.PromotionCode,
                 GameName = postAction.GameCampaign.Name,
-                GameCode = gameCode
+                GameCode = gameCode,
+                Duration = postAction.GameCampaign.ExpiredDuration
             });
         }
 
@@ -279,6 +280,7 @@ namespace ApplicationCore.Chain
                 if (gifts != null)
                 {
                     effect.Prop = gifts;
+                    
                 }
                 /*else
                 {
