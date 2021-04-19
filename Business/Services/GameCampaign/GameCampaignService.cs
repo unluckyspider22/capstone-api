@@ -241,20 +241,20 @@ namespace ApplicationCore.Services
                         }
                         else throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.No_Game_Campaign);
                     }
-                    else throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.No_Game_Campaign);
+                    else throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Device_Not_Found);
                 }
                 else
-                {
-                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.StatisticMessage.BRAND_ID_INVALID,
-                        description: AppConstant.StatisticMessage.BRAND_ID_INVALID);
-
-                }
+                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Brand_Not_Exist, description: AppConstant.ErrMessage.Brand_Not_Exist);
+            }
+            catch (ErrorObj e)
+            {
+                throw e;
             }
             catch (Exception e)
             {
+                Debug.WriteLine(e.StackTrace);
+                Debug.WriteLine(e.InnerException);
                 throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message, description: AppConstant.ErrMessage.Internal_Server_Error);
-
-
             }
         }
     }

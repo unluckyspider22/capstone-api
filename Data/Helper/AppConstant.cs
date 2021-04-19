@@ -247,6 +247,7 @@ namespace Infrastructure.Helper
             public const string Product_Exist = "Product exist.";
             public const string Product_Cate_NotFound = "Product category not found";
             public const string Exist_ProductCategory = "ProductCategory exist";
+            public const string Brand_Not_Exist = "Brand does not exist!";
         }
         public class QueueMessage
         {
