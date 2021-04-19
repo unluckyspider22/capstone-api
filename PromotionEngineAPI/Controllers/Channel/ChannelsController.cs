@@ -1,4 +1,5 @@
 ﻿using ApplicationCore.Services;
+using ApplicationCore.Utils;
 using Infrastructure.DTOs;
 using Infrastructure.DTOs.VoucherChannel;
 using Microsoft.AspNetCore.Mvc;
@@ -95,6 +96,7 @@ namespace PromotionEngineAPI.Controllers
         {
             dto.ChannelId = Guid.NewGuid();
 
+            dto.ApiKey = Common.GenerateAPIKey();
             var result = await _service.CreateAsync(dto);
 
             if (result == null)

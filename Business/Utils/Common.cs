@@ -65,17 +65,6 @@ namespace ApplicationCore.Utils
                 throw ex;
             }
         }
-        public static string DecodeSignData(string encodedData, string secret)
-        {
-            var encoding = new UTF8Encoding();
-            Decoder utf8Decode = encoding.GetDecoder();
-            byte[] todecode_byte = Convert.FromBase64String(encodedData);
-            int charCount = utf8Decode.GetCharCount(todecode_byte, 0, todecode_byte.Length);
-            char[] decoded_char = new char[charCount];
-            utf8Decode.GetChars(todecode_byte, 0, todecode_byte.Length, decoded_char, 0);
-            string result = new String(decoded_char);
-            return result;
-        }
         public static string EncodeToBase64(string plainText)
         {
             try
@@ -90,19 +79,14 @@ namespace ApplicationCore.Utils
                 throw ex;
             }
         }
-
-        public static string SignData(string message, string secret)
+        public static string GenerateAPIKey()
         {
-            var encoding = new UTF8Encoding();
-            var keyBytes = encoding.GetBytes(secret);
-            var messageBytes = encoding.GetBytes(message);
-            using (var hmacsha1 = new HMACSHA1(keyBytes))
-            {
-                var hashMessage = hmacsha1.ComputeHash(messageBytes);
-                return Convert.ToBase64String(hashMessage);
-            }
+            var key = new byte[32];
+            using (var generator = RandomNumberGenerator.Create())
+                generator.GetBytes(key);
+            string apiKey = Convert.ToBase64String(key);
+            return apiKey;
         }
-
 
     }
 }

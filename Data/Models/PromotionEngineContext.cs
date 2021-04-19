@@ -218,6 +218,10 @@ namespace Infrastructure.Models
             {
                 entity.Property(e => e.ChannelId).HasDefaultValueSql("(newid())");
 
+                entity.Property(e => e.ApiKey)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.ChannelCode)
                     .IsRequired()
                     .HasMaxLength(20)
