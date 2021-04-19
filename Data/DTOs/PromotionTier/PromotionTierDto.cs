@@ -15,5 +15,7 @@ namespace Infrastructure.DTOs
         public int VoucherQuantity { get; set; } = 0;
         public int Priority { get; set; }
 
+        public int MoreQuantity { get; set; } = 0;
+
     }
 }

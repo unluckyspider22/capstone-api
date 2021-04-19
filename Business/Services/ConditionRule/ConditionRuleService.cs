@@ -27,59 +27,36 @@ namespace ApplicationCore.Services
 
         public async Task<bool> Delete(Guid conditionRuleId)
         {
-            IGenericRepository<ConditionGroup> groupRepo = _unitOfWork.ConditionGroupRepository;
-            IGenericRepository<ProductCondition> productRepo = _unitOfWork.ProductConditionRepository;
-            IGenericRepository<ProductConditionMapping> mappRepo = _unitOfWork.ProductConditionMappingRepository;
-            IGenericRepository<OrderCondition> orderRepo = _unitOfWork.OrderConditionRepository;
-            IGenericRepository<PromotionTier> tierRepo = _unitOfWork.PromotionTierRepository;
             try
             {
-                var conditionRule = await _repository.GetFirst(filter: o => o.ConditionRuleId.Equals(conditionRuleId),
+                var conditionRule = await _repository.GetFirst(filter: o => o.ConditionRuleId.Equals(conditionRuleId) && !o.DelFlg,
                     includeProperties: "ConditionGroup," +
                     "ConditionGroup.ProductCondition," +
-                    "ConditionGroup.OrderCondition," +
-                    "PromotionTier," +
-                    "PromotionTier.Action," +
-                    "PromotionTier.Gift");
-                var groups = conditionRule.ConditionGroup.ToList();
-                if (groups != null && groups.Count > 0)
+                    "ConditionGroup.OrderCondition");
+                if (conditionRule != null)
                 {
+                    var groups = conditionRule.ConditionGroup.ToList();
+                    conditionRule.DelFlg = true;
                     foreach (var group in groups)
                     {
-                        var productConds = group.ProductCondition;
-                        var orderConds = group.OrderCondition;
-                        if (productConds != null && productConds.Count > 0)
+                        if (group.ProductCondition != null)
                         {
-                            foreach (var product in productConds)
+                            foreach (ProductCondition condition in group.ProductCondition)
                             {
-                                mappRepo.Delete(id: Guid.Empty, filter: o => o.ProductConditionId.Equals(product.ProductConditionId));
-                                productRepo.Delete(id: product.ProductConditionId);
+                                condition.DelFlg = true;
                             }
-                            await _unitOfWork.SaveAsync();
                         }
-
-                        if (orderConds != null && orderConds.Count > 0)
+                        if (group.OrderCondition != null)
                         {
-                            foreach (var orderCond in orderConds)
+                            foreach (OrderCondition condition in group.OrderCondition)
                             {
-                                orderRepo.Delete(id: orderCond.OrderConditionId);
+                                condition.DelFlg = true;
                             }
-                            await _unitOfWork.SaveAsync();
                         }
-                        groupRepo.Delete(id: group.ConditionGroupId);
                     }
+                    _repository.Update(conditionRule);
                 }
-                /* var promotionTier = conditionRule.PromotionTier;
-                 if (promotionTier.Action != null)
-                 {
-                     await _actionService.Delete((Guid)promotionTier.ActionId);
-                 }
-                 else if (promotionTier.Gift != null)
-                 {
-                     await _postActionService.Delete((Guid)promotionTier.GiftId);
-                 }
-                 tierRepo.Delete(id: promotionTier.PromotionTierId);
-                 _repository.Delete(id: conditionRuleId);*/
+
                 return await _unitOfWork.SaveAsync() > 0;
             }
             catch (Exception e)

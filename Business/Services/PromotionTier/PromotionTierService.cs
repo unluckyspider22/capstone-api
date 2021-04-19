@@ -1,4 +1,5 @@
 ﻿
+using ApplicationCore.Utils;
 using AutoMapper;
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
@@ -209,6 +210,221 @@ namespace ApplicationCore.Services
             }
 
         }
+
+        public async Task<bool> DeleteTier(Guid id)
+        {
+            try
+            {
+                IVoucherRepository myRepo = new VoucherRepositoryImp();
+                IGenericRepository<VoucherGroup> groupRepo = _unitOfWork.VoucherGroupRepository;
+                var tierEntity = await _repository.GetFirst(filter: el => el.PromotionTierId.Equals(id));
+                if (tierEntity != null)
+                {
+                    var groupId = tierEntity.VoucherGroupId;
+                    if (groupId != null && !groupId.Equals(Guid.Empty))
+                    {
+                        await myRepo.UpdateVoucherGroupWhenDeletetier(voucherGroupId: (Guid)groupId, tierId: tierEntity.PromotionTierId);
+                    }
+                }
+                _repository.Delete(id: id);
+                return await _unitOfWork.SaveAsync() > 0;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                throw new ErrorObj(code: 500, message: e.Message);
+            }
+
+        }
+        #region Update promotion tier
+        public async Task<bool> UpdateTier(PromotionTierDto dto, PromotionTier entity)
+        {
+            try
+            {
+                var now = Common.GetCurrentDatetime();
+                if (dto.VoucherGroupId != null && !dto.VoucherGroupId.Equals(Guid.Empty))
+                {
+                    entity = await UpdateVoucherOfTier(dto: dto, entity: entity);
+                }
+
+                if (dto.ConditionRuleId != null && !dto.ConditionRuleId.Equals(Guid.Empty))
+                {
+                    entity = await UpdateConditionOfTier(dto: dto, entity: entity);
+                }
+                if (dto.ActionId != null && !dto.ActionId.Equals(Guid.Empty))
+                {
+                    entity = await UpdateActionOfTier(dto: dto, entity: entity);
+                }
+                if (dto.GiftId != null && !dto.GiftId.Equals(Guid.Empty))
+                {
+                    entity = await UpdateGiftOfTier(dto: dto, entity: entity);
+                }
+                entity.UpdDate = now;
+                entity.Priority = dto.Priority;
+                _repository.Update(entity);
+                return await _unitOfWork.SaveAsync() > 0;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
+            }
+
+        }
+
+        private async Task<PromotionTier> UpdateVoucherOfTier(PromotionTierDto dto, PromotionTier entity)
+        {
+            try
+            {
+                var now = Common.GetCurrentDatetime();
+                var oldId = entity.VoucherGroupId;
+
+                // Trường hợp đổi voucher group
+                if (!dto.VoucherGroupId.Equals(oldId))
+                {
+                    IVoucherRepository myRepo = new VoucherRepositoryImp();
+                    await myRepo.UpdateVoucherGroupWhenDeletetier(voucherGroupId: (Guid)oldId, tierId: dto.PromotionTierId);
+                    await UpdateVoucher(dto);
+                    IGenericRepository<VoucherGroup> groupRepo = _unitOfWork.VoucherGroupRepository;
+                    var voucherGroup = await groupRepo.GetFirst(filter: el => el.VoucherGroupId.Equals(dto.VoucherGroupId));
+                    if (voucherGroup != null)
+                    {
+                        entity.VoucherGroup = voucherGroup;
+                        entity.VoucherGroupId = voucherGroup.VoucherGroupId;
+                    }
+                }
+                else
+                {
+                    // Trường hợp tạo thêm voucher
+                    if (dto.MoreQuantity > 0)
+                    {
+                        IGenericRepository<Voucher> voucherRepo = _unitOfWork.VoucherRepository;
+                        var vouchers = await voucherRepo.Get(filter: el => el.VoucherGroupId.Equals(dto.VoucherGroupId)
+                                                                    && (el.PromotionId.Equals(Guid.Empty) || el.PromotionId == null)
+                                                                    && (el.PromotionTierId.Equals(Guid.Empty) || el.PromotionTierId == null)
+                                                                    && !el.VoucherGroup.DelFlg);
+                        if (vouchers.Count() > 0)
+                        {
+                            var remain = dto.MoreQuantity;
+                            while (remain > 0)
+                            {
+                                var voucher = vouchers.Where(el => (el.PromotionId.Equals(Guid.Empty) || el.PromotionId == null)
+                                                             && (el.PromotionTierId.Equals(Guid.Empty) || el.PromotionTierId == null)).FirstOrDefault();
+                                if (voucher != null)
+                                {
+                                    voucher.PromotionId = dto.PromotionId;
+                                    voucher.PromotionTierId = dto.PromotionTierId;
+                                    voucher.UpdDate = now;
+                                    voucherRepo.Update(voucher);
+                                }
+                                if (voucher == null && remain > 0)
+                                {
+                                    remain = 0;
+                                }
+                                else
+                                {
+                                    remain--;
+                                }
+                            }
+                            entity.VoucherQuantity += dto.MoreQuantity;
+                        }
+                    }
+                }
+                await _unitOfWork.SaveAsync();
+                return entity;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
+            }
+
+        }
+        private async Task<PromotionTier> UpdateConditionOfTier(PromotionTierDto dto, PromotionTier entity)
+        {
+            try
+            {
+                var oldId = entity.ConditionRuleId;
+                var newId = dto.ConditionRuleId;
+                if (!newId.Equals(oldId))
+                {
+                    IGenericRepository<ConditionRule> conditionRepo = _unitOfWork.ConditionRuleRepository;
+                    var newCondition = await conditionRepo.GetFirst(filter: el => el.ConditionRuleId.Equals(newId) && !el.DelFlg);
+                    if (newCondition != null)
+                    {
+                        entity.ConditionRule = newCondition;
+                        entity.ConditionRuleId = newCondition.ConditionRuleId;
+                    }
+                    else
+                    {
+                        throw new ErrorObj(404, "Cannot find condition");
+                    }
+                }
+                return entity;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
+            }
+        }
+        private async Task<PromotionTier> UpdateActionOfTier(PromotionTierDto dto, PromotionTier entity)
+        {
+            try
+            {
+                var oldId = entity.ActionId;
+                var newId = dto.ActionId;
+                if (!newId.Equals(oldId))
+                {
+                    IGenericRepository<Infrastructure.Models.Action> actionRepo = _unitOfWork.ActionRepository;
+                    var newAction = await actionRepo.GetFirst(filter: el => el.ActionId.Equals(newId) && !el.DelFlg);
+                    if (newAction != null)
+                    {
+                        entity.Action = newAction;
+                        entity.ActionId = newAction.ActionId;
+                    }
+                    else
+                    {
+                        throw new ErrorObj(404, "Cannot find action");
+                    }
+                }
+                return entity;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
+            }
+        }
+        private async Task<PromotionTier> UpdateGiftOfTier(PromotionTierDto dto, PromotionTier entity)
+        {
+            try
+            {
+                var oldId = entity.GiftId;
+                var newId = dto.GiftId;
+                if (!newId.Equals(oldId))
+                {
+                    IGenericRepository<Gift> actionRepo = _unitOfWork.GiftRepository;
+                    var newAction = await actionRepo.GetFirst(filter: el => el.GiftId.Equals(newId) && !el.DelFlg);
+                    if (newAction != null)
+                    {
+                        entity.Gift = newAction;
+                        entity.GiftId = newAction.GiftId;
+                    }
+                    else
+                    {
+                        throw new ErrorObj(404, "Cannot find gift");
+                    }
+                }
+                return entity;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
+            }
+        }
+        #endregion
     }
 
 }
