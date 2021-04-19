@@ -17,13 +17,16 @@ namespace ApplicationCore.Services
     public class GameCampaignService : BaseService<GameCampaign, GameCampaignDto>, IGameCampaignService
     {
         private readonly IDeviceService _deviceService;
-        public GameCampaignService(IUnitOfWork unitOfWork, IMapper mapper, IDeviceService deviceService) : base(unitOfWork, mapper)
+        private readonly IBrandService _brandService;
+        public GameCampaignService(IUnitOfWork unitOfWork, IMapper mapper, IDeviceService deviceService, IBrandService brandService
+            ) : base(unitOfWork, mapper)
         {
             _deviceService = deviceService;
+            _brandService = brandService;
         }
 
         protected override IGenericRepository<GameCampaign> _repository => _unitOfWork.GameConfigRepository;
-
+        protected IGenericRepository<StoreGameCampaignMapping> _storeGameCampaignMappingRepos => _unitOfWork.StoreGameCampaignMappingRepository;
 
 
         public async Task<bool> DeleteGameConfig(Guid id)
@@ -210,6 +213,49 @@ namespace ApplicationCore.Services
                 }
             }
             return await _unitOfWork.SaveAsync() > 0;
+        }
+
+        public async Task<List<GameCampaign>> GetGameCampaignForDevice(Guid deviceId, Guid brandId)
+        {
+            try
+            {
+                List<GameCampaign> result = new List<GameCampaign>();
+                var brand = await _brandService.GetFirst(filter: el => el.BrandId.Equals(brandId) && !el.DelFlg);
+                if (brand != null)
+                {
+                    var device = await _deviceService.GetFirst(el => el.DeviceId.Equals(deviceId) && !el.DelFlg);
+                    if (device != null)
+                    {
+                        var storeId = device.StoreId;
+                        var listMappingresult = await _storeGameCampaignMappingRepos.Get(filter: el => el.StoreId.Equals(storeId), includeProperties: "GameCampaign.Promotion");
+                        if (listMappingresult != null && listMappingresult.Count() > 0)
+                        {
+                            foreach (var storeGameMapping in listMappingresult)
+                            {
+                                if (storeGameMapping.GameCampaign != null)
+                                {
+                                    result.Add(storeGameMapping.GameCampaign);
+                                }
+                            }
+                            return result;
+                        }
+                        else throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.No_Game_Campaign);
+                    }
+                    else throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.No_Game_Campaign);
+                }
+                else
+                {
+                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.StatisticMessage.BRAND_ID_INVALID,
+                        description: AppConstant.StatisticMessage.BRAND_ID_INVALID);
+
+                }
+            }
+            catch (Exception e)
+            {
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message, description: AppConstant.ErrMessage.Internal_Server_Error);
+
+
+            }
         }
     }
 }

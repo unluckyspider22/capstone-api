@@ -13,5 +13,6 @@ namespace ApplicationCore.Services
         public Task<List<GameItemDto>> GetGameCampaignItems(Guid deviceId, string gameCode);
 
         public Task<bool> CreateGameCampaign(GameCampaignDto dto, List<Guid> storeIdList);
+        public Task<List<GameCampaign>> GetGameCampaignForDevice(Guid deviceId,Guid brandId);
     }
 }

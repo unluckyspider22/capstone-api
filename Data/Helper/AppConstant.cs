@@ -239,6 +239,8 @@ namespace Infrastructure.Helper
             public const string Not_Found_Resource = "The server can not find the requested resource.";
             public const string Bad_Request = "The server could not understand the request due to invalid syntax.";
             public const string Unauthorized = "Unauthorized.";
+            public const string No_Game_Campaign = "Hiện tại không có chương trình khuyến mãi dành cho game, bạn vui lòng quay lại lần sau nhé !";
+            public const string Device_Not_Found = "Không tìm thấy thiết bị !";
             public const string Order_Fail = "Order failed !.";
             public const string MemberLevel_Exist = "MemberLevel exist.";
             public const string MemberLevel_NotFound = "MemberLevel notfound.";

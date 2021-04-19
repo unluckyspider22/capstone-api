@@ -129,5 +129,23 @@ namespace PromotionEngineAPI.Controllers
                 return StatusCode(statusCode: e.Code, e);
             }
         }
+        [HttpGet]
+        [Route("get-game-campaign-device/{deviceId}/brand/{brandId}")]
+        public async Task<IActionResult> GetGameCampaignForDevice([FromRoute] Guid deviceId, [FromRoute] Guid brandId)
+        {
+            try
+            {
+                if (deviceId.Equals(Guid.Empty) || brandId.Equals(Guid.Empty)) 
+                {
+                    return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
+                }
+                var result = await _service.GetGameCampaignForDevice(deviceId: deviceId, brandId: brandId);
+                return Ok(result);
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
     }
 }
