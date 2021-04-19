@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -69,6 +70,8 @@ namespace PromotionEngineAPI
             {
                 c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Promotion Engine API", Version = "1" });
             });
+            services.AddDbContext<PromotionEngineContext>(options =>
+                options.UseSqlServer(Configuration["ConnectionStrings:PromotionEngineDatabase"]));
             services.AddTransient<PromotionEngineContext, PromotionEngineContext>();
             // add config auto mapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

@@ -60,15 +60,15 @@ namespace ApplicationCore.Services
 
         }
 
-        public async Task<List<GameItemDto>> GetGameCampaignItems(Guid deviceId, string gameCode)
+        public async Task<List<GameItemDto>> GetGameCampaignItems(Guid deviceId, Guid gameCampaignId)
         {
             try
             {
                 List<GameItemDto> gameItemDtos = null;
 
                 var gameConfig = await _repository.GetFirst(filter: o =>
-                    o.StoreGameCampaignMapping.Select(s => s.Store).FirstOrDefault(f => f.Device.Any(a => a.DeviceId == deviceId)) != null
-                    && o.SecretCode == gameCode
+                o.Id == gameCampaignId
+                && o.StoreGameCampaignMapping.Select(s => s.Store).FirstOrDefault(f => f.Device.Any(a => a.DeviceId == deviceId)) != null
                     && !o.DelFlg,
                     includeProperties: "StoreGameCampaignMapping.Store.Device,GameItems");
 

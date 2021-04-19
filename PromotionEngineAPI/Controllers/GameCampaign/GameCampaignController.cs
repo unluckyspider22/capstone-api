@@ -112,8 +112,8 @@ namespace PromotionEngineAPI.Controllers
             }
         }
         [HttpGet]
-        [Route("device/{deviceId}/game-campaign/{gameCode}")]
-        public async Task<IActionResult> GetGameCampaignDevice([FromRoute] Guid deviceId, [FromRoute]string gameCode)
+        [Route("device/{deviceId}/{gameCampaignId}")]
+        public async Task<IActionResult> GetGameCampaignDevice([FromRoute] Guid deviceId, [FromRoute] Guid gameCampaignId)
         {
             if (deviceId.Equals(Guid.Empty))
             {
@@ -121,7 +121,7 @@ namespace PromotionEngineAPI.Controllers
             }
             try
             {
-                var result = await _service.GetGameCampaignItems(deviceId, gameCode);
+                var result = await _service.GetGameCampaignItems(deviceId, gameCampaignId);
                 return Ok(result);
             }
             catch (ErrorObj e)
