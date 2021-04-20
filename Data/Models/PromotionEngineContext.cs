@@ -219,7 +219,7 @@ namespace Infrastructure.Models
                 entity.Property(e => e.ChannelId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.ApiKey)
-                    .HasMaxLength(100)
+                    .HasMaxLength(44)
                     .IsUnicode(false);
 
                 entity.Property(e => e.ChannelCode)
@@ -234,6 +234,16 @@ namespace Infrastructure.Models
                 entity.Property(e => e.InsDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.PrivateKey)
+                    .HasMaxLength(1700)
+                    .IsUnicode(false)
+                    .IsFixedLength();
+
+                entity.Property(e => e.PublicKey)
+                    .HasMaxLength(458)
+                    .IsUnicode(false)
+                    .IsFixedLength();
 
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")

@@ -8,6 +8,7 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers
@@ -97,10 +98,17 @@ namespace PromotionEngineAPI.Controllers
         public async Task<IActionResult> PostChannel([FromBody] ChannelDto dto)
         {
             dto.ChannelId = Guid.NewGuid();
-
-            dto.ApiKey = Common.CreateApiKey();
+            if (dto.ChannelType != (int)AppConstant.ChannelType.Other)
+            {
+                dto.ApiKey = Common.CreateApiKey();
+            }
+            else
+            {
+                RSACryptoServiceProvider rsaProvider = new RSACryptoServiceProvider(2048);
+                dto.PublicKey = RSACryptoUtils.ExportPublicKey(rsaProvider);
+                dto.PrivateKey = RSACryptoUtils.ExportPrivateKey(rsaProvider);
+            }
             var result = await _service.CreateAsync(dto);
-
             if (result == null)
             {
                 return NotFound();
@@ -226,25 +234,14 @@ namespace PromotionEngineAPI.Controllers
         }
         [HttpPost]
         [Route("encrypt")]
-        public async Task<IActionResult> EncryptData(/*[FromBody] string json*/)
+        public async Task<IActionResult> EncryptData([FromBody] string json)
         {
-            /*   if (!string.IsNullOrEmpty(json))
-               {*/
-            RSACryptoServiceProvider initialProvider = new RSACryptoServiceProvider(2048);
-            string privateKey = RSACryptoUtils.ExportPrivateKey(initialProvider);
-            string publicKey = RSACryptoUtils.ExportPublicKey(initialProvider);
-            var encryptData = RSACryptoUtils.Encrypt("abc");
-            return Ok(encryptData);
-            /*
-                        } else
-                        {
-                            return BadRequest();
-                        }
-            */
-
-            /* RSACryptoUtils rSA = new RSACryptoUtils();
-             rSA.MakeKey();
-             return Ok();*/
+            RSACryptoServiceProvider publicK = RSACryptoUtils.ImportPublicKey("ac");
+            string publicKey = RSACryptoUtils.ExportPublicKey(publicK);
+            byte[] bytesPlainTextData = Encoding.UTF8.GetBytes(json);
+            var bytesCipherText = publicK.Encrypt(bytesPlainTextData, false);
+            string encryptedText = Convert.ToBase64String(bytesCipherText);
+            return Ok(encryptedText);
         }
 
         [HttpPost]
@@ -252,7 +249,11 @@ namespace PromotionEngineAPI.Controllers
         public async Task<IActionResult> DecryptData([FromBody] string encryptText)
         {
             /*var plainText = RSACryptoUtils.Decryption(encryptText);*/
-            return Ok();
+            RSACryptoServiceProvider privateK = RSACryptoUtils.ImportPrivateKey("ac");
+            byte[] bytesCipherText = Convert.FromBase64String(encryptText);
+            byte[] bytesPlainTextData = privateK.Decrypt(bytesCipherText, false);
+            //get our original plainText back...
+            return Ok(Encoding.UTF8.GetString(bytesPlainTextData));
         }
     }
 }

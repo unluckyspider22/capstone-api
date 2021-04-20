@@ -25,6 +25,12 @@ namespace Infrastructure.Helper
             public const string ALL = "0";
         }
        
+        public enum ChannelType
+        {
+            In_Store=1,
+            Online=2,
+            Other=3
+        }
         public const string Sender = "Promotion Engine";
         public const string Sender_Email = "promotion.engine.fpt@gmail.com";
         public const string Sender_Email_Pwd = "promotionengine";

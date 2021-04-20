@@ -14,6 +14,8 @@ namespace Infrastructure.DTOs
         public decimal Group { get; set; }
         public int ChannelType { get; set; }
         public string ApiKey { get; set; }
+        public string PublicKey { get; set; }
+        public string PrivateKey { get; set; }
 
     }
 }

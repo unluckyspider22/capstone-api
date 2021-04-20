@@ -21,6 +21,8 @@ namespace Infrastructure.Models
         public int? Group { get; set; }
         public int? ChannelType { get; set; }
         public string ApiKey { get; set; }
+        public string PublicKey { get; set; }
+        public string PrivateKey { get; set; }
 
         public virtual Brand Brand { get; set; }
         public virtual ICollection<PromotionChannelMapping> PromotionChannelMapping { get; set; }
