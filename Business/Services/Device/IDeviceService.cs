@@ -13,6 +13,6 @@ namespace ApplicationCore.Services
         public Task<DeviceDto> Update(DeviceDto dto);
         public Task<GenericRespones<BrandDeviceDto>> GetBrandDevice(int PageSize, int PageIndex, Guid brandId);
         public string GenerateCode(Guid deviceId);
-        public Task<PairResponseDto> GetTokenDevice(string deviceCode);
+        public Task<PairResponseDto> GetTokenDevice(string deviceCode,string channelCode);
     }
 }

@@ -29,7 +29,7 @@ namespace ApplicationCore.Services
         }
 
         protected override IGenericRepository<Device> _repository => _unitOfWork.DeviceRepository;
-
+        protected  IGenericRepository<Channel> _channelRepository => _unitOfWork.ChannelRepository;
         public async Task<bool> CheckExistingDevice(string code)
         {
             var isExist = (await _repository.Get(filter: o => o.Code.Equals(code) && !o.DelFlg)).ToList().Count > 0;
@@ -142,14 +142,20 @@ namespace ApplicationCore.Services
 
         }
 
-        public async Task<PairResponseDto> GetTokenDevice(string deviceCode)
+        public async Task<PairResponseDto> GetTokenDevice(string deviceCode,string channelCode)
         {
 
             try
             {
-                var isExist = await _repository.GetFirst(
+                var isDeviceExist = await _repository.GetFirst(
                     filter: o => o.Code.Equals(deviceCode) && !o.DelFlg) != null;
-                if (!isExist)
+                var isChannelExist = await _channelRepository.GetFirst(
+                    filter: o => o.ChannelCode.Equals(channelCode) && !o.DelFlg) != null;
+                if(!isChannelExist)
+                {
+                    throw new ErrorObj(code: 400, message: AppConstant.ErrMessage.Invalid_ChannelCode);
+                }
+                if (!isDeviceExist)
                 {
                     throw new ErrorObj(code: (int)AppConstant.ErrCode.Device_Access_Fail, message: AppConstant.ErrMessage.Device_Access_Fail);
                 }
@@ -168,6 +174,7 @@ namespace ApplicationCore.Services
                         result.BrandCode = device.Store.Brand.BrandCode;
                         result.DeviceCode = device.Code;
                         result.StoreCode = device.Store.StoreCode;
+                        result.StoreName = device.Store.StoreName;
                         result.Token = token;
                         result.DeviceId = device.DeviceId;
                         result.BrandId = device.Store.BrandId;

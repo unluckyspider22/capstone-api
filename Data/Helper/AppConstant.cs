@@ -202,6 +202,7 @@ namespace Infrastructure.Helper
         }
         public class ErrMessage
         {
+
             public const string Invalid_Product = "Sản phẩm không tồn tại!";
             public const string Invalid_Quantity = "Số lượng không phải kiểu số!";
             public const string Invalid_Min_Quantity = "Số lượng sản phẩm ít hơn số lượng quy định";
@@ -262,6 +263,8 @@ namespace Infrastructure.Helper
             public const string Brand_Not_Exist = "Brand does not exist!";
             public const string Length_Param = "length";
             public const string Length_Error_Message = "Length must be non-negative";
+            public const string Invalid_ChannelCode = "Channel không tồn tại!";
+
         }
         public class QueueMessage
         {

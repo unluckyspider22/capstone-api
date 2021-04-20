@@ -154,13 +154,13 @@ namespace PromotionEngineAPI.Controllers
         }
 
         [HttpPost]
-        [Route("pair/{pairCode}")]
-        public async Task<IActionResult> PairDevice([FromRoute] string pairCode)
+        [Route("pair/{pairCode}/{channelCode}")]
+        public async Task<IActionResult> PairDevice([FromRoute] string pairCode, [FromRoute] string channelCode)
         {
 
             try
             {
-                var result = await _service.GetTokenDevice(pairCode);
+                var result = await _service.GetTokenDevice(pairCode,channelCode);
                 return Ok(result);
             }
             catch (ErrorObj e)
