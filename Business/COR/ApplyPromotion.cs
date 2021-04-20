@@ -173,14 +173,18 @@ namespace ApplicationCore.Chain
             var firstDayOfTYear = new DateTime(2021, 01, 01);
 
             string nowStr = new DateTime((now - firstDayOfTYear).Ticks).ToString("HHddyyMMmm");
-
-            int gameCode = int.Parse(nowStr) + int.Parse(postAction.GameCampaign.SecretCode);
+            Int64 temp1 = Convert.ToInt64(nowStr); 
+            //Int64.Parse(nowStr);
+            Int64 temp2 = Convert.ToInt64(postAction.GameCampaign.SecretCode);
+            //int.Parse(postAction.GameCampaign.SecretCode);
+            Int64 gameCode = temp1 + temp2;
             order.Gift.Add(new
             {
                 promotion.PromotionName,
                 code = promotion.PromotionCode,
                 GameName = postAction.GameCampaign.Name,
-                GameCode = gameCode
+                GameCode = gameCode,
+                Duration = postAction.GameCampaign.ExpiredDuration
             });
         }
 
@@ -279,6 +283,7 @@ namespace ApplicationCore.Chain
                 if (gifts != null)
                 {
                     effect.Prop = gifts;
+                    
                 }
                 /*else
                 {
