@@ -136,7 +136,10 @@ namespace PromotionEngineAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetPromotion([FromQuery] PagingRequestParam param, [FromQuery] Guid BrandId, [FromQuery] string status)
+        public async Task<IActionResult> GetPromotion(
+            [FromQuery] PagingRequestParam param, 
+            [FromQuery] Guid BrandId, 
+            [FromQuery] string status)
         {
             if (status == null) return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
             try
@@ -178,16 +181,26 @@ namespace PromotionEngineAPI.Controllers
         [HttpGet]
         [Route("search")]
         // api/Promotions?SearchContent=...?pageIndex=...&pageSize=...
-        public async Task<IActionResult> SearchPromotion([FromQuery] SearchPagingRequestParam param, [FromQuery] Guid BrandId)
+        public async Task<IActionResult> SearchPromotion(
+            [FromQuery] SearchPagingRequestParam param,
+            [FromQuery] Guid BrandId,
+            [FromQuery] int Status = 0)
         {
             try
             {
+                Expression<Func<Promotion, bool>> filter = el => !el.DelFlg
+                                                    && el.PromotionName.ToLower().Contains(param.SearchContent.ToLower())
+                                                    && el.BrandId.Equals(BrandId);
+                Expression<Func<Promotion, bool>> filter2;
+                if (Status > 0)
+                {
+                    filter2 = el => el.Status == Status;
+                    filter = filter.And(filter2);
+                }
                 var result = await _promotionService.GetAsync(
-                pageIndex: param.PageIndex,
-                pageSize: param.PageSize,
-                filter: el => !el.DelFlg
-                && el.PromotionName.ToLower().Contains(param.SearchContent.ToLower())
-                && el.BrandId.Equals(BrandId));
+                                                    pageIndex: param.PageIndex,
+                                                    pageSize: param.PageSize,
+                                                    filter: filter);
                 return Ok(result);
             }
             catch (ErrorObj e)
@@ -422,7 +435,7 @@ namespace PromotionEngineAPI.Controllers
 
         [HttpGet]
         [Route("check-exist-promoCode")]
-        public async Task<IActionResult> CheckExistPromoCode([FromQuery]string promoCode, [FromQuery] Guid brandId)
+        public async Task<IActionResult> CheckExistPromoCode([FromQuery] string promoCode, [FromQuery] Guid brandId)
         {
             try
             {
