@@ -177,12 +177,12 @@ namespace ApplicationCore.Chain
             var firstDayOfTYear = new DateTime(2021, 01, 01);
 
             string nowStr = new DateTime((now - firstDayOfTYear).Ticks).ToString("HHddyyMMmm");
-            Int64 temp1 = Convert.ToInt64(nowStr); 
+            Int64 temp1 = Convert.ToInt64(nowStr);
             //Int64.Parse(nowStr);
             Int64 temp2 = Convert.ToInt64(postAction.GameCampaign.SecretCode);
             //int.Parse(postAction.GameCampaign.SecretCode);
             Int64 gameCode = temp1 + temp2;
-            order.Gift.Add(new
+            var gift = new
             {
                 promotion.PromotionName,
                 code = promotion.PromotionCode,
@@ -190,6 +190,8 @@ namespace ApplicationCore.Chain
                 GameCode = gameCode,
                 Duration = postAction.GameCampaign.ExpiredDuration
             };
+            order.Gift.Add(gift);
+            List<object> gifts = new List<object>();
             gifts.Add(gift);
             order.Gift.Add(gift);
             return gifts;
