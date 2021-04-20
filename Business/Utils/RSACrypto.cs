@@ -1,4 +1,5 @@
-﻿using Org.BouncyCastle.Crypto;
+﻿using Infrastructure.Helper;
+using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.OpenSsl;
 using Org.BouncyCastle.Security;
@@ -26,12 +27,7 @@ namespace ApplicationCore.Utils
             byte[] bytesPlainTextData = privateK.Decrypt(bytesCipherText, false);
             return Encoding.UTF8.GetString(bytesPlainTextData);
         }
-
-        /// <summary>
-        /// Import OpenSSH PEM private key string into MS RSACryptoServiceProvider
-        /// </summary>
-        /// <param name="pem"></param>
-        /// <returns></returns>
+        #region Import Privatekey from PEM
         public static RSACryptoServiceProvider ImportPrivateKey(string pem)
         {
             PemReader pr = new PemReader(new StringReader(pem));
@@ -42,12 +38,8 @@ namespace ApplicationCore.Utils
             csp.ImportParameters(rsaParams);
             return csp;
         }
-
-        /// <summary>
-        /// Import OpenSSH PEM public key string into MS RSACryptoServiceProvider
-        /// </summary>
-        /// <param name="pem"></param>
-        /// <returns></returns>
+        #endregion
+        #region Import Publickey from PEM
         public static RSACryptoServiceProvider ImportPublicKey(string pem)
         {
             PemReader pr = new PemReader(new StringReader(pem));
@@ -58,13 +50,8 @@ namespace ApplicationCore.Utils
             csp.ImportParameters(rsaParams);
             return csp;
         }
-
-        /// <summary>
-        /// Export private (including public) key from MS RSACryptoServiceProvider into OpenSSH PEM string
-        /// slightly modified from https://stackoverflow.com/a/23739932/2860309
-        /// </summary>
-        /// <param name="csp"></param>
-        /// <returns></returns>
+        #endregion
+        #region Export Private Key
         public static string ExportPrivateKey(RSACryptoServiceProvider csp)
         {
             StringWriter outputStream = new StringWriter();
@@ -93,25 +80,20 @@ namespace ApplicationCore.Utils
 
                 var base64 = Convert.ToBase64String(stream.GetBuffer(), 0, (int)stream.Length).ToCharArray();
                 // WriteLine terminates with \r\n, we want only \n
-                outputStream.Write("-----BEGIN RSA PRIVATE KEY-----\n");
+                outputStream.Write(AppConstant.BeginPrivate);
                 // Output as Base64 with lines chopped at 64 characters
                 for (var i = 0; i < base64.Length; i += 64)
                 {
                     outputStream.Write(base64, i, Math.Min(64, base64.Length - i));
                     outputStream.Write("\n");
                 }
-                outputStream.Write("-----END RSA PRIVATE KEY-----");
+                outputStream.Write(AppConstant.EndPrivate);
             }
 
             return outputStream.ToString();
         }
-
-        /// <summary>
-        /// Export public key from MS RSACryptoServiceProvider into OpenSSH PEM string
-        /// slightly modified from https://stackoverflow.com/a/28407693
-        /// </summary>
-        /// <param name="csp"></param>
-        /// <returns></returns>
+        #endregion
+        #region Export Public Key
         public static string ExportPublicKey(RSACryptoServiceProvider csp)
         {
             StringWriter outputStream = new StringWriter();
@@ -157,26 +139,23 @@ namespace ApplicationCore.Utils
 
                 var base64 = Convert.ToBase64String(stream.GetBuffer(), 0, (int)stream.Length).ToCharArray();
                 // WriteLine terminates with \r\n, we want only \n
-                outputStream.Write("-----BEGIN PUBLIC KEY-----\n");
+                outputStream.Write(AppConstant.BeginPublic);
                 for (var i = 0; i < base64.Length; i += 64)
                 {
                     outputStream.Write(base64, i, Math.Min(64, base64.Length - i));
                     outputStream.Write("\n");
                 }
-                outputStream.Write("-----END PUBLIC KEY-----");
+                outputStream.Write(AppConstant.EndPublic);
             }
 
             return outputStream.ToString();
         }
 
-        /// <summary>
-        /// https://stackoverflow.com/a/23739932/2860309
-        /// </summary>
-        /// <param name="stream"></param>
-        /// <param name="length"></param>
+        #endregion
+        #region Encode
         private static void EncodeLength(BinaryWriter stream, int length)
         {
-            if (length < 0) throw new ArgumentOutOfRangeException("length", "Length must be non-negative");
+            if (length < 0) throw new ArgumentOutOfRangeException(AppConstant.ErrMessage.Length_Param, AppConstant.ErrMessage.Length_Error_Message);
             if (length < 0x80)
             {
                 // Short form
@@ -200,12 +179,6 @@ namespace ApplicationCore.Utils
             }
         }
 
-        /// <summary>
-        /// https://stackoverflow.com/a/23739932/2860309
-        /// </summary>
-        /// <param name="stream"></param>
-        /// <param name="value"></param>
-        /// <param name="forceUnsigned"></param>
         private static void EncodeIntegerBigEndian(BinaryWriter stream, byte[] value, bool forceUnsigned = true)
         {
             stream.Write((byte)0x02); // INTEGER
@@ -239,5 +212,6 @@ namespace ApplicationCore.Utils
             }
         }
 
+        #endregion
     }
 }

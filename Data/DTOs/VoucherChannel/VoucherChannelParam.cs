@@ -11,6 +11,5 @@ namespace Infrastructure.DTOs.VoucherChannel
         public string ChannelCode { get; set; }
         public string BrandCode { get; set; }
         public int Quantity { get; set; } = 1;
-
     }
 }

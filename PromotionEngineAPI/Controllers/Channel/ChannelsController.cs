@@ -4,6 +4,7 @@ using Infrastructure.DTOs;
 using Infrastructure.DTOs.VoucherChannel;
 using Infrastructure.Helper;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System;
 using System.Linq;
 using System.Net;
@@ -98,24 +99,18 @@ namespace PromotionEngineAPI.Controllers
         public async Task<IActionResult> PostChannel([FromBody] ChannelDto dto)
         {
             dto.ChannelId = Guid.NewGuid();
-            if (dto.ChannelType != (int)AppConstant.ChannelType.Other)
+            if (dto.ChannelType == (int)AppConstant.ChannelType.Other)
             {
-                dto.ApiKey = Common.CreateApiKey();
+                RSACryptoServiceProvider rsaProvider = new RSACryptoServiceProvider(AppConstant.RSA_LENGTH_2048);
+                dto.PublicKey = Common.EncodeToBase64(RSACryptoUtils.ExportPublicKey(rsaProvider));
+                dto.PrivateKey = Common.EncodeToBase64(RSACryptoUtils.ExportPrivateKey(rsaProvider));
             }
-            else
-            {
-                RSACryptoServiceProvider rsaProvider = new RSACryptoServiceProvider(2048);
-                dto.PublicKey = RSACryptoUtils.ExportPublicKey(rsaProvider);
-                dto.PrivateKey = RSACryptoUtils.ExportPrivateKey(rsaProvider);
-            }
+            dto.ApiKey = Common.CreateApiKey();
             var result = await _service.CreateAsync(dto);
             if (result == null)
             {
                 return NotFound();
             }
-
-            //var result = dto;
-
             return Ok(result);
         }
 
@@ -159,15 +154,15 @@ namespace PromotionEngineAPI.Controllers
         }
 
         [HttpGet]
-        [Route("{channelCode}/brands/{BrandCode}/promotions")]
-        public async Task<IActionResult> GetPromotionForChannel(string channelCode, string BrandCode, [FromQuery] string key)
+        [Route("{channelCode}/brands/{brandCode}/promotions")]
+        public async Task<IActionResult> GetPromotionForChannel(string channelCode, string brandCode, [FromQuery] string key)
         {
             try
             {
                 VoucherChannelParam param = new VoucherChannelParam
                 {
                     ChannelCode = channelCode,
-                    BrandCode = BrandCode
+                    BrandCode = brandCode
                 };
                 var channel = await _service.GetFirst(filter: el => el.ChannelCode == channelCode);
                 if (channel != null)
@@ -188,6 +183,28 @@ namespace PromotionEngineAPI.Controllers
                 return StatusCode(statusCode: (int)HttpStatusCode.NotFound,
                     new ErrorObj(code: (int)HttpStatusCode.NotFound, message: AppConstant.ErrMessage.Not_Found_Resource));
 
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
+
+        [HttpGet]
+        [Route("promotions")]
+        public async Task<IActionResult> GetPromotionForOtherChannel([FromBody] ChannelOtherRequestParam param)
+        {
+            try
+            {
+                var channel = await _service.GetFirst(filter: el => el.ChannelCode == param.ChannelCode);
+                if (channel != null)
+                {
+                    var voucherParam = RSACryptoUtils.Decrypt(param.Hash, Common.DecodeFromBase64(channel.PrivateKey));
+                    VoucherChannelParam voucher = JsonConvert.DeserializeObject<VoucherChannelParam>(voucherParam);
+                    return Ok(await _service.GetPromotionsForChannel(voucher));
+                }
+                return StatusCode(statusCode: (int)HttpStatusCode.NotFound,
+                    new ErrorObj(code: (int)HttpStatusCode.NotFound, message: AppConstant.ErrMessage.Not_Found_Resource));
             }
             catch (ErrorObj e)
             {
@@ -234,26 +251,31 @@ namespace PromotionEngineAPI.Controllers
         }
         [HttpPost]
         [Route("encrypt")]
-        public async Task<IActionResult> EncryptData([FromBody] string json)
+        public IActionResult EncryptData([FromBody] VoucherChannelParam param)
         {
-            RSACryptoServiceProvider publicK = RSACryptoUtils.ImportPublicKey("ac");
-            string publicKey = RSACryptoUtils.ExportPublicKey(publicK);
-            byte[] bytesPlainTextData = Encoding.UTF8.GetBytes(json);
-            var bytesCipherText = publicK.Encrypt(bytesPlainTextData, false);
-            string encryptedText = Convert.ToBase64String(bytesCipherText);
-            return Ok(encryptedText);
+            param.PromotionId = Guid.NewGuid();
+            var json = JsonConvert.SerializeObject(param);
+
+
+            var hash = RSACryptoUtils.Encrypt(json, Common.DecodeFromBase64("LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUFtOUM4SXVHU2dQQmthNWozRDlYdgorZFNSQ0pPbXZkUmdUQy9RUjYxUkhZOTlhQUoyOEs0ckhUZ0Fad2VENU5XV2JVUXdwQmgvV0ZRajhweHF5YnFZCnNOMmxoeEpxTU1QYk5LNzJUQkVOWS9QemQ0N0RwNThIdkRNVFVTb2Vja0dtY1ppc3grUE9EYW9uRFFzOGthaUkKMFhrS3lFK0JWZzFReHYzeXhUODFTZ1hNaTFBNXc1bFh6MjBOTEJ3QWNEaTl3ZkFFRGxFQ1lHbng2M0tvOXpKQwpURUNUTmhNc0ZGYUk0aGhtWENzNVE1R3Y0N0E3Rnc3c2hLV3lTUVR1enN4QW15anJmcWM1dlFaU21ZdEhTaHR4Ci9id2RGTVBJVCtCbWxlSmpqYzhNZm5BNDh3MFYyWEs3UnF0YlUvbUFGdzBlajF4K0xubFRqUkp4Nlk1elplRFYKY1FJREFRQUIKLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t"));
+
+            ChannelOtherRequestParam channelOtherRequestParam = new ChannelOtherRequestParam
+            {
+                ApiKey = "feLEsSeA6On2UhrOGOKXFerd3rSjihitmY1IrBLXkZU",
+                BrandCode = param.BrandCode,
+                ChannelCode = param.ChannelCode,
+                Hash = hash
+            };
+            return Ok(channelOtherRequestParam);
         }
 
         [HttpPost]
         [Route("decrypt")]
-        public async Task<IActionResult> DecryptData([FromBody] string encryptText)
+        public async Task<IActionResult> DecryptData([FromBody] ChannelOtherRequestParam request)
         {
-            /*var plainText = RSACryptoUtils.Decryption(encryptText);*/
-            RSACryptoServiceProvider privateK = RSACryptoUtils.ImportPrivateKey("ac");
-            byte[] bytesCipherText = Convert.FromBase64String(encryptText);
-            byte[] bytesPlainTextData = privateK.Decrypt(bytesCipherText, false);
-            //get our original plainText back...
-            return Ok(Encoding.UTF8.GetString(bytesPlainTextData));
+            var voucherParam = RSACryptoUtils.Decrypt(request.Hash, Common.DecodeFromBase64("LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFcEFJQkFBS0NBUUVBbTlDOEl1R1NnUEJrYTVqM0Q5WHYrZFNSQ0pPbXZkUmdUQy9RUjYxUkhZOTlhQUoyCjhLNHJIVGdBWndlRDVOV1diVVF3cEJoL1dGUWo4cHhxeWJxWXNOMmxoeEpxTU1QYk5LNzJUQkVOWS9QemQ0N0QKcDU4SHZETVRVU29lY2tHbWNaaXN4K1BPRGFvbkRRczhrYWlJMFhrS3lFK0JWZzFReHYzeXhUODFTZ1hNaTFBNQp3NWxYejIwTkxCd0FjRGk5d2ZBRURsRUNZR254NjNLbzl6SkNURUNUTmhNc0ZGYUk0aGhtWENzNVE1R3Y0N0E3CkZ3N3NoS1d5U1FUdXpzeEFteWpyZnFjNXZRWlNtWXRIU2h0eC9id2RGTVBJVCtCbWxlSmpqYzhNZm5BNDh3MFYKMlhLN1JxdGJVL21BRncwZWoxeCtMbmxUalJKeDZZNXpaZURWY1FJREFRQUJBb0lCQUhERk9lVGs3V3Qwa0xsdgpGQ0RaN2IwYkkzelpvQ3h6c041ekhJTkQ1UmxINkxPR1ZSOE1ieGZPbUR2NUxIUktRWDBEaFZDK2lpd2JlWWoxCnZEUVVZTDVoTEpQOXQrMWpVeHRtSmN3WDYyRVVCbm5aVWJIWFgzbk9YWVM0dnlCaWMxeHo2MWtnZnRsVTlMNTAKQzNwQVNBV1RYVUpzaUdjSGJCY1paTU50WTl3V0JUMXpGcFhHa01LV2ZkRnpQMmhYMXBDT1grS0pGd2dmcmJsYgozaVFJa0x4aXYzbEkvR2VWa09Sa2pPY0xzelhxRWVqUTFKLzRKZ1gyR0I2MzNjRlFvbVJEMitoS1QxbEtmOGhqCi9EWTUzVnk0aDdhVUIwZVprWklIT2tVcWI0ZzczSGgrT01YNUVnQWYrWFVMNXFOam9EbUYrMUhxd1haSUFQS3kKcDFKVUNLRUNnWUVBeWlVV1FHc0hkeUtuVkwzKzhCc0t1RWtGVDFaM3FBMkhNdDNneUgrYVk1REJqNHV1RWo1MQovZ3VDdk9XS1NyK1VjNXBsbFhHQVlVendVZUJ0NVFqRzlsbnA0VTVkK1poenFKWlkraG5TUHNsaDZvVURHWU9HClhuYUFlNmt5cVV3eGdnV2kzSXdPYVU4ZU1WeXErYTBBSWswVjkyRDc0YXNHSkdSdzJhQkNpOE1DZ1lFQXhWUFUKdm5KeTEwR0Y4ZVpiZm5XY04yMDdjaGNYODY4ZXUwcDhIall2cUNFVEFaMVBRL2xGcVdXN2IzVGE2RFB6M2UxNwpNVWRjVnM5cGtTeGJlTnowNTk2dVpOYlU3cHFuVnlPYVA1TmpqK29aSmVwUnIwdjY1N2hRTGdoc1F5VGlnVWIrCmNobjFHRVo0Szh1ckh3SDdBUVlZZVIydVk5ZzlKQTRPTi9LaWFyc0NnWUVBaHdZKzFzaW5NK3p4MktrUW9WRnUKMTZudTRnL2YzV0VyN2M1SFY2WGtlcDAycmF1Zm1wQWVRSk52d0wyU29sdFZ6ZUpUK0g3WVFpWWlZSTZJMlhRRApjb3FjcnVLcDR3N3lNcW82eE5SNm0zWG84YjNuVkNPR25aS0tRQS9FeDFFZHdMd0REVTZBVWRlSFUzR1N3elBMCjR4MmFqcU01bklPZ2xxNkFzdDFabGdFQ2dZQXVldEdZem9LSWU1R2VhaUZSQjBqMXNWQVlUcUpBcnhZeERabHcKMEZpblpLc0NiVmgzYldiZ1FPdEdsS0xmb1NVbk9FSVZXSGJDcC9aNDBKYjNRQ3liMVZNRXc2bkNUa0Z1Z0I5YwpMRTUrWHFqdnltTFZSTE5rRTRFblpxcUJvbFdNRi9ubFRJSHo1dDExaTNMU1NmZ2l4Sm5OSlpXblJROFp5QW5ICldlcXg4d0tCZ1FDc1FLa3JHNlRJcFJTWUVEbWVJOUxBaG43WTVUUkI5RnphTnFzd0o5azRYL2NzK1EwS1RaRncKcWhRNC9FQlgrYjVzRENIcFJnY282ZytQdWNDcTBjVFpEL0ZrQmdWc2h0ZFdzM1JHRmthMFlDYzJhSkdkL3VzQgpNbnAyOThlamJ4TUhoK21PbFZMVnpVMUVTdW9UdW53UTZXb0x5UW5GV1ltVlJVQ1Jncm1IWmc9PQotLS0tLUVORCBSU0EgUFJJVkFURSBLRVktLS0tLQ=="));
+            VoucherChannelParam voucher = JsonConvert.DeserializeObject<VoucherChannelParam>(voucherParam);
+            return Ok(voucher);
         }
     }
 }

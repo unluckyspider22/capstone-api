@@ -24,7 +24,11 @@ namespace Infrastructure.Helper
         {
             public const string ALL = "0";
         }
-       
+        public const string BeginPublic = "-----BEGIN PUBLIC KEY-----\n";
+        public const string EndPublic = "-----END PUBLIC KEY-----";
+        public const string BeginPrivate = "-----BEGIN RSA PRIVATE KEY-----\n";
+        public const string EndPrivate = "-----END RSA PRIVATE KEY-----";
+        public const int RSA_LENGTH_2048 = 2048;
         public enum ChannelType
         {
             In_Store=1,
@@ -256,6 +260,8 @@ namespace Infrastructure.Helper
             public const string ApiKey_Not_Exist = "APIKey is not exist in the system";
             public const string ApiKey_Required = "APIKey is not required";
             public const string Brand_Not_Exist = "Brand does not exist!";
+            public const string Length_Param = "length";
+            public const string Length_Error_Message = "Length must be non-negative";
         }
         public class QueueMessage
         {

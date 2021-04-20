@@ -51,7 +51,7 @@ namespace Infrastructure.Models
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
-            { }
+            {}
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -236,14 +236,12 @@ namespace Infrastructure.Models
                     .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.PrivateKey)
-                    .HasMaxLength(1700)
-                    .IsUnicode(false)
-                    .IsFixedLength();
+                    .HasMaxLength(2240)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.PublicKey)
-                    .HasMaxLength(458)
-                    .IsUnicode(false)
-                    .IsFixedLength();
+                    .HasMaxLength(600)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.UpdDate)
                     .HasColumnType("datetime")

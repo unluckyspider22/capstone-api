@@ -196,12 +196,21 @@ namespace PromotionEngineAPI.Controllers
             bool isValidGameCd = false;
             if (gameCampaign != null)
             {
-                var now = Common.GetCurrentDatetime();
+                try
+                {
+                    var now = Common.GetCurrentDatetime();
 
-                var dateRedemped = code - int.Parse(gameCampaign.SecretCode);
-                var minus = DateTime.ParseExact(dateRedemped.ToString(), "HHddyyMMmm", CultureInfo.InvariantCulture);
-                var dateStr = new DateTime(minus.Year - 2000, minus.Month, minus.Day, minus.Hour, minus.Minute, 0).Add(new TimeSpan(firstDayOfTYear.Ticks));
-                isValidGameCd = dateStr.AddMinutes(gameCampaign.ExpiredDuration) >= now;
+                    var dateRedemped = code - int.Parse(gameCampaign.SecretCode);
+
+                    var minus = DateTime.ParseExact(dateRedemped.ToString(), "HHddyyMMmm", CultureInfo.InvariantCulture);
+                    var dateStr = new DateTime(minus.Year - 2000, minus.Month, minus.Day, minus.Hour, minus.Minute, 0).Add(new TimeSpan(firstDayOfTYear.Ticks));
+                    isValidGameCd = dateStr.AddMinutes(gameCampaign.ExpiredDuration) >= now;
+                }
+                catch (Exception)
+                {
+                    isValidGameCd = false;
+                }
+
             }
             return Ok(isValidGameCd);
 
