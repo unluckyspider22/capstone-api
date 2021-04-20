@@ -193,7 +193,6 @@ namespace ApplicationCore.Chain
             order.Gift.Add(gift);
             List<object> gifts = new List<object>();
             gifts.Add(gift);
-            order.Gift.Add(gift);
             return gifts;
         }
 

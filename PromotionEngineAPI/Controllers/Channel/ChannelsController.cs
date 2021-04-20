@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
 using System.Net;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers
@@ -225,19 +226,21 @@ namespace PromotionEngineAPI.Controllers
         }
         [HttpPost]
         [Route("encrypt")]
-        public async Task<IActionResult> EncryptData([FromBody] string json)
+        public async Task<IActionResult> EncryptData(/*[FromBody] string json*/)
         {
-            if (!string.IsNullOrEmpty(json))
-            {
-                RSACryptoUtils.MakeKey();
-                var encryptData = RSACryptoUtils.Encrypt(json);
-                return Ok(encryptData);
-
-            } else
-            {
-                return BadRequest();
-            }
-
+            /*   if (!string.IsNullOrEmpty(json))
+               {*/
+            RSACryptoServiceProvider initialProvider = new RSACryptoServiceProvider(2048);
+            string privateKey = RSACryptoUtils.ExportPrivateKey(initialProvider);
+            string publicKey = RSACryptoUtils.ExportPublicKey(initialProvider);
+            var encryptData = RSACryptoUtils.Encrypt("abc");
+            return Ok(encryptData);
+            /*
+                        } else
+                        {
+                            return BadRequest();
+                        }
+            */
 
             /* RSACryptoUtils rSA = new RSACryptoUtils();
              rSA.MakeKey();
