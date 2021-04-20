@@ -92,17 +92,17 @@ namespace ApplicationCore.Worker
             // Tạo voucher
 
             // Task item để notify cho client
-            var item = new VoucherNotiObj()
-            {
-                PromotionId = promotionId,
-                VoucherGroupId = voucherGroupId,
-                IsDone = false,
-                Message = AppConstant.NotiMess.VOUCHER_INSERT_MESS + " " + AppConstant.NotiMess.PROCESSING_MESS,
-                Type = AppConstant.NotiMess.Type.INSERT_VOUCHERS
-            };
+            //var item = new VoucherNotiObj()
+            //{
+            //    PromotionId = promotionId,
+            //    VoucherGroupId = voucherGroupId,
+            //    IsDone = false,
+            //    Message = AppConstant.NotiMess.VOUCHER_INSERT_MESS + " " + AppConstant.NotiMess.PROCESSING_MESS,
+            //    Type = AppConstant.NotiMess.Type.INSERT_VOUCHERS
+            //};
 
-            item.Message = AppConstant.NotiMess.VOUCHER_GENERATE_MESS + " " + AppConstant.NotiMess.PROCESSING_MESS;
-            notify.GeneratingVoucher(item);
+            //item.Message = AppConstant.NotiMess.VOUCHER_GENERATE_MESS + " " + AppConstant.NotiMess.PROCESSING_MESS;
+            //notify.GeneratingVoucher(item);
             _logger.LogInformation(">>>>>>Start generate: " + DateTime.Now.ToString("HH:mm:ss"));
             List<Voucher> vouchers = vouchersAdd;
             if (!isAddMore && vouchersAdd == null)
@@ -110,8 +110,8 @@ namespace ApplicationCore.Worker
                 vouchers = GenerateDistinctVoucher(dto);
             }
             _logger.LogInformation(">>>>>>End generate: " + DateTime.Now.ToString("HH:mm:ss"));
-            item.Message = AppConstant.NotiMess.VOUCHER_GENERATE_MESS + " " + AppConstant.NotiMess.PROCESSED_MESS;
-            notify.GeneratedVoucher(item);
+            //item.Message = AppConstant.NotiMess.VOUCHER_GENERATE_MESS + " " + AppConstant.NotiMess.PROCESSED_MESS;
+            //notify.GeneratedVoucher(item);
 
             // Chạy luồng
             Task.Run(() =>
@@ -120,7 +120,7 @@ namespace ApplicationCore.Worker
                 {
                     _logger.LogInformation("InsertVouchers is starting.");
                     // Gửi notify processing task
-                    notify.ProcessingVoucher(item: item);
+                    //notify.ProcessingVoucher(item: item);
                     _taskQueue.QueueBackgroundWorkItem(async token =>
                     {
                         try
@@ -129,18 +129,18 @@ namespace ApplicationCore.Worker
                             // Insert vouchers 
                             await voucherRepository.InsertBulk(vouchers);
                             _logger.LogInformation(">>>>>>End insert: " + DateTime.Now.ToString("HH:mm:ss"));
-                            item.Message = AppConstant.NotiMess.VOUCHER_INSERT_MESS + " " + AppConstant.NotiMess.PROCESSED_MESS;
-                            item.IsDone = true;
+                            //item.Message = AppConstant.NotiMess.VOUCHER_INSERT_MESS + " " + AppConstant.NotiMess.PROCESSED_MESS;
+                            //item.IsDone = true;
                             // Gửi notify hoàn thành task
-                            await notify.ProcessedVoucher(item: item);
+                            //await notify.ProcessedVoucher(item: item);
                         }
                         catch (Exception e)
                         {
                             _logger.LogInformation(e.Message);
-                            item.Message = AppConstant.NotiMess.VOUCHER_INSERT_MESS + " " + AppConstant.NotiMess.ERROR_MESS;
-                            item.IsDone = true;
+                            //item.Message = AppConstant.NotiMess.VOUCHER_INSERT_MESS + " " + AppConstant.NotiMess.ERROR_MESS;
+                            //item.IsDone = true;
                             // Gửi notify lỗi
-                            await notify.ErrorProcess(item: item);
+                            //await notify.ErrorProcess(item: item);
                         }
                     });
                 }
@@ -165,6 +165,7 @@ namespace ApplicationCore.Worker
             {
                 var v = new Voucher()
                 {
+                    VoucherId = Guid.NewGuid(),
                     VoucherGroupId = dto.VoucherGroupId,
                     VoucherCode = codes.ElementAt(i),
                     InsDate = now,
