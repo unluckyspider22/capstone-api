@@ -232,7 +232,7 @@ namespace ApplicationCore.Services
                         {
                             foreach (var storeGameMapping in listMappingresult)
                             {
-                                if (storeGameMapping.GameCampaign != null)
+                                if (storeGameMapping.GameCampaign != null && !storeGameMapping.GameCampaign.DelFlg)
                                 {
                                     result.Add(storeGameMapping.GameCampaign);
                                 }
