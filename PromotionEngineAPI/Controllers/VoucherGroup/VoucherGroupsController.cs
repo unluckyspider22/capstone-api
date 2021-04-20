@@ -43,9 +43,6 @@ namespace PromotionEngineAPI.Controllers
                 {
                     param.SearchContent = "";
                 }
-
-                var myInclude = "";
-
                 Expression<Func<VoucherGroup, bool>> myFilter = el => !el.DelFlg
                                                              && el.BrandId.Equals(BrandId)
                                                              && el.VoucherName.ToLower().Contains(param.SearchContent.ToLower().Trim());
@@ -54,18 +51,15 @@ namespace PromotionEngineAPI.Controllers
                 {
                     filter2 = el => el.Action.ActionType == ActionType;
                     myFilter = myFilter.And(filter2);
-                    myInclude = "Action";
-
                 }
                 else if (PostActionType > 0)
                 {
                     filter2 = el => el.Gift.PostActionType == PostActionType;
                     myFilter = myFilter.And(filter2);
-                    myInclude = "Gift";
                 }
                 var result = await _service.GetAsync(
                     pageIndex: param.PageIndex, pageSize: param.PageSize, filter: myFilter,
-                    includeProperties: myInclude,
+                    includeProperties: "Action,Gift",
                     orderBy: el => el.OrderByDescending(b => b.InsDate));
 
                 return Ok(result);

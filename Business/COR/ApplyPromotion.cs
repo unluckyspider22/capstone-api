@@ -124,21 +124,24 @@ namespace ApplicationCore.Chain
                 order.Gift = new List<Object>();
             }
             string effectType = "";
+            List<object> giftProp = new List<object>(); ;
             switch (giftAction.PostActionType)
             {
                 case (int)AppConstant.EnvVar.PostActionType.Gift_Product:
                     effectType = AppConstant.EffectMessage.AddGiftProduct;
-
-                    var gifts = giftAction.GiftProductMapping.Select(el => el.Product);
-                    foreach (var gift in gifts)
+                    giftProp = new List<object>();
+                    var productGifts = giftAction.GiftProductMapping.Select(el => el.Product);
+                    foreach (var product in productGifts)
                     {
-                        order.Gift.Add(new
+                        var gift = new
                         {
                             promotion.PromotionName,
                             code = promotion.PromotionCode,
-                            ProductCode = gift.Code,
-                            ProductName = gift.Name
-                        });
+                            ProductCode = product.Code,
+                            ProductName = product.Name
+                        };
+                        order.Gift.Add(gift);
+                        giftProp.Add(gift);
                     }
                     break;
                 case (int)AppConstant.EnvVar.PostActionType.Gift_Voucher:
@@ -148,13 +151,14 @@ namespace ApplicationCore.Chain
                                              && !el.IsRedemped
                                 && !el.IsUsed,
                                 includeProperties: "Promotion").Result;
-                    order.Gift.Add(new
+                    giftProp.Add(new
                     {
                         promotion.PromotionName,
                         code = promotion.PromotionCode,
                         ProductCode = voucher.Promotion.PromotionCode + "-" + voucher.VoucherCode,
                         ProductName = voucher.VoucherGroup.VoucherName
                     });
+                    order.Gift.Add(giftProp);
                     break;
                 case (int)AppConstant.EnvVar.PostActionType.Gift_Point:
                     effectType = AppConstant.EffectMessage.AddGiftPoint;
@@ -162,30 +166,34 @@ namespace ApplicationCore.Chain
                     break;
                 case (int)AppConstant.EnvVar.PostActionType.Gift_GameCode:
                     effectType = AppConstant.EffectMessage.AddGiftGameCode;
-                    AddGiftGameCode(order, promotionTier.Gift, promotion);
+                    giftProp = AddGiftGameCode(order, promotionTier.Gift, promotion);
                     break;
             }
-            SetEffect(order, promotion, 0, effectType, promotionTier, gifts: order.Gift);
+            SetEffect(order, promotion, 0, effectType, promotionTier, gifts: giftProp);
         }
-        public void AddGiftGameCode(Order order, Gift postAction, Promotion promotion)
+        public List<object> AddGiftGameCode(Order order, Gift postAction, Promotion promotion)
         {
             var now = Common.GetCurrentDatetime();
             var firstDayOfTYear = new DateTime(2021, 01, 01);
 
             string nowStr = new DateTime((now - firstDayOfTYear).Ticks).ToString("HHddyyMMmm");
-            Int64 temp1 = Convert.ToInt64(nowStr); 
+            Int64 temp1 = Convert.ToInt64(nowStr);
             //Int64.Parse(nowStr);
             Int64 temp2 = Convert.ToInt64(postAction.GameCampaign.SecretCode);
             //int.Parse(postAction.GameCampaign.SecretCode);
             Int64 gameCode = temp1 + temp2;
-            order.Gift.Add(new
+            var gift = new
             {
                 promotion.PromotionName,
                 code = promotion.PromotionCode,
                 GameName = postAction.GameCampaign.Name,
                 GameCode = gameCode,
                 Duration = postAction.GameCampaign.ExpiredDuration
-            });
+            };
+            order.Gift.Add(gift);
+            List<object> gifts = new List<object>();
+            gifts.Add(gift);
+            return gifts;
         }
 
         public void AddPoint(Order order, Gift postAction, Promotion promotion, PromotionTier promotionTier)
@@ -283,7 +291,7 @@ namespace ApplicationCore.Chain
                 if (gifts != null)
                 {
                     effect.Prop = gifts;
-                    
+
                 }
                 /*else
                 {

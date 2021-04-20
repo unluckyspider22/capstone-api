@@ -572,7 +572,9 @@ namespace ApplicationCore.Services
                     IPromotionRepository promotionRepo = new PromotionRepositoryImp();
                     await promotionRepo.SetUnlimitedDate(_mapper.Map<Promotion>(dto));
                 }
-                if (dto.MemberLevelMapping != null)
+                if ((dto.ForMembership == 1 || dto.ForMembership == 3) 
+                    && dto.MemberLevelMapping != null 
+                    && dto.MemberLevelMapping.Count() > 0)
                 {
                     await DeleteAndAddMemberLevelMapp(promotionId: dto.PromotionId, levels: dto.MemberLevelMapping.ToList());
                     dto.MemberLevelMapping = null;

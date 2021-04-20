@@ -1,5 +1,6 @@
 ﻿using Infrastructure.DTOs;
 using Infrastructure.Helper;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,7 +36,7 @@ namespace ApplicationCore.Utils
                 AppConstant.Operator.LESS_THAN => orderAmount.CompareTo(minAmount) < 0,
                 AppConstant.Operator.LESS_THAN_OR_EQUAL => orderAmount.CompareTo(minAmount) <= 0,
                 AppConstant.Operator.EQUAL => orderAmount.CompareTo(minAmount) == 0,
-                _ => throw new ErrorObj(code:(int) AppConstant.ErrCode.Invalid_Operator, message: AppConstant.ErrMessage.Invalid_Operator),
+                _ => throw new ErrorObj(code: (int)AppConstant.ErrCode.Invalid_Operator, message: AppConstant.ErrMessage.Invalid_Operator),
             };
         }
         public static DateTime GetCurrentDatetime()
@@ -107,5 +108,7 @@ namespace ApplicationCore.Utils
             }
             return builder.ToString();
         }
+
+
     }
 }

@@ -78,6 +78,7 @@ namespace ApplicationCore.Services
             {
                 //chạy bằng debug mode để xem log
                 Debug.WriteLine("\n\nError at GetAsync: \n" + e.InnerException);
+                Debug.WriteLine("\n\nError at GetAsync: \n" + e.StackTrace);
                 throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: "GetAsync:" + e.Message);
             }
         }
