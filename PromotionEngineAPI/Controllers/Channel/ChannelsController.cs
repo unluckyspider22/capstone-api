@@ -223,6 +223,33 @@ namespace PromotionEngineAPI.Controllers
                 return StatusCode(statusCode: e.Code, e);
             }
         }
+        [HttpPost]
+        [Route("encrypt")]
+        public async Task<IActionResult> EncryptData([FromBody] string json)
+        {
+            if (!string.IsNullOrEmpty(json))
+            {
+                RSACryptoUtils.MakeKey();
+                var encryptData = RSACryptoUtils.Encrypt(json);
+                return Ok(encryptData);
 
+            } else
+            {
+                return BadRequest();
+            }
+
+
+            /* RSACryptoUtils rSA = new RSACryptoUtils();
+             rSA.MakeKey();
+             return Ok();*/
+        }
+
+        [HttpPost]
+        [Route("decrypt")]
+        public async Task<IActionResult> DecryptData([FromBody] string encryptText)
+        {
+            /*var plainText = RSACryptoUtils.Decryption(encryptText);*/
+            return Ok();
+        }
     }
 }
