@@ -1,8 +1,12 @@
-﻿using Infrastructure.Models;
+﻿using Infrastructure.DTOs;
+using Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 
@@ -17,7 +21,8 @@ namespace Infrastructure.Repository
     }
     public class VoucherRepositoryImp : IVoucherRepository
     {
-        private PromotionEngineContext context = new PromotionEngineContext();
+        private const string connectionString = "Server=tcp:promotionengine.database.windows.net,1433;Database=PromotionEngine;User ID=adm;Password=Abcd1234;Trusted_Connection=false;MultipleActiveResultSets=true";
+        private readonly PromotionEngineContext context = new PromotionEngineContext();
         public async Task DeleteBulk(Guid voucherGroupId)
         {
             var vouchers = context.Voucher.Where(x => x.VoucherGroupId.Equals(voucherGroupId));
@@ -29,10 +34,21 @@ namespace Infrastructure.Repository
 
         public async Task InsertBulk(List<Voucher> vouchers)
         {
-            using (var context = new PromotionEngineContext())
+            try
             {
-                await context.BulkInsertAsync(vouchers, b => b.IncludeGraph = true);
+                var option =  SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder<PromotionEngineContext>(), connectionString: connectionString).Options;
+                using (var context = new PromotionEngineContext(options:option))
+                {
+                    await context.BulkInsertAsync(vouchers, b => b.IncludeGraph = true);
+                }
             }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Error voucher repository: ",ex.InnerException);
+                Debug.WriteLine("Error voucher repository: ", ex.StackTrace);
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: ex.Message);
+            }
+
 
         }
 

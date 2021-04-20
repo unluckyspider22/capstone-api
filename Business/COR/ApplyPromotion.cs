@@ -457,7 +457,7 @@ namespace ApplicationCore.Chain
             product.Discount += discount;
             if (action.ActionType == (int)AppConstant.EnvVar.ActionType.Amount_Product)
             {
-                product.Discount = product.Discount < action.MinPriceAfter ? (decimal)action.MinPriceAfter : product.Discount;
+                product.Discount = (product.SubTotal - product.Discount) < action.MinPriceAfter ? (decimal)action.MinPriceAfter : product.Discount;
             }
             else if (action.ActionType == (int)AppConstant.EnvVar.ActionType.Percentage_Product)
             {
