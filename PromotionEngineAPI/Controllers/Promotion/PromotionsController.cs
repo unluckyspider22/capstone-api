@@ -273,7 +273,6 @@ namespace PromotionEngineAPI.Controllers
 
         }
 
-        // PUT: api/Promotions/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutPromotion([FromRoute] Guid id, [FromBody] PromotionDto dto)
         {
@@ -287,11 +286,10 @@ namespace PromotionEngineAPI.Controllers
                 {
                     return StatusCode(statusCode: (int)HttpStatusCode.NotFound, new ErrorObj((int)HttpStatusCode.NotFound, AppConstant.ErrMessage.Not_Found_Resource));
                 }
-                if (dto.PromotionStoreMapping != null)
+                if (dto.PromotionStoreMapping != null && dto.PromotionStoreMapping.Count() > 0)
                 {
                     await _promotionStoreMappingService.DeletePromotionStoreMapping(dto.PromotionId);
                 }
-
                 var result = await _promotionService.UpdatePromotion(dto);
 
                 return Ok(result);
