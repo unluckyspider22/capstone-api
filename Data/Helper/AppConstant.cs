@@ -199,6 +199,10 @@ namespace Infrastructure.Helper
             MemberLevel_NotFound=147,
             Order_Fail=148,
             Channel_Not_Exist=149,
+            ApiKey_Not_Exist = 150,
+            BrandCode_Mismatch = 151,
+            Signature_Err = 152,
+            HashData_Not_Valid = 153,
             Internal_Server_Error = 500
         }
         public class ErrMessage
@@ -264,6 +268,10 @@ namespace Infrastructure.Helper
             public const string Brand_Not_Exist = "Brand does not exist!";
             public const string Length_Param = "length";
             public const string Length_Error_Message = "Length must be non-negative";
+            public const string BrandCode_Mismatch = "Brand code không đúng";
+            public const string Signature_Err = "Signature mismatch";
+            public const string Signature_Err_Description = "Check your [BrandCode] or [ChannelCode]";
+            public const string HashData_Not_Valid = "Hash data is not valid";
             public const string Invalid_ChannelCode = "Channel không tồn tại!";
 
         }

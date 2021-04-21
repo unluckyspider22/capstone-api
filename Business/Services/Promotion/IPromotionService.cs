@@ -26,5 +26,6 @@ namespace ApplicationCore.Services
         Task<bool> ExistPromoCode(string promoCode, Guid brandId);
         Task<bool> DeletePromotion(Guid promotionId);
         public Task<PromotionDto> CreatePromotion(PromotionDto dto);
+
     }
 }

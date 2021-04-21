@@ -21,8 +21,7 @@ namespace ApplicationCore.Services
 {
     public class PromotionService : BaseService<Promotion, PromotionDto>, IPromotionService
     {
-        private readonly ICheckPromotionHandler _applyPromotionHandler;
-        private readonly IHolidayService _holidayService;
+        private readonly ICheckPromotionHandler _checkPromotionHandler;
         private readonly ITimeframeHandle _timeframeHandle;
         private List<Promotion> _promotions;
 
@@ -30,11 +29,9 @@ namespace ApplicationCore.Services
             IUnitOfWork unitOfWork,
             IMapper mapper,
             ICheckPromotionHandler promotionHandle,
-            IHolidayService holidayService,
             ITimeframeHandle timeframeHandle) : base(unitOfWork, mapper)
         {
-            _applyPromotionHandler = promotionHandle;
-            _holidayService = holidayService;
+            _checkPromotionHandler = promotionHandle;
             _timeframeHandle = timeframeHandle;
         }
         protected override IGenericRepository<Promotion> _repository => _unitOfWork.PromotionRepository;
@@ -401,7 +398,7 @@ namespace ApplicationCore.Services
                 }
                 else
                 {
-                    throw new ErrorObj(code:(int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Bad_Request);
+                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Bad_Request);
                 }
                 //await _unitOfWork.SaveAsync();
                 // update condition rule
@@ -535,8 +532,6 @@ namespace ApplicationCore.Services
         #region check voucher
         public async Task<Order> HandlePromotion(Order orderResponse)
         {
-            var listPublicHoliday = await _holidayService.GetHolidays();
-            _timeframeHandle.SetHolidays(listPublicHoliday);
             foreach (var promotion in _promotions)
             {
                 //Check promotion is active
@@ -555,9 +550,9 @@ namespace ApplicationCore.Services
                     throw new ErrorObj(code: (int)AppConstant.ErrCode.Expire_Promotion, message: AppConstant.ErrMessage.Expire_Promotion, description: AppConstant.ErrMessage.Expire_Promotion);
                 }
             }
-            _applyPromotionHandler.SetPromotions(_promotions);
-            _applyPromotionHandler.Handle(orderResponse);
-            _promotions = _applyPromotionHandler.GetPromotions();
+            _checkPromotionHandler.SetPromotions(_promotions);
+            _checkPromotionHandler.Handle(orderResponse);
+            _promotions = _checkPromotionHandler.GetPromotions();
             return orderResponse;
         }
         #endregion
@@ -572,8 +567,8 @@ namespace ApplicationCore.Services
                     IPromotionRepository promotionRepo = new PromotionRepositoryImp();
                     await promotionRepo.SetUnlimitedDate(_mapper.Map<Promotion>(dto));
                 }
-                if ((dto.ForMembership == 1 || dto.ForMembership == 3) 
-                    && dto.MemberLevelMapping != null 
+                if ((dto.ForMembership == 1 || dto.ForMembership == 3)
+                    && dto.MemberLevelMapping != null
                     && dto.MemberLevelMapping.Count() > 0)
                 {
                     await DeleteAndAddMemberLevelMapp(promotionId: dto.PromotionId, levels: dto.MemberLevelMapping.ToList());
@@ -1473,5 +1468,6 @@ namespace ApplicationCore.Services
             }
         }
         #endregion
+     
     }
 }
