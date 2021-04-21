@@ -116,12 +116,9 @@ namespace ApplicationCore.Chain
                     ConditionRuleName = promotionTier.ConditionRule.RuleName,
                     TierIndex = promotionTier.TierIndex,
                     PromotionName = promotion.PromotionName,
-                    EffectType = effectType,
-                    Prop = new
-                    {
-                        imgUrl = promotion.ImgUrl,
-                        description = promotion.Description
-                    }
+                    ImgUrl = promotion.ImgUrl,
+                    Description = promotion.Description,
+                    EffectType = effectType
                 };
                 if (order.Effects == null)
                 {

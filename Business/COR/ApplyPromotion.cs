@@ -258,7 +258,9 @@ namespace ApplicationCore.Chain
                 ConditionRuleName = promotionTier.ConditionRule.RuleName,
                 TierIndex = promotionTier.TierIndex,
                 PromotionName = promotion.PromotionName,
-                EffectType = effectType
+                EffectType = effectType,
+                ImgUrl = promotion.ImgUrl,
+                Description = promotion.Description
             };
             if (promotionTier.Action != null)
             {
@@ -266,11 +268,8 @@ namespace ApplicationCore.Chain
                 {
                     effect.Prop = new
                     {
-                        name = promotionTier.VoucherGroup.VoucherName,
                         code = promotion.PromotionCode + promotionTier.TierIndex,
-                        value = discount,
-                        imgUrl = promotion.ImgUrl,
-                        description = promotion.Description
+                        value = discount
                     };
                 }
                 else
@@ -278,33 +277,16 @@ namespace ApplicationCore.Chain
                     effect.EffectType = effectType;
                     effect.Prop = new
                     {
-                        name = promotion.PromotionName,
-                        value = discount,
-                        imgUrl = promotion.ImgUrl,
-                        description = promotion.Description
+                        value = discount
                     };
                 }
-
             }
             if (promotionTier.Gift != null)
             {
                 if (gifts != null)
                 {
                     effect.Prop = gifts;
-
                 }
-                /*else
-                {
-                    effect.Prop = new
-                    {
-                        gifts = promotionTier.Gift.GiftProductMapping.Select(s =>
-                        {
-                            string listProduct = "";
-                            listProduct += s.Product.Name;
-                            return listProduct;
-                        })
-                    };
-                }*/
             }
             order.Effects.Add(effect);
             if (order.Effects.Count() == 0)
