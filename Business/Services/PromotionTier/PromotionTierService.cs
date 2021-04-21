@@ -61,17 +61,30 @@ namespace ApplicationCore.Services
 
         public async Task<PromotionTierDto> CreateTier(PromotionTierDto dto)
         {
-            dto.PromotionTierId = Guid.NewGuid();
-            dto.InsDate = DateTime.Now;
-            dto.UpdDate = DateTime.Now;
-            var entity = _mapper.Map<PromotionTier>(dto);
-            _repository.Add(entity);
-            if (dto.VoucherGroupId != null && !dto.VoucherGroupId.Equals(Guid.Empty))
+            try
             {
-                await UpdateVoucher(dto);
+                var now = Common.GetCurrentDatetime();
+                var tiers = await _repository.Get(filter: el => el.PromotionId.Equals(dto.PromotionId));
+                var index = tiers.Count();
+                dto.PromotionTierId = Guid.NewGuid();
+                var entity = _mapper.Map<PromotionTier>(dto);
+                entity.InsDate = now;
+                entity.UpdDate = now;
+                entity.TierIndex = index;
+                _repository.Add(entity);
+                if (entity.VoucherGroupId != null && !entity.VoucherGroupId.Equals(Guid.Empty))
+                {
+                    await UpdateVoucher(dto);
+                }
+                await _unitOfWork.SaveAsync();
+                return _mapper.Map<PromotionTierDto>(entity);
             }
-            await _unitOfWork.SaveAsync();
-            return _mapper.Map<PromotionTierDto>(entity);
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.InnerException);
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
+            }
+
 
         }
         private async Task UpdateVoucher(PromotionTierDto dto)
@@ -218,8 +231,10 @@ namespace ApplicationCore.Services
                 IVoucherRepository myRepo = new VoucherRepositoryImp();
                 IGenericRepository<VoucherGroup> groupRepo = _unitOfWork.VoucherGroupRepository;
                 var tierEntity = await _repository.GetFirst(filter: el => el.PromotionTierId.Equals(id));
+                var promotionId = Guid.Empty;
                 if (tierEntity != null)
                 {
+                    promotionId = (Guid)tierEntity.PromotionId;
                     var groupId = tierEntity.VoucherGroupId;
                     if (groupId != null && !groupId.Equals(Guid.Empty))
                     {
@@ -227,7 +242,12 @@ namespace ApplicationCore.Services
                     }
                 }
                 _repository.Delete(id: id);
-                return await _unitOfWork.SaveAsync() > 0;
+                var result = await _unitOfWork.SaveAsync() > 0;
+                if (result && !promotionId.Equals(Guid.Empty))
+                {
+                    result = await ReorderPromotionTier(promotionId: promotionId);
+                }
+                return result;
             }
             catch (Exception e)
             {
@@ -235,6 +255,21 @@ namespace ApplicationCore.Services
                 throw new ErrorObj(code: 500, message: e.Message);
             }
 
+        }
+        public async Task<bool> ReorderPromotionTier(Guid promotionId)
+        {
+            var tiers = await _repository.Get(filter: el => el.PromotionId.Equals(promotionId),
+                                                orderBy: el => el.OrderBy(o => o.TierIndex));
+            if (tiers.Count() > 0)
+            {
+                for (int i = 0; i < tiers.Count(); i++)
+                {
+                    var tier = tiers.ElementAt(i);
+                    tier.TierIndex = i;
+                    _repository.Update(tier);
+                }
+            }
+            return await _unitOfWork.SaveAsync() > 0;
         }
         #region Update promotion tier
         public async Task<bool> UpdateTier(PromotionTierDto dto, PromotionTier entity)
@@ -341,6 +376,7 @@ namespace ApplicationCore.Services
             }
 
         }
+
         private async Task<PromotionTier> UpdateConditionOfTier(PromotionTierDto dto, PromotionTier entity)
         {
             try
