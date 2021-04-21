@@ -1,4 +1,5 @@
-﻿using ApplicationCore.Services;
+﻿using ApplicationCore.Request;
+using ApplicationCore.Services;
 using ApplicationCore.Utils;
 using Infrastructure.DTOs;
 using Infrastructure.DTOs.VoucherChannel;
@@ -6,10 +7,10 @@ using Infrastructure.Helper;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers
@@ -250,20 +251,53 @@ namespace PromotionEngineAPI.Controllers
             }
         }
         [HttpPost]
-        [Route("encrypt")]
-        public IActionResult EncryptData([FromBody] VoucherChannelParam param)
+        [Route("test/encrypt")]
+        public IActionResult EncryptData([FromBody] CustomerOrderInfo param)
         {
-            param.PromotionId = Guid.NewGuid();
-            var json = JsonConvert.SerializeObject(param);
+            var json = JsonConvert.SerializeObject(param.Attributes);
 
+            var pubKey = Common.DecodeFromBase64("LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUFuLytXMzVQVmpQUUh4NHA2dVhFcAp3MFVsS3V3ZklTcmRZdlVzTmtaMzAvRGdCWSs3SmxWYjZmUHc0Zy92Snh3bERJL3U0SkUrUUU2SnlXcnNzTmtnClpsOUJxUTczNUxvNitwemVyK0FCc0NTNUQvc3ErL3p4b1dMaGhuL0tBNndjdElTanpqRDA1TjBwekZpZC9TWTUKNjFaV3ZoQTRVNGtQQUxwbFlYbmphUDkrYUNFTGFYazhNTTNCbXJwN1ZCV2cvbStCeS9pdlRtanV0MUIxSEZUYwpWUDhwMGZsMmhQaWFPSkZvWUdDQU4zUGJQRk02OVNyWXR0NEYzYTU0dkJGVmM3ZU9PMmJOOGdQa3RoMVZwNGFZCjU4VmN0S2tYcEpYbjR5TWdmTXlJNWJpS0duSkFralp1aFdzMjdFRm5VV1c3NVB3Nm5vUlgrMTdYRzFpaEQzS2YKR1FJREFRQUIKLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t");
+            var hash = RSACryptoUtils.Encrypt(json, pubKey);
 
-            var hash = RSACryptoUtils.Encrypt(json, Common.DecodeFromBase64("LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUFtOUM4SXVHU2dQQmthNWozRDlYdgorZFNSQ0pPbXZkUmdUQy9RUjYxUkhZOTlhQUoyOEs0ckhUZ0Fad2VENU5XV2JVUXdwQmgvV0ZRajhweHF5YnFZCnNOMmxoeEpxTU1QYk5LNzJUQkVOWS9QemQ0N0RwNThIdkRNVFVTb2Vja0dtY1ppc3grUE9EYW9uRFFzOGthaUkKMFhrS3lFK0JWZzFReHYzeXhUODFTZ1hNaTFBNXc1bFh6MjBOTEJ3QWNEaTl3ZkFFRGxFQ1lHbng2M0tvOXpKQwpURUNUTmhNc0ZGYUk0aGhtWENzNVE1R3Y0N0E3Rnc3c2hLV3lTUVR1enN4QW15anJmcWM1dlFaU21ZdEhTaHR4Ci9id2RGTVBJVCtCbWxlSmpqYzhNZm5BNDh3MFYyWEs3UnF0YlUvbUFGdzBlajF4K0xubFRqUkp4Nlk1elplRFYKY1FJREFRQUIKLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t"));
+            List<ChannelItem> items = new List<ChannelItem>();
+            foreach (var item in param.CartItems)
+            {
+                items.Add(
+                    new ChannelItem
+                    {
+                        ProductCode = item.ProductCode,
+                        UnitPrice = item.UnitPrice,
+                        Quantity = item.Quantity,
+                        SubTotal = item.SubTotal
+                    }
+                   );
+            }
 
+            var vouchers = new List<ChannelCouponCode>();
+            foreach (var voucher in param.Vouchers)
+            {
+                vouchers.Add(new ChannelCouponCode
+                {
+                    PromotionCode = voucher.PromotionCode,
+                    VoucherCode = voucher.VoucherCode
+                });
+            }
             ChannelOtherRequestParam channelOtherRequestParam = new ChannelOtherRequestParam
             {
-                ApiKey = "feLEsSeA6On2UhrOGOKXFerd3rSjihitmY1IrBLXkZU",
-                BrandCode = param.BrandCode,
-                ChannelCode = param.ChannelCode,
+                ApiKey = "nJCBdBq4cPhx2bpu5MpYaTm4jZvXvvSLxkyXzOwcEuw",
+                BrandCode = param.Attributes.StoreInfo.BrandCode,
+                ChannelCode = "Pos1",
+                Amount = param.Amount,
+                BookingDate = param.BookingDate,
+                CartItems = items,
+                Customer = new ChannelCustomer
+                {
+                    CustomerGender = 3,
+                    CustomerLevel = "Nam"
+                },
+                Id = param.Id,
+                ShippingFee = 0,
+                Vouchers = vouchers,
                 Hash = hash
             };
             return Ok(channelOtherRequestParam);

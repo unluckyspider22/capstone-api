@@ -99,7 +99,6 @@ namespace PromotionEngineAPI
             //ConditionRule
             services.AddScoped<IConditionRuleService, ConditionRuleService>();
             //Holiday
-            services.AddScoped<IHolidayService, HolidayService>();
             //Membership
             services.AddScoped<IMembershipService, MembershipService>();
             //OrderCondition

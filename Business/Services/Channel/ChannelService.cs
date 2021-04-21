@@ -1,4 +1,6 @@
 ﻿
+using ApplicationCore.Request;
+using ApplicationCore.Utils;
 using AutoMapper;
 using Infrastructure.DTOs;
 using Infrastructure.DTOs.Voucher;
@@ -7,6 +9,7 @@ using Infrastructure.Helper;
 using Infrastructure.Models;
 using Infrastructure.Repository;
 using Infrastructure.UnitOfWork;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -213,5 +216,77 @@ namespace ApplicationCore.Services
             }
         }
         #endregion
+
+        public async Task<CustomerOrderInfo> EncryptAttribute(ChannelOtherRequestParam param)
+        {
+            var channel = await _repository.GetFirst(filter: el =>
+                    el.ChannelCode == param.ChannelCode
+                    && el.Brand.BrandCode == param.BrandCode,
+                    includeProperties: "Brand");
+            CustomerOrderInfo customerOrder = null;
+            if (channel != null)
+            {
+                if (channel.ApiKey != param.ApiKey)
+                {
+                    throw new ErrorObj(code: (int)AppConstant.ErrCode.ApiKey_Not_Exist, message: AppConstant.ErrMessage.ApiKey_Not_Exist);
+                }
+                string attributesJson;
+                try
+                {
+                    attributesJson = RSACryptoUtils.Decrypt(param.Hash, Common.DecodeFromBase64(channel.PrivateKey));
+                }
+                catch (Exception)
+                {
+                    throw new ErrorObj(code: (int)AppConstant.ErrCode.HashData_Not_Valid, message: AppConstant.ErrMessage.HashData_Not_Valid);
+                }
+                OrderAttribute attribute = JsonConvert.DeserializeObject<OrderAttribute>(attributesJson);
+                if (channel.Brand.BrandCode != attribute.StoreInfo.BrandCode)
+                {
+                    throw new ErrorObj(code: (int)AppConstant.ErrCode.BrandCode_Mismatch, message: AppConstant.ErrMessage.BrandCode_Mismatch);
+                }
+                else
+                {
+                    List<Item> items = new List<Item>();
+                    foreach (var item in param.CartItems)
+                    {
+                        items.Add(
+                            new Item
+                            {
+                                ProductCode = item.ProductCode,
+                                UnitPrice = item.UnitPrice,
+                                Quantity = item.Quantity,
+                                SubTotal = item.SubTotal
+                            }
+                            );
+                    }
+                    List<CouponCode> coupons = new List<CouponCode>();
+                    foreach (var coupon in param.Vouchers)
+                    {
+                        coupons.Add(new CouponCode
+                        {
+                            PromotionCode = coupon.PromotionCode,
+                            VoucherCode = coupon.VoucherCode
+                        });
+                    }
+                    customerOrder = new CustomerOrderInfo
+                    {
+                        Amount = param.Amount,
+                        Attributes = attribute,
+                        BookingDate = param.BookingDate,
+                        CartItems = items,
+                        Customer = new Customer
+                        {
+                            CustomerGender = param.Customer.CustomerGender,
+                            CustomerLevel = param.Customer.CustomerLevel
+                        },
+                        Id = param.Id,
+                        ShippingFee = param.ShippingFee,
+                        Vouchers = coupons
+                    };
+                }
+
+            }
+            return customerOrder;
+        }
     }
 }
