@@ -136,7 +136,7 @@ namespace ApplicationCore.Chain
                         var gift = new
                         {
                             promotion.PromotionName,
-                            code = promotion.PromotionCode,
+                            code = promotion.PromotionCode + promotionTier.TierIndex,
                             ProductCode = product.Code,
                             ProductName = product.Name
                         };
@@ -154,8 +154,8 @@ namespace ApplicationCore.Chain
                     giftProp.Add(new
                     {
                         promotion.PromotionName,
-                        code = promotion.PromotionCode,
-                        ProductCode = voucher.Promotion.PromotionCode + "-" + voucher.VoucherCode,
+                        code = promotion.PromotionCode + promotionTier.TierIndex,
+                        ProductCode = voucher.Promotion.PromotionCode + promotionTier.TierIndex + "-" + voucher.VoucherCode,
                         ProductName = voucher.VoucherGroup.VoucherName
                     });
                     order.Gift.Add(giftProp);
@@ -166,12 +166,12 @@ namespace ApplicationCore.Chain
                     break;
                 case (int)AppConstant.EnvVar.PostActionType.Gift_GameCode:
                     effectType = AppConstant.EffectMessage.AddGiftGameCode;
-                    giftProp = AddGiftGameCode(order, promotionTier.Gift, promotion);
+                    giftProp = AddGiftGameCode(order, promotionTier.Gift, promotion, promotionTier);
                     break;
             }
             SetEffect(order, promotion, 0, effectType, promotionTier, gifts: giftProp);
         }
-        public List<object> AddGiftGameCode(Order order, Gift postAction, Promotion promotion)
+        public List<object> AddGiftGameCode(Order order, Gift postAction, Promotion promotion, PromotionTier promotionTier)
         {
             var now = Common.GetCurrentDatetime();
             var firstDayOfTYear = new DateTime(2021, 01, 01);
@@ -185,7 +185,7 @@ namespace ApplicationCore.Chain
             var gift = new
             {
                 promotion.PromotionName,
-                code = promotion.PromotionCode,
+                code = promotion.PromotionCode + promotionTier.TierIndex,
                 GameName = postAction.GameCampaign.Name,
                 GameCode = gameCode,
                 Duration = postAction.GameCampaign.ExpiredDuration
@@ -267,7 +267,7 @@ namespace ApplicationCore.Chain
                     effect.Prop = new
                     {
                         name = promotionTier.VoucherGroup.VoucherName,
-                        code = promotion.PromotionCode,
+                        code = promotion.PromotionCode + promotionTier.TierIndex,
                         value = discount,
                         imgUrl = promotion.ImgUrl,
                         description = promotion.Description

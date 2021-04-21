@@ -260,8 +260,6 @@ namespace PromotionEngineAPI.Controllers
         {
             try
             {
-
-
                 return Ok(await _service.GetVoucherForCustomer(dto));
             }
             catch (ErrorObj e)

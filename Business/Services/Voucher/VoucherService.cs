@@ -49,7 +49,7 @@ namespace ApplicationCore.Services
                 {
                     var voucher = await _repository.Get(filter: el =>
                     (!string.IsNullOrEmpty(voucherModel.VoucherCode) ?
-                        (el.VoucherCode.Equals(voucherModel.VoucherCode) && el.Promotion.PromotionCode.Equals(voucherModel.PromotionCode)) :
+                        (el.VoucherCode.Equals(voucherModel.VoucherCode) && el.VoucherGroup.PromotionTier.Any(a => (a.Promotion.PromotionCode + a.TierIndex).Equals(voucherModel.PromotionCode))) :
                         el.Promotion.PromotionCode.Equals(voucherModel.PromotionCode))
                     && el.Promotion.Brand.BrandCode.Equals(order.Attributes.StoreInfo.BrandCode)
                     && !el.IsUsed,
@@ -148,15 +148,14 @@ namespace ApplicationCore.Services
                     voucher.IsRedemped = AppConstant.EnvVar.Voucher.REDEEMPED;
                     voucher.RedempedDate = DateTime.Now;
                     _repository.Update(voucher);
-                    await _unitOfWork.SaveAsync();
-                    //await UpdateVoucherGroupAfterRedeemed(entity);
+
                     var entity = voucher.VoucherGroup;
                     entity.RedempedQuantity += 1;
                     entity.UpdDate = DateTime.Now;
                     _voucherGroupRepos.Update(entity);
-                    await _unitOfWork.SaveAsync();
                     var promoCode = voucher.Promotion.PromotionCode;
                     var description = voucher.Promotion.Description;
+                    await _unitOfWork.SaveAsync();
                     return new VoucherParamResponse(voucherGroupId: entity.VoucherGroupId, voucherGroupName: entity.VoucherName,
                         voucherId: voucher.VoucherId, code: promoCode + "-" + voucher.VoucherCode, description: description);
                 }
@@ -260,12 +259,14 @@ namespace ApplicationCore.Services
                     "VoucherGroup.Brand," +
                     "Membership," +
                     "VoucherGroup.Action," +
-                    "VoucherGroup.Gift");
+                    "VoucherGroup.Gift," +
+                    "VoucherGroup.PromotionTier");
                 var voucher = new Voucher();
                 if (vouchers.Count() > 0)
                 {
                     voucher = vouchers.FirstOrDefault();
-                    await SendEmailSmtp(param, voucher);
+                    var tier = voucher.VoucherGroup.PromotionTier.FirstOrDefault(f => f.PromotionTierId == tierId);
+                    await SendEmailSmtp(param, voucher, tier);
                     //Update voucher vừa lấy
                     await UpdateVoucherRedemped(voucher, param);
                 }
@@ -288,7 +289,7 @@ namespace ApplicationCore.Services
         }
 
 
-        private async Task SendEmailSmtp(VoucherForCustomerModel param, Voucher voucher)
+        private async Task SendEmailSmtp(VoucherForCustomerModel param, Voucher voucher, PromotionTier tier)
         {
 
             //Tạo người gửi - nhận
@@ -303,7 +304,7 @@ namespace ApplicationCore.Services
 
             //Tạo nội dung email
             BodyBuilder bodyBuilder = new BodyBuilder();
-            bodyBuilder.HtmlBody = GenerateContent(param, voucher);
+            bodyBuilder.HtmlBody = GenerateContent(param, voucher, tier);
             message.Body = bodyBuilder.ToMessageBody();
 
             //Kết nối tới SMTP server
@@ -329,7 +330,7 @@ namespace ApplicationCore.Services
 
         }
 
-        private string GenerateContent(VoucherForCustomerModel param, Voucher voucher)
+        private string GenerateContent(VoucherForCustomerModel param, Voucher voucher, PromotionTier tier)
         {
             var promotion = voucher.Promotion;
             var brand = voucher.VoucherGroup.Brand;
@@ -342,7 +343,7 @@ namespace ApplicationCore.Services
             string preface = string.Format("<p>Thank you for your submission. " +
                 "Hope that you enjoy this promotion of <b>{0}</b>. Detail of your voucher is below:<p>", brand.BrandName);
             //Body
-            string voucherCode = promotion.PromotionCode + "-" + voucher.VoucherCode;
+            string voucherCode = promotion.PromotionCode + tier.TierIndex + "-" + voucher.VoucherCode;
             string QrCode = AppConstant.Url_Gen_QR + voucherCode;
             string body = string.Format("<p>Promotion Code: <b>{0}</b></p>" +
                 "<p>Voucher: <b>{3}</b></p>" +

@@ -130,7 +130,7 @@ namespace PromotionEngineAPI.Controllers
                     Message = e.Message,
                     Order = responseModel
                 };
-                return StatusCode(statusCode: e.Code, orderResponse);
+                return Ok(orderResponse);
             }
             return Ok(responseModel);
         }
