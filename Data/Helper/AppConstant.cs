@@ -388,6 +388,8 @@ namespace Infrastructure.Helper
             public const int USED = 3;
             public const int REDEMPED = 4;
         }
-        public const string CONNECTION_STRING = "Server=tcp:promotionengine.database.windows.net,1433;Database=PromotionEngine;User ID=adm;Password=Abcd1234;Trusted_Connection=false;MultipleActiveResultSets=true";
+        
+        //public const string CONNECTION_STRING = "Server=tcp:promotionengine.database.windows.net,1433;Database=PromotionEngine;User ID=adm;Password=Abcd1234;Trusted_Connection=false;MultipleActiveResultSets=true";
+        public const string CONNECTION_STRING = "Server=sqlserver.reso.vn,1433;Database=PromotionEngine;User ID = promotionengine; Password=promotion_engine_fall_2020;Trusted_Connection=false;MultipleActiveResultSets=true";
     }
 }
