@@ -13,6 +13,7 @@ namespace Infrastructure.Models
         public PromotionEngineContext(DbContextOptions<PromotionEngineContext> options)
             : base(options)
         {
+            this.Database.SetCommandTimeout(30);
         }
 
         public virtual DbSet<Account> Account { get; set; }
