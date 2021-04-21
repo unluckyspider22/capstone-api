@@ -84,9 +84,7 @@ namespace ApplicationCore.Request
     }
     public class CouponCode
     {
-        [StringLength(6)]
         public string PromotionCode { get; set; }
-        [StringLength(20)]
         public string VoucherCode { get; set; }
     }
     public class StoreInfo
