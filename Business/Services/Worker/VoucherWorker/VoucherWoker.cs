@@ -136,7 +136,10 @@ namespace ApplicationCore.Worker
                         }
                         catch (Exception e)
                         {
+                            _logger.LogInformation(">>>>>>>>>>>> INSERT VOUCHER ERROR !! <<<<<<<<<<<<<<<");
                             _logger.LogInformation(e.Message);
+                            _logger.LogInformation(e.StackTrace);
+                            _logger.LogInformation(">>>>>>>>>>>> INSERT VOUCHER ERROR !! <<<<<<<<<<<<<<<");
                             //item.Message = AppConstant.NotiMess.VOUCHER_INSERT_MESS + " " + AppConstant.NotiMess.ERROR_MESS;
                             //item.IsDone = true;
                             // Gửi notify lỗi

@@ -47,6 +47,7 @@ namespace Infrastructure.Repository
             }
             catch (Exception ex)
             {
+                Debug.WriteLine("Error voucher repository: ", ex.Message);
                 Debug.WriteLine("Error voucher repository: ",ex.InnerException);
                 Debug.WriteLine("Error voucher repository: ", ex.StackTrace);
                 throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: ex.Message);
