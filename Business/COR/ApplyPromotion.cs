@@ -121,7 +121,7 @@ namespace ApplicationCore.Chain
         {
             if (order.Gift == null)
             {
-                order.Gift = new List<Object>();
+                order.Gift = new List<object>();
             }
             string effectType = "";
             List<object> giftProp = new List<object>(); ;
@@ -135,7 +135,6 @@ namespace ApplicationCore.Chain
                     {
                         var gift = new
                         {
-                            promotion.PromotionName,
                             code = promotion.PromotionCode + promotionTier.TierIndex,
                             ProductCode = product.Code,
                             ProductName = product.Name
@@ -153,7 +152,6 @@ namespace ApplicationCore.Chain
                                 includeProperties: "Promotion").Result;
                     giftProp.Add(new
                     {
-                        promotion.PromotionName,
                         code = promotion.PromotionCode + promotionTier.TierIndex,
                         ProductCode = voucher.Promotion.PromotionCode + promotionTier.TierIndex + "-" + voucher.VoucherCode,
                         ProductName = voucher.VoucherGroup.VoucherName
@@ -184,7 +182,6 @@ namespace ApplicationCore.Chain
             Int64 gameCode = temp1 + temp2;
             var gift = new
             {
-                promotion.PromotionName,
                 code = promotion.PromotionCode + promotionTier.TierIndex,
                 GameName = postAction.GameCampaign.Name,
                 GameCode = gameCode,
@@ -260,6 +257,7 @@ namespace ApplicationCore.Chain
                 PromotionTierId = promotionTier.PromotionTierId,
                 ConditionRuleName = promotionTier.ConditionRule.RuleName,
                 TierIndex = promotionTier.TierIndex,
+                PromotionName = promotion.PromotionName,
                 EffectType = effectType
             };
             if (promotionTier.Action != null)
