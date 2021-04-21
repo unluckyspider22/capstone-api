@@ -160,7 +160,11 @@ namespace ApplicationCore.Chain
                     break;
                 case (int)AppConstant.EnvVar.PostActionType.Gift_Point:
                     effectType = AppConstant.EffectMessage.AddGiftPoint;
-                    AddPoint(order, giftAction, promotion, promotionTier);
+                    order.BonusPoint = giftAction.BonusPoint;
+                    giftProp.Add(new
+                    {
+                        value = giftAction.BonusPoint
+                    });
                     break;
                 case (int)AppConstant.EnvVar.PostActionType.Gift_GameCode:
                     effectType = AppConstant.EffectMessage.AddGiftGameCode;
@@ -195,12 +199,6 @@ namespace ApplicationCore.Chain
             return gifts;
         }
 
-        public void AddPoint(Order order, Gift postAction, Promotion promotion, PromotionTier promotionTier)
-        {
-            string effectType = AppConstant.EffectMessage.AddGiftPoint;
-            order.BonusPoint = postAction.BonusPoint;
-            SetEffect(order, promotion, 0, effectType, promotionTier);
-        }
         #endregion
         #region Discount Order
         private void DiscountOrder(Order order, Infrastructure.Models.Action action, Promotion promotion, PromotionTier promotionTier)
