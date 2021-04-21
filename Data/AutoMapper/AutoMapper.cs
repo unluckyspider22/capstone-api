@@ -25,9 +25,6 @@ namespace Infrastructure.AutoMapper
             //ConditionRule
             CreateMap<ConditionRule, ConditionRuleDto>();
             CreateMap<ConditionRuleDto, ConditionRule>();
-            //Holiday
-            CreateMap<Holiday, HolidayDto>();
-            CreateMap<HolidayDto, Holiday>();
             //Membership
             CreateMap<Membership, MembershipDto>();
             CreateMap<MembershipDto, Membership>();
@@ -134,7 +131,6 @@ namespace Infrastructure.AutoMapper
             CreateMap<GameItems, GameItemDto>();
             CreateMap<GameMasterDto, GameMaster>();
             CreateMap<GameMaster, GameMasterDto>();
-
         }
     }
 }

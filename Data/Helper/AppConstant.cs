@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Helper
 {
@@ -32,9 +31,9 @@ namespace Infrastructure.Helper
         public const int RSA_LENGTH_2048 = 2048;
         public enum ChannelType
         {
-            In_Store=1,
-            Online=2,
-            Other=3
+            In_Store = 1,
+            Online = 2,
+            Other = 3
         }
         public const string Sender = "Promotion Engine";
         public const string Sender_Email = "promotion.engine.fpt@gmail.com";
@@ -193,13 +192,17 @@ namespace Infrastructure.Helper
             Login_Fail = 140,
             Device_Access_Fail = 141,
             Device_Access_Server_Fail = 142,
-            Exist_ProductCategory=143,
+            Exist_ProductCategory = 143,
             MemberLevel_Exist = 144,
             Product_Exist = 145,
             Product_Cate_NotFound=146,
             MemberLevel_NotFound=147,
             Order_Fail=148,
             Channel_Not_Exist=149,
+            ApiKey_Not_Exist = 150,
+            BrandCode_Mismatch = 151,
+            Signature_Err = 152,
+            HashData_Not_Valid = 153,
             Internal_Server_Error = 500
         }
         public class ErrMessage
@@ -265,6 +268,10 @@ namespace Infrastructure.Helper
             public const string Brand_Not_Exist = "Brand does not exist!";
             public const string Length_Param = "length";
             public const string Length_Error_Message = "Length must be non-negative";
+            public const string BrandCode_Mismatch = "Brand code không đúng";
+            public const string Signature_Err = "Signature mismatch";
+            public const string Signature_Err_Description = "Check your [BrandCode] or [ChannelCode]";
+            public const string HashData_Not_Valid = "Hash data is not valid";
             public const string Invalid_ChannelCode = "Channel không tồn tại!";
 
         }
@@ -381,5 +388,6 @@ namespace Infrastructure.Helper
             public const int USED = 3;
             public const int REDEMPED = 4;
         }
+        public const string CONNECTION_STRING = "Server=tcp:promotionengine.database.windows.net,1433;Database=PromotionEngine;User ID=adm;Password=Abcd1234;Trusted_Connection=false;MultipleActiveResultSets=true";
     }
 }

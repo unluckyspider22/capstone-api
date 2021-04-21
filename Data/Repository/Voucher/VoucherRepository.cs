@@ -1,4 +1,5 @@
 ﻿using Infrastructure.DTOs;
+using Infrastructure.Helper;
 using Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -21,14 +22,17 @@ namespace Infrastructure.Repository
     }
     public class VoucherRepositoryImp : IVoucherRepository
     {
-        private const string connectionString = "Server=tcp:promotionengine.database.windows.net,1433;Database=PromotionEngine;User ID=adm;Password=Abcd1234;Trusted_Connection=false;MultipleActiveResultSets=true";
-        private readonly PromotionEngineContext context = new PromotionEngineContext();
+        private const string connectionString = AppConstant.CONNECTION_STRING;  
         public async Task DeleteBulk(Guid voucherGroupId)
         {
-            var vouchers = context.Voucher.Where(x => x.VoucherGroupId.Equals(voucherGroupId));
-            await context.BulkDeleteAsync(vouchers);
-            var voucherGroup = context.VoucherGroup.FirstOrDefault(x => x.VoucherGroupId.Equals(voucherGroupId));
-            await context.SingleDeleteAsync(voucherGroup);
+            using (var context = new PromotionEngineContext(options: GetDbOption()))
+            {
+                var vouchers = context.Voucher.Where(x => x.VoucherGroupId.Equals(voucherGroupId));
+                await context.BulkDeleteAsync(vouchers);
+                var voucherGroup = context.VoucherGroup.FirstOrDefault(x => x.VoucherGroupId.Equals(voucherGroupId));
+                await context.SingleDeleteAsync(voucherGroup);
+            }
+              
 
         }
 
@@ -36,8 +40,7 @@ namespace Infrastructure.Repository
         {
             try
             {
-                var option =  SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder<PromotionEngineContext>(), connectionString: connectionString).Options;
-                using (var context = new PromotionEngineContext(options:option))
+                using (var context = new PromotionEngineContext(options: GetDbOption()))
                 {
                     await context.BulkInsertAsync(vouchers, b => b.IncludeGraph = true);
                 }
@@ -49,7 +52,10 @@ namespace Infrastructure.Repository
                 throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: ex.Message);
             }
         }
-
+        private DbContextOptions<PromotionEngineContext> GetDbOption()
+        {
+            return SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder<PromotionEngineContext>(), connectionString: connectionString).Options;
+        }
         public async Task<bool> RejectVoucher(Guid voucherGroupId, Guid promotionId)
         {
             using (var context = new PromotionEngineContext())
@@ -81,7 +87,7 @@ namespace Infrastructure.Repository
         public async Task<bool> UpdateVoucherGroupWhenDeletetier(Guid voucherGroupId, Guid tierId)
         {
 
-            using (var context = new PromotionEngineContext())
+            using (var context = new PromotionEngineContext(options: GetDbOption()))
             {
                 IQueryable<VoucherGroup> query = context.Set<VoucherGroup>();
                 var voucherGroup = await query.Where(el => el.VoucherGroupId.Equals(voucherGroupId)).Include("Voucher").FirstOrDefaultAsync();

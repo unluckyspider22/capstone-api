@@ -1,10 +1,6 @@
 ﻿using ApplicationCore.Models;
 using ApplicationCore.Request;
 using ApplicationCore.Utils;
-using Infrastructure.DTOs;
-using Infrastructure.Helper;
-using Infrastructure.Models;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace ApplicationCore.Chain
@@ -23,7 +19,7 @@ namespace ApplicationCore.Chain
             if (_condition is OrderConditionModel)
             {
                 HandleMinAmount((OrderConditionModel)_condition, order);
-                
+
                 HandleMinQuantity((OrderConditionModel)_condition, order);
 
             }

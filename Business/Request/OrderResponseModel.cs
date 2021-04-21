@@ -1,9 +1,6 @@
-﻿using Infrastructure.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ApplicationCore.Request
 {
@@ -23,7 +20,7 @@ namespace ApplicationCore.Request
         public List<Effect> Effects { get; set; }
         public CustomerOrderInfo CustomerOrderInfo { get; set; }
 
-        public List<Object> Gift { get; set; }
+        public List<object> Gift { get; set; }
         public decimal? TotalAmount { get; set; }
         public decimal? Discount { get; set; }
         public decimal? DiscountOrderDetail { get; set; }
@@ -51,10 +48,10 @@ namespace ApplicationCore.Request
             CartItems = new List<Item>();
             Customer = new Customer();
         }
-        public string? Id { get; set; }
+        public string Id { get; set; }
         public DateTime BookingDate { get; set; }
 
-        public Attribute Attributes { get; set; }
+        public OrderAttribute Attributes { get; set; }
         public List<Item> CartItems { get; set; }
 
         public List<CouponCode> Vouchers { get; set; }
@@ -63,7 +60,7 @@ namespace ApplicationCore.Request
         public Customer Customer { get; set; }
 
     }
-    public class Attribute
+    public class OrderAttribute
     {
         public int SalesMode { get; set; }
         [StringLength(1000)]
