@@ -1,11 +1,8 @@
 ﻿using ApplicationCore.Request;
 using ApplicationCore.Services;
 using Infrastructure.DTOs;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 
@@ -24,7 +21,7 @@ namespace PromotionEngineAPI.Controllers
         //[Authorize]
         [HttpPost]
         [Route("check-out")]
-        public async Task<IActionResult> Checkout([FromBody] Order order,[FromQuery] Guid brandId,[FromQuery] Guid deviceId)
+        public async Task<IActionResult> Checkout([FromBody] Order order, [FromQuery] Guid brandId, [FromQuery] Guid deviceId)
         {
             try
             {

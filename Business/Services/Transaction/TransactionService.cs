@@ -43,7 +43,7 @@ namespace ApplicationCore.Services
 
                         foreach (var effect in order.Effects)
                         {
-                            if (effect.EffectType.Equals("setDiscount") || effect.EffectType.Equals("actionProductMismatch"))
+                            if (effect.EffectType.Contains(AppConstant.EffectMessage.SetDiscount) || effect.EffectType.Contains(AppConstant.EffectMessage.AddGift))
                             {
                                 var promotion = await _promotionService.GetByIdAsync(effect.PromotionId);
                                 if (promotion == null || promotion.Status != (int)AppConstant.EnvVar.PromotionStatus.PUBLISH)
@@ -52,39 +52,41 @@ namespace ApplicationCore.Services
                                     throw new ErrorObj(code: (int)AppConstant.ErrCode.Expire_Promotion, message: AppConstant.ErrMessage.Expire_Promotion, description: AppConstant.ErrMessage.Expire_Promotion);
                                 }
                                 promotionSetDiscounts.Add(_mapper.Map<Promotion>(promotion));
+                                await CheckVoucher(order: order, deviceId: deviceId, transactionId: transactionId, (Guid)effect.PromotionTierId);
                             }
                         }
+                        await AddTransaction(order: order, brandId: brandId, transactionId: transactionId);
                         // neu co setDiscount nhung ko them ap dung effect nao het
 
-                        if (promotionSetDiscounts.Count < 1)
-                        {
-                            //kiem tra co apply voucher nao ko
-                            var listVoucher = checkVoucher(order: order, deviceId: deviceId, transactionId: transactionId);
-                            if(listVoucher.Result!= null)
-                            return await AddTransaction(order: order, brandId: brandId, transactionId: transactionId);
-                            else
-                            return await AddTransaction(order: order, brandId: brandId, transactionId: transactionId);
+                        /*  if (promotionSetDiscounts.Count < 1)
+                          {
+                              //kiem tra co apply voucher nao ko
+                              var listVoucher = await checkVoucher(order: order, deviceId: deviceId, transactionId: transactionId);
+                              if(listVoucher != null)
+                              return await AddTransaction(order: order, brandId: brandId, transactionId: transactionId);
+                              else
+                              return await AddTransaction(order: order, brandId: brandId, transactionId: transactionId);
 
-                        }
-                        else
+                          }
+                          else
+                          {*/
+                        try
                         {
-                            try
-                            {
-                                var listVoucher = checkVoucher(order: order, deviceId: deviceId, transactionId: transactionId);
-                            }
-                            catch (ErrorObj e)
-                            {
-                                throw e;
-                            }
-                            foreach (var promotionSetDiscount in promotionSetDiscounts)
-                            {
-                                if (promotionSetDiscount.IsAuto)
-                                 return await AddTransactionWithPromo(order: order, brandId: brandId, transactionId: transactionId, promotionId: promotionSetDiscount.PromotionId);
-                                if (!promotionSetDiscount.HasVoucher && !promotionSetDiscount.IsAuto)
+                            /* var listVoucher = checkVoucher(order: order, deviceId: deviceId, transactionId: transactionId);*/
+                        }
+                        catch (ErrorObj e)
+                        {
+                            throw e;
+                        }
+                        foreach (var promotionSetDiscount in promotionSetDiscounts)
+                        {
+                            if (promotionSetDiscount.IsAuto)
+                                return await AddTransactionWithPromo(order: order, brandId: brandId, transactionId: transactionId, promotionId: promotionSetDiscount.PromotionId);
+                            if (!promotionSetDiscount.HasVoucher && !promotionSetDiscount.IsAuto)
                                 return await AddTransactionWithPromo(order: order, brandId: brandId, transactionId: transactionId, promotionId: promotionSetDiscount.PromotionId);
 
-                            }
                         }
+                        //}
                     }
                     //neu ko co effect nao thi add transaction with no promotion
                     else return await AddTransaction(order: order, brandId: brandId, transactionId: transactionId);
@@ -93,12 +95,12 @@ namespace ApplicationCore.Services
             }
             else
                 throw new ErrorObj(code: (int)HttpStatusCode.NotFound, message: AppConstant.ErrMessage.Not_Found_Resource);
-            return null;
+            return order;
         }
         private async Task<Order> AddTransaction(Order order, Guid brandId, Guid transactionId)
         {
 
-            var jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(order);
+            var jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(order.CustomerOrderInfo);
             var transaction = new Transaction()
             { BrandId = brandId, Id = transactionId, InsDate = DateTime.Now, UpdDate = DateTime.Now, TransactionJson = jsonString };
             _repository.Add(transaction);
@@ -123,14 +125,14 @@ namespace ApplicationCore.Services
             else
                 throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: AppConstant.ErrMessage.Order_Fail, description: AppConstant.ErrMessage.Order_Fail);
         }
-        private async Task<List<Voucher>> checkVoucher(Order order, Guid deviceId, Guid transactionId)
+        private async Task<List<Voucher>> CheckVoucher(Order order, Guid deviceId, Guid transactionId, Guid promotionTierId)
         {
             if (order.CustomerOrderInfo.Vouchers.Count > 0)
             {
                 var device = await _deviceService.GetByIdAsync(deviceId);
                 if (device != null)
                 {
-                    var appliedVoucher = await _voucherService.UpdateVoucherApplied(transactionId: transactionId, order: order.CustomerOrderInfo, storeId: device.StoreId);
+                    var appliedVoucher = await _voucherService.UpdateVoucherApplied(transactionId: transactionId, order: order.CustomerOrderInfo, storeId: device.StoreId, promotionTierId);
                     return appliedVoucher;
                 }
             }

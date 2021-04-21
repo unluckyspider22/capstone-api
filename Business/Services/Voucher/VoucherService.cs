@@ -170,7 +170,7 @@ namespace ApplicationCore.Services
 
         #endregion
         #region Update voucher đã applied
-        public async Task<List<Voucher>> UpdateVoucherApplied(Guid transactionId, CustomerOrderInfo order, Guid storeId)
+        public async Task<List<Voucher>> UpdateVoucherApplied(Guid transactionId, CustomerOrderInfo order, Guid storeId, Guid promotionTierId)
         {
 
             try
@@ -180,8 +180,9 @@ namespace ApplicationCore.Services
                 foreach (var voucherInReq in order.Vouchers)
                 {
                     var voucher = await _repository.GetFirst(
-                        filter: el => el.VoucherCode.Equals(voucherInReq.VoucherCode)
-                        && el.Promotion.PromotionCode.Equals(voucherInReq.PromotionCode));
+                        filter: el => el.PromotionTierId == promotionTierId 
+                        && el.VoucherCode == voucherInReq.VoucherCode,
+                        includeProperties:"VoucherGroup");
 
                     if (voucher != null)
                     {
@@ -191,8 +192,8 @@ namespace ApplicationCore.Services
                         //existGroup = voucherGroup != null;
                         //if (!existGroup)
                         //{
-                        var voucherGroup = await _voucherGroupRepos.GetFirst(filter: el => el.VoucherGroupId.Equals(voucher.VoucherGroupId));
-                        voucherGroups.Add(voucherGroup);
+                        var voucherGroup = voucher.VoucherGroup;
+                        _voucherGroupRepos.Update(voucherGroup);
                         //}
                         DateTime now = Common.GetCurrentDatetime();
                         voucher.IsUsed = AppConstant.EnvVar.Voucher.USED;
@@ -207,13 +208,6 @@ namespace ApplicationCore.Services
                         voucherGroup.UpdDate = now;
                         _repository.Update(voucher);
                         result.Add(voucher);
-                    }
-                }
-                if (voucherGroups.Count > 0)
-                {
-                    foreach (var group in voucherGroups)
-                    {
-                        _voucherGroupRepos.Update(group);
                     }
                 }
                 await _unitOfWork.SaveAsync();

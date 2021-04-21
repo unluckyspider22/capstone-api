@@ -281,11 +281,12 @@ namespace ApplicationCore.Services
         }
         private async Task<ProductSyncParamDTO> getProductFromApiUrl(ProductRequestParam productRequestParam)
         {
+            var client = new HttpClient();
             try
             {
                 var token = await getToken(productRequestParam);
                 ProductSyncParamDTO productSyncParamDTO = null;
-                var client = new HttpClient();
+                
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
                 //var url = (PASSIO_PRODUCT_HOST);
                 var request = new HttpRequestMessage
@@ -308,6 +309,11 @@ namespace ApplicationCore.Services
             {
                 Debug.WriteLine("\n\nError at getVoucherForGame: \n" + e.Message);
                 throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
+            }
+            finally
+            {
+                //Teminate
+                client.Dispose();
             }
 
         }
