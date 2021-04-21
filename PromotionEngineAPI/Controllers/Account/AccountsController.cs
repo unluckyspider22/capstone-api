@@ -1,19 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Infrastructure.Models;
-using ApplicationCore.Services;
-
+﻿using ApplicationCore.Services;
+using ApplicationCore.Utils;
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
-using ApplicationCore.Utils;
-using System.Text;
-using System.Security.Cryptography;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers
 {
