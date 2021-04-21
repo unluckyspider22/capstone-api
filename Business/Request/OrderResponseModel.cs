@@ -63,8 +63,6 @@ namespace ApplicationCore.Request
     public class OrderAttribute
     {
         public int SalesMode { get; set; }
-        [StringLength(1000)]
-        public string Note { get; set; }
         public int PaymentMethod { get; set; }
         public StoreInfo StoreInfo { get; set; }
     }
@@ -95,10 +93,8 @@ namespace ApplicationCore.Request
     {
         public string StoreId { get; set; }
         [StringLength(100)]
-        public string StoreName { get; set; }
         public string BrandCode { get; set; }
         public string Applier { get; set; }
-        public string IpAddress { get; set; }
     }
     public class Item
     {

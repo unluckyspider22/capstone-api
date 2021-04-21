@@ -99,6 +99,10 @@ namespace PromotionEngineAPI.Controllers
             {
                 return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, e);
             }
+            catch (Exception)
+            {
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, AppConstant.ErrMessage.Bad_Request);
+            }
             if (orderInfo != null)
             {
                 var vouchers = orderInfo.Vouchers;

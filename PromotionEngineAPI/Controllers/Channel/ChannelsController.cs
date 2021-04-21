@@ -256,7 +256,7 @@ namespace PromotionEngineAPI.Controllers
         {
             var json = JsonConvert.SerializeObject(param.Attributes);
 
-            var pubKey = Common.DecodeFromBase64("LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUFuLytXMzVQVmpQUUh4NHA2dVhFcAp3MFVsS3V3ZklTcmRZdlVzTmtaMzAvRGdCWSs3SmxWYjZmUHc0Zy92Snh3bERJL3U0SkUrUUU2SnlXcnNzTmtnClpsOUJxUTczNUxvNitwemVyK0FCc0NTNUQvc3ErL3p4b1dMaGhuL0tBNndjdElTanpqRDA1TjBwekZpZC9TWTUKNjFaV3ZoQTRVNGtQQUxwbFlYbmphUDkrYUNFTGFYazhNTTNCbXJwN1ZCV2cvbStCeS9pdlRtanV0MUIxSEZUYwpWUDhwMGZsMmhQaWFPSkZvWUdDQU4zUGJQRk02OVNyWXR0NEYzYTU0dkJGVmM3ZU9PMmJOOGdQa3RoMVZwNGFZCjU4VmN0S2tYcEpYbjR5TWdmTXlJNWJpS0duSkFralp1aFdzMjdFRm5VV1c3NVB3Nm5vUlgrMTdYRzFpaEQzS2YKR1FJREFRQUIKLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t");
+            var pubKey = Common.DecodeFromBase64("LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUF6NW5hNGVGRkRiQ2Y2czBSSWU4VAp5RjZsZk1uS3p3MEFBVmZCVHVmK0VPQldSTGVoL2x6ZGJQMzNxdHVFN2U1bmhxQVh5anhWamhGckxSWFIrK3lrCktUK1h1d3NYUmxQOUVFS21Iamw5ZmRYakh0aEZlTjgzWXBLT0FudlFNVk0ySFdQMmxpQjZac00xMlh3MzN4YmYKeWdSY05TSEhiL1dlckRiNDFDQnU5N25ORzNLcVcvWEFYd3JIUEJ0azVZUmhwTDhvL0lnYXNrbW1BS3ZiNkhKcgpJUWVpMVErcDNZWWg2aCt2VkV2TitHaWgyaG15UkhBWGFoRG9aTFgxa2lMZWVOZk45Um1RWUFrc3hEeG5qOVNxCmFjQ2ZTelZObEZZVkxtZitROVlBb0pCd3kvM0FYN2h0L0kwZ09rZGg1OUJwUnMzajR5T29na2tSbHdoeFFneVgKaFFJREFRQUIKLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t");
             var hash = RSACryptoUtils.Encrypt(json, pubKey);
 
             List<ChannelItem> items = new List<ChannelItem>();
@@ -284,9 +284,9 @@ namespace PromotionEngineAPI.Controllers
             }
             ChannelOtherRequestParam channelOtherRequestParam = new ChannelOtherRequestParam
             {
-                ApiKey = "nJCBdBq4cPhx2bpu5MpYaTm4jZvXvvSLxkyXzOwcEuw",
+                ApiKey = "198wKzgcx1t1xjFhovqux6fHO2MOsUzIfR4hZUIfzqq",
                 BrandCode = param.Attributes.StoreInfo.BrandCode,
-                ChannelCode = "Pos1",
+                ChannelCode = "BeanOi",
                 Amount = param.Amount,
                 BookingDate = param.BookingDate,
                 CartItems = items,
