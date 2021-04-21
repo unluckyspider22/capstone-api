@@ -8,7 +8,7 @@ using AutoMapper;
 using Infrastructure.DTOs;
 using Infrastructure.Models;
 using Infrastructure.Repository;
-using Infrastructure.UnitOrWork;
+using Infrastructure.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 
 namespace ApplicationCore.Services

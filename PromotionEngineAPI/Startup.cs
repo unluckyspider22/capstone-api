@@ -3,7 +3,7 @@ using ApplicationCore.Services;
 using ApplicationCore.Worker;
 using AutoMapper;
 using Infrastructure.Models;
-using Infrastructure.UnitOrWork;
+using Infrastructure.UnitOfWork;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

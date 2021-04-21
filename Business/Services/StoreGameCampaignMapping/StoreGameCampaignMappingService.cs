@@ -2,7 +2,7 @@
 using Infrastructure.DTOs;
 using Infrastructure.Models;
 using Infrastructure.Repository;
-using Infrastructure.UnitOrWork;
+using Infrastructure.UnitOfWork;
 
 namespace ApplicationCore.Services
 {
