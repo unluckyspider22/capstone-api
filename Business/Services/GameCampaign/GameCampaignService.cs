@@ -227,12 +227,15 @@ namespace ApplicationCore.Services
                     if (device != null)
                     {
                         var storeId = device.StoreId;
-                        var listMappingresult = await _storeGameCampaignMappingRepos.Get(filter: el => el.StoreId.Equals(storeId), includeProperties: "GameCampaign.Promotion");
+                        var listMappingresult = await _storeGameCampaignMappingRepos.Get(filter: el => el.StoreId.Equals(storeId),
+                            includeProperties: "GameCampaign.Promotion");
                         if (listMappingresult != null && listMappingresult.Count() > 0)
                         {
                             foreach (var storeGameMapping in listMappingresult)
                             {
-                                if (storeGameMapping.GameCampaign != null && !storeGameMapping.GameCampaign.DelFlg)
+                                if (storeGameMapping.GameCampaign != null && !storeGameMapping.GameCampaign.DelFlg && 
+                                    storeGameMapping.GameCampaign.Promotion.Status == (int)AppConstant.EnvVar.PromotionStatus.PUBLISH && 
+                                    !storeGameMapping.GameCampaign.Promotion.DelFlg)
                                 {
                                     result.Add(storeGameMapping.GameCampaign);
                                 }
