@@ -84,9 +84,9 @@ namespace ApplicationCore.Services
             return randomCode;
         }
 
-       
 
-                public async Task<bool> DeleteVoucherGroup(Guid id)
+
+        public async Task<bool> DeleteVoucherGroup(Guid id)
         {
             try
             {
@@ -266,7 +266,7 @@ namespace ApplicationCore.Services
                 var dto = _mapper.Map<VoucherGroupDto>(voucherGroup);
                 dto.Voucher = null;
                 dto.Quantity = quantityParam;
-
+                Debug.WriteLine("dto.Quantity "+ dto.Quantity);
                 // Voucher mới
                 var newVoucherCodes = _voucherWorker.GenerateVoucher(dto, isAddMore: true).Select(el => el.VoucherCode);
 
@@ -292,9 +292,10 @@ namespace ApplicationCore.Services
                 // Danh sách voucher mới
                 newVoucherCodes = combineList.Where(el => !oldVoucherCode.Any(code => code.IndexOf(el, StringComparison.CurrentCultureIgnoreCase) >= 0));
                 var now = Common.GetCurrentDatetime();
+                List<Voucher> insList = new List<Voucher>();
                 for (int i = 1; i <= newVoucherCodes.Count(); i++)
                 {
-                    var code = newVoucherCodes.ElementAt(i-1);
+                    var code = newVoucherCodes.ElementAt(i - 1);
                     var startIndex = oldVoucherCode.Count();
                     var voucherEntity = new Voucher()
                     {
@@ -304,14 +305,19 @@ namespace ApplicationCore.Services
                         UpdDate = now,
                         Index = startIndex + i,
                     };
+                    insList.Add(voucherEntity);
                     voucherRepo.Add(voucherEntity);
                     voucherGroup.Voucher.Add(voucherEntity);
                 }
+             
                 voucherGroup.UpdDate = now;
+                //voucherGroup.Voucher = null;
                 voucherGroup.Quantity = completeTotal;
                 _repository.Update(voucherGroup);
+                var result = await _unitOfWork.SaveAsync() > 0;
 
-                return await _unitOfWork.SaveAsync() > 0;
+                //_voucherWorker.InsertVouchers(voucherDto: dto, isAddMore: true, vouchersAdd: insList);
+                return result;
             }
             catch (Exception e)
             {

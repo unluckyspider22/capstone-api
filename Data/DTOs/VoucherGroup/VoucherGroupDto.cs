@@ -10,9 +10,9 @@ namespace Infrastructure.DTOs
         public Guid? PromotionId { get; set; }
         public Guid? BrandId { get; set; }
         public string VoucherName { get; set; }
-        public decimal? Quantity { get; set; }
-        public decimal? UsedQuantity { get; set; }
-        public decimal? RedempedQuantity { get; set; }
+        public int Quantity { get; set; } = 0;
+        public int UsedQuantity { get; set; } = 0;
+        public int RedempedQuantity { get; set; } = 0;
         public string Charset { get; set; }
         public string Postfix { get; set; }
         public string Prefix { get; set; }

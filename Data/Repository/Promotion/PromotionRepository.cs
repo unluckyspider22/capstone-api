@@ -1,7 +1,6 @@
-﻿using Infrastructure.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Infrastructure.Helper;
+using Infrastructure.Models;
+using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
 namespace Infrastructure.Repository
@@ -12,12 +11,20 @@ namespace Infrastructure.Repository
     }
     public class PromotionRepositoryImp : IPromotionRepository
     {
-        private PromotionEngineContext ctx = new PromotionEngineContext();
+        private const string connectionString = AppConstant.CONNECTION_STRING;
         public async Task<bool> SetUnlimitedDate(Promotion entity)
         {
-            ctx.Promotion.Attach(entity);
-            ctx.Entry(entity).Property(e => e.EndDate).IsModified = true;
-            return await ctx.SaveChangesAsync() > 0;
+            using (var context = new PromotionEngineContext(options: GetDbOption()))
+            {
+                context.Promotion.Attach(entity);
+                context.Entry(entity).Property(e => e.EndDate).IsModified = true;
+                return await context.SaveChangesAsync() > 0;
+            }
+        }
+
+        private DbContextOptions<PromotionEngineContext> GetDbOption()
+        {
+            return SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder<PromotionEngineContext>(), connectionString: connectionString).Options;
         }
     }
 }
