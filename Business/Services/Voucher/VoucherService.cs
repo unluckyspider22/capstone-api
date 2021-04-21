@@ -8,7 +8,7 @@ using Infrastructure.DTOs.VoucherChannel;
 using Infrastructure.Helper;
 using Infrastructure.Models;
 using Infrastructure.Repository;
-using Infrastructure.UnitOrWork;
+using Infrastructure.UnitOfWork;
 using MailKit.Net.Smtp;
 using MimeKit;
 using Newtonsoft.Json;

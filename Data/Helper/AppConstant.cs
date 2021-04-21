@@ -19,6 +19,7 @@ namespace Infrastructure.Helper
         public const string UNREDEMPED = "0";
         public const string UNUSED = "0";
         public const string USED = "1";
+        public const string Err_Prefix = "E-";
         public struct Status
         {
             public const string ALL = "0";
@@ -194,9 +195,10 @@ namespace Infrastructure.Helper
             Exist_ProductCategory = 143,
             MemberLevel_Exist = 144,
             Product_Exist = 145,
-            Product_Cate_NotFound = 146,
-            MemberLevel_NotFound = 147,
-            Order_Fail = 148,
+            Product_Cate_NotFound=146,
+            MemberLevel_NotFound=147,
+            Order_Fail=148,
+            Channel_Not_Exist=149,
             Internal_Server_Error = 500
         }
         public class ErrMessage

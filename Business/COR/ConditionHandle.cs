@@ -114,14 +114,11 @@ namespace ApplicationCore.Chain
                     PromotionId = promotion.PromotionId,
                     PromotionTierId = promotionTier.PromotionTierId,
                     ConditionRuleName = promotionTier.ConditionRule.RuleName,
-                    TierIndex = (int)promotionTier.TierIndex,
-                    EffectType = effectType,
-                    Prop = new
-                    {
-                        name = promotion.PromotionName,
-                        imgUrl = promotion.ImgUrl,
-                        description = promotion.Description
-                    }
+                    TierIndex = promotionTier.TierIndex,
+                    PromotionName = promotion.PromotionName,
+                    ImgUrl = promotion.ImgUrl,
+                    Description = promotion.Description,
+                    EffectType = effectType
                 };
                 if (order.Effects == null)
                 {

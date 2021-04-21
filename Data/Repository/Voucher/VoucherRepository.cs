@@ -51,8 +51,6 @@ namespace Infrastructure.Repository
                 Debug.WriteLine("Error voucher repository: ", ex.StackTrace);
                 throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: ex.Message);
             }
-
-
         }
         private DbContextOptions<PromotionEngineContext> GetDbOption()
         {

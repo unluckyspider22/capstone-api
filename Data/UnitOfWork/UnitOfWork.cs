@@ -4,7 +4,7 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
-namespace Infrastructure.UnitOrWork
+namespace Infrastructure.UnitOfWork
 {
     public class UnitOfWork : IUnitOfWork, IDisposable
     {

@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="UnitOrWork\IUnitOfWork.cs~RF9e18763.TMP" />
+    <None Remove="UnitOfWork\IUnitOfWork.cs~RF9e18763.TMP" />
   </ItemGroup>
 
   <ItemGroup>

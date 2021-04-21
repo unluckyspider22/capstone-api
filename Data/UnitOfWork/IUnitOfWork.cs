@@ -2,7 +2,7 @@
 using Infrastructure.Repository;
 using System.Threading.Tasks;
 
-namespace Infrastructure.UnitOrWork
+namespace Infrastructure.UnitOfWork
 {
     public interface IUnitOfWork
     {

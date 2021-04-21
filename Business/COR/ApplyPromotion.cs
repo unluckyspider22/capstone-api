@@ -121,7 +121,7 @@ namespace ApplicationCore.Chain
         {
             if (order.Gift == null)
             {
-                order.Gift = new List<Object>();
+                order.Gift = new List<object>();
             }
             string effectType = "";
             List<object> giftProp = new List<object>(); ;
@@ -135,7 +135,6 @@ namespace ApplicationCore.Chain
                     {
                         var gift = new
                         {
-                            promotion.PromotionName,
                             code = promotion.PromotionCode + promotionTier.TierIndex,
                             ProductCode = product.Code,
                             ProductName = product.Name
@@ -153,7 +152,6 @@ namespace ApplicationCore.Chain
                                 includeProperties: "Promotion").Result;
                     giftProp.Add(new
                     {
-                        promotion.PromotionName,
                         code = promotion.PromotionCode + promotionTier.TierIndex,
                         ProductCode = voucher.Promotion.PromotionCode + promotionTier.TierIndex + "-" + voucher.VoucherCode,
                         ProductName = voucher.VoucherGroup.VoucherName
@@ -162,7 +160,11 @@ namespace ApplicationCore.Chain
                     break;
                 case (int)AppConstant.EnvVar.PostActionType.Gift_Point:
                     effectType = AppConstant.EffectMessage.AddGiftPoint;
-                    AddPoint(order, giftAction, promotion, promotionTier);
+                    order.BonusPoint = giftAction.BonusPoint;
+                    giftProp.Add(new
+                    {
+                        value = giftAction.BonusPoint
+                    });
                     break;
                 case (int)AppConstant.EnvVar.PostActionType.Gift_GameCode:
                     effectType = AppConstant.EffectMessage.AddGiftGameCode;
@@ -184,24 +186,19 @@ namespace ApplicationCore.Chain
             Int64 gameCode = temp1 + temp2;
             var gift = new
             {
-                promotion.PromotionName,
                 code = promotion.PromotionCode + promotionTier.TierIndex,
                 GameName = postAction.GameCampaign.Name,
                 GameCode = gameCode,
                 Duration = postAction.GameCampaign.ExpiredDuration
             };
             order.Gift.Add(gift);
-            List<object> gifts = new List<object>();
-            gifts.Add(gift);
+            List<object> gifts = new List<object>
+            {
+                gift
+            };
             return gifts;
         }
 
-        public void AddPoint(Order order, Gift postAction, Promotion promotion, PromotionTier promotionTier)
-        {
-            string effectType = AppConstant.EffectMessage.AddGiftPoint;
-            order.BonusPoint = postAction.BonusPoint;
-            SetEffect(order, promotion, 0, effectType, promotionTier);
-        }
         #endregion
         #region Discount Order
         private void DiscountOrder(Order order, Infrastructure.Models.Action action, Promotion promotion, PromotionTier promotionTier)
@@ -258,7 +255,10 @@ namespace ApplicationCore.Chain
                 PromotionTierId = promotionTier.PromotionTierId,
                 ConditionRuleName = promotionTier.ConditionRule.RuleName,
                 TierIndex = promotionTier.TierIndex,
-                EffectType = effectType
+                PromotionName = promotion.PromotionName,
+                EffectType = effectType,
+                ImgUrl = promotion.ImgUrl,
+                Description = promotion.Description
             };
             if (promotionTier.Action != null)
             {
@@ -266,11 +266,8 @@ namespace ApplicationCore.Chain
                 {
                     effect.Prop = new
                     {
-                        name = promotionTier.VoucherGroup.VoucherName,
                         code = promotion.PromotionCode + promotionTier.TierIndex,
-                        value = discount,
-                        imgUrl = promotion.ImgUrl,
-                        description = promotion.Description
+                        value = discount
                     };
                 }
                 else
@@ -278,33 +275,16 @@ namespace ApplicationCore.Chain
                     effect.EffectType = effectType;
                     effect.Prop = new
                     {
-                        name = promotion.PromotionName,
-                        value = discount,
-                        imgUrl = promotion.ImgUrl,
-                        description = promotion.Description
+                        value = discount
                     };
                 }
-
             }
             if (promotionTier.Gift != null)
             {
                 if (gifts != null)
                 {
                     effect.Prop = gifts;
-
                 }
-                /*else
-                {
-                    effect.Prop = new
-                    {
-                        gifts = promotionTier.Gift.GiftProductMapping.Select(s =>
-                        {
-                            string listProduct = "";
-                            listProduct += s.Product.Name;
-                            return listProduct;
-                        })
-                    };
-                }*/
             }
             order.Effects.Add(effect);
             if (order.Effects.Count() == 0)

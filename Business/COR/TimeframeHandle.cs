@@ -12,7 +12,7 @@ using System.Net;
 using System;
 using ApplicationCore.Services;
 using Infrastructure.Repository;
-using Infrastructure.UnitOrWork;
+using Infrastructure.UnitOfWork;
 using AutoMapper;
 using System.Threading.Tasks;
 using System.Collections.Generic;

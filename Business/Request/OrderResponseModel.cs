@@ -36,7 +36,10 @@ namespace ApplicationCore.Request
         public Guid PromotionId { get; set; }
         public Guid? PromotionTierId { get; set; }
         public int TierIndex { get; set; }
+        public string PromotionName { get; set; }
         public string ConditionRuleName { get; set; }
+        public string ImgUrl { get; set; }
+        public string Description { get; set; }
         public string EffectType { get; set; }
         public Object Prop { get; set; }
     }

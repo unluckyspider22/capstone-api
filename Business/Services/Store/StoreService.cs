@@ -1,7 +1,7 @@
 ﻿using Infrastructure.Models;
 using Infrastructure.DTOs;
 using AutoMapper;
-using Infrastructure.UnitOrWork;
+using Infrastructure.UnitOfWork;
 using Infrastructure.Repository;
 using System.Threading.Tasks;
 using System;
