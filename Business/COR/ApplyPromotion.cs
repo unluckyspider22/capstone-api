@@ -191,8 +191,10 @@ namespace ApplicationCore.Chain
                 Duration = postAction.GameCampaign.ExpiredDuration
             };
             order.Gift.Add(gift);
-            List<object> gifts = new List<object>();
-            gifts.Add(gift);
+            List<object> gifts = new List<object>
+            {
+                gift
+            };
             return gifts;
         }
 
