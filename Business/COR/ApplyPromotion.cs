@@ -178,7 +178,7 @@ namespace ApplicationCore.Chain
             var now = Common.GetCurrentDatetime();
             var firstDayOfTYear = new DateTime(2021, 01, 01);
 
-            string nowStr = new DateTime((now - firstDayOfTYear).Ticks).ToString("HHddyyMMmm");
+            string nowStr = new DateTime((now - firstDayOfTYear).Ticks).ToString("yyHHddMMmm");
             Int64 temp1 = Convert.ToInt64(nowStr);
             //Int64.Parse(nowStr);
             Int64 temp2 = Convert.ToInt64(postAction.GameCampaign.SecretCode);

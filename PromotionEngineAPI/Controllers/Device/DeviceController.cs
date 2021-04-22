@@ -188,7 +188,7 @@ namespace PromotionEngineAPI.Controllers
         }
         [HttpGet]
         [Route("checkGameCode")]
-        public async Task<IActionResult> CheckGameCode([FromQuery] int code, [FromQuery] Guid gameCampaignId)
+        public async Task<IActionResult> CheckGameCode([FromQuery] Int64 code, [FromQuery] Guid gameCampaignId)
         {
             var firstDayOfTYear = new DateTime(2021, 01, 01);
             var gameCampaign = await _gameCampaignService.GetByIdAsync(gameCampaignId);
@@ -202,7 +202,7 @@ namespace PromotionEngineAPI.Controllers
 
                     var dateRedemped = code - int.Parse(gameCampaign.SecretCode);
 
-                    var minus = DateTime.ParseExact(dateRedemped.ToString(), "HHddyyMMmm", CultureInfo.InvariantCulture);
+                    var minus = DateTime.ParseExact(dateRedemped.ToString(), "yyHHddMMmm", CultureInfo.InvariantCulture);
                     var dateStr = new DateTime(minus.Year - 2000, minus.Month, minus.Day, minus.Hour, minus.Minute, 0).Add(new TimeSpan(firstDayOfTYear.Ticks));
                     isValidGameCd = dateStr.AddMinutes(gameCampaign.ExpiredDuration) >= now;
                 }
