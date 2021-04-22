@@ -13,7 +13,6 @@ namespace Infrastructure.Models
         public PromotionEngineContext(DbContextOptions<PromotionEngineContext> options)
             : base(options)
         {
-            this.Database.SetCommandTimeout(30);
         }
 
         public virtual DbSet<Account> Account { get; set; }
@@ -29,7 +28,6 @@ namespace Infrastructure.Models
         public virtual DbSet<GameMaster> GameMaster { get; set; }
         public virtual DbSet<Gift> Gift { get; set; }
         public virtual DbSet<GiftProductMapping> GiftProductMapping { get; set; }
-        public virtual DbSet<Holiday> Holiday { get; set; }
         public virtual DbSet<MemberLevel> MemberLevel { get; set; }
         public virtual DbSet<MemberLevelMapping> MemberLevelMapping { get; set; }
         public virtual DbSet<Membership> Membership { get; set; }
@@ -52,7 +50,7 @@ namespace Infrastructure.Models
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
-            { }
+            {}
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -476,25 +474,6 @@ namespace Infrastructure.Models
                     .HasConstraintName("FK_PostActionProductMapping_Product");
             });
 
-            modelBuilder.Entity<Holiday>(entity =>
-            {
-                entity.Property(e => e.HolidayId).HasDefaultValueSql("(newid())");
-
-                entity.Property(e => e.Date).HasColumnType("date");
-
-                entity.Property(e => e.HolidayName)
-                    .IsRequired()
-                    .HasMaxLength(100);
-
-                entity.Property(e => e.InsDate)
-                    .HasColumnType("datetime")
-                    .HasDefaultValueSql("(getdate())");
-
-                entity.Property(e => e.UpdDate)
-                    .HasColumnType("datetime")
-                    .HasDefaultValueSql("(getdate())");
-            });
-
             modelBuilder.Entity<MemberLevel>(entity =>
             {
                 entity.Property(e => e.MemberLevelId).HasDefaultValueSql("(newid())");
@@ -911,7 +890,7 @@ namespace Infrastructure.Models
 
             modelBuilder.Entity<Transaction>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.InsDate).HasColumnType("datetime");
 

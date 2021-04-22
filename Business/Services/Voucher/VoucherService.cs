@@ -65,7 +65,7 @@ namespace ApplicationCore.Services
                     "Promotion.PromotionTier.VoucherGroup," +
                     "Promotion.Brand," +
                     "Promotion.MemberLevelMapping.MemberLevel");
-                    voucher = voucher.Where(f => Regex.IsMatch(f.VoucherCode, "^"+ voucherModel.VoucherCode +"$"));
+                    voucher = voucher.Where(f => Regex.IsMatch(f.VoucherCode, "^" + voucherModel.VoucherCode + "$"));
                     if (voucher.Count() > 1)
                     {
                         throw new ErrorObj(code: (int)AppConstant.ErrCode.Duplicate_VoucherCode, message: AppConstant.ErrMessage.Duplicate_VoucherCode, description: AppConstant.ErrMessage.Duplicate_VoucherCode);
@@ -172,13 +172,12 @@ namespace ApplicationCore.Services
 
         #endregion
         #region Update voucher đã applied
-        public async Task<List<Voucher>> UpdateVoucherApplied(Guid transactionId, CustomerOrderInfo order, Guid storeId, Guid promotionTierId)
+        public async Task<int> UpdateVoucherApplied(Guid transactionId, CustomerOrderInfo order, Guid storeId, Guid promotionTierId)
         {
 
             try
             {
-                List<Voucher> result = new List<Voucher>();
-                List<VoucherGroup> voucherGroups = new List<VoucherGroup>();
+                DateTime now = Common.GetCurrentDatetime();
                 foreach (var voucherInReq in order.Vouchers)
                 {
                     var voucher = await _repository.GetFirst(
@@ -188,32 +187,27 @@ namespace ApplicationCore.Services
 
                     if (voucher != null)
                     {
-                        //var existGroup = voucherGroups.Count > 0;
-
-                        //var voucherGroup = existGroup ? voucherGroups.Where(el => el.VoucherGroupId.Equals(voucher.VoucherGroupId)).First() : new VoucherGroup();
-                        //existGroup = voucherGroup != null;
-                        //if (!existGroup)
-                        //{
                         var voucherGroup = voucher.VoucherGroup;
+                        voucherGroup.UsedQuantity += 1;
+                        voucherGroup.UpdDate = now;
                         _voucherGroupRepos.Update(voucherGroup);
-                        //}
-                        DateTime now = Common.GetCurrentDatetime();
+
                         voucher.IsUsed = AppConstant.EnvVar.Voucher.USED;
                         voucher.UsedDate = now;
                         voucher.UpdDate = now;
                         voucher.OrderId = order.Id.ToString();
                         voucher.TransactionId = transactionId;
-                        voucher.StoreId = storeId;
 
-                        //var voucherGroup = await _voucherGroupRepos.GetById(voucher.VoucherGroupId);
-                        voucherGroup.UsedQuantity += 1;
-                        voucherGroup.UpdDate = now;
+                        IGenericRepository<Store> _storeRepo = _unitOfWork.StoreRepository;
+                        var store = await _storeRepo.GetFirst(filter: el => el.StoreId == storeId);
+                        if (store != null)
+                        {
+                            voucher.Store = store;
+                        }
                         _repository.Update(voucher);
-                        result.Add(voucher);
                     }
                 }
-                await _unitOfWork.SaveAsync();
-                return result;
+                return await _unitOfWork.SaveAsync();
             }
             catch (Exception e)
             {

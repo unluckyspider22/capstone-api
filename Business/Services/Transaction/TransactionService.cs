@@ -8,6 +8,7 @@ using Infrastructure.Repository;
 using Infrastructure.UnitOfWork;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -35,14 +36,16 @@ namespace ApplicationCore.Services
             List<Promotion> promotionSetDiscounts = new List<Promotion>();
             if (brand != null)
             {
-                var transactionId = Guid.NewGuid();
                 if (order != null)
                 {
+                    var transactionId = Guid.NewGuid();
                     if (order.Effects != null)
                     {
 
+                        order.Effects = order.Effects.Where(w => w.EffectType.Contains(AppConstant.EffectMessage.SetDiscount) || w.EffectType.Contains(AppConstant.EffectMessage.AddGift)).ToList();
                         foreach (var effect in order.Effects)
                         {
+
                             if (effect.EffectType.Contains(AppConstant.EffectMessage.SetDiscount) || effect.EffectType.Contains(AppConstant.EffectMessage.AddGift))
                             {
                                 var promotion = await _promotionService.GetByIdAsync(effect.PromotionId);
@@ -52,44 +55,32 @@ namespace ApplicationCore.Services
                                     throw new ErrorObj(code: (int)AppConstant.ErrCode.Expire_Promotion, message: AppConstant.ErrMessage.Expire_Promotion, description: AppConstant.ErrMessage.Expire_Promotion);
                                 }
                                 promotionSetDiscounts.Add(_mapper.Map<Promotion>(promotion));
-                                await CheckVoucher(order: order, deviceId: deviceId, transactionId: transactionId, (Guid)effect.PromotionTierId);
+                                int updatedRecord = await CheckVoucher(order, deviceId, transactionId, (Guid)effect.PromotionTierId);
+                                if (updatedRecord > 0)
+                                {
+                                    AddTransactionWithPromo(order: order, brandId: brandId, effect.PromotionId, transactionId);
+                                }
                             }
-                        }
-                        await AddTransaction(order: order, brandId: brandId, transactionId: transactionId);
-                        // neu co setDiscount nhung ko them ap dung effect nao het
-
-                        /*  if (promotionSetDiscounts.Count < 1)
-                          {
-                              //kiem tra co apply voucher nao ko
-                              var listVoucher = await checkVoucher(order: order, deviceId: deviceId, transactionId: transactionId);
-                              if(listVoucher != null)
-                              return await AddTransaction(order: order, brandId: brandId, transactionId: transactionId);
-                              else
-                              return await AddTransaction(order: order, brandId: brandId, transactionId: transactionId);
-
-                          }
-                          else
-                          {*/
-                        try
-                        {
-                            /* var listVoucher = checkVoucher(order: order, deviceId: deviceId, transactionId: transactionId);*/
-                        }
-                        catch (ErrorObj e)
-                        {
-                            throw e;
                         }
                         foreach (var promotionSetDiscount in promotionSetDiscounts)
                         {
                             if (promotionSetDiscount.IsAuto)
-                                return await AddTransactionWithPromo(order: order, brandId: brandId, transactionId: transactionId, promotionId: promotionSetDiscount.PromotionId);
-                            if (!promotionSetDiscount.HasVoucher && !promotionSetDiscount.IsAuto)
-                                return await AddTransactionWithPromo(order: order, brandId: brandId, transactionId: transactionId, promotionId: promotionSetDiscount.PromotionId);
+                            {
+                                AddTransactionWithPromo(order, brandId, promotionSetDiscount.PromotionId);
 
+                            }
+                            if (!promotionSetDiscount.HasVoucher && !promotionSetDiscount.IsAuto)
+                            {
+                                AddTransactionWithPromo(order, brandId, promotionSetDiscount.PromotionId);
+                            }
+                        }
+                        if (await _unitOfWork.SaveAsync() > 0)
+                        {
+                            return order;
                         }
                         //}
                     }
-                    //neu ko co effect nao thi add transaction with no promotion
-                    else return await AddTransaction(order: order, brandId: brandId, transactionId: transactionId);
+                    else AddTransaction(order: order, brandId: brandId, transactionId);
                 }
                 else throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: AppConstant.ErrMessage.Order_Fail, description: AppConstant.ErrMessage.Order_Fail);
             }
@@ -97,49 +88,53 @@ namespace ApplicationCore.Services
                 throw new ErrorObj(code: (int)HttpStatusCode.NotFound, message: AppConstant.ErrMessage.Not_Found_Resource);
             return order;
         }
-        private async Task<Order> AddTransaction(Order order, Guid brandId, Guid transactionId)
-        {
-            Order newOrder = order;
-            newOrder.Effects = null;
-            var jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(newOrder);
-            var transaction = new Transaction()
-            { BrandId = brandId, Id = transactionId, InsDate = DateTime.Now, UpdDate = DateTime.Now, TransactionJson = jsonString };
-            _repository.Add(transaction);
-            if (await _unitOfWork.SaveAsync() > 0)
-            {
-                return order;
-            }
-            else
-                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: AppConstant.ErrMessage.Order_Fail, description: AppConstant.ErrMessage.Order_Fail);
-        }
-        private async Task<Order> AddTransactionWithPromo(Order order, Guid brandId, Guid transactionId, Guid promotionId)
+        private void AddTransaction(Order order, Guid brandId, Guid transactionId)
         {
             var now = Common.GetCurrentDatetime();
             Order newOrder = order;
             newOrder.Effects = null;
             var jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(newOrder);
-            var transaction = new Transaction()
-            { BrandId = brandId, Id = transactionId, InsDate = now, UpdDate = now, TransactionJson = jsonString, PromotionId = promotionId };
-            _repository.Add(transaction);
-            if (await _unitOfWork.SaveAsync() > 0)
+            var transaction = new Transaction
             {
-                return order;
-            }
-            else
-                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: AppConstant.ErrMessage.Order_Fail, description: AppConstant.ErrMessage.Order_Fail);
+                Id = transactionId,
+                BrandId = brandId,
+                InsDate = now,
+                UpdDate = now,
+                TransactionJson = jsonString
+            };
+            _repository.Add(transaction);
         }
-        private async Task<List<Voucher>> CheckVoucher(Order order, Guid deviceId, Guid transactionId, Guid promotionTierId)
+        private void AddTransactionWithPromo(Order order, Guid brandId, Guid promotionId, Guid? tranactionId = null, Guid? voucherId = null)
         {
+            var now = Common.GetCurrentDatetime();
+            Order newOrder = order;
+            newOrder.Effects = null;
+            var jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(newOrder);
+            Transaction transaction = new Transaction
+            {
+                BrandId = brandId,
+                InsDate = now,
+                UpdDate = now,
+                Id = tranactionId != null ? (Guid)tranactionId : Guid.NewGuid(),
+                VoucherId = voucherId,
+                TransactionJson = jsonString,
+                PromotionId = promotionId,
+            };
+
+            _repository.Add(transaction);
+        }
+        private async Task<int> CheckVoucher(Order order, Guid deviceId, Guid transactionId, Guid promotionTierId)
+        {
+            int result = 0;
             if (order.CustomerOrderInfo.Vouchers.Count > 0)
             {
                 var device = await _deviceService.GetFirst(filter: el => el.DeviceId.Equals(deviceId) && !el.DelFlg);
                 if (device != null)
                 {
-                    var appliedVoucher = await _voucherService.UpdateVoucherApplied(transactionId: transactionId, order: order.CustomerOrderInfo, storeId: device.StoreId, promotionTierId);
-                    return appliedVoucher;
+                    result = await _voucherService.UpdateVoucherApplied(transactionId: transactionId, order: order.CustomerOrderInfo, storeId: device.StoreId, promotionTierId);
                 }
             }
-            return null;
+            return result;
         }
     }
 }
