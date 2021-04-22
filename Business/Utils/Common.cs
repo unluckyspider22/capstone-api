@@ -109,6 +109,5 @@ namespace ApplicationCore.Utils
             return builder.ToString();
         }
 
-
     }
 }

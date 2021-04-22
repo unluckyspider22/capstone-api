@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace ApplicationCore.Services
@@ -64,6 +65,7 @@ namespace ApplicationCore.Services
                     "Promotion.PromotionTier.VoucherGroup," +
                     "Promotion.Brand," +
                     "Promotion.MemberLevelMapping.MemberLevel");
+                    voucher = voucher.Where(f => Regex.IsMatch(f.VoucherCode, "^"+ voucherModel.VoucherCode +"$"));
                     if (voucher.Count() > 1)
                     {
                         throw new ErrorObj(code: (int)AppConstant.ErrCode.Duplicate_VoucherCode, message: AppConstant.ErrMessage.Duplicate_VoucherCode, description: AppConstant.ErrMessage.Duplicate_VoucherCode);
@@ -180,9 +182,9 @@ namespace ApplicationCore.Services
                 foreach (var voucherInReq in order.Vouchers)
                 {
                     var voucher = await _repository.GetFirst(
-                        filter: el => el.PromotionTierId == promotionTierId 
+                        filter: el => el.PromotionTierId == promotionTierId
                         && el.VoucherCode == voucherInReq.VoucherCode,
-                        includeProperties:"VoucherGroup");
+                        includeProperties: "VoucherGroup");
 
                     if (voucher != null)
                     {

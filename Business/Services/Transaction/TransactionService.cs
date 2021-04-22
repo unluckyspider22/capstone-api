@@ -99,8 +99,9 @@ namespace ApplicationCore.Services
         }
         private async Task<Order> AddTransaction(Order order, Guid brandId, Guid transactionId)
         {
-
-            var jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(order.CustomerOrderInfo);
+            Order newOrder = order;
+            newOrder.Effects = null;
+            var jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(newOrder);
             var transaction = new Transaction()
             { BrandId = brandId, Id = transactionId, InsDate = DateTime.Now, UpdDate = DateTime.Now, TransactionJson = jsonString };
             _repository.Add(transaction);
@@ -114,7 +115,9 @@ namespace ApplicationCore.Services
         private async Task<Order> AddTransactionWithPromo(Order order, Guid brandId, Guid transactionId, Guid promotionId)
         {
             var now = Common.GetCurrentDatetime();
-            var jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(order);
+            Order newOrder = order;
+            newOrder.Effects = null;
+            var jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(newOrder);
             var transaction = new Transaction()
             { BrandId = brandId, Id = transactionId, InsDate = now, UpdDate = now, TransactionJson = jsonString, PromotionId = promotionId };
             _repository.Add(transaction);
