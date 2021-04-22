@@ -132,7 +132,7 @@ namespace ApplicationCore.Services
         {
             if (order.CustomerOrderInfo.Vouchers.Count > 0)
             {
-                var device = await _deviceService.GetByIdAsync(deviceId);
+                var device = await _deviceService.GetFirst(filter: el => el.DeviceId.Equals(deviceId) && !el.DelFlg);
                 if (device != null)
                 {
                     var appliedVoucher = await _voucherService.UpdateVoucherApplied(transactionId: transactionId, order: order.CustomerOrderInfo, storeId: device.StoreId, promotionTierId);
