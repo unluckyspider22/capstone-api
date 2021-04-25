@@ -174,7 +174,12 @@ namespace PromotionEngineAPI.Controllers
                     }
                     if (channel.ApiKey.Equals(key))
                     {
-                        return Ok(await _service.GetPromotionsForChannel(param));
+                        return Ok(new
+                        {
+                            code = HttpStatusCode.OK,
+                            message = AppConstant.EnvVar.Success_Message,
+                            data = await _service.GetPromotionsForChannel(param)
+                        });
                     }
                     else
                     {
@@ -183,7 +188,6 @@ namespace PromotionEngineAPI.Controllers
                 }
                 return StatusCode(statusCode: (int)HttpStatusCode.NotFound,
                     new ErrorObj(code: (int)HttpStatusCode.NotFound, message: AppConstant.ErrMessage.Not_Found_Resource));
-
             }
             catch (ErrorObj e)
             {

@@ -44,6 +44,7 @@ namespace PromotionEngineAPI.Controllers
             //Lấy promotion bởi voucher code
             Order responseModel = new Order();
             var vouchers = orderInfo.Vouchers;
+            OrderResponseModel orderResponse;
             try
             {
                 List<Promotion> promotions = null;
@@ -74,7 +75,7 @@ namespace PromotionEngineAPI.Controllers
             }
             catch (ErrorObj e)
             {
-                OrderResponseModel orderResponse = new OrderResponseModel
+                orderResponse = new OrderResponseModel
                 {
                     Code = AppConstant.Err_Prefix + e.Code,
                     Message = e.Message,
@@ -82,11 +83,17 @@ namespace PromotionEngineAPI.Controllers
                 };
                 return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, orderResponse);
             }
-            return Ok(responseModel);
+            orderResponse = new OrderResponseModel
+            {
+                Code = (int)HttpStatusCode.OK,
+                Message = AppConstant.EnvVar.Success_Message,
+                Order = responseModel
+            };
+            return Ok(orderResponse);
         }
 
         [HttpPost]
-        [Route("channel/check-voucher")]
+        [Route("channel/check-promotion")]
         public async Task<IActionResult> CheckPromotionChannel([FromBody] ChannelOtherRequestParam param)
         {
             Order responseModel = new Order();
@@ -108,6 +115,7 @@ namespace PromotionEngineAPI.Controllers
                 var vouchers = orderInfo.Vouchers;
                 responseModel.CustomerOrderInfo = orderInfo;
                 Setorder(responseModel);
+                OrderResponseModel orderResponse;
                 try
                 {
                     if (vouchers != null && vouchers.Count() > 0)
@@ -120,10 +128,17 @@ namespace PromotionEngineAPI.Controllers
                             responseModel = await _promotionService.HandlePromotion(responseModel);
                         }
                     }
+                    responseModel.Effects = new List<Effect>();
+                    orderResponse = new OrderResponseModel
+                    {
+                        Code = HttpStatusCode.OK,
+                        Message = AppConstant.EnvVar.Success_Message,
+                        Order = responseModel
+                    };
                 }
                 catch (ErrorObj e)
                 {
-                    OrderResponseModel orderResponse = new OrderResponseModel
+                    orderResponse = new OrderResponseModel
                     {
                         Code = AppConstant.Err_Prefix + e.Code,
                         Message = e.Message,
@@ -131,11 +146,11 @@ namespace PromotionEngineAPI.Controllers
                     };
                     return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, orderResponse);
                 }
-                return Ok(responseModel);
+                return Ok(orderResponse);
             }
             else return StatusCode(statusCode: (int)HttpStatusCode.BadRequest,
-                new ErrorObj(code: (int)AppConstant.ErrCode.Signature_Err, 
-                            message: AppConstant.ErrMessage.Signature_Err, 
+                new ErrorObj(code: (int)AppConstant.ErrCode.Signature_Err,
+                            message: AppConstant.ErrMessage.Signature_Err,
                             description: AppConstant.ErrMessage.Signature_Err_Description));
         }
 
@@ -145,6 +160,7 @@ namespace PromotionEngineAPI.Controllers
             order.DiscountOrderDetail ??= 0;
             order.TotalAmount ??= order.CustomerOrderInfo.Amount;
             order.FinalAmount ??= order.CustomerOrderInfo.Amount;
+            order.BonusPoint ??= 0;
         }
         [HttpGet]
         public async Task<IActionResult> GetPromotion(

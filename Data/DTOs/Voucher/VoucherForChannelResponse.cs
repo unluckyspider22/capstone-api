@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Infrastructure.DTOs.Voucher
+namespace Infrastructure.DTOs
 {
     public class VoucherForChannelResponse
     {
@@ -27,5 +27,6 @@ namespace Infrastructure.DTOs.Voucher
         public string ActionName { get; set; }
         public string VoucherName { get; set; }
         public string ImgUrl { get; set; }
+        public string Url { get; set; }
     }
 }

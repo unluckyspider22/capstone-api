@@ -69,6 +69,7 @@ namespace ApplicationCore.Chain
             order.DiscountOrderDetail ??= 0;
             order.TotalAmount ??= order.CustomerOrderInfo.Amount;
             order.FinalAmount ??= order.CustomerOrderInfo.Amount;
+            order.BonusPoint ??= 0;
         }
     }
 }

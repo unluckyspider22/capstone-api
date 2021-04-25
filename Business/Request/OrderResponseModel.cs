@@ -6,7 +6,7 @@ namespace ApplicationCore.Request
 {
     public class OrderResponseModel
     {
-        public string Code { get; set; }
+        public object Code { get; set; }
         public string Message { get; set; }
         public Order Order { get; set; }
 
@@ -48,6 +48,7 @@ namespace ApplicationCore.Request
             CartItems = new List<Item>();
             Customer = new Customer();
         }
+        public string ApiKey { get; set; }
         public string Id { get; set; }
         public DateTime BookingDate { get; set; }
 

@@ -68,6 +68,7 @@ namespace Infrastructure.Helper
             public const int AdminId = 2;
             public const string Admin = "Admin";
             public const string BrandManager = "Brand Manager";
+            public const string Success_Message = "Thành công";
             public enum Holiday_Env
             {
                 FOR_WEEKEND = 1,
