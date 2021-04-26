@@ -479,7 +479,7 @@ namespace PromotionEngineAPI.Controllers
             try
             {
                 return Ok(await _promotionService.GetAsync(filter: o => o.BrandId.Equals(brandId)
-                                && o.Status != (int)AppConstant.EnvVar.PromotionStatus.EXPIRED
+                                && o.Status == (int)AppConstant.EnvVar.PromotionStatus.PUBLISH
                                 && !o.IsAuto
                                 && !o.DelFlg,
                                 includeProperties: "PromotionTier.Action,PromotionTier.Gift"));
