@@ -113,6 +113,7 @@ namespace PromotionEngineAPI.Controllers
             if (orderInfo != null)
             {
                 var vouchers = orderInfo.Vouchers;
+                orderInfo.ApiKey = param.ApiKey;
                 responseModel.CustomerOrderInfo = orderInfo;
                 Setorder(responseModel);
                 OrderResponseModel orderResponse;
@@ -133,7 +134,9 @@ namespace PromotionEngineAPI.Controllers
                         Code = HttpStatusCode.OK,
                         Message = AppConstant.EnvVar.Success_Message,
                         Order = responseModel
+                        
                     };
+                    
                 }
                 catch (ErrorObj e)
                 {
