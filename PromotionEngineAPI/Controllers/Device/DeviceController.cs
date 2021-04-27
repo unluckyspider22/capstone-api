@@ -190,7 +190,7 @@ namespace PromotionEngineAPI.Controllers
         [Route("checkGameCode")]
         public async Task<IActionResult> CheckGameCode([FromQuery] Int64 code, [FromQuery] Guid gameCampaignId)
         {
-            var firstDayOfTYear = new DateTime(2021, 01, 01);
+            var firstDayOfTYear = new DateTime(2000, 01, 01);
             var gameCampaign = await _gameCampaignService.GetByIdAsync(gameCampaignId);
 
             bool isValidGameCd = false;

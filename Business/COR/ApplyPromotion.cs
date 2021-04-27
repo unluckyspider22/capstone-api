@@ -176,7 +176,7 @@ namespace ApplicationCore.Chain
         public List<object> AddGiftGameCode(Order order, Gift postAction, Promotion promotion, PromotionTier promotionTier)
         {
             var now = Common.GetCurrentDatetime();
-            var firstDayOfTYear = new DateTime(2021, 01, 01);
+            var firstDayOfTYear = new DateTime(2000, 01, 01);
 
             string nowStr = new DateTime((now - firstDayOfTYear).Ticks).ToString("yyHHddMMmm");
             Int64 temp1 = Convert.ToInt64(nowStr);
