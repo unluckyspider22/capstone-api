@@ -128,7 +128,6 @@ namespace PromotionEngineAPI.Controllers
                             responseModel = await _promotionService.HandlePromotion(responseModel);
                         }
                     }
-                    responseModel.Effects = new List<Effect>();
                     orderResponse = new OrderResponseModel
                     {
                         Code = HttpStatusCode.OK,
