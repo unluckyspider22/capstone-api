@@ -24,10 +24,13 @@ namespace ApplicationCore.Services
 {
     public class VoucherService : BaseService<Voucher, VoucherDto>, IVoucherService
     {
-        IVoucherGroupService _voucherGroupService;
-        IMembershipService _membershipService;
+        private readonly IVoucherGroupService _voucherGroupService;
+        private readonly IMembershipService _membershipService;
 
-        public VoucherService(IUnitOfWork unitOfWork, IMapper mapper, IVoucherGroupService voucherGroupService, IMembershipService membershipService) : base(unitOfWork, mapper)
+
+        public VoucherService(IUnitOfWork unitOfWork, IMapper mapper,
+            IVoucherGroupService voucherGroupService,
+            IMembershipService membershipService) : base(unitOfWork, mapper)
         {
             _voucherGroupService = voucherGroupService;
             _membershipService = membershipService;
@@ -48,12 +51,12 @@ namespace ApplicationCore.Services
                 var promotions = new List<Promotion>();
                 foreach (var voucherModel in vouchers)
                 {
-                    var voucher = await _repository.Get(filter: el =>
-                    (!string.IsNullOrEmpty(voucherModel.VoucherCode) ?
-                        (el.VoucherCode.Equals(voucherModel.VoucherCode) && el.VoucherGroup.PromotionTier.Any(a => (a.Promotion.PromotionCode + a.TierIndex).Equals(voucherModel.PromotionCode))) :
-                        el.Promotion.PromotionCode.Equals(voucherModel.PromotionCode))
-                    && el.Promotion.Brand.BrandCode.Equals(order.Attributes.StoreInfo.BrandCode)
-                    && !el.IsUsed,
+                    if (!string.IsNullOrEmpty(voucherModel.VoucherCode))
+                    {
+                        var voucher = await _repository.Get(filter: el =>
+                        el.VoucherCode.Equals(voucherModel.VoucherCode) && el.VoucherGroup.PromotionTier.Any(a => (a.Promotion.PromotionCode + a.TierIndex).Equals(voucherModel.PromotionCode))
+                        && el.Promotion.Brand.BrandCode.Equals(order.Attributes.StoreInfo.BrandCode)
+                        && !el.IsUsed,
                     includeProperties:
                     "Promotion.PromotionTier.Action.ActionProductMapping.Product," +
                     "Promotion.PromotionTier.Gift.GiftProductMapping.Product," +
@@ -65,18 +68,45 @@ namespace ApplicationCore.Services
                     "Promotion.PromotionTier.VoucherGroup," +
                     "Promotion.Brand," +
                     "Promotion.MemberLevelMapping.MemberLevel");
-                    voucher = voucher.Where(f => Regex.IsMatch(f.VoucherCode, "^" + voucherModel.VoucherCode + "$"));
-                    if (voucher.Count() > 1)
-                    {
-                        throw new ErrorObj(code: (int)AppConstant.ErrCode.Duplicate_VoucherCode, message: AppConstant.ErrMessage.Duplicate_VoucherCode, description: AppConstant.ErrMessage.Duplicate_VoucherCode);
+                        voucher = voucher.Where(f => Regex.IsMatch(f.VoucherCode, "^" + voucherModel.VoucherCode + "$"));
+                        if (voucher.Count() > 1)
+                        {
+                            throw new ErrorObj(code: (int)AppConstant.ErrCode.Duplicate_VoucherCode, message: AppConstant.ErrMessage.Duplicate_VoucherCode, description: AppConstant.ErrMessage.Duplicate_VoucherCode);
+                        }
+                        if (voucher.Count() == 0)
+                        {
+                            throw new ErrorObj(code: (int)AppConstant.ErrCode.Invalid_VoucherCode, message: AppConstant.ErrMessage.Invalid_VoucherCode, description: AppConstant.ErrMessage.Invalid_VoucherCode);
+                        }
+                        var promotion = voucher.FirstOrDefault().Promotion;
+                        promotion.PromotionTier = promotion.PromotionTier.Where(w => w.PromotionTierId == voucher.First().PromotionTierId).ToList();
+                        promotions.Add(promotion);
                     }
-                    if (voucher.Count() == 0)
+                    else
                     {
-                        throw new ErrorObj(code: (int)AppConstant.ErrCode.Invalid_VoucherCode, message: AppConstant.ErrMessage.Invalid_VoucherCode, description: AppConstant.ErrMessage.Invalid_VoucherCode);
+                        IGenericRepository<Promotion> promoRepo = _unitOfWork.PromotionRepository;
+                        var promotion = await promoRepo.Get(filter: el => el.PromotionCode == voucherModel.PromotionCode,
+                            includeProperties:
+                    "PromotionTier.Action.ActionProductMapping.Product," +
+                    "PromotionTier.Gift.GiftProductMapping.Product," +
+                    "PromotionTier.Gift.GameCampaign.GameMaster," +
+                    "PromotionTier.Action.ActionProductMapping.Product," +
+                    "PromotionTier.ConditionRule.ConditionGroup.OrderCondition," +
+                    "PromotionTier.ConditionRule.ConditionGroup.ProductCondition.ProductConditionMapping.Product," +
+                    "PromotionStoreMapping.Store," +
+                    "PromotionTier.VoucherGroup," +
+                    "Brand," +
+                    "MemberLevelMapping.MemberLevel");
+                        if (promotion.Count() > 1)
+                        {
+                            throw new ErrorObj(code: (int)AppConstant.ErrCode.Duplicate_VoucherCode, message: AppConstant.ErrMessage.Duplicate_VoucherCode, description: AppConstant.ErrMessage.Duplicate_VoucherCode);
+                        }
+                        if (promotion.Count() == 0)
+                        {
+                            throw new ErrorObj(code: (int)AppConstant.ErrCode.Invalid_VoucherCode, message: AppConstant.ErrMessage.Invalid_VoucherCode, description: AppConstant.ErrMessage.Invalid_VoucherCode);
+                        }
+                        promotions.Add(promotion.FirstOrDefault());
                     }
-                    var promotion = voucher.FirstOrDefault().Promotion;
-                    promotion.PromotionTier = promotion.PromotionTier.Where(w => w.PromotionTierId == voucher.First().PromotionTierId).ToList();
-                    promotions.Add(promotion);
+
                 }
                 if (promotions.Select(s => s.PromotionId).Distinct().Count() < promotions.Select(s => s.PromotionId).Count())
                 {
