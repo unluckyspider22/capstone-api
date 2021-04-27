@@ -27,6 +27,6 @@ namespace Infrastructure.DTOs
         public string ActionName { get; set; }
         public string VoucherName { get; set; }
         public string ImgUrl { get; set; }
-        public string Url { get; set; }
+        public string VoucherCode { get; set; }
     }
 }

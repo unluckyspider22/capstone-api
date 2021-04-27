@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Infrastructure.DTOs.Voucher
+namespace Infrastructure.DTOs
 {
     public class VoucherForCustomerModel
     {
@@ -13,5 +13,12 @@ namespace Infrastructure.DTOs.Voucher
         public string CusGender { get; set; }
         public string ChannelCode { get; set; }
 
+    }
+    public class VoucherForOtherChannel
+    {
+        public string ApiKey { get; set; }
+        public string ChannelCode { get; set; }
+        public string BrandCode { get; set; }
+        public string Hash { get; set; }
     }
 }

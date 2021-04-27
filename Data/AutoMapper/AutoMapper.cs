@@ -1,7 +1,6 @@
 ﻿using ApplicationCore.Models;
 using AutoMapper;
 using Infrastructure.DTOs;
-using Infrastructure.DTOs.Voucher;
 using Infrastructure.Models;
 
 namespace Infrastructure.AutoMapper

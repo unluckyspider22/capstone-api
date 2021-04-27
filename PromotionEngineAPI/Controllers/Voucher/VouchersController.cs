@@ -1,6 +1,5 @@
 ﻿using ApplicationCore.Services;
 using Infrastructure.DTOs;
-using Infrastructure.DTOs.Voucher;
 using Infrastructure.Helper;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -19,9 +18,11 @@ namespace PromotionEngineAPI.Controllers
     public class VouchersController : ControllerBase
     {
         private readonly IVoucherService _service;
-        public VouchersController(IVoucherService service)
+        private readonly IChannelService _channelService;
+        public VouchersController(IVoucherService service, IChannelService channelService)
         {
             _service = service;
+            _channelService = channelService;
         }
         [HttpGet]
         public async Task<IActionResult> GetVoucher(
@@ -160,6 +161,24 @@ namespace PromotionEngineAPI.Controllers
             try
             {
                 await _service.GetVoucherForCusOnSite(param, promotionId, tierId);
+                return Ok();
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
+        [HttpPost]
+        [Route("send-email/{promotionId}/{tierId}")]
+        public async Task<IActionResult> GetVoucherForCustomerOther([FromBody] VoucherForOtherChannel param, Guid promotionId, Guid tierId)
+        {
+            try
+            {
+                var voucherForCus = await _channelService.DecryptCustomer(param);
+                if (voucherForCus != null)
+                {
+                    await _service.GetVoucherForCusOnSite(voucherForCus, promotionId, tierId);
+                }
                 return Ok();
             }
             catch (ErrorObj e)

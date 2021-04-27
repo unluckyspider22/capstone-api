@@ -3,7 +3,6 @@ using ApplicationCore.Request;
 using ApplicationCore.Utils;
 using AutoMapper;
 using Infrastructure.DTOs;
-using Infrastructure.DTOs.Voucher;
 using Infrastructure.DTOs.VoucherChannel;
 using Infrastructure.Helper;
 using Infrastructure.Models;
@@ -45,7 +44,7 @@ namespace ApplicationCore.Services
                 "Brand,PromotionChannelMapping.Channel," +
                 "PromotionTier.Action," +
                 "PromotionTier.Gift," +
-                "PromotionTier.VoucherGroup")).Data; ;
+                "PromotionTier.VoucherGroup.Voucher")).Data; ;
 
                 promotions = promotions.Where(w =>
                 w.PromotionChannelMapping.Select(vc =>
@@ -65,7 +64,12 @@ namespace ApplicationCore.Services
                             ImgUrl = promotion.ImgUrl,
                             PromotionCode = promotion.PromotionCode,
                             PromotionTierId = promotionTier.PromotionTierId,
-                            VoucherName = promotionTier.VoucherGroup.VoucherName
+                            VoucherName = promotionTier.VoucherGroup.VoucherName,
+                            VoucherCode = promotion.PromotionCode +
+                                        promotionTier.TierIndex + "-" +
+                                        promotionTier.VoucherGroup.Voucher.First(el => !el.IsRedemped && !el.IsUsed)
+                                        .VoucherCode
+
                         };
                         result.Add(tier);
                     }
@@ -217,7 +221,7 @@ namespace ApplicationCore.Services
         }
         #endregion
 
-        public async Task<CustomerOrderInfo> EncryptAttribute(ChannelOtherRequestParam param)
+        public async Task<CustomerOrderInfo> DecryptAttribute(ChannelOtherRequestParam param)
         {
             var channel = await _repository.GetFirst(filter: el =>
                     el.ChannelCode == param.ChannelCode
@@ -287,6 +291,33 @@ namespace ApplicationCore.Services
 
             }
             return customerOrder;
+        }
+
+        public async Task<VoucherForCustomerModel> DecryptCustomer(VoucherForOtherChannel param)
+        {
+            var channel = await _repository.GetFirst(filter: el =>
+                    el.ChannelCode == param.ChannelCode
+                    && el.Brand.BrandCode == param.BrandCode,
+                    includeProperties: "Brand");
+            VoucherForCustomerModel cusInfo = null;
+            if (channel != null)
+            {
+                if (channel.ApiKey != param.ApiKey)
+                {
+                    throw new ErrorObj(code: (int)AppConstant.ErrCode.ApiKey_Not_Exist, message: AppConstant.ErrMessage.ApiKey_Not_Exist);
+                }
+                string cusJson;
+                try
+                {
+                    cusJson = RSACryptoUtils.Decrypt(param.Hash, Common.DecodeFromBase64(channel.PrivateKey));
+                }
+                catch (Exception)
+                {
+                    throw new ErrorObj(code: (int)AppConstant.ErrCode.HashData_Not_Valid, message: AppConstant.ErrMessage.HashData_Not_Valid);
+                }
+                cusInfo = JsonConvert.DeserializeObject<VoucherForCustomerModel>(cusJson);
+            }
+            return cusInfo;
         }
     }
 }

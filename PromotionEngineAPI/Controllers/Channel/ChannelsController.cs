@@ -165,7 +165,9 @@ namespace PromotionEngineAPI.Controllers
                     ChannelCode = channelCode,
                     BrandCode = brandCode
                 };
-                var channel = await _service.GetFirst(filter: el => el.ChannelCode == channelCode);
+                var channel = await _service.GetFirst(filter: el => el.ChannelCode == channelCode
+                                && el.Brand.BrandCode == brandCode,
+                                includeProperties: "Brand");
                 if (channel != null)
                 {
                     if (string.IsNullOrEmpty(key))

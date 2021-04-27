@@ -100,7 +100,7 @@ namespace PromotionEngineAPI.Controllers
             CustomerOrderInfo orderInfo;
             try
             {
-                orderInfo = await _channelService.EncryptAttribute(param);
+                orderInfo = await _channelService.DecryptAttribute(param);
             }
             catch (ErrorObj e)
             {

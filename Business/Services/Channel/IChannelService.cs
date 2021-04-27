@@ -1,7 +1,6 @@
 ﻿
 using ApplicationCore.Request;
 using Infrastructure.DTOs;
-using Infrastructure.DTOs.Voucher;
 using Infrastructure.DTOs.VoucherChannel;
 using Infrastructure.Models;
 using System;
@@ -18,6 +17,7 @@ namespace ApplicationCore.Services
 
         public Task<List<GroupChannelOfPromotion>> GetChannelOfPromotion(Guid promotionId, Guid brandId);
         public Task<List<GroupChannelOfPromotion>> UpdateChannelOfPromotion(UpdateChannelOfPromotion dto);
-        public Task<CustomerOrderInfo> EncryptAttribute(ChannelOtherRequestParam param);
+        public Task<CustomerOrderInfo> DecryptAttribute(ChannelOtherRequestParam param);
+        public Task<VoucherForCustomerModel> DecryptCustomer(VoucherForOtherChannel param);
     }
 }
