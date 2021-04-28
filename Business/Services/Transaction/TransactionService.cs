@@ -30,7 +30,7 @@ namespace ApplicationCore.Services
         }
         protected override IGenericRepository<Transaction> _repository => _unitOfWork.TransactionRepository;
 
-        public async Task<Order> Checkout(Guid brandId, Order order, Guid deviceId)
+        public async Task<Order> PlaceOrder(Guid brandId, Order order, Guid deviceId)
         {
             var brand = await _brandService.GetByIdAsync(id: brandId);
             List<Promotion> promotionSetDiscounts = new List<Promotion>();
@@ -78,7 +78,6 @@ namespace ApplicationCore.Services
                         {
                             return order;
                         }
-                        //}
                     }
                     else AddTransaction(order: order, brandId: brandId, transactionId);
                 }
@@ -88,7 +87,50 @@ namespace ApplicationCore.Services
                 throw new ErrorObj(code: (int)HttpStatusCode.NotFound, message: AppConstant.ErrMessage.Not_Found_Resource);
             return order;
         }
-        private void AddTransaction(Order order, Guid brandId, Guid transactionId)
+
+        public async Task<Order> PlaceOrderForChannel(Order order, string channelCode)
+        {
+            var brand = await _brandService.GetFirst(filter: el => el.BrandCode == order.CustomerOrderInfo.Attributes.StoreInfo.BrandCode,
+                includeProperties: "Channel,Store");
+            if (string.IsNullOrEmpty(order.CustomerOrderInfo.Customer.CustomerName) || string.IsNullOrEmpty(order.CustomerOrderInfo.Customer.CustomerPhoneNo))
+            {
+                throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, AppConstant.ErrMessage.Empty_CustomerInfo);
+            }
+            List<Promotion> promotionSetDiscounts = new List<Promotion>();
+            var channel = brand.Channel.FirstOrDefault(el => el.ChannelCode == channelCode);
+            var store = brand.Store.FirstOrDefault(el => el.StoreCode == order.CustomerOrderInfo.Attributes.StoreInfo.StoreId);
+            if (order.Effects != null)
+            {
+                order.Effects = order.Effects.Where(w => w.EffectType.Contains(AppConstant.EffectMessage.SetDiscount) || w.EffectType.Contains(AppConstant.EffectMessage.AddGift)).ToList();
+
+            }
+            else
+            {
+                return null;
+            }
+            foreach (var effect in order.Effects)
+            {
+
+                if (effect.EffectType.Contains(AppConstant.EffectMessage.SetDiscount) || effect.EffectType.Contains(AppConstant.EffectMessage.AddGift))
+                {
+                    var promotion = await _promotionService.GetByIdAsync(effect.PromotionId);
+                    if (promotion == null || promotion.Status != (int)AppConstant.EnvVar.PromotionStatus.PUBLISH)
+                    {
+                        //neu voucher dang apply vao order ma brand manager xoa promotion hoac change promotion status
+                        throw new ErrorObj(code: (int)AppConstant.ErrCode.Expire_Promotion, message: AppConstant.ErrMessage.Expire_Promotion, description: AppConstant.ErrMessage.Expire_Promotion);
+                    }
+                    promotionSetDiscounts.Add(_mapper.Map<Promotion>(promotion));
+                    var transaction = AddTransactionWithPromo(order: order, brandId: brand.BrandId, effect.PromotionId);
+                    if (transaction != null)
+                    {
+                        int updatedRecord = await CheckVoucherOther(order, transaction.Id, (Guid)effect.PromotionTierId, channel, store);
+                    }
+                }
+            }
+            return order;
+        }
+
+        private Transaction AddTransaction(Order order, Guid brandId, Guid transactionId)
         {
             var now = Common.GetCurrentDatetime();
             Order newOrder = order;
@@ -103,8 +145,9 @@ namespace ApplicationCore.Services
                 TransactionJson = jsonString
             };
             _repository.Add(transaction);
+            return transaction;
         }
-        private void AddTransactionWithPromo(Order order, Guid brandId, Guid promotionId, Guid? tranactionId = null, Guid? voucherId = null)
+        private Transaction AddTransactionWithPromo(Order order, Guid brandId, Guid promotionId, Guid? tranactionId = null, Guid? voucherId = null)
         {
             var now = Common.GetCurrentDatetime();
             Order newOrder = order;
@@ -122,6 +165,7 @@ namespace ApplicationCore.Services
             };
 
             _repository.Add(transaction);
+            return transaction;
         }
         private async Task<int> CheckVoucher(Order order, Guid deviceId, Guid transactionId, Guid promotionTierId)
         {
@@ -133,6 +177,15 @@ namespace ApplicationCore.Services
                 {
                     result = await _voucherService.UpdateVoucherApplied(transactionId: transactionId, order: order.CustomerOrderInfo, storeId: device.StoreId, promotionTierId);
                 }
+            }
+            return result;
+        }
+        private async Task<int> CheckVoucherOther(Order order, Guid transactionId, Guid promotionTierId, Channel channel, Store store)
+        {
+            int result = 0;
+            if (order.CustomerOrderInfo.Vouchers.Count > 0)
+            {
+                result = await _voucherService.UpdateVoucherOther(transactionId: transactionId, order: order.CustomerOrderInfo, promotionTierId, channel, store);
             }
             return result;
         }

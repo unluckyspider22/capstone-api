@@ -220,6 +220,7 @@ namespace Infrastructure.Helper
             public const string Invalid_Group = "Sản phẩm chưa được chọn nhóm";
             public const string Duplicate_VoucherCode = "Trùng mã voucher.";
             public const string Invalid_VoucherCode = "Không có chương trình khuyến mãi phù hợp với mã voucher này.";
+            public const string Used_VoucherCode = "Voucher đã được sử dụng.";
             public const string Expire_Promotion = "Khuyến mãi tạm dừng.";
             public const string Exclusive_Promotion = "Khuyến mãi không dùng chung với các khuyến mãi khác";
             public const string Invalid_Gender = "Giới tính không phù hợp với khuyến mãi";
@@ -274,6 +275,7 @@ namespace Infrastructure.Helper
             public const string Signature_Err_Description = "Check your [BrandCode] or [ChannelCode]";
             public const string HashData_Not_Valid = "Hash data is not valid";
             public const string Invalid_ChannelCode = "Channel không tồn tại!";
+            public const string Empty_CustomerInfo = "Thông tin khách hàng không hợp lệ [CustomerName] [CustomerPhoneNo]!";
 
         }
         public class QueueMessage

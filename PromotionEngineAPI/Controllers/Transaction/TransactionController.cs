@@ -1,8 +1,10 @@
 ﻿using ApplicationCore.Request;
 using ApplicationCore.Services;
 using Infrastructure.DTOs;
+using Infrastructure.Helper;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Net;
 using System.Threading.Tasks;
 
 
@@ -14,9 +16,12 @@ namespace PromotionEngineAPI.Controllers
     {
 
         private readonly ITransactionService _service;
-        public TransactionController(ITransactionService service)
+        private readonly IChannelService _channelService;
+
+        public TransactionController(ITransactionService service, IChannelService channelService)
         {
             _service = service;
+            _channelService = channelService;
         }
         //[Authorize]
         [HttpPost]
@@ -25,11 +30,39 @@ namespace PromotionEngineAPI.Controllers
         {
             try
             {
-                return Ok(await _service.Checkout(order: order, brandId: brandId, deviceId: deviceId));
+                return Ok(await _service.PlaceOrder(brandId: brandId, order: order, deviceId: deviceId));
             }
             catch (ErrorObj e)
             {
                 return StatusCode(statusCode: e.Code, e);
+            }
+        }
+        [HttpPost]
+        [Route("{channelCode}/check-out-other")]
+        public async Task<IActionResult> CheckoutOther([FromBody] Order order, string channelCode)
+        {
+            try
+            {
+                var result = await _service.PlaceOrderForChannel(order: order, channelCode);
+                if (result != null)
+                {
+                    return Ok(
+                     new
+                     {
+                         code = (int)HttpStatusCode.OK,
+                         message = AppConstant.EnvVar.Success_Message,
+                         order = result
+                     });
+                }
+                else
+                {
+                    return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, AppConstant.ErrMessage.Bad_Request);
+                }
+
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, e);
             }
         }
     }

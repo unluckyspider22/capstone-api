@@ -14,7 +14,7 @@ namespace ApplicationCore.Utils
     {
         public static string Encrypt(string data, string publicKeyPem)
         {
-            RSACryptoServiceProvider publicK = RSACryptoUtils.ImportPublicKey(publicKeyPem);
+            RSACryptoServiceProvider publicK = ImportPublicKey(publicKeyPem);
             byte[] bytesPlainTextData = Encoding.UTF8.GetBytes(data);
             var bytesCipherText = publicK.Encrypt(bytesPlainTextData, false);
             string encryptedText = Convert.ToBase64String(bytesCipherText);
@@ -22,7 +22,7 @@ namespace ApplicationCore.Utils
         }
         public static string Decrypt(string encryptedText, string privateKeyPem)
         {
-            RSACryptoServiceProvider privateK = RSACryptoUtils.ImportPrivateKey(privateKeyPem);
+            RSACryptoServiceProvider privateK = ImportPrivateKey(privateKeyPem);
             byte[] bytesCipherText = Convert.FromBase64String(encryptedText);
             byte[] bytesPlainTextData = privateK.Decrypt(bytesCipherText, false);
             return Encoding.UTF8.GetString(bytesPlainTextData);

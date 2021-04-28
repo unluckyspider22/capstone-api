@@ -39,6 +39,7 @@ namespace ApplicationCore.Services
                 el.Status == (int)AppConstant.EnvVar.PromotionStatus.PUBLISH
                 && el.Brand.BrandCode == channelParam.BrandCode
                 && !el.IsAuto
+                && el.Voucher.Any(a => !a.IsRedemped && !a.IsUsed)
                 && !el.DelFlg,
                 includeProperties:
                 "Brand,PromotionChannelMapping.Channel," +

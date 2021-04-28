@@ -55,8 +55,7 @@ namespace ApplicationCore.Services
                     {
                         var voucher = await _repository.Get(filter: el =>
                         el.VoucherCode.Equals(voucherModel.VoucherCode) && el.VoucherGroup.PromotionTier.Any(a => (a.Promotion.PromotionCode + a.TierIndex).Equals(voucherModel.PromotionCode))
-                        && el.Promotion.Brand.BrandCode.Equals(order.Attributes.StoreInfo.BrandCode)
-                        && !el.IsUsed,
+                        && el.Promotion.Brand.BrandCode.Equals(order.Attributes.StoreInfo.BrandCode),
                     includeProperties:
                     "Promotion.PromotionTier.Action.ActionProductMapping.Product," +
                     "Promotion.PromotionTier.Gift.GiftProductMapping.Product," +
@@ -69,6 +68,7 @@ namespace ApplicationCore.Services
                     "Promotion.Brand," +
                     "Promotion.MemberLevelMapping.MemberLevel");
                         voucher = voucher.Where(f => Regex.IsMatch(f.VoucherCode, "^" + voucherModel.VoucherCode + "$"));
+                        
                         if (voucher.Count() > 1)
                         {
                             throw new ErrorObj(code: (int)AppConstant.ErrCode.Duplicate_VoucherCode, message: AppConstant.ErrMessage.Duplicate_VoucherCode, description: AppConstant.ErrMessage.Duplicate_VoucherCode);
@@ -76,6 +76,10 @@ namespace ApplicationCore.Services
                         if (voucher.Count() == 0)
                         {
                             throw new ErrorObj(code: (int)AppConstant.ErrCode.Invalid_VoucherCode, message: AppConstant.ErrMessage.Invalid_VoucherCode, description: AppConstant.ErrMessage.Invalid_VoucherCode);
+                        }
+                        if (voucher.First().IsUsed)
+                        {
+                            throw new ErrorObj(code: (int)AppConstant.ErrCode.Invalid_VoucherCode, message: AppConstant.ErrMessage.Used_VoucherCode, description: AppConstant.ErrMessage.Used_VoucherCode);
                         }
                         var promotion = voucher.FirstOrDefault().Promotion;
                         promotion.PromotionTier = promotion.PromotionTier.Where(w => w.PromotionTierId == voucher.First().PromotionTierId).ToList();
@@ -230,6 +234,63 @@ namespace ApplicationCore.Services
 
                         IGenericRepository<Store> _storeRepo = _unitOfWork.StoreRepository;
                         var store = await _storeRepo.GetFirst(filter: el => el.StoreId == storeId);
+                        if (store != null)
+                        {
+                            voucher.Store = store;
+                        }
+                        _repository.Update(voucher);
+                    }
+                }
+                return await _unitOfWork.SaveAsync();
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("\n\nError at CheckVoucher: \n" + e.Message);
+
+                throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
+            }
+        }
+        public async Task<int> UpdateVoucherOther(Guid transactionId, CustomerOrderInfo orderInfo, Guid promotionTierId, Channel channel, Store store)
+        {
+
+            try
+            {
+                DateTime now = Common.GetCurrentDatetime();
+                foreach (var voucherInReq in orderInfo.Vouchers)
+                {
+                    var voucher = await _repository.GetFirst(
+                        filter: el => el.PromotionTierId == promotionTierId
+                        && el.VoucherCode == voucherInReq.VoucherCode,
+                        includeProperties: "VoucherGroup");
+
+                    if (voucher != null)
+                    {
+                        var voucherGroup = voucher.VoucherGroup;
+                        voucherGroup.RedempedQuantity += 1;
+                        voucherGroup.UsedQuantity += 1;
+                        voucherGroup.UpdDate = now;
+                        _voucherGroupRepos.Update(voucherGroup);
+
+                        voucher.IsRedemped = AppConstant.EnvVar.Voucher.USED;
+                        voucher.RedempedDate = now;
+                        voucher.IsUsed = AppConstant.EnvVar.Voucher.USED;
+                        voucher.UsedDate = now;
+                        voucher.UpdDate = now;
+                        voucher.Channel = channel;
+                        voucher.OrderId = orderInfo.Id.ToString();
+                        voucher.TransactionId = transactionId;
+                        MembershipDto membership = new MembershipDto
+                        {
+                            MembershipId = Guid.NewGuid(),
+                            Email = orderInfo.Customer.CustomerEmail,
+                            Fullname = orderInfo.Customer.CustomerName,
+                            PhoneNumber = orderInfo.Customer.CustomerPhoneNo
+                        };
+                        var result = await _membershipService.CreateAsync(membership);
+                        if (result != null)
+                        {
+                            voucher.MembershipId = membership.MembershipId;
+                        }
                         if (store != null)
                         {
                             voucher.Store = store;

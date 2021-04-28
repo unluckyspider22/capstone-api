@@ -10,6 +10,7 @@ namespace ApplicationCore.Services
 {
     public interface ITransactionService : IBaseService<Transaction, TransactionDTO>
     {
-        public Task<Order> Checkout( Guid brandId, Order order,Guid deviceId);
+        public Task<Order> PlaceOrder(Guid brandId, Order order, Guid deviceId);
+        public Task<Order> PlaceOrderForChannel(Order order, string channelCode);
     }
 }
