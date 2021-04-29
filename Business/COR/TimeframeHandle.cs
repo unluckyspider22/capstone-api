@@ -48,26 +48,23 @@ namespace ApplicationCore.Chain
             {
                 var acceptPromotions = new List<Promotion>();
                 int invalidPromotions = 0;
-                foreach (var promotion in _promotions)
+                try
                 {
-                    try
+                    foreach (var promotion in _promotions)
                     {
-                        if (promotion.ForHoliday != (int)AppConstant.EnvVar.Holiday_Env.FOR_HOLIDAY)
-                        {
-                            HandleHolidayAsync(order);
-                        }
+
                         HandleDayOfWeek(promotion, order.CustomerOrderInfo.BookingDate.DayOfWeek);
                         HandleHour(promotion, order.CustomerOrderInfo.BookingDate.Hour);
-
                         acceptPromotions.Add(promotion);
                     }
-                    catch (ErrorObj e)
+
+                }
+                catch (ErrorObj e)
+                {
+                    invalidPromotions++;
+                    if (invalidPromotions == _promotions.Count && invalidPromotions > 0)
                     {
-                        invalidPromotions++;
-                        if (invalidPromotions == _promotions.Count && invalidPromotions > 0)
-                        {
-                            throw e;
-                        }
+                        throw e;
                     }
                 }
                 if (acceptPromotions.Count > 0)

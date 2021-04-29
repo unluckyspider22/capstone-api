@@ -56,22 +56,12 @@ namespace ApplicationCore.Chain
                         acceptPromotions.Add(promotion);
                     }
                 }
-                catch (ErrorObj)
+                catch (ErrorObj e)
                 {
                     invalidPromotions++;
                     if (invalidPromotions == _promotions.Count && invalidPromotions > 0)
                     {
-                        if (invalidPromotions == _promotions.Count())
-                        {
-                            if (order.Effects == null)
-                            {
-                                order.Effects = new List<Effect>();
-                            }
-                            order.Effects.Add(new Effect
-                            {
-                                EffectType = AppConstant.EffectMessage.NoAutoPromotion
-                            });
-                        }
+                        throw e;
                     }
                 }
                 _promotions = acceptPromotions;

@@ -53,14 +53,20 @@ namespace PromotionEngineAPI.Controllers
                 promotions = await _promotionService.GetAutoPromotions(orderInfo, promotionId);
                 if (promotions != null && promotions.Count() > 0)
                 {
-
                     _promotionService.SetPromotions(promotions);
                     //Check promotion
-                    responseModel = await _promotionService.HandlePromotion(responseModel);
-
-                    promotions = _promotionService.GetPromotions();
+                    try
+                    {
+                        responseModel = await _promotionService.HandlePromotion(responseModel);
+                        promotions = _promotionService.GetPromotions();
+                    }
+                    catch (ErrorObj)
+                    {
+                        Console.WriteLine(AppConstant.EffectMessage.NoAutoPromotion);
+                    }
+                    orderInfo.Vouchers = vouchers;
                 }
-                orderInfo.Vouchers = vouchers;
+
                 if (vouchers != null && vouchers.Count() > 0)
                 {
                     promotions = await _voucherService.CheckVoucher(orderInfo);
@@ -134,9 +140,9 @@ namespace PromotionEngineAPI.Controllers
                         Code = HttpStatusCode.OK,
                         Message = AppConstant.EnvVar.Success_Message,
                         Order = responseModel
-                        
+
                     };
-                    
+
                 }
                 catch (ErrorObj e)
                 {
