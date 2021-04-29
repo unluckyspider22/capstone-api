@@ -47,24 +47,29 @@ namespace ApplicationCore.Chain
             {
                 var acceptPromotions = new List<Promotion>();
                 int invalidPromotions = 0;
-                try
+
+                foreach (var promotion in _promotions)
                 {
-                    foreach (var promotion in _promotions)
+                    try
                     {
                         HandlePromotionCondition(promotion, order);
 
                         acceptPromotions.Add(promotion);
                     }
-                }
-                catch (ErrorObj e)
-                {
-                    invalidPromotions++;
-                    if (invalidPromotions == _promotions.Count && invalidPromotions > 0)
+                    catch (ErrorObj e)
                     {
-                        throw e;
+                        invalidPromotions++;
+                        if (invalidPromotions == _promotions.Count && invalidPromotions > 0)
+                        {
+                            throw e;
+                        }
                     }
                 }
-                _promotions = acceptPromotions;
+                if (acceptPromotions.Count > 0)
+                {
+                    _promotions = acceptPromotions;
+
+                }
             }
             #endregion
             else
