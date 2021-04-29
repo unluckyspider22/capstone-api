@@ -38,7 +38,8 @@ namespace ApplicationCore.Chain
         }
         private void HandleMinQuantity(OrderConditionModel orderCondition, Order order)
         {
-            if (!Common.Compare<decimal>(orderCondition.QuantityOperator, order.CustomerOrderInfo.CartItems.Count(), orderCondition.Quantity))
+            var totalItem = order.CustomerOrderInfo.CartItems.Sum(s => s.Quantity);
+            if (!Common.Compare<decimal>(orderCondition.QuantityOperator, totalItem, orderCondition.Quantity))
             {
                 orderCondition.IsMatch = false;
             }
