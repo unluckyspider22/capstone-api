@@ -65,10 +65,10 @@ namespace ApplicationCore.Chain
 
                     HandleStore(promotion, order);
                     HandleSalesMode(promotion, order);
+                    HandleApplier(promotion, order);
                     HandlePayment(promotion, order);
                     HandleGender(promotion, order);
                     HandleMemberLevel(promotion, order);
-
                 }
             }
             _timeframeHandle.SetPromotions(_promotions);
@@ -113,7 +113,7 @@ namespace ApplicationCore.Chain
         {
             if (!Common.CompareBinary(order.CustomerOrderInfo.Attributes.SalesMode, promotion.SaleMode))
             {
-                throw new ErrorObj(code: (int)AppConstant.ErrCode.Invalid_SaleMode, message: AppConstant.ErrMessage.Invalid_SaleMode);
+                throw new ErrorObj(code: (int)AppConstant.ErrCode.Invalid_SaleMode, message: "[SaleMode]"+ AppConstant.ErrMessage.Invalid_SaleMode);
             }
         }
         #endregion
@@ -127,6 +127,15 @@ namespace ApplicationCore.Chain
         }
         #endregion
 
+        #region Handle Applier
+        private void HandleApplier(Promotion promotion, Order order)
+        {
+            if (!Common.CompareBinary(int.Parse(order.CustomerOrderInfo.Attributes.StoreInfo.Applier), promotion.ApplyBy))
+            {
+                throw new ErrorObj(code: (int)AppConstant.ErrCode.Invalid_SaleMode, message: "[Applier]" + AppConstant.ErrMessage.Invalid_SaleMode);
+            }
+        }
+        #endregion
         #region Handle Gender
         private void HandleGender(Promotion promotion, Order order)
         {
