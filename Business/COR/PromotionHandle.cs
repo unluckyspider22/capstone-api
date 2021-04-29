@@ -50,20 +50,6 @@ namespace ApplicationCore.Chain
                     catch (ErrorObj)
                     {
                         invalidPromotions++;
-                        if (invalidPromotions == _promotions.Count())
-                        {
-                            if (order.Effects == null)
-                            {
-                                order.Effects = new List<Effect>();
-                            }
-                            order.Effects.Add(new Effect
-                            {
-                                Prop = new
-                                {
-                                    value = AppConstant.EffectMessage.NoAutoPromotion
-                                }
-                            });
-                        }
                     }
                 }
                 if (acceptPromotions.Count > 0)
