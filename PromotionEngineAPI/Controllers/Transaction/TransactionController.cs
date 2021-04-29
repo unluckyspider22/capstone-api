@@ -62,6 +62,7 @@ namespace PromotionEngineAPI.Controllers
             }
             catch (ErrorObj e)
             {
+                e.StackTrace = null;
                 return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, e);
             }
         }
