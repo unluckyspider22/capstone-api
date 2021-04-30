@@ -82,7 +82,7 @@ namespace ApplicationCore.Chain
             Promotion autoPromotion = null;
             if (order.Effects != null && order.Effects.Count > 0)
             {
-                autoPromotion = _promotions.FirstOrDefault(f => f.PromotionId == order.Effects.FirstOrDefault(f => 
+                autoPromotion = _promotions.FirstOrDefault(f => f.PromotionId == order.Effects.FirstOrDefault(f =>
                                 f.EffectType == AppConstant.EffectMessage.AutoPromotion).PromotionId);
             }
             //Nếu như có voucher mới handle Exclusive, còn auto apply thì không check mà trả về cho user chọn
@@ -105,7 +105,10 @@ namespace ApplicationCore.Chain
                     throw new ErrorObj(code: (int)AppConstant.ErrCode.Exclusive_Promotion, message: AppConstant.ErrMessage.Exclusive_Promotion);
                 }
             }
-            _promotions.Remove(autoPromotion);
+            if (autoPromotion != null)
+            {
+                _promotions.Remove(autoPromotion);
+            }
         }
         #endregion
         #region Handle Store
