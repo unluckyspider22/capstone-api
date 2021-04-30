@@ -57,13 +57,9 @@ namespace ApplicationCore.Chain
                         HandleHour(promotion, order.CustomerOrderInfo.BookingDate.Hour);
                         acceptPromotions.Add(promotion);
                     }
-                    catch (ErrorObj e)
+                    catch (ErrorObj)
                     {
                         invalidPromotions++;
-                        if (invalidPromotions == _promotions.Count && invalidPromotions > 0)
-                        {
-                            throw e;
-                        }
                     }
                 }
                 if (acceptPromotions.Count > 0)

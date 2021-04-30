@@ -56,13 +56,9 @@ namespace ApplicationCore.Chain
 
                         acceptPromotions.Add(promotion);
                     }
-                    catch (ErrorObj e)
+                    catch (ErrorObj)
                     {
                         invalidPromotions++;
-                        if (invalidPromotions == _promotions.Count && invalidPromotions > 0)
-                        {
-                            throw e;
-                        }
                     }
                 }
                 if (acceptPromotions.Count > 0)
@@ -84,6 +80,7 @@ namespace ApplicationCore.Chain
         private void HandlePromotionCondition(Promotion promotion, Order order)
         {
             int invalidPromotionDetails = 0;
+            promotion.PromotionTier = promotion.PromotionTier.OrderByDescending(o => o.Priority).ToList();
             foreach (var promotionTier in promotion.PromotionTier)
             {
                 #region Handle Condition
@@ -121,6 +118,7 @@ namespace ApplicationCore.Chain
                 }
                 order.Effects.Add(effect);
                 #endregion
+                break;
             }
             if (invalidPromotionDetails == promotion.PromotionTier.Count && invalidPromotionDetails > 0)
             {

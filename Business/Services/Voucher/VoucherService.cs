@@ -54,7 +54,8 @@ namespace ApplicationCore.Services
                     if (!string.IsNullOrEmpty(voucherModel.VoucherCode))
                     {
                         var voucher = await _repository.Get(filter: el =>
-                        el.VoucherCode.Equals(voucherModel.VoucherCode) && el.VoucherGroup.PromotionTier.Any(a => (a.Promotion.PromotionCode + a.TierIndex).Equals(voucherModel.PromotionCode))
+                        el.VoucherCode.Equals(voucherModel.VoucherCode)
+                        && el.Promotion.PromotionTier.Any(a => (a.Promotion.PromotionCode + a.TierIndex).Equals(voucherModel.PromotionCode))
                         && el.Promotion.Brand.BrandCode.Equals(order.Attributes.StoreInfo.BrandCode),
                     includeProperties:
                     "Promotion.PromotionTier.Action.ActionProductMapping.Product," +
@@ -68,7 +69,7 @@ namespace ApplicationCore.Services
                     "Promotion.Brand," +
                     "Promotion.MemberLevelMapping.MemberLevel");
                         voucher = voucher.Where(f => Regex.IsMatch(f.VoucherCode, "^" + voucherModel.VoucherCode + "$"));
-
+                        
                         if (voucher.Count() > 1)
                         {
                             throw new ErrorObj(code: (int)AppConstant.ErrCode.Duplicate_VoucherCode, message: AppConstant.ErrMessage.Duplicate_VoucherCode, description: AppConstant.ErrMessage.Duplicate_VoucherCode);
