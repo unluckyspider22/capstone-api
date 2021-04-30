@@ -65,6 +65,14 @@ namespace PromotionEngineAPI.Controllers
                 e.StackTrace = null;
                 return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, e);
             }
+            catch (Exception)
+            {
+                return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new
+                {
+                    code = (int)HttpStatusCode.BadRequest,
+                    message = AppConstant.ErrMessage.Bad_Request
+                });
+            }
         }
     }
 }

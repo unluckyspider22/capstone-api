@@ -92,6 +92,10 @@ namespace ApplicationCore.Services
         {
             var brand = await _brandService.GetFirst(filter: el => el.BrandCode == order.CustomerOrderInfo.Attributes.StoreInfo.BrandCode,
                 includeProperties: "Channel,Store");
+            if (order.CustomerOrderInfo.Customer == null)
+            {
+                throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, AppConstant.ErrMessage.Empty_CustomerInfo);
+            }
             if (string.IsNullOrEmpty(order.CustomerOrderInfo.Customer.CustomerName) || string.IsNullOrEmpty(order.CustomerOrderInfo.Customer.CustomerPhoneNo))
             {
                 throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, AppConstant.ErrMessage.Empty_CustomerInfo);
