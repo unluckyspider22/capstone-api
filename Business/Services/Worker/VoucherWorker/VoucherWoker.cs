@@ -119,14 +119,16 @@ namespace ApplicationCore.Worker
                     {
                         try
                         {
-                            _logger.LogInformation("\n>>>>>>Start generate: " + DateTime.Now.ToString("HH:mm:ss"));
+                            _logger.LogInformation("\n>>>>>>>>>>>> INSERT VOUCHER  !! <<<<<<<<<<<<<<<");
+                            _logger.LogInformation("\n>>>>>>>>>>>> GENERATE VOUCHER  !! <<<<<<<<<<<<<<<");
+                            _logger.LogInformation("\n>>>>>> Start generate: " + DateTime.Now.ToString("HH:mm:ss"));
                             List<Voucher> vouchers = vouchersAdd;
                             if (!isAddMore && vouchersAdd == null)
                             {
                                 vouchers = GenerateDistinctVoucher(dto);
                             }
-                            _logger.LogInformation("\n>>>>>>End generate: " + DateTime.Now.ToString("HH:mm:ss"));
-                            _logger.LogInformation("\n>>>>>>Start insert: " + DateTime.Now.ToString("HH:mm:ss"));
+                            _logger.LogInformation("\n>>>>>> End generate: " + DateTime.Now.ToString("HH:mm:ss"));
+                            _logger.LogInformation("\n>>>>>> Start insert: " + DateTime.Now.ToString("HH:mm:ss"));
                             // Insert vouchers 
                             await voucherRepository.InsertBulk(vouchers);
                             _logger.LogInformation("\n>>>>>>End insert: " + DateTime.Now.ToString("HH:mm:ss"));
