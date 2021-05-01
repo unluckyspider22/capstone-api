@@ -273,14 +273,18 @@ namespace ApplicationCore.Services
                             VoucherCode = coupon.VoucherCode
                         });
                     }
+
                     customerOrder = new CustomerOrderInfo
                     {
                         Amount = param.Amount,
                         Attributes = attribute,
                         BookingDate = param.BookingDate,
                         CartItems = items,
+
                         Customer = new Customer
                         {
+                            CustomerName = param.Customer.CustomerName,
+                            CustomerPhoneNo = param.Customer.CustomerPhoneNo,
                             CustomerGender = param.Customer.CustomerGender,
                             CustomerLevel = param.Customer.CustomerLevel
                         },

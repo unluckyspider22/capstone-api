@@ -3,7 +3,8 @@ using System.Collections.Generic;
 
 namespace Infrastructure.DTOs
 {
-    public class ChannelOtherPlaceOrder {
+    public class ChannelOtherPlaceOrder
+    {
 
     }
 
@@ -41,8 +42,11 @@ namespace Infrastructure.DTOs
     }
     public class ChannelCustomer
     {
+        public string CustomerName { get; set; }
+        public string CustomerPhoneNo { get; set; }
         public int CustomerGender { get; set; } = 3;
         public string CustomerLevel { get; set; }
+
     }
     public class ChannelCouponCode
     {

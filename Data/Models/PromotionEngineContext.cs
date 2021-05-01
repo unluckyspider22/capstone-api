@@ -50,7 +50,7 @@ namespace Infrastructure.Models
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
-            {}
+            { }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -527,7 +527,6 @@ namespace Infrastructure.Models
                 entity.Property(e => e.MembershipId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.Email)
-                    .IsRequired()
                     .HasMaxLength(62)
                     .IsUnicode(false);
 
@@ -541,7 +540,7 @@ namespace Infrastructure.Models
 
                 entity.Property(e => e.PhoneNumber)
                     .IsRequired()
-                    .HasMaxLength(11)
+                    .HasMaxLength(12)
                     .IsUnicode(false);
 
                 entity.Property(e => e.UpdDate)
@@ -976,6 +975,10 @@ namespace Infrastructure.Models
 
                 entity.Property(e => e.CustomCharset)
                     .HasMaxLength(106)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ImgUrl)
+                    .HasMaxLength(2048)
                     .IsUnicode(false);
 
                 entity.Property(e => e.InsDate)

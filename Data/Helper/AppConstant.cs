@@ -20,6 +20,7 @@ namespace Infrastructure.Helper
         public const string UNUSED = "0";
         public const string USED = "1";
         public const string Err_Prefix = "E-";
+        public const string VietNamPhoneCode = "+84";
         public struct Status
         {
             public const string ALL = "0";

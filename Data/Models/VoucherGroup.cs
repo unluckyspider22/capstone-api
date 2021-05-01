@@ -27,6 +27,7 @@ namespace Infrastructure.Models
         public Guid? ActionId { get; set; }
         public Guid? GiftId { get; set; }
         public int? CodeLength { get; set; }
+        public string ImgUrl { get; set; }
 
         public virtual Action Action { get; set; }
         public virtual Brand Brand { get; set; }
