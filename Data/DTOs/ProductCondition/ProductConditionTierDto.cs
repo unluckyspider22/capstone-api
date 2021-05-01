@@ -10,7 +10,7 @@ namespace Infrastructure.DTOs
     {
         public Guid ProductConditionId { get; set; }
         [StringLength(1)]
-        public string ProductConditionType { get; set; }
+        public int ProductConditionType { get; set; }
         [Range(0, 999999)]
         public decimal ProductQuantity { get; set; }
         [StringLength(1)]
