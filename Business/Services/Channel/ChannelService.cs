@@ -257,6 +257,7 @@ namespace ApplicationCore.Services
                         items.Add(
                             new Item
                             {
+                                ProductName = item.ProductName,
                                 ProductCode = item.ProductCode,
                                 UnitPrice = item.UnitPrice,
                                 Quantity = item.Quantity,
