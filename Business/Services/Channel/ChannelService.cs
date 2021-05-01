@@ -68,8 +68,8 @@ namespace ApplicationCore.Services
                             VoucherName = promotionTier.VoucherGroup.VoucherName,
                             VoucherCode = promotion.PromotionCode +
                                         promotionTier.TierIndex + "-" +
-                                        promotionTier.VoucherGroup.Voucher.First(el => !el.IsRedemped && !el.IsUsed)
-                                        .VoucherCode
+                                        promotionTier.VoucherGroup.Voucher.First(el => !el.IsRedemped && !el.IsUsed
+                                                                           && el.PromotionId == promotion.PromotionId).VoucherCode
 
                         };
                         result.Add(tier);
