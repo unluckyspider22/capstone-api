@@ -42,7 +42,8 @@ namespace Infrastructure.Repository
             {
                 using (var context = new PromotionEngineContext(options: GetDbOption()))
                 {
-                    await context.BulkInsertAsync(vouchers, b => b.IncludeGraph = true);
+                    await context.Voucher.AddRangeAsync(vouchers);
+                    await context.SaveChangesAsync();
                 }
             }
             catch (Exception ex)

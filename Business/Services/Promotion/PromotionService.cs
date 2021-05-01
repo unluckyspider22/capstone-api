@@ -477,7 +477,7 @@ namespace ApplicationCore.Services
                     InsDate = DateTime.Now,
                     UpdDate = DateTime.Now,
                 };
-                conditionGroupEntity.Summary = CreateSummary(group);
+                //conditionGroupEntity.Summary = CreateSummary(group);
                 conditionGroupRepo.Add(conditionGroupEntity);
                 group.ConditionGroupId = conditionGroupEntity.ConditionGroupId;
                 // Create product condition
@@ -723,200 +723,200 @@ namespace ApplicationCore.Services
         private string CreateSummary(ConditionGroupDto group)
         {
             var result = "";
-            CultureInfo cul = CultureInfo.GetCultureInfo("vi-VN");
-            var conditions = ConvertConditionList(group);
-            for (int i = 0; i < conditions.Count; i++)
-            {
-                var condition = conditions[i];
-                if (condition.GetType() == typeof(ProductConditionDto))
-                {
-                    var value = (ProductConditionDto)condition;
-                    var productResult = "";
-                    if (value.ProductConditionType.Equals("0"))
-                    {
-                        if (result.Equals(""))
-                        {
-                            productResult = "- Include ";
-                        }
-                        else
-                        {
-                            productResult = "include ";
-                        }
-                    }
-                    else
-                    {
-                        if (result == "")
-                        {
-                            productResult = "- Exclude ";
-                        }
-                        else
-                        {
-                            productResult = "exclude ";
-                        }
-                    }
+            //CultureInfo cul = CultureInfo.GetCultureInfo("vi-VN");
+            //var conditions = ConvertConditionList(group);
+            //for (int i = 0; i < conditions.Count; i++)
+            //{
+            //    var condition = conditions[i];
+            //    if (condition.GetType() == typeof(ProductConditionDto))
+            //    {
+            //        var value = (ProductConditionDto)condition;
+            //        var productResult = "";
+            //        if (value.ProductConditionType.Equals("0"))
+            //        {
+            //            if (result.Equals(""))
+            //            {
+            //                productResult = "- Include ";
+            //            }
+            //            else
+            //            {
+            //                productResult = "include ";
+            //            }
+            //        }
+            //        else
+            //        {
+            //            if (result == "")
+            //            {
+            //                productResult = "- Exclude ";
+            //            }
+            //            else
+            //            {
+            //                productResult = "exclude ";
+            //            }
+            //        }
 
-                    if (value.ProductConditionType.Equals("0"))
-                    {
-                        switch (value.QuantityOperator)
-                        {
-                            case "1":
-                                {
-                                    productResult += "more than ";
-                                    break;
-                                }
-                            case "2":
-                                {
-                                    productResult += "more than or equal ";
-                                    break;
-                                }
-                            case "3":
-                                {
-                                    productResult += "less than ";
-                                    break;
-                                }
-                            case "4":
-                                {
-                                    productResult += "less than or equal ";
-                                    break;
-                                }
-                        }
-                    }
-                    if (value.ProductConditionType.Equals("0"))
-                    {
-                        productResult += value.ProductQuantity + " ";
-                    }
-                    //productResult += value.ProductName;
-                    if (i < conditions.Count - 1)
-                    {
-                        if (value.NextOperator.Equals("1"))
-                        {
-                            productResult += " or ";
-                        }
-                        else
-                        {
-                            productResult += " and ";
-                        }
-                    }
+            //        if (value.ProductConditionType.Equals("0"))
+            //        {
+            //            switch (value.QuantityOperator)
+            //            {
+            //                case "1":
+            //                    {
+            //                        productResult += "more than ";
+            //                        break;
+            //                    }
+            //                case "2":
+            //                    {
+            //                        productResult += "more than or equal ";
+            //                        break;
+            //                    }
+            //                case "3":
+            //                    {
+            //                        productResult += "less than ";
+            //                        break;
+            //                    }
+            //                case "4":
+            //                    {
+            //                        productResult += "less than or equal ";
+            //                        break;
+            //                    }
+            //            }
+            //        }
+            //        if (value.ProductConditionType.Equals("0"))
+            //        {
+            //            productResult += value.ProductQuantity + " ";
+            //        }
+            //        //productResult += value.ProductName;
+            //        if (i < conditions.Count - 1)
+            //        {
+            //            if (value.NextOperator.Equals("1"))
+            //            {
+            //                productResult += " or ";
+            //            }
+            //            else
+            //            {
+            //                productResult += " and ";
+            //            }
+            //        }
 
-                    result += productResult;
-                }
-                if (condition.GetType() == typeof(OrderConditionDto))
-                {
-                    var value = (OrderConditionDto)condition;
-                    var orderResult = "order has ";
-                    if (result.Equals(""))
-                    {
-                        orderResult = "- Order has ";
-                    }
-                    switch (value.QuantityOperator)
-                    {
-                        case "1":
-                            {
-                                orderResult += "more than ";
-                                break;
-                            }
-                        case "2":
-                            {
-                                orderResult += "more than or equal ";
-                                break;
-                            }
-                        case "3":
-                            {
-                                orderResult += "less than ";
-                                break;
-                            }
-                        case "4":
-                            {
-                                orderResult += "less than or equal ";
-                                break;
-                            }
-                        case "5":
-                            {
-                                orderResult += "equal ";
-                                break;
-                            }
-                    }
-                    orderResult += value.Quantity + " item(s) and total ";
-                    switch (value.AmountOperator)
-                    {
-                        case "1":
-                            {
-                                orderResult += "more than ";
-                                break;
-                            }
-                        case "2":
-                            {
-                                orderResult += "more than or equal ";
-                                break;
-                            }
-                        case "3":
-                            {
-                                orderResult += "less than ";
-                                break;
-                            }
-                        case "4":
-                            {
-                                orderResult += "less than or equal ";
-                                break;
-                            }
-                        case "5":
-                            {
-                                orderResult += "equal ";
-                                break;
-                            }
-                    }
-                    orderResult += double.Parse(value.Amount.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
-                    if (i < conditions.Count - 1)
-                    {
-                        if (value.NextOperator.Equals("1"))
-                        {
-                            orderResult += " or ";
-                        }
-                        else
-                        {
-                            orderResult += " and ";
-                        }
-                    }
+            //        result += productResult;
+            //    }
+            //    if (condition.GetType() == typeof(OrderConditionDto))
+            //    {
+            //        var value = (OrderConditionDto)condition;
+            //        var orderResult = "order has ";
+            //        if (result.Equals(""))
+            //        {
+            //            orderResult = "- Order has ";
+            //        }
+            //        switch (value.QuantityOperator)
+            //        {
+            //            case "1":
+            //                {
+            //                    orderResult += "more than ";
+            //                    break;
+            //                }
+            //            case "2":
+            //                {
+            //                    orderResult += "more than or equal ";
+            //                    break;
+            //                }
+            //            case "3":
+            //                {
+            //                    orderResult += "less than ";
+            //                    break;
+            //                }
+            //            case "4":
+            //                {
+            //                    orderResult += "less than or equal ";
+            //                    break;
+            //                }
+            //            case "5":
+            //                {
+            //                    orderResult += "equal ";
+            //                    break;
+            //                }
+            //        }
+            //        orderResult += value.Quantity + " item(s) and total ";
+            //        switch (value.AmountOperator)
+            //        {
+            //            case "1":
+            //                {
+            //                    orderResult += "more than ";
+            //                    break;
+            //                }
+            //            case "2":
+            //                {
+            //                    orderResult += "more than or equal ";
+            //                    break;
+            //                }
+            //            case "3":
+            //                {
+            //                    orderResult += "less than ";
+            //                    break;
+            //                }
+            //            case "4":
+            //                {
+            //                    orderResult += "less than or equal ";
+            //                    break;
+            //                }
+            //            case "5":
+            //                {
+            //                    orderResult += "equal ";
+            //                    break;
+            //                }
+            //        }
+            //        orderResult += double.Parse(value.Amount.ToString()).ToString("#,###", cul.NumberFormat) + " VNĐ";
+            //        if (i < conditions.Count - 1)
+            //        {
+            //            if (value.NextOperator.Equals("1"))
+            //            {
+            //                orderResult += " or ";
+            //            }
+            //            else
+            //            {
+            //                orderResult += " and ";
+            //            }
+            //        }
 
-                    result += orderResult;
-                }
-                if (condition.GetType() == typeof(MembershipConditionDto))
-                {
-                    var value = (MembershipConditionDto)condition;
-                    var membershipResult = "membership level are:  ";
-                    if (result.Equals(""))
-                    {
-                        membershipResult = "- Membership level are:  ";
-                    }
-                    var list = "";
-                    var levels = value.MembershipLevel.Split("|");
-                    foreach (var level in levels)
-                    {
-                        if (list.Equals(""))
-                        {
-                            list += level;
-                        }
-                        else
-                        {
-                            list += ", " + level;
-                        }
-                    }
-                    membershipResult += list;
-                    if (i < conditions.Count - 1)
-                    {
-                        if (value.NextOperator.Equals("1"))
-                        {
-                            membershipResult += " or ";
-                        }
-                        else
-                        {
-                            membershipResult += " and ";
-                        }
-                    }
+            //        result += orderResult;
+            //    }
+            //    if (condition.GetType() == typeof(MembershipConditionDto))
+            //    {
+            //        var value = (MembershipConditionDto)condition;
+            //        var membershipResult = "membership level are:  ";
+            //        if (result.Equals(""))
+            //        {
+            //            membershipResult = "- Membership level are:  ";
+            //        }
+            //        var list = "";
+            //        var levels = value.MembershipLevel.Split("|");
+            //        foreach (var level in levels)
+            //        {
+            //            if (list.Equals(""))
+            //            {
+            //                list += level;
+            //            }
+            //            else
+            //            {
+            //                list += ", " + level;
+            //            }
+            //        }
+            //        membershipResult += list;
+            //        if (i < conditions.Count - 1)
+            //        {
+            //            if (value.NextOperator.Equals("1"))
+            //            {
+            //                membershipResult += " or ";
+            //            }
+            //            else
+            //            {
+            //                membershipResult += " and ";
+            //            }
+            //        }
 
-                    result += membershipResult;
-                }
-            }
+            //        result += membershipResult;
+            //    }
+            //}
 
 
             return result;

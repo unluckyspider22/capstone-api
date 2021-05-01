@@ -103,13 +103,7 @@ namespace ApplicationCore.Worker
 
             //item.Message = AppConstant.NotiMess.VOUCHER_GENERATE_MESS + " " + AppConstant.NotiMess.PROCESSING_MESS;
             //notify.GeneratingVoucher(item);
-            _logger.LogInformation(">>>>>>Start generate: " + DateTime.Now.ToString("HH:mm:ss"));
-            List<Voucher> vouchers = vouchersAdd;
-            if (!isAddMore && vouchersAdd == null)
-            {
-                vouchers = GenerateDistinctVoucher(dto);
-            }
-            _logger.LogInformation(">>>>>>End generate: " + DateTime.Now.ToString("HH:mm:ss"));
+
             //item.Message = AppConstant.NotiMess.VOUCHER_GENERATE_MESS + " " + AppConstant.NotiMess.PROCESSED_MESS;
             //notify.GeneratedVoucher(item);
 
@@ -118,17 +112,24 @@ namespace ApplicationCore.Worker
             {
                 if (!_cancellationToken.IsCancellationRequested)
                 {
-                    _logger.LogInformation("InsertVouchers is starting.");
+                    _logger.LogInformation("\nInsertVouchers is starting.");
                     // Gửi notify processing task
                     //notify.ProcessingVoucher(item: item);
                     _taskQueue.QueueBackgroundWorkItem(async token =>
                     {
                         try
                         {
-                            _logger.LogInformation(">>>>>>Start insert: " + DateTime.Now.ToString("HH:mm:ss"));
+                            _logger.LogInformation("\n>>>>>>Start generate: " + DateTime.Now.ToString("HH:mm:ss"));
+                            List<Voucher> vouchers = vouchersAdd;
+                            if (!isAddMore && vouchersAdd == null)
+                            {
+                                vouchers = GenerateDistinctVoucher(dto);
+                            }
+                            _logger.LogInformation("\n>>>>>>End generate: " + DateTime.Now.ToString("HH:mm:ss"));
+                            _logger.LogInformation("\n>>>>>>Start insert: " + DateTime.Now.ToString("HH:mm:ss"));
                             // Insert vouchers 
                             await voucherRepository.InsertBulk(vouchers);
-                            _logger.LogInformation(">>>>>>End insert: " + DateTime.Now.ToString("HH:mm:ss"));
+                            _logger.LogInformation("\n>>>>>>End insert: " + DateTime.Now.ToString("HH:mm:ss"));
                             //item.Message = AppConstant.NotiMess.VOUCHER_INSERT_MESS + " " + AppConstant.NotiMess.PROCESSED_MESS;
                             //item.IsDone = true;
                             // Gửi notify hoàn thành task
@@ -136,10 +137,10 @@ namespace ApplicationCore.Worker
                         }
                         catch (Exception e)
                         {
-                            _logger.LogInformation(">>>>>>>>>>>> INSERT VOUCHER ERROR !! <<<<<<<<<<<<<<<");
+                            _logger.LogInformation("\n>>>>>>>>>>>> INSERT VOUCHER ERROR !! <<<<<<<<<<<<<<<");
                             _logger.LogInformation(e.Message);
                             _logger.LogInformation(e.StackTrace);
-                            _logger.LogInformation(">>>>>>>>>>>> INSERT VOUCHER ERROR !! <<<<<<<<<<<<<<<");
+                            _logger.LogInformation("\n>>>>>>>>>>>> INSERT VOUCHER ERROR !! <<<<<<<<<<<<<<<");
                             //item.Message = AppConstant.NotiMess.VOUCHER_INSERT_MESS + " " + AppConstant.NotiMess.ERROR_MESS;
                             //item.IsDone = true;
                             // Gửi notify lỗi
