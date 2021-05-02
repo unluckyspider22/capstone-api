@@ -3,10 +3,8 @@ using ApplicationCore.Utils;
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
@@ -162,7 +160,7 @@ namespace PromotionEngineAPI.Controllers
 
             try
             {
-                var result = await _service.GetTokenDevice(pairCode,channelCode);
+                var result = await _service.GetTokenDevice(pairCode, channelCode);
                 return Ok(result);
             }
             catch (ErrorObj e)

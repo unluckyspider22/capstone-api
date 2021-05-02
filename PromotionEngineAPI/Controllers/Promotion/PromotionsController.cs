@@ -275,7 +275,6 @@ namespace PromotionEngineAPI.Controllers
             }
 
         }
-        [Authorize]
         // GET: api/Promotions/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPromotion([FromRoute] Guid id)
