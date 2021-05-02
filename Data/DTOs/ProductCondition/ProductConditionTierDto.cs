@@ -12,7 +12,7 @@ namespace Infrastructure.DTOs
         [Range(0, 999999)]
         public decimal ProductQuantity { get; set; }
         [StringLength(1)]
-        public int QuantityOperator { get; set; }
+        public string QuantityOperator { get; set; }
         [StringLength(1)]
         public int NextOperator { get; set; }
         [Range(0, 999)]
