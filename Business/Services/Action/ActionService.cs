@@ -49,6 +49,7 @@ namespace ApplicationCore.Services
             {
                 result = _mapper.Map<ActionDto>(entity);
                 result.ListProduct = new List<ActionProductMap>();
+                result.ListProductMapp = new List<ActionProductMapping>();
                 if (entity.ActionProductMapping.Count > 0)
                 {
                     foreach (var product in entity.ActionProductMapping)

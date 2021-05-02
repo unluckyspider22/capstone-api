@@ -74,5 +74,22 @@ namespace PromotionEngineAPI.Controllers
                 });
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetTransaction(
+          [FromQuery] PagingRequestParam param,
+          [FromQuery] Guid PromotionId)
+        {
+            try
+            {
+                var result = await _service.GetPromoTrans(promotionId: PromotionId, param: param);
+                return Ok(result);
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
+
     }
 }

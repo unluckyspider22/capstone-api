@@ -6,6 +6,7 @@ using Infrastructure.Helper;
 using Infrastructure.Models;
 using Infrastructure.Repository;
 using Infrastructure.UnitOfWork;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -191,6 +192,33 @@ namespace ApplicationCore.Services
             {
                 result = await _voucherService.UpdateVoucherOther(transactionId: transactionId, order: order.CustomerOrderInfo, promotionTierId, channel, store);
             }
+            return result;
+        }
+
+        public async Task<GenericRespones<PromoTrans>> GetPromoTrans(Guid promotionId, PagingRequestParam param)
+        {
+            var listTrans = new List<PromoTrans>();
+            var trans = await _repository.Get(
+                                            pageIndex: param.PageIndex,
+                                            pageSize: param.PageSize,
+                                            filter: el => el.PromotionId.Equals(promotionId),
+                                            orderBy: el => el.OrderByDescending(o => o.InsDate));
+            if (trans.Count() > 0)
+            {
+                foreach (var tran in trans)
+                {
+                    var dto = new PromoTrans()
+                    {
+                        Transaction = tran,
+                        Order = JsonConvert.DeserializeObject(tran.TransactionJson),
+                    };
+                    listTrans.Add(dto);
+                }
+            }
+            var totalItem = await _repository.CountAsync(el => el.PromotionId.Equals(promotionId));
+            MetaData metadata = new MetaData(pageIndex: param.PageIndex, pageSize: param.PageSize, totalItems: totalItem);
+
+            GenericRespones<PromoTrans> result = new GenericRespones<PromoTrans>(data: listTrans, metadata: metadata);
             return result;
         }
     }

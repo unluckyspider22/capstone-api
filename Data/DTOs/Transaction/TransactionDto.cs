@@ -17,4 +17,10 @@ namespace Infrastructure.DTOs
 
         public virtual Brand Brand { get; set; }
     }
+
+    public class PromoTrans
+    {
+        public Transaction Transaction { get; set; }
+        public dynamic Order { get; set; }
+    }
 }
