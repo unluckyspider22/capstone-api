@@ -72,11 +72,12 @@ namespace ApplicationCore.Services
         {
             try
             {
+                //var now = Common.GetCurrentDatetime();
                 // Insert condition rule
                 var ruleEntity = _mapper.Map<ConditionRule>(param);
                 ruleEntity.ConditionRuleId = Guid.NewGuid();
-                ruleEntity.InsDate = DateTime.Now;
-                ruleEntity.UpdDate = DateTime.Now;
+                //ruleEntity.InsDate = now;
+                //ruleEntity.UpdDate = now;
                 _repository.Add(ruleEntity);
                 await _unitOfWork.SaveAsync();
                 return _mapper.Map<ConditionRuleDto>(ruleEntity);
@@ -105,6 +106,8 @@ namespace ApplicationCore.Services
                     BrandId = rule.BrandId,
                     RuleName = rule.RuleName,
                     Description = rule.Description,
+                    InsDate = rule.InsDate,
+                    UpdDate = rule.UpdDate,
                     ConditionGroups = new List<ConditionGroupResponse>(),
                 };
                 //if (rule.PromotionTier.PromotionId != null)

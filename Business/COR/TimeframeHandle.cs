@@ -21,7 +21,7 @@ namespace ApplicationCore.Chain
 {
     public interface ITimeframeHandle : IHandler<Order>
     {
-        void SetHolidays(List<Holiday> holidays);
+        //void SetHolidays(List<Holiday> holidays);
         void SetPromotions(List<Promotion> promotions);
 
     }
