@@ -33,41 +33,44 @@ namespace ApplicationCore.Chain
         public void Apply(Order order)
         {
             order.TotalAmount = order.CustomerOrderInfo.Amount + order.CustomerOrderInfo.ShippingFee;
-            foreach (var promotion in _promotions)
+            if (order.Effects != null)
             {
-                //Lấy những Tier có ID đc thỏa hết các điều kiện
-                var promotionTiers =
-                    promotion.PromotionTier.Where(el =>
-                        order.Effects.Any(a => a.PromotionTierId == el.PromotionTierId)
-                ).ToList();
+                foreach (var promotion in _promotions)
+                {
+                    //Lấy những Tier có ID đc thỏa hết các điều kiện
+                    var promotionTiers =
+                        promotion.PromotionTier.Where(el =>
+                            order.Effects.Any(a => a.PromotionTierId == el.PromotionTierId)
+                    ).ToList();
 
-                PromotionTier applyTier = null;
-                if (promotionTiers != null && promotionTiers.Count > 0)
-                {
-                    applyTier = promotionTiers.FirstOrDefault(w => w.Priority == promotionTiers.Max(m => m.Priority));
-                }
-                //FilterTier(promotionTiers, promotion);
-                if (applyTier != null)
-                {
-                    var action = applyTier.Action;
-                    var postAction = applyTier.Gift;
-                    if (action != null)
+                    PromotionTier applyTier = null;
+                    if (promotionTiers != null && promotionTiers.Count > 0)
                     {
-                        if (action.ActionType >= 1 && action.ActionType <= 3)
+                        applyTier = promotionTiers.FirstOrDefault(w => w.Priority == promotionTiers.Max(m => m.Priority));
+                    }
+                    //FilterTier(promotionTiers, promotion);
+                    if (applyTier != null)
+                    {
+                        var action = applyTier.Action;
+                        var postAction = applyTier.Gift;
+                        if (action != null)
                         {
-                            DiscountOrder(order, action, promotion, applyTier);
+                            if (action.ActionType >= 1 && action.ActionType <= 3)
+                            {
+                                DiscountOrder(order, action, promotion, applyTier);
+                            }
+                            else
+                            {
+                                DiscountProduct(order, action, promotion, applyTier);
+                            }
                         }
-                        else
+                        if (postAction != null)
                         {
-                            DiscountProduct(order, action, promotion, applyTier);
+                            AddGift(order, postAction, promotion, applyTier);
                         }
                     }
-                    if (postAction != null)
-                    {
-                        AddGift(order, postAction, promotion, applyTier);
-                    }
+                    SetFinalAmountApply(order);
                 }
-                SetFinalAmountApply(order);
             }
         }
         #region Filter Action & Post Action
@@ -130,14 +133,15 @@ namespace ApplicationCore.Chain
                 case (int)AppConstant.EnvVar.PostActionType.Gift_Product:
                     effectType = AppConstant.EffectMessage.AddGiftProduct;
                     giftProp = new List<object>();
-                    var productGifts = giftAction.GiftProductMapping.Select(el => el.Product);
+                    var productGifts = giftAction.GiftProductMapping;
                     foreach (var product in productGifts)
                     {
                         var gift = new
                         {
                             code = promotion.PromotionCode + promotionTier.TierIndex,
-                            ProductCode = product.Code,
-                            ProductName = product.Name
+                            ProductCode = product.Product.Code,
+                            product.Quantity,
+                            ProductName = product.Product.Name
                         };
                         order.Gift.Add(gift);
                         giftProp.Add(gift);
@@ -362,53 +366,11 @@ namespace ApplicationCore.Chain
             else
             {
                 #region bundle
-                /*   
-                   var products = order.CustomerOrderInfo.CartItems;
-                   int countProductMatch = 0;
-                   effectType = AppConstant.EffectMessage.SetBundle;
-                   foreach (var product in products)
-                   {
-                       if (actionProducts.Any(a => a.Product.Code.Equals(product.ProductCode)))
-                       {
-                           countProductMatch += (int)(product.Quantity > action.BundleQuantity ? action.BundleQuantity : product.Quantity);
-                       }
-                   }
-                   if (countProductMatch >= action.BundleQuantity)
-                   {
-                       int bundleQuantity = (int)action.BundleQuantity;
-                       int discountedProduct = 0;
-                       switch (action.BundleStrategy)
-                       {
-                           case (int)AppConstant.BundleStrategy.CHEAPEST:
-                               products = products.OrderBy(e => e.UnitPrice).ToList();
-                               break;
-                           case (int)AppConstant.BundleStrategy.MOST_EXPENSIVE:
-                               products = products.OrderByDescending(e => e.UnitPrice).ToList();
-                               break;
-                       }
-                       foreach (var product in products)
-                       {
-                           discount = product.Discount;
-                           if (actionProducts.Any(a => a.Product.Code.Equals(product.ProductCode)))
-                           {
-                               discountedProduct = product.Quantity > bundleQuantity ? bundleQuantity : product.Quantity;
-                               discount += (decimal)(product.SubTotal - discountedProduct * action.BundlePrice);
-
-                               bundleQuantity -= discountedProduct;
-                               SetDiscountProduct(product, action, discount);
-                           }
-                           if (bundleQuantity <= 0)
-                           {
-                               break;
-                           }
-                       }
-                   }
-                  */
                 var cartItems = order.CustomerOrderInfo.CartItems;
                 effectType = AppConstant.EffectMessage.SetBundle;
-
                 int totalBundleProduct = action.ActionProductMapping.Count();
                 int matchProduct = 0;
+                List<Item> acceptProduct = new List<Item>();
                 foreach (var product in cartItems)
                 {
                     bool isMatchProduct =
@@ -418,17 +380,17 @@ namespace ApplicationCore.Chain
                     if (isMatchProduct)
                     {
                         matchProduct++;
+                        acceptProduct.Add(product);
                     }
                 }
                 if (matchProduct == totalBundleProduct)
                 {
-
-                    foreach (var product in cartItems)
+                    discount = acceptProduct.Sum(s => s.SubTotal) - (decimal)action.BundlePrice;
+                    foreach (var product in acceptProduct)
                     {
-                        var discountProduct = Math.Round((product.SubTotal / (decimal)order.TotalAmount) * (decimal)action.BundlePrice);
+                        var discountProduct = Math.Round(product.SubTotal /acceptProduct.Sum(s => s.SubTotal) * discount);
                         SetDiscountProduct(product, action, discountProduct);
                     }
-                    discount = order.CustomerOrderInfo.Amount - (decimal)action.BundlePrice;
                 }
                 #endregion
             }

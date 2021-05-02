@@ -42,7 +42,7 @@ namespace ApplicationCore.Chain
         }
         public override void Handle(Order order)
         {
-            #region Trường hợp có voucher
+            #region Trường hợp k có voucher
             if (order.CustomerOrderInfo.Vouchers == null || order.CustomerOrderInfo.Vouchers.Count == 0)
             {
                 var acceptPromotions = new List<Promotion>();
@@ -59,6 +59,10 @@ namespace ApplicationCore.Chain
                     catch (ErrorObj)
                     {
                         invalidPromotions++;
+                        if(invalidPromotions == _promotions.Count())
+                        {
+                            return;
+                        }
                     }
                 }
                 if (acceptPromotions.Count > 0)
