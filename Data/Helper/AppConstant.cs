@@ -20,6 +20,7 @@ namespace Infrastructure.Helper
         public const string UNUSED = "0";
         public const string USED = "1";
         public const string Err_Prefix = "E-";
+        public const string VietNamPhoneCode = "+84";
         public struct Status
         {
             public const string ALL = "0";
@@ -196,10 +197,10 @@ namespace Infrastructure.Helper
             Exist_ProductCategory = 143,
             MemberLevel_Exist = 144,
             Product_Exist = 145,
-            Product_Cate_NotFound=146,
-            MemberLevel_NotFound=147,
-            Order_Fail=148,
-            Channel_Not_Exist=149,
+            Product_Cate_NotFound = 146,
+            MemberLevel_NotFound = 147,
+            Order_Fail = 148,
+            Channel_Not_Exist = 149,
             ApiKey_Not_Exist = 150,
             BrandCode_Mismatch = 151,
             Signature_Err = 152,
@@ -392,7 +393,34 @@ namespace Infrastructure.Helper
             public const int USED = 3;
             public const int REDEMPED = 4;
         }
-        
+        public struct NOTIFY_MESSAGE
+        {
+            public struct TYPE
+            {
+                public const string WARNING = "warning";
+                public const string SUCCESS = "success";
+                public const string INFO = "info";
+            }
+            public struct ICON
+            {
+                public const string LOADING = "el-icon-loading";
+                public const string WARNING = "el-icon-warning-outline";
+                public const string SUCCESS = "el-icon-circle-check";
+            }
+            public struct TITLE
+            {
+                public const string WARNING = "Warning";
+                public const string SUCCESS = "Success";
+            }
+            public struct MESSAGE
+            {
+                public const string GENERATE_VOUCHER = "Generating voucher";
+                public const string GENERATE_VOUCHER_ERROR = "Error occurs generate voucher, please try again";
+                public const string INSERT_VOUCHER = "Inserting voucher";
+                public const string INSERT_VOUCHER_ERROR = "Error occurs when insert voucher, please try again";
+                public const string INSERT_VOUCHER_COMPLETED = "Create voucher completed";
+            }
+        }
         //public const string CONNECTION_STRING = "Server=tcp:promotionengine.database.windows.net,1433;Database=PromotionEngine;User ID=adm;Password=Abcd1234;Trusted_Connection=false;MultipleActiveResultSets=true";
         public const string CONNECTION_STRING = "Server=sqlserver.reso.vn,1433;Database=PromotionEngine;User ID = promotionengine; Password=promotion_engine_fall_2020;Trusted_Connection=false;MultipleActiveResultSets=true";
     }

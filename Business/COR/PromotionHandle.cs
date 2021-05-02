@@ -30,7 +30,7 @@ namespace ApplicationCore.Chain
         }
         public override void Handle(Order order)
         {
-            HandleExclusive(order.CustomerOrderInfo);
+
             //Trường hợp auto apply
             if (order.CustomerOrderInfo.Vouchers == null || order.CustomerOrderInfo.Vouchers.Count == 0)
             {
@@ -50,20 +50,6 @@ namespace ApplicationCore.Chain
                     catch (ErrorObj)
                     {
                         invalidPromotions++;
-                        if (invalidPromotions == _promotions.Count())
-                        {
-                            if (order.Effects == null)
-                            {
-                                order.Effects = new List<Effect>();
-                            }
-                            order.Effects.Add(new Effect
-                            {
-                                Prop = new
-                                {
-                                    value = AppConstant.EffectMessage.NoAutoPromotion
-                                }
-                            });
-                        }
                     }
                 }
                 if (acceptPromotions.Count > 0)
@@ -74,23 +60,31 @@ namespace ApplicationCore.Chain
             //Trường hợp dùng voucher
             else
             {
+                HandleExclusive(order);
                 foreach (var promotion in _promotions)
                 {
 
                     HandleStore(promotion, order);
                     HandleSalesMode(promotion, order);
+                    HandleApplier(promotion, order);
                     HandlePayment(promotion, order);
                     HandleGender(promotion, order);
                     HandleMemberLevel(promotion, order);
-
                 }
             }
             _timeframeHandle.SetPromotions(_promotions);
             base.Handle(order);
         }
         #region Handle Exclusive
-        private void HandleExclusive(CustomerOrderInfo orderInfo)
+        private void HandleExclusive(Order order)
         {
+            var orderInfo = order.CustomerOrderInfo;
+            Promotion autoPromotion = null;
+            if (order.Effects != null && order.Effects.Count > 0)
+            {
+                autoPromotion = _promotions.FirstOrDefault(f => f.PromotionId == order.Effects.FirstOrDefault(f =>
+                                f.EffectType == AppConstant.EffectMessage.AutoPromotion).PromotionId);
+            }
             //Nếu như có voucher mới handle Exclusive, còn auto apply thì không check mà trả về cho user chọn
             if (orderInfo.Vouchers != null && orderInfo.Vouchers.Count() > 0)
             {
@@ -111,6 +105,10 @@ namespace ApplicationCore.Chain
                     throw new ErrorObj(code: (int)AppConstant.ErrCode.Exclusive_Promotion, message: AppConstant.ErrMessage.Exclusive_Promotion);
                 }
             }
+            if (autoPromotion != null)
+            {
+                _promotions.Remove(autoPromotion);
+            }
         }
         #endregion
         #region Handle Store
@@ -127,7 +125,7 @@ namespace ApplicationCore.Chain
         {
             if (!Common.CompareBinary(order.CustomerOrderInfo.Attributes.SalesMode, promotion.SaleMode))
             {
-                throw new ErrorObj(code: (int)AppConstant.ErrCode.Invalid_SaleMode, message: AppConstant.ErrMessage.Invalid_SaleMode);
+                throw new ErrorObj(code: (int)AppConstant.ErrCode.Invalid_SaleMode, message: "[SaleMode]" + AppConstant.ErrMessage.Invalid_SaleMode);
             }
         }
         #endregion
@@ -141,6 +139,15 @@ namespace ApplicationCore.Chain
         }
         #endregion
 
+        #region Handle Applier
+        private void HandleApplier(Promotion promotion, Order order)
+        {
+            if (!Common.CompareBinary(int.Parse(order.CustomerOrderInfo.Attributes.StoreInfo.Applier), promotion.ApplyBy))
+            {
+                throw new ErrorObj(code: (int)AppConstant.ErrCode.Invalid_SaleMode, message: "[Applier]" + AppConstant.ErrMessage.Invalid_SaleMode);
+            }
+        }
+        #endregion
         #region Handle Gender
         private void HandleGender(Promotion promotion, Order order)
         {

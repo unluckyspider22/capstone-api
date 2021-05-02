@@ -47,34 +47,25 @@ namespace ApplicationCore.Chain
             {
                 var acceptPromotions = new List<Promotion>();
                 int invalidPromotions = 0;
-                try
+
+                foreach (var promotion in _promotions)
                 {
-                    foreach (var promotion in _promotions)
+                    try
                     {
                         HandlePromotionCondition(promotion, order);
 
                         acceptPromotions.Add(promotion);
                     }
-                }
-                catch (ErrorObj)
-                {
-                    invalidPromotions++;
-                    if (invalidPromotions == _promotions.Count && invalidPromotions > 0)
+                    catch (ErrorObj)
                     {
-                        if (invalidPromotions == _promotions.Count())
-                        {
-                            if (order.Effects == null)
-                            {
-                                order.Effects = new List<Effect>();
-                            }
-                            order.Effects.Add(new Effect
-                            {
-                                EffectType = AppConstant.EffectMessage.NoAutoPromotion
-                            });
-                        }
+                        invalidPromotions++;
                     }
                 }
-                _promotions = acceptPromotions;
+                if (acceptPromotions.Count > 0)
+                {
+                    _promotions = acceptPromotions;
+
+                }
             }
             #endregion
             else
@@ -89,6 +80,7 @@ namespace ApplicationCore.Chain
         private void HandlePromotionCondition(Promotion promotion, Order order)
         {
             int invalidPromotionDetails = 0;
+            promotion.PromotionTier = promotion.PromotionTier.OrderByDescending(o => o.Priority).ToList();
             foreach (var promotionTier in promotion.PromotionTier)
             {
                 #region Handle Condition
@@ -126,6 +118,7 @@ namespace ApplicationCore.Chain
                 }
                 order.Effects.Add(effect);
                 #endregion
+                break;
             }
             if (invalidPromotionDetails == promotion.PromotionTier.Count && invalidPromotionDetails > 0)
             {

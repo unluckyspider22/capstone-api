@@ -118,7 +118,7 @@ namespace ApplicationCore.Request
         public string CustomerName { get; set; }
         [StringLength(100)]
         public string CustomerEmail { get; set; }
-        [StringLength(11)]
+        [StringLength(12)]
         public string CustomerPhoneNo { get; set; }
         public int CustomerGender { get; set; } = 3;
         [StringLength(100)]

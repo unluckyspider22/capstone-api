@@ -4,12 +4,11 @@ using Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-
+using System.Transactions;
 
 namespace Infrastructure.Repository
 {
@@ -22,7 +21,7 @@ namespace Infrastructure.Repository
     }
     public class VoucherRepositoryImp : IVoucherRepository
     {
-        private const string connectionString = AppConstant.CONNECTION_STRING;  
+        private const string connectionString = AppConstant.CONNECTION_STRING;
         public async Task DeleteBulk(Guid voucherGroupId)
         {
             using (var context = new PromotionEngineContext(options: GetDbOption()))
@@ -32,7 +31,7 @@ namespace Infrastructure.Repository
                 var voucherGroup = context.VoucherGroup.FirstOrDefault(x => x.VoucherGroupId.Equals(voucherGroupId));
                 await context.SingleDeleteAsync(voucherGroup);
             }
-              
+
 
         }
 
@@ -40,18 +39,62 @@ namespace Infrastructure.Repository
         {
             try
             {
-                using (var context = new PromotionEngineContext(options: GetDbOption()))
+                using (TransactionScope scope = new TransactionScope())
                 {
-                    await context.BulkInsertAsync(vouchers, b => b.IncludeGraph = true);
+                    PromotionEngineContext context = null;
+                    try
+                    {
+                        context = new PromotionEngineContext(options: GetDbOption());
+                        context.ChangeTracker.AutoDetectChangesEnabled = false;
+
+                        int count = 0;
+                        foreach (var entityToInsert in vouchers)
+                        {
+                            ++count;
+                            context = AddToContext(context, entityToInsert, count, 100, true);
+                        }
+
+                        context.SaveChanges();
+                    }
+                    finally
+                    {
+                        if (context != null)
+                            context.Dispose();
+                    }
+
+                    scope.Complete();
                 }
+
             }
             catch (Exception ex)
             {
                 Debug.WriteLine("Error voucher repository: ", ex.Message);
-                Debug.WriteLine("Error voucher repository: ",ex.InnerException);
+                Debug.WriteLine("Error voucher repository: ", ex.InnerException);
                 Debug.WriteLine("Error voucher repository: ", ex.StackTrace);
                 throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: ex.Message);
             }
+        }
+
+        private PromotionEngineContext AddToContext(PromotionEngineContext context, 
+            Voucher entity, 
+            int count, 
+            int commitCount, 
+            bool recreateContext)
+        {
+            context.Set<Voucher>().Add(entity);
+
+            if (count % commitCount == 0)
+            {
+                context.SaveChanges();
+                if (recreateContext)
+                {
+                    context.Dispose();
+                    context = new PromotionEngineContext(options: GetDbOption());
+                    context.ChangeTracker.AutoDetectChangesEnabled = false;
+                }
+            }
+
+            return context;
         }
         private DbContextOptions<PromotionEngineContext> GetDbOption()
         {

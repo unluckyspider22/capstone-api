@@ -361,7 +361,8 @@ namespace ApplicationCore.Chain
             }
             else
             {
-                /*   #region bundle
+                #region bundle
+                /*   
                    var products = order.CustomerOrderInfo.CartItems;
                    int countProductMatch = 0;
                    effectType = AppConstant.EffectMessage.SetBundle;
@@ -402,7 +403,7 @@ namespace ApplicationCore.Chain
                            }
                        }
                    }
-                   #endregion*/
+                  */
                 var cartItems = order.CustomerOrderInfo.CartItems;
                 effectType = AppConstant.EffectMessage.SetBundle;
 
@@ -427,8 +428,9 @@ namespace ApplicationCore.Chain
                         var discountProduct = Math.Round((product.SubTotal / (decimal)order.TotalAmount) * (decimal)action.BundlePrice);
                         SetDiscountProduct(product, action, discountProduct);
                     }
-                    discount = (decimal)action.BundlePrice;
+                    discount = order.CustomerOrderInfo.Amount - (decimal)action.BundlePrice;
                 }
+                #endregion
             }
             SetEffect(order, promotion, discount, effectType, promotionTier);
         }

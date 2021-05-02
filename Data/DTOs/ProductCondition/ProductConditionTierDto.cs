@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Infrastructure.DTOs
 {
@@ -10,13 +8,13 @@ namespace Infrastructure.DTOs
     {
         public Guid ProductConditionId { get; set; }
         [StringLength(1)]
-        public string ProductConditionType { get; set; }
+        public int ProductConditionType { get; set; }
         [Range(0, 999999)]
         public decimal ProductQuantity { get; set; }
         [StringLength(1)]
-        public string QuantityOperator { get; set; }
+        public int QuantityOperator { get; set; }
         [StringLength(1)]
-        public string NextOperator { get; set; }
+        public int NextOperator { get; set; }
         [Range(0, 999)]
         public int IndexGroup { get; set; }
 

@@ -68,8 +68,8 @@ namespace ApplicationCore.Services
                             VoucherName = promotionTier.VoucherGroup.VoucherName,
                             VoucherCode = promotion.PromotionCode +
                                         promotionTier.TierIndex + "-" +
-                                        promotionTier.VoucherGroup.Voucher.First(el => !el.IsRedemped && !el.IsUsed)
-                                        .VoucherCode
+                                        promotionTier.VoucherGroup.Voucher.First(el => !el.IsRedemped && !el.IsUsed
+                                                                           && el.PromotionId == promotion.PromotionId).VoucherCode
 
                         };
                         result.Add(tier);
@@ -257,6 +257,7 @@ namespace ApplicationCore.Services
                         items.Add(
                             new Item
                             {
+                                ProductName = item.ProductName,
                                 ProductCode = item.ProductCode,
                                 UnitPrice = item.UnitPrice,
                                 Quantity = item.Quantity,
@@ -273,14 +274,18 @@ namespace ApplicationCore.Services
                             VoucherCode = coupon.VoucherCode
                         });
                     }
+
                     customerOrder = new CustomerOrderInfo
                     {
                         Amount = param.Amount,
                         Attributes = attribute,
                         BookingDate = param.BookingDate,
                         CartItems = items,
+
                         Customer = new Customer
                         {
+                            CustomerName = param.Customer.CustomerName,
+                            CustomerPhoneNo = param.Customer.CustomerPhoneNo,
                             CustomerGender = param.Customer.CustomerGender,
                             CustomerLevel = param.Customer.CustomerLevel
                         },
