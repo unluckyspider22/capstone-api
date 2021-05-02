@@ -1,17 +1,15 @@
 ﻿using ApplicationCore.Services;
 using Infrastructure.DTOs;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers.Statistic
 {
     [Route("api/statistic")]
     [ApiController]
+    [Authorize]
     public class StatisticController : ControllerBase
     {
         private readonly IPromotionService _promotionService;

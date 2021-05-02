@@ -51,7 +51,6 @@ namespace ApplicationCore.Chain
             if (_promotions.Count == 1)
             {
                 _applyPromotion.Apply(order);
-                return;
             }
             else
             {
