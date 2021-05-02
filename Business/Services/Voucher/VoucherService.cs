@@ -89,7 +89,9 @@ namespace ApplicationCore.Services
                     else
                     {
                         IGenericRepository<Promotion> promoRepo = _unitOfWork.PromotionRepository;
-                        var promotion = await promoRepo.Get(filter: el => el.PromotionCode == voucherModel.PromotionCode,
+                        var promotion = await promoRepo.Get(filter: el => 
+                        el.PromotionCode == voucherModel.PromotionCode
+                        && !el.DelFlg,
                             includeProperties:
                     "PromotionTier.Action.ActionProductMapping.Product," +
                     "PromotionTier.Gift.GiftProductMapping.Product," +

@@ -65,13 +65,12 @@ namespace PromotionEngineAPI.Controllers
                     {
                         Console.WriteLine(AppConstant.EffectMessage.NoAutoPromotion);
                     }*/
-                    orderInfo.Vouchers = vouchers;
                 }
-
+                orderInfo.Vouchers = vouchers;
                 if (vouchers != null && vouchers.Count() > 0)
                 {
                     promotions = await _voucherService.CheckVoucher(orderInfo);
-                    if (_promotionService.GetPromotions().Count == 1)
+                    if (_promotionService.GetPromotions() != null &&  _promotionService.GetPromotions().Count == 1)
                     {
                         promotions.Add(_promotionService.GetPromotions().First());
                     }
