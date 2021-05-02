@@ -12,7 +12,6 @@ namespace PromotionEngineAPI.Controllers.Statistic
 {
     [Route("api/statistic")]
     [ApiController]
-    [Authorize]
     public class StatisticController : ControllerBase
     {
         private readonly IPromotionService _promotionService;
@@ -25,7 +24,6 @@ namespace PromotionEngineAPI.Controllers.Statistic
         [Route("promotion/status/{brandId}")]
         public async Task<IActionResult> CountPromotionStatus([FromRoute] Guid brandId)
         {
-
             try
             {
                 return Ok(await _promotionService.CountPromotionStatus(brandId: brandId));
