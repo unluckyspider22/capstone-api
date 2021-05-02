@@ -147,7 +147,8 @@ namespace ApplicationCore.Services
         {
             try
             {
-                dto.UpdDate = DateTime.Now;
+                var now = Common.GetCurrentDatetime();
+                dto.UpdDate = now;
 
                 var entity = _mapper.Map<GameCampaign>(dto);
                 var gameMaster = await GetGameMaster(dto.GameMasterId);

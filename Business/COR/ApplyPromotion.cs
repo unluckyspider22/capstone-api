@@ -314,7 +314,7 @@ namespace ApplicationCore.Chain
         #region Discount for item
         private void DiscountProduct(Order order, Infrastructure.Models.Action action, Promotion promotion, PromotionTier promotionTier)
         {
-            var actionProducts = action.ActionProductMapping;
+            var actionProducts = action.ActionProductMapping.ToList();
             string effectType = "";
             decimal discount = 0;
             if (action.ActionType != (int)AppConstant.EnvVar.ActionType.Bundle)
@@ -385,10 +385,15 @@ namespace ApplicationCore.Chain
                 }
                 if (matchProduct == totalBundleProduct)
                 {
-                    discount = acceptProduct.Sum(s => s.SubTotal) - (decimal)action.BundlePrice;
+                    decimal totalPriceDiscount = 0;
+                    for (int i = 0; i < actionProducts.Count(); i++)
+                    {
+                        totalPriceDiscount += acceptProduct[i].UnitPrice * (int)actionProducts[i].Quantity;
+                    }
+                    discount = totalPriceDiscount - (decimal)action.BundlePrice;
                     foreach (var product in acceptProduct)
                     {
-                        var discountProduct = Math.Round(product.SubTotal /acceptProduct.Sum(s => s.SubTotal) * discount);
+                        var discountProduct = Math.Round(product.SubTotal / acceptProduct.Sum(s => s.SubTotal) * discount);
                         SetDiscountProduct(product, action, discountProduct);
                     }
                 }
