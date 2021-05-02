@@ -35,7 +35,6 @@ namespace ApplicationCore.Chain
         }
 
         private List<Promotion> _promotions;
-        private List<Holiday> _listPublicHoliday;
         public void SetPromotions(List<Promotion> promotions)
         {
             _promotions = promotions;
@@ -71,10 +70,6 @@ namespace ApplicationCore.Chain
             {
                 foreach (var promotion in _promotions)
                 {
-                    if (promotion.ForHoliday != (int)AppConstant.EnvVar.Holiday_Env.FOR_HOLIDAY)
-                    {
-                        HandleHolidayAsync(order);
-                    }
                     HandleDayOfWeek(promotion, order.CustomerOrderInfo.BookingDate.DayOfWeek);
                     HandleHour(promotion, order.CustomerOrderInfo.BookingDate.Hour);
                 }
@@ -83,20 +78,6 @@ namespace ApplicationCore.Chain
             base.Handle(order);
         }
 
-        public void HandleHolidayAsync(Order order)
-        {
-            if (_listPublicHoliday != null && _listPublicHoliday.Count() > 0)
-            {
-                foreach (var holiday in _listPublicHoliday)
-                {
-                    if (order.CustomerOrderInfo.BookingDate.Day == ((DateTime)holiday.Date).Day && order.CustomerOrderInfo.BookingDate.Month == ((DateTime)holiday.Date).Month)
-                    {
-                        throw new ErrorObj(code: (int)AppConstant.ErrCode.Invalid_Holiday, message:
-                           AppConstant.ErrMessage.Invalid_Holiday);
-                    }
-                }
-            }
-        }
         public void HandleDayOfWeek(Promotion promotion, DayOfWeek dayOfWeek)
         {
             if (!Common.CompareBinary((int)(Math.Pow(2, (int)dayOfWeek)), promotion.DayFilter))
@@ -110,11 +91,6 @@ namespace ApplicationCore.Chain
             {
                 throw new ErrorObj(code: (int)AppConstant.ErrCode.Invalid_HourFrame, message: AppConstant.ErrMessage.Invalid_HourFrame);
             }
-        }
-
-        public void SetHolidays(List<Holiday> holidays)
-        {
-            _listPublicHoliday = holidays;
         }
     }
 }
