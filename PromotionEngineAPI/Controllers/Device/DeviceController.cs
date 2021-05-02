@@ -2,6 +2,7 @@
 using ApplicationCore.Utils;
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -28,6 +29,7 @@ namespace PromotionEngineAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetDevice([FromQuery] PagingRequestParam param, [FromQuery] Guid storeId)
         {
             try

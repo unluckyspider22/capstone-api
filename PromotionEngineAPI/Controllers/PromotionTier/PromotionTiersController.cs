@@ -2,6 +2,7 @@
 using ApplicationCore.Services;
 
 using Infrastructure.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Net;
@@ -11,6 +12,7 @@ namespace PromotionEngineAPI.Controllers
 {
     [Route("api/promotion-tiers")]
     [ApiController]
+    [Authorize]
     public class PromotionTiersController : ControllerBase
     {
         private readonly IPromotionTierService _service;

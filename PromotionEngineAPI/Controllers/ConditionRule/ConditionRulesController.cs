@@ -1,6 +1,7 @@
 ﻿using ApplicationCore.Services;
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
@@ -11,17 +12,14 @@ namespace PromotionEngineAPI.Controllers
 {
     [Route("api/condition-rules")]
     [ApiController]
+    [Authorize]
     public class ConditionRulesController : ControllerBase
     {
         private readonly IConditionRuleService _service;
-        private readonly IProductConditionService _productService;
-        private readonly IOrderConditionService _orderService;
 
-        public ConditionRulesController(IConditionRuleService service, IProductConditionService productService, IOrderConditionService orderService)
+        public ConditionRulesController(IConditionRuleService service)
         {
             _service = service;
-            _productService = productService;
-            _orderService = orderService;
         }
 
         // GET: api/ConditionRules

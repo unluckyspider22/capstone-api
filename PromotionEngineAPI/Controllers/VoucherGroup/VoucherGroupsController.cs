@@ -5,6 +5,7 @@ using ApplicationCore.Worker;
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
 using Infrastructure.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Diagnostics;
@@ -17,6 +18,7 @@ namespace PromotionEngineAPI.Controllers
 {
     [Route("api/voucher-groups")]
     [ApiController]
+    [Authorize]
     public class VoucherGroupsController : ControllerBase
     {
         private readonly IVoucherGroupService _service;

@@ -2,6 +2,7 @@
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
 using Infrastructure.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.ComponentModel.DataAnnotations;
@@ -15,6 +16,7 @@ namespace PromotionEngineAPI.Controllers
 {
     [Route("api/vouchers")]
     [ApiController]
+    [Authorize]
     public class VouchersController : ControllerBase
     {
         private readonly IVoucherService _service;

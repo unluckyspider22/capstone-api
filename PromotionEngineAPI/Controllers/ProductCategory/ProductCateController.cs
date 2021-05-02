@@ -1,6 +1,7 @@
 ﻿using ApplicationCore.Services;
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -13,6 +14,7 @@ namespace PromotionEngineAPI.Controllers.ProductCategory
 {
     [Route("api/product-category")]
     [ApiController]
+    [Authorize]
     public class ProductCateController : ControllerBase
     {
 
