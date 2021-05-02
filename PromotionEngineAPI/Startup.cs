@@ -1,4 +1,5 @@
 using ApplicationCore.Chain;
+using ApplicationCore.Notification;
 using ApplicationCore.Services;
 using ApplicationCore.Worker;
 using AutoMapper;
@@ -16,6 +17,7 @@ using Microsoft.IdentityModel.Tokens;
 using PromotionEngineAPI.Hubs;
 using System;
 using System.Text;
+using WebAPI.Hubs;
 
 namespace PromotionEngineAPI
 {
@@ -134,7 +136,7 @@ namespace PromotionEngineAPI
             services.AddScoped<IGameItemService, GameItemService>();
             services.AddScoped<IGameMasterService, GameMasterService>();
             services.AddScoped<ITransactionService, TransactionService>();
-
+            services.AddScoped<IPushNotification, PushNotification>();
             ChainOfResponsibilityServices(services);
 
             WorkerServices(services);
@@ -203,6 +205,7 @@ namespace PromotionEngineAPI
         private void ReigsterHubs(IEndpointRouteBuilder endpoints)
         {
             endpoints.MapHub<VoucherHub>("/voucher/notify");
+            endpoints.MapHub<NotifyMessageHub>("/notify/message");
         }
         #endregion
     }

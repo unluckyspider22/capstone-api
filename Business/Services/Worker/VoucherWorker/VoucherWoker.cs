@@ -1,4 +1,5 @@
-﻿using ApplicationCore.Utils;
+﻿using ApplicationCore.Services;
+using ApplicationCore.Utils;
 using AutoMapper;
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
@@ -19,6 +20,7 @@ namespace ApplicationCore.Worker
         public void InsertVouchers(VoucherGroupDto voucherDto, bool isAddMore = false, List<Voucher> vouchersAdd = null);
         public void DeleteVouchers(Guid voucherGroupId);
         public List<Voucher> GenerateVoucher(VoucherGroupDto dto, bool isAddMore = false);
+        public void AddMoreVoucher(Guid voucherGroupId, int quantityParam);
     }
     public class VoucherWorker : IVoucherWorker
     {
@@ -26,7 +28,7 @@ namespace ApplicationCore.Worker
         private readonly ILogger _logger;
         private readonly CancellationToken _cancellationToken;
         private readonly IVoucherRepository voucherRepository = new VoucherRepositoryImp();
-        private readonly IVoucherNotify notify = new VoucherNotify();
+        private readonly IHubNotify notify = new HubNotify();
         protected readonly IMapper _mapper;
 
         public VoucherWorker(IBackgroundTaskQueue taskQueue,
@@ -38,7 +40,6 @@ namespace ApplicationCore.Worker
             _cancellationToken = applicationLifetime.ApplicationStopping;
             _mapper = mapper;
         }
-
         public void DeleteVouchers(Guid voucherGroupId)
         {
             // Task item để notify cho client
@@ -82,32 +83,11 @@ namespace ApplicationCore.Worker
                  }
              });
         }
-
         public void InsertVouchers(VoucherGroupDto dto, bool isAddMore, List<Voucher> vouchersAdd)
         {
             // Param để insert
             Guid voucherGroupId = dto.VoucherGroupId;
             Guid? promotionId = dto.PromotionId;
-
-            // Tạo voucher
-
-            // Task item để notify cho client
-            //var item = new VoucherNotiObj()
-            //{
-            //    PromotionId = promotionId,
-            //    VoucherGroupId = voucherGroupId,
-            //    IsDone = false,
-            //    Message = AppConstant.NotiMess.VOUCHER_INSERT_MESS + " " + AppConstant.NotiMess.PROCESSING_MESS,
-            //    Type = AppConstant.NotiMess.Type.INSERT_VOUCHERS
-            //};
-
-            //item.Message = AppConstant.NotiMess.VOUCHER_GENERATE_MESS + " " + AppConstant.NotiMess.PROCESSING_MESS;
-            //notify.GeneratingVoucher(item);
-
-            //item.Message = AppConstant.NotiMess.VOUCHER_GENERATE_MESS + " " + AppConstant.NotiMess.PROCESSED_MESS;
-            //notify.GeneratedVoucher(item);
-
-            // Chạy luồng
             Task.Run(() =>
             {
                 if (!_cancellationToken.IsCancellationRequested)
@@ -121,38 +101,35 @@ namespace ApplicationCore.Worker
                         {
                             _logger.LogInformation("\n>>>>>>>>>>>> INSERT VOUCHER  !! <<<<<<<<<<<<<<<");
                             _logger.LogInformation("\n>>>>>>>>>>>> GENERATE VOUCHER  !! <<<<<<<<<<<<<<<");
-                            _logger.LogInformation("\n>>>>>> Start generate: " + DateTime.Now.ToString("HH:mm:ss"));
+                            _logger.LogInformation("\n>>>>>> START generate: " + DateTime.Now.ToString("HH:mm:ss"));
                             List<Voucher> vouchers = vouchersAdd;
+
                             if (!isAddMore && vouchersAdd == null)
                             {
+                                await notify.SendInfoMessage(message: AppConstant.NOTIFY_MESSAGE.MESSAGE.GENERATE_VOUCHER);
                                 vouchers = GenerateDistinctVoucher(dto);
                             }
-                            _logger.LogInformation("\n>>>>>> End generate: " + DateTime.Now.ToString("HH:mm:ss"));
-                            _logger.LogInformation("\n>>>>>> Start insert: " + DateTime.Now.ToString("HH:mm:ss"));
+                            _logger.LogInformation("\n>>>>>> END generate: " + DateTime.Now.ToString("HH:mm:ss"));
+                            _logger.LogInformation("\n>>>>>> START insert: " + DateTime.Now.ToString("HH:mm:ss"));
                             // Insert vouchers 
                             await voucherRepository.InsertBulk(vouchers);
-                            _logger.LogInformation("\n>>>>>>End insert: " + DateTime.Now.ToString("HH:mm:ss"));
-                            //item.Message = AppConstant.NotiMess.VOUCHER_INSERT_MESS + " " + AppConstant.NotiMess.PROCESSED_MESS;
-                            //item.IsDone = true;
-                            // Gửi notify hoàn thành task
-                            //await notify.ProcessedVoucher(item: item);
+                            await notify.SendSuccessMessage(message: AppConstant.NOTIFY_MESSAGE.MESSAGE.INSERT_VOUCHER_COMPLETED);
+                            _logger.LogInformation("\n>>>>>> FINISH insert: " + DateTime.Now.ToString("HH:mm:ss"));
+
                         }
                         catch (Exception e)
                         {
+                            await notify.SendErrorMessage(message: AppConstant.NOTIFY_MESSAGE.MESSAGE.INSERT_VOUCHER_ERROR);
                             _logger.LogInformation("\n>>>>>>>>>>>> INSERT VOUCHER ERROR !! <<<<<<<<<<<<<<<");
                             _logger.LogInformation(e.Message);
                             _logger.LogInformation(e.StackTrace);
                             _logger.LogInformation("\n>>>>>>>>>>>> INSERT VOUCHER ERROR !! <<<<<<<<<<<<<<<");
-                            //item.Message = AppConstant.NotiMess.VOUCHER_INSERT_MESS + " " + AppConstant.NotiMess.ERROR_MESS;
-                            //item.IsDone = true;
-                            // Gửi notify lỗi
-                            //await notify.ErrorProcess(item: item);
+
                         }
                     });
                 }
             });
         }
-
         private List<Voucher> GenerateDistinctVoucher(VoucherGroupDto dto)
         {
             var now = Common.GetCurrentDatetime();
@@ -176,7 +153,7 @@ namespace ApplicationCore.Worker
                     VoucherCode = codes.ElementAt(i),
                     InsDate = now,
                     UpdDate = now,
-                    Index = i,
+                    Index = i + 1,
                 };
                 vouchers.Add(v);
             }
@@ -256,7 +233,34 @@ namespace ApplicationCore.Worker
             }
             return randomCode;
         }
-
         #endregion
+        public void AddMoreVoucher(Guid voucherGroupId, int quantityParam)
+        {
+            Task.Run(() =>
+            {
+                if (!_cancellationToken.IsCancellationRequested)
+                {
+                    _taskQueue.QueueBackgroundWorkItem(async token =>
+                    {
+                        try
+                        {
+                            _logger.LogInformation("\n>>>>>>>>>>>> ADD MORE VOUCHER  !! <<<<<<<<<<<<<<<");
+                            _logger.LogInformation("\n>>>>>>>>>>>> GENERATE VOUCHER  !! <<<<<<<<<<<<<<<");
+                            _logger.LogInformation("\n>>>>>> START generate: " + DateTime.Now.ToString("HH:mm:ss"));
+                          
+
+                        }
+                        catch (Exception e)
+                        {
+                            _logger.LogInformation("\n>>>>>>>>>>>> INSERT VOUCHER ERROR !! <<<<<<<<<<<<<<<");
+                            _logger.LogInformation(e.Message);
+                            _logger.LogInformation(e.StackTrace);
+                            _logger.LogInformation("\n>>>>>>>>>>>> INSERT VOUCHER ERROR !! <<<<<<<<<<<<<<<");
+
+                        }
+                    });
+                }
+            });
+        }
     }
 }

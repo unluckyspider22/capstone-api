@@ -39,11 +39,6 @@ namespace Infrastructure.Repository
         {
             try
             {
-                //using (var context = new PromotionEngineContext(options: GetDbOption()))
-                //{
-                //    await context.Voucher.AddRangeAsync(vouchers);
-                //    await context.SaveChangesAsync();
-                //}
                 using (TransactionScope scope = new TransactionScope())
                 {
                     PromotionEngineContext context = null;
