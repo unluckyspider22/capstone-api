@@ -9,8 +9,8 @@ namespace Infrastructure.DTOs
         public int NextOperator { get; set; }
         public int IndexGroup { get; set; }
         public int Quantity { get; set; }
-        public int QuantityOperator { get; set; }
+        public string QuantityOperator { get; set; }
         public decimal Amount { get; set; }
-        public int AmountOperator { get; set; }
+        public string AmountOperator { get; set; }
     }
 }
