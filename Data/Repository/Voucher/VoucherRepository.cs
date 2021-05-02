@@ -26,13 +26,32 @@ namespace Infrastructure.Repository
         {
             using (var context = new PromotionEngineContext(options: GetDbOption()))
             {
-                var vouchers = context.Voucher.Where(x => x.VoucherGroupId.Equals(voucherGroupId));
-                await context.BulkDeleteAsync(vouchers);
-                var voucherGroup = context.VoucherGroup.FirstOrDefault(x => x.VoucherGroupId.Equals(voucherGroupId));
-                await context.SingleDeleteAsync(voucherGroup);
+                try
+                {
+                    Debug.WriteLine("\n>>>>>> DELETE VOUCHER: " + DateTime.Now.ToString("HH:mm:ss"));
+                    var vouchers = context.Voucher.Where(x => x.VoucherGroupId.Equals(voucherGroupId)
+                                                         && !x.IsUsed
+                                                         && !x.IsRedemped);
+                    var voucherGroup = context.VoucherGroup.FirstOrDefault(x => x.VoucherGroupId.Equals(voucherGroupId));
+                    context.Voucher.RemoveRange(vouchers);
+                    foreach (var voucher in vouchers)
+                    {
+                        var item = voucherGroup.Voucher.Where(el => el.VoucherId.Equals(voucher.VoucherId)).FirstOrDefault();
+                        voucherGroup.Voucher.Remove(item);
+                    }
+                    context.SaveChanges();
+                    Debug.WriteLine("\n>>>>>> DELETE VOUCHER GROUP: " + DateTime.Now.ToString("HH:mm:ss"));
+                    context.Entry(voucherGroup).State = EntityState.Modified;
+                    voucherGroup.DelFlg = true;
+                    context.SaveChanges();
+                }
+                finally
+                {
+                    if (context != null)
+                        context.Dispose();
+                }
+
             }
-
-
         }
 
         public async Task InsertBulk(List<Voucher> vouchers)
@@ -75,10 +94,10 @@ namespace Infrastructure.Repository
             }
         }
 
-        private PromotionEngineContext AddToContext(PromotionEngineContext context, 
-            Voucher entity, 
-            int count, 
-            int commitCount, 
+        private PromotionEngineContext AddToContext(PromotionEngineContext context,
+            Voucher entity,
+            int count,
+            int commitCount,
             bool recreateContext)
         {
             context.Set<Voucher>().Add(entity);

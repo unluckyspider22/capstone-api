@@ -58,27 +58,18 @@ namespace ApplicationCore.Worker
              {
                  if (!_cancellationToken.IsCancellationRequested)
                  {
-                     _logger.LogInformation("DeleteVouchers is starting.");
-                     // Gửi notify processing task
-                     //notify.ProcessingVoucher(item: item);
                      _taskQueue.QueueBackgroundWorkItem(async token =>
                      {
                          try
                          {
-                             // Delete voucher
+                             _logger.LogInformation("\n>>>>>> START delete: " + DateTime.Now.ToString("HH:mm:ss"));
                              await voucherRepository.DeleteBulk(voucherGroupId: voucherGroupId);
-                             item.Message = AppConstant.NotiMess.VOUCHER_DELETE_MESS + " " + AppConstant.NotiMess.PROCESSED_MESS;
-                             item.IsDone = true;
-                             // Gửi notify hoàn thành task
-                             //await notify.ProcessedVoucher(item: item);
+                             _logger.LogInformation("\n>>>>>> END delete: " + DateTime.Now.ToString("HH:mm:ss"));
                          }
                          catch (Exception e)
                          {
+                             _logger.LogInformation("\n>>>>>> ERROR delete: " + DateTime.Now.ToString("HH:mm:ss"));
                              _logger.LogInformation(e.Message);
-                             item.Message = AppConstant.NotiMess.VOUCHER_DELETE_MESS + " " + AppConstant.NotiMess.ERROR_MESS;
-                             item.IsDone = true;
-                             // Gửi notify lỗi
-                             //await notify.ErrorProcess(item: item);
                          }
                      });
                  }
