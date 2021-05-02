@@ -4,11 +4,13 @@ using ApplicationCore.Services;
 using System.Threading.Tasks;
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PromotionEngineAPI.Controllers
 {
     [Route("api/memberships")]
     [ApiController]
+    [Authorize]
     public class MembershipsController : ControllerBase
     {
         private readonly IMembershipService _service;

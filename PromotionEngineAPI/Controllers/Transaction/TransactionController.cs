@@ -16,12 +16,10 @@ namespace PromotionEngineAPI.Controllers
     {
 
         private readonly ITransactionService _service;
-        private readonly IChannelService _channelService;
 
-        public TransactionController(ITransactionService service, IChannelService channelService)
+        public TransactionController(ITransactionService service)
         {
             _service = service;
-            _channelService = channelService;
         }
         //[Authorize]
         [HttpPost]

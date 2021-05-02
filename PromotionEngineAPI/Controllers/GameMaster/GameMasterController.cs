@@ -1,5 +1,6 @@
 ﻿using ApplicationCore.Services;
 using Infrastructure.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Net;
@@ -9,6 +10,7 @@ namespace PromotionEngineAPI.Controllers.GameMaster
 {
     [Route("api/game-master")]
     [ApiController]
+    [Authorize]
     public class GameMasterController : ControllerBase
     {
         private readonly IGameMasterService _service;
