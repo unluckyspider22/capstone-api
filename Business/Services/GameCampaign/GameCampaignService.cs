@@ -233,7 +233,8 @@ namespace ApplicationCore.Services
                         {
                             foreach (var storeGameMapping in listMappingresult)
                             {
-                                if (storeGameMapping.GameCampaign != null && !storeGameMapping.GameCampaign.DelFlg && 
+                                if (storeGameMapping.GameCampaign != null && !storeGameMapping.GameCampaign.DelFlg && DateTime.Now >= storeGameMapping.GameCampaign.StartGame 
+                                    &&  DateTime.Now <= storeGameMapping.GameCampaign.EndGame  &&
                                     storeGameMapping.GameCampaign.Promotion.Status == (int)AppConstant.EnvVar.PromotionStatus.PUBLISH && 
                                     !storeGameMapping.GameCampaign.Promotion.DelFlg)
                                 {
