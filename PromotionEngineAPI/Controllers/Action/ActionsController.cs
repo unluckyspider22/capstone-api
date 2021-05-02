@@ -2,6 +2,7 @@
 using ApplicationCore.Utils;
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
@@ -13,6 +14,7 @@ namespace PromotionEngineAPI.Controllers
 {
     [Route("api/actions")]
     [ApiController]
+    [Authorize]
     public class ActionsController : ControllerBase
     {
         private readonly IActionService _service;

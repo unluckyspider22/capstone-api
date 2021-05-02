@@ -2,6 +2,7 @@
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
 using Infrastructure.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
@@ -13,6 +14,7 @@ namespace PromotionEngineAPI.Controllers
 {
     [Route("api/post-actions")]
     [ApiController]
+    [Authorize]
     public class GiftsController : ControllerBase
     {
         private readonly IGiftService _service;

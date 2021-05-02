@@ -4,6 +4,7 @@ using ApplicationCore.Utils;
 using Infrastructure.DTOs;
 using Infrastructure.DTOs.VoucherChannel;
 using Infrastructure.Helper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
@@ -44,6 +45,7 @@ namespace PromotionEngineAPI.Controllers
         }
         [HttpPost]
         [Route("checkChannelCodeExist")]
+        [Authorize]
         public async Task<IActionResult> CheckChannelExisting([FromBody] DuplicateParam param)
         {
             bool isExisting = false;
@@ -56,6 +58,7 @@ namespace PromotionEngineAPI.Controllers
         // GET: api/Channels/count
         [HttpGet]
         [Route("count")]
+        [Authorize]
         public async Task<IActionResult> CountChannel([FromQuery] Guid BrandId)
         {
             return Ok(await _service.CountAsync(el => !el.DelFlg && el.BrandId.Equals(BrandId)));
@@ -63,6 +66,7 @@ namespace PromotionEngineAPI.Controllers
 
         // GET: api/Channels/5
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<IActionResult> GetChannel([FromRoute]Guid id)
         {
             var result = await _service.GetByIdAsync(id);
@@ -75,6 +79,7 @@ namespace PromotionEngineAPI.Controllers
 
         // PUT: api/Channels/5
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> PutChannel([FromRoute]Guid id, [FromBody] ChannelDto dto)
         {
             if (id != dto.ChannelId)
@@ -97,6 +102,7 @@ namespace PromotionEngineAPI.Controllers
 
         // POST: api/Channels
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> PostChannel([FromBody] ChannelDto dto)
         {
             dto.ChannelId = Guid.NewGuid();
@@ -117,6 +123,7 @@ namespace PromotionEngineAPI.Controllers
 
         // DELETE: api/Channels/5
         [HttpDelete]
+        [Authorize]
         public async Task<IActionResult> DeleteChannel([FromQuery]Guid id)
         {
             if (id == null)

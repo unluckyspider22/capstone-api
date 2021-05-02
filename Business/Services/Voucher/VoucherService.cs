@@ -69,7 +69,7 @@ namespace ApplicationCore.Services
                     "Promotion.Brand," +
                     "Promotion.MemberLevelMapping.MemberLevel");
                         voucher = voucher.Where(f => Regex.IsMatch(f.VoucherCode, "^" + voucherModel.VoucherCode + "$"));
-                        
+
                         if (voucher.Count() > 1)
                         {
                             throw new ErrorObj(code: (int)AppConstant.ErrCode.Duplicate_VoucherCode, message: AppConstant.ErrMessage.Duplicate_VoucherCode, description: AppConstant.ErrMessage.Duplicate_VoucherCode);
@@ -89,7 +89,9 @@ namespace ApplicationCore.Services
                     else
                     {
                         IGenericRepository<Promotion> promoRepo = _unitOfWork.PromotionRepository;
-                        var promotion = await promoRepo.Get(filter: el => el.PromotionCode == voucherModel.PromotionCode,
+                        var promotion = await promoRepo.Get(filter: el =>
+                        el.PromotionCode == voucherModel.PromotionCode
+                        && !el.DelFlg,
                             includeProperties:
                     "PromotionTier.Action.ActionProductMapping.Product," +
                     "PromotionTier.Gift.GiftProductMapping.Product," +

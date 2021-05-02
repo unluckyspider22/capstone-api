@@ -3,6 +3,7 @@ using ApplicationCore.Services;
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
 using Infrastructure.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -64,13 +65,12 @@ namespace PromotionEngineAPI.Controllers
                     {
                         Console.WriteLine(AppConstant.EffectMessage.NoAutoPromotion);
                     }*/
-                    orderInfo.Vouchers = vouchers;
                 }
-
+                orderInfo.Vouchers = vouchers;
                 if (vouchers != null && vouchers.Count() > 0)
                 {
                     promotions = await _voucherService.CheckVoucher(orderInfo);
-                    if (_promotionService.GetPromotions().Count == 1)
+                    if (_promotionService.GetPromotions() != null &&  _promotionService.GetPromotions().Count == 1)
                     {
                         promotions.Add(_promotionService.GetPromotions().First());
                     }
@@ -175,6 +175,7 @@ namespace PromotionEngineAPI.Controllers
             order.BonusPoint ??= 0;
         }
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetPromotion(
             [FromQuery] PagingRequestParam param,
             [FromQuery] Guid BrandId,
@@ -200,6 +201,7 @@ namespace PromotionEngineAPI.Controllers
 
         // GET: api/Promotions/count
         [HttpGet]
+        [Authorize]
         [Route("countSearch")]
         public async Task<IActionResult> CountPromotion([FromQuery] SearchPagingRequestParam param, [FromQuery] Guid BrandId)
         {
@@ -218,6 +220,7 @@ namespace PromotionEngineAPI.Controllers
 
         // GET: api/Promotions
         [HttpGet]
+        [Authorize]
         [Route("search")]
         // api/Promotions?SearchContent=...?pageIndex=...&pageSize=...
         public async Task<IActionResult> SearchPromotion(
@@ -250,6 +253,7 @@ namespace PromotionEngineAPI.Controllers
 
         // GET: api/Promotions/count
         [HttpGet]
+        [Authorize]
         [Route("count")]
         public async Task<IActionResult> CountSearchResultPromotion([FromQuery] string status, [FromQuery] Guid brandId)
         {
@@ -270,7 +274,6 @@ namespace PromotionEngineAPI.Controllers
             }
 
         }
-
         // GET: api/Promotions/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPromotion([FromRoute] Guid id)
@@ -300,7 +303,7 @@ namespace PromotionEngineAPI.Controllers
 
 
         }
-
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutPromotion([FromRoute] Guid id, [FromBody] PromotionDto dto)
         {
@@ -329,7 +332,7 @@ namespace PromotionEngineAPI.Controllers
 
 
         }
-
+        [Authorize]
         // POST: api/Promotions
         [HttpPost]
         public async Task<IActionResult> PostPromotion([FromBody] PromotionDto dto)
@@ -345,7 +348,7 @@ namespace PromotionEngineAPI.Controllers
                 return StatusCode(statusCode: e.Code, e);
             }
         }
-
+        [Authorize]
         // DELETE: api/Promotions/5
         [HttpDelete]
         [Route("{id}")]

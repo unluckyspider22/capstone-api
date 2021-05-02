@@ -2,6 +2,7 @@
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
 using Infrastructure.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.ComponentModel.DataAnnotations;
@@ -15,6 +16,7 @@ namespace PromotionEngineAPI.Controllers
 {
     [Route("api/vouchers")]
     [ApiController]
+
     public class VouchersController : ControllerBase
     {
         private readonly IVoucherService _service;
@@ -25,6 +27,7 @@ namespace PromotionEngineAPI.Controllers
             _channelService = channelService;
         }
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetVoucher(
             [FromQuery] PagingRequestParam param,
             [FromQuery] Guid VoucherGroupId,
@@ -115,6 +118,7 @@ namespace PromotionEngineAPI.Controllers
 
         [HttpGet]
         [Route("check-voucher")]
+        [Authorize]
         public async Task<IActionResult> CheckVoucher(
          [Required][FromQuery] Guid VoucherGroupId,
             [FromQuery] string SearchCode = "")
@@ -137,6 +141,7 @@ namespace PromotionEngineAPI.Controllers
 
         [HttpGet]
         [Route("promotion-voucher-count")]
+        [Authorize]
         public async Task<IActionResult> CountPromotionVoucher([FromQuery] Guid PromotionId, [FromQuery] Guid VoucherGroupId)
         {
             if (PromotionId.Equals(Guid.Empty))
@@ -230,6 +235,7 @@ namespace PromotionEngineAPI.Controllers
         // GET: api/Vouchers/count
         [HttpGet]
         [Route("count")]
+        [Authorize]
         public async Task<IActionResult> CountVoucher([FromQuery] Guid VoucherGroupId)
         {
             try
@@ -244,6 +250,7 @@ namespace PromotionEngineAPI.Controllers
 
         // GET: api/Vouchers/5
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<IActionResult> GetVoucher([FromRoute] Guid id)
         {
             try
@@ -257,6 +264,7 @@ namespace PromotionEngineAPI.Controllers
         }
         // PUT: api/Vouchers/5
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> PutVoucher([FromRoute] Guid id, [FromBody] VoucherDto dto)
         {
             try
@@ -306,6 +314,7 @@ namespace PromotionEngineAPI.Controllers
 
         // POST: api/Vouchers
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> PostVoucher([FromBody] VoucherDto dto)
         {
             try
@@ -321,6 +330,7 @@ namespace PromotionEngineAPI.Controllers
 
         // DELETE: api/Vouchers/5
         [HttpDelete]
+        [Authorize]
         public async Task<IActionResult> DeleteVoucher([FromQuery] Guid id)
         {
             try

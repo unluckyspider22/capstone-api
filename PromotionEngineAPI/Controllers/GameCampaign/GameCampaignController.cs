@@ -1,6 +1,7 @@
 ﻿using ApplicationCore.Services;
 using ApplicationCore.Utils;
 using Infrastructure.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace PromotionEngineAPI.Controllers
 {
+    [Authorize]
     [Route("api/game-campaign")]
     [ApiController]
     public class GameCampaignController : ControllerBase

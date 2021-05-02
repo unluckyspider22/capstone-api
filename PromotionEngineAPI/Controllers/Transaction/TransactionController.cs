@@ -16,12 +16,10 @@ namespace PromotionEngineAPI.Controllers
     {
 
         private readonly ITransactionService _service;
-        private readonly IChannelService _channelService;
 
-        public TransactionController(ITransactionService service, IChannelService channelService)
+        public TransactionController(ITransactionService service)
         {
             _service = service;
-            _channelService = channelService;
         }
         //[Authorize]
         [HttpPost]
@@ -74,5 +72,22 @@ namespace PromotionEngineAPI.Controllers
                 });
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetTransaction(
+          [FromQuery] PagingRequestParam param,
+          [FromQuery] Guid PromotionId)
+        {
+            try
+            {
+                var result = await _service.GetPromoTrans(promotionId: PromotionId, param: param);
+                return Ok(result);
+            }
+            catch (ErrorObj e)
+            {
+                return StatusCode(statusCode: e.Code, e);
+            }
+        }
+
     }
 }
