@@ -265,7 +265,7 @@ namespace ApplicationCore.Services
                 var voucherGroup = await _repository.GetFirst(filter: el => el.VoucherGroupId.Equals(voucherGroupId), includeProperties: "Voucher");
                 IGenericRepository<Voucher> voucherRepo = _unitOfWork.VoucherRepository;
                 // Voucher cũ
-                var oldVouchers = voucherGroup.Voucher.OrderBy(el =>el.InsDate);
+                var oldVouchers = voucherGroup.Voucher.OrderBy(el => el.InsDate);
                 var oldVoucherCode = oldVouchers.Select(el => el.VoucherCode);
 
                 // Tổng voucher sau khi tạo xong
@@ -612,5 +612,28 @@ namespace ApplicationCore.Services
             return result;
         }
 
+        public async Task<VoucherGroupDto> UpdateVoucherGroup(VoucherGroupDto dto)
+        {
+            IGenericRepository<Infrastructure.Models.Action> actionRepo = _unitOfWork.ActionRepository;
+            IGenericRepository<Gift> giftRepo = _unitOfWork.GiftRepository;
+            var entity = await _repository.GetFirst(filter: el => el.VoucherGroupId.Equals(dto.VoucherGroupId));
+            var now = Common.GetCurrentDatetime();
+            entity.UpdDate = now;
+            //entity.Voucher = null;
+            if (dto.ActionId != null && !dto.ActionId.Equals(Guid.Empty))
+            {
+                var action = await actionRepo.GetFirst(filter: el => el.ActionId.Equals(dto.ActionId));
+                entity.Action = action;
+            }
+            else if (dto.GiftId != null && !dto.GiftId.Equals(Guid.Empty))
+            {
+                var action = await giftRepo.GetFirst(filter: el => el.GiftId.Equals(dto.GiftId));
+                entity.Gift = action;
+            }
+
+            _repository.Update(entity);
+            await _unitOfWork.SaveAsync();
+            return _mapper.Map<VoucherGroupDto>(entity);
+        }
     }
 }

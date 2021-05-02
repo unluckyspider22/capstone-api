@@ -1,6 +1,5 @@
 ﻿
 using ApplicationCore.Services;
-using ApplicationCore.Utils;
 using ApplicationCore.Worker;
 using Infrastructure.DTOs;
 using Infrastructure.Helper;
@@ -61,7 +60,7 @@ namespace PromotionEngineAPI.Controllers
                 }
                 var result = await _service.GetAsync(
                     pageIndex: param.PageIndex, pageSize: param.PageSize, filter: myFilter,
-                    includeProperties: "Action,Gift",
+                    includeProperties: "Action,Gift,PromotionTier",
                     orderBy: el => el.OrderByDescending(b => b.InsDate));
 
                 return Ok(result);
@@ -138,8 +137,7 @@ namespace PromotionEngineAPI.Controllers
             {
                 if (id != dto.VoucherGroupId)
                     return StatusCode(statusCode: (int)HttpStatusCode.BadRequest, new ErrorResponse().BadRequest);
-                dto.UpdDate = Common.GetCurrentDatetime();
-                return Ok(await _service.UpdateAsync(dto));
+                return Ok(await _service.UpdateVoucherGroup(dto));
             }
             catch (ErrorObj e)
             {

@@ -37,5 +37,7 @@ namespace ApplicationCore.Services
 
         public Task<VoucherGroupDetailDto> GetDetail(Guid id);
         public Task<CheckAddMoreDto> GetAddMoreInfo(Guid id);
+
+        public Task<VoucherGroupDto> UpdateVoucherGroup(VoucherGroupDto dto);
     }
 }
