@@ -7,6 +7,7 @@ using Infrastructure.Helper;
 using Infrastructure.Models;
 using Infrastructure.Repository;
 using Infrastructure.UnitOfWork;
+using MlkPwgen;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -33,6 +34,7 @@ namespace ApplicationCore.Services
             for (var i = 0; i < dto.Quantity; i++)
             {
                 VoucherDto voucher = new VoucherDto();
+
                 string randomVoucher = RandomString(dto.Charset, dto.CustomCharset, dto.CodeLength);
                 voucher.VoucherCode = dto.Prefix + randomVoucher + dto.Postfix;
                 voucher.VoucherGroupId = dto.VoucherGroupId;
@@ -40,48 +42,55 @@ namespace ApplicationCore.Services
             }
             return result;
         }
-        private Random Random = new Random();
+        // private Random Random = new Random();
         public string RandomString(string charset, string customCode, int length)
         {
             if (length == 0)
             {
                 length = 10;
             }
-            string randomCode = "";
-            string chars = "";
-            switch (charset)
+            if (!string.IsNullOrEmpty(customCode))
             {
-                case AppConstant.EnvVar.CharsetType.ALPHABETIC:
-                    chars = AppConstant.EnvVar.CharsetChars.ALPHABETIC;
-
-                    randomCode = new string(Enumerable.Repeat(chars, length).Select(s => s[Random.Next(s.Length)]).ToArray());
-                    break;
-                case AppConstant.EnvVar.CharsetType.ALPHANUMERIC:
-                    chars = AppConstant.EnvVar.CharsetChars.ALPHANUMERIC;
-
-                    randomCode = new string(Enumerable.Repeat(chars, length).Select(s => s[Random.Next(s.Length)]).ToArray());
-                    break;
-                case AppConstant.EnvVar.CharsetType.ALPHABETIC_UPERCASE:
-                    chars = AppConstant.EnvVar.CharsetChars.ALPHABETIC_UPERCASE;
-
-                    randomCode = new string(Enumerable.Repeat(chars, length).Select(s => s[Random.Next(s.Length)]).ToArray());
-                    break;
-                case AppConstant.EnvVar.CharsetType.ALPHABETIC_LOWERCASE:
-                    chars = AppConstant.EnvVar.CharsetChars.ALPHABETIC_LOWERCASE;
-
-                    randomCode = new string(Enumerable.Repeat(chars, length).Select(s => s[Random.Next(s.Length)]).ToArray());
-                    break;
-                case AppConstant.EnvVar.CharsetType.NUMBERS:
-                    chars = AppConstant.EnvVar.CharsetChars.NUMBERS;
-
-                    randomCode = new string(Enumerable.Repeat(chars, length).Select(s => s[Random.Next(s.Length)]).ToArray());
-                    break;
-                case AppConstant.EnvVar.CharsetType.CUSTOM:
-                    chars = customCode;
-                    randomCode = new string(Enumerable.Repeat(chars, length).Select(s => s[Random.Next(s.Length)]).ToArray());
-                    break;
+                charset = customCode;
             }
-            return randomCode;
+            var str = PasswordGenerator.Generate(length: length, allowed: charset);
+            return str;
+
+            /*string randomCode = "";
+           string chars = "";
+           switch (charset)
+           {
+               case AppConstant.EnvVar.CharsetType.ALPHABETIC:
+                   chars = AppConstant.EnvVar.CharsetChars.ALPHABETIC;
+
+                   randomCode = new string(Enumerable.Repeat(chars, length).Select(s => s[Random.Next(s.Length)]).ToArray());
+                   break;
+               case AppConstant.EnvVar.CharsetType.ALPHANUMERIC:
+                   chars = AppConstant.EnvVar.CharsetChars.ALPHANUMERIC;
+
+                   randomCode = new string(Enumerable.Repeat(chars, length).Select(s => s[Random.Next(s.Length)]).ToArray());
+                   break;
+               case AppConstant.EnvVar.CharsetType.ALPHABETIC_UPERCASE:
+                   chars = AppConstant.EnvVar.CharsetChars.ALPHABETIC_UPERCASE;
+
+                   randomCode = new string(Enumerable.Repeat(chars, length).Select(s => s[Random.Next(s.Length)]).ToArray());
+                   break;
+               case AppConstant.EnvVar.CharsetType.ALPHABETIC_LOWERCASE:
+                   chars = AppConstant.EnvVar.CharsetChars.ALPHABETIC_LOWERCASE;
+
+                   randomCode = new string(Enumerable.Repeat(chars, length).Select(s => s[Random.Next(s.Length)]).ToArray());
+                   break;
+               case AppConstant.EnvVar.CharsetType.NUMBERS:
+                   chars = AppConstant.EnvVar.CharsetChars.NUMBERS;
+
+                   randomCode = new string(Enumerable.Repeat(chars, length).Select(s => s[Random.Next(s.Length)]).ToArray());
+                   break;
+               case AppConstant.EnvVar.CharsetType.CUSTOM:
+                   chars = customCode;
+                   randomCode = new string(Enumerable.Repeat(chars, length).Select(s => s[Random.Next(s.Length)]).ToArray());
+                   break;
+           }
+           return randomCode;*/
         }
 
 

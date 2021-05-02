@@ -7,6 +7,7 @@ using Infrastructure.Models;
 using Infrastructure.Repository;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using MlkPwgen;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -190,14 +191,20 @@ namespace ApplicationCore.Worker
             }
             return result;
         }
-        private Random Random = new Random();
+        //   private Random Random = new Random();
         private string RandomString(string charset, string customCode, int length)
         {
             if (length == 0)
             {
                 length = 10;
             }
-            string randomCode = "";
+            if (!string.IsNullOrEmpty(customCode))
+            {
+                charset = customCode;
+            }
+            var str = PasswordGenerator.Generate(length: length, allowed: charset);
+            return str;
+            /*string randomCode = "";
             string chars = "";
             switch (charset)
             {
@@ -231,7 +238,7 @@ namespace ApplicationCore.Worker
                     randomCode = new string(Enumerable.Repeat(chars, length).Select(s => s[Random.Next(s.Length)]).ToArray());
                     break;
             }
-            return randomCode;
+            return randomCode;*/
         }
         #endregion
         public void AddMoreVoucher(Guid voucherGroupId, int quantityParam)
