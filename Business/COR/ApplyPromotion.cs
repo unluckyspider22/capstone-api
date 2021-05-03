@@ -180,19 +180,25 @@ namespace ApplicationCore.Chain
         public List<object> AddGiftGameCode(Order order, Gift postAction, Promotion promotion, PromotionTier promotionTier)
         {
             var now = Common.GetCurrentDatetime();
-            var firstDayOfTYear = new DateTime(2000, 01, 01);
+            var firstDayOfTYear = new DateTime(2021, 01, 01);
 
-            string nowStr = new DateTime((now - firstDayOfTYear).Ticks).ToString("yyHHddMMmm");
+            string nowStr = new DateTime((now - firstDayOfTYear).Ticks).ToString(AppConstant.FormatGameCode);
             Int64 temp1 = Convert.ToInt64(nowStr);
             //Int64.Parse(nowStr);
             Int64 temp2 = Convert.ToInt64(postAction.GameCampaign.SecretCode);
             //int.Parse(postAction.GameCampaign.SecretCode);
             Int64 gameCode = temp1 + temp2;
+            string gameCdStr = gameCode.ToString();
+            if (gameCdStr.Length < 10)
+            {
+                gameCdStr = "0" + gameCdStr;
+            }
             var gift = new
             {
                 code = promotion.PromotionCode + promotionTier.TierIndex,
                 GameName = postAction.GameCampaign.Name,
-                GameCode = gameCode,
+                now = "0"+ temp1,
+                GameCode = gameCdStr,
                 Duration = postAction.GameCampaign.ExpiredDuration
             };
             order.Gift.Add(gift);

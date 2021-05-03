@@ -322,7 +322,6 @@ namespace ApplicationCore.Services
 
                 throw new ErrorObj(code: (int)HttpStatusCode.InternalServerError, message: e.Message);
             }
-
         }
         private async Task UpdateVoucherGroupAfterApplied(VoucherGroup voucherGroup)
         {

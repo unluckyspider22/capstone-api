@@ -21,6 +21,7 @@ namespace Infrastructure.Helper
         public const string USED = "1";
         public const string Err_Prefix = "E-";
         public const string VietNamPhoneCode = "+84";
+        public const string FormatGameCode = "yyHHddMMmm";
         public struct Status
         {
             public const string ALL = "0";
