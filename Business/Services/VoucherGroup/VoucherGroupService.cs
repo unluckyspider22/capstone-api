@@ -630,10 +630,32 @@ namespace ApplicationCore.Services
                 var action = await giftRepo.GetFirst(filter: el => el.GiftId.Equals(dto.GiftId));
                 entity.Gift = action;
             }
-
+            await UpdateTierOfVoucherGroup(entity);
             _repository.Update(entity);
             await _unitOfWork.SaveAsync();
             return _mapper.Map<VoucherGroupDto>(entity);
+        }
+
+        private async Task UpdateTierOfVoucherGroup(VoucherGroup entity)
+        {
+            IGenericRepository<PromotionTier> tierRepo = _unitOfWork.PromotionTierRepository;
+            var tiers = await tierRepo.Get(filter: el => el.VoucherGroupId.Equals(entity.VoucherGroupId));
+            if (tiers.Count() > 0)
+            {
+                foreach (var tier in tiers)
+                {
+                    if (tier.ActionId != null && !tier.ActionId.Equals(Guid.Empty))
+                    {
+                        tier.Action = entity.Action;
+                    }
+                    else if (tier.GiftId != null && !tier.GiftId.Equals(Guid.Empty))
+                    {
+                        tier.Gift = entity.Gift;
+                    }
+                    tierRepo.Update(tier);
+                }
+                await _unitOfWork.SaveAsync();
+            }
         }
     }
 }

@@ -50,19 +50,18 @@ namespace PromotionEngineAPI.Controllers
                 Expression<Func<VoucherGroup, bool>> filter2;
                 if (ActionType > 0)
                 {
-                    filter2 = el => el.Action.ActionType == ActionType;
+                    filter2 = el => el.Action.ActionType == ActionType && !el.Action.DelFlg;
                     myFilter = myFilter.And(filter2);
                 }
                 else if (PostActionType > 0)
                 {
-                    filter2 = el => el.Gift.PostActionType == PostActionType;
+                    filter2 = el => el.Gift.PostActionType == PostActionType && !el.Gift.DelFlg;
                     myFilter = myFilter.And(filter2);
                 }
                 var result = await _service.GetAsync(
                     pageIndex: param.PageIndex, pageSize: param.PageSize, filter: myFilter,
                     includeProperties: "Action,Gift,PromotionTier",
                     orderBy: el => el.OrderByDescending(b => b.InsDate));
-
                 return Ok(result);
             }
             catch (ErrorObj e)

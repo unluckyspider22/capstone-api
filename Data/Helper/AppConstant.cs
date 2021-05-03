@@ -423,6 +423,6 @@ namespace Infrastructure.Helper
             }
         }
         //public const string CONNECTION_STRING = "Server=tcp:promotionengine.database.windows.net,1433;Database=PromotionEngine;User ID=adm;Password=Abcd1234;Trusted_Connection=false;MultipleActiveResultSets=true";
-        public const string CONNECTION_STRING = "Server=sqlserver.reso.vn,1433;Database=PromotionEngine;User ID = promotionengine; Password=promotion_engine_fall_2020;Trusted_Connection=false;MultipleActiveResultSets=true";
+        public const string CONNECTION_STRING = "Server=54.151.235.125,1433;Database=PromotionEngine;User ID=promotion_engine;Password=GnvX!meNa6J@xrN:3y;Trusted_Connection=false;MultipleActiveResultSets=true";
     }
 }
