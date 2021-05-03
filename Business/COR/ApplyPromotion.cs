@@ -358,7 +358,7 @@ namespace ApplicationCore.Chain
                                 effectType = AppConstant.EffectMessage.SetLadder;
                                 if (product.Quantity >= action.OrderLadderProduct)
                                 {
-                                   /* quantityDiscount = (product.Quantity - quantityDiscount + 1) > quantityDiscount ? quantityDiscount : (product.Quantity - quantityDiscount + 1);*/
+                                    quantityDiscount = (product.Quantity - (int)action.OrderLadderProduct + 1) > quantityDiscount ? quantityDiscount : (product.Quantity - (int)action.OrderLadderProduct + 1);
                                     discount = (decimal)(product.UnitPrice - action.LadderPrice) * quantityDiscount;
                                 }
                                 SetDiscountProduct(product, action, discount);
