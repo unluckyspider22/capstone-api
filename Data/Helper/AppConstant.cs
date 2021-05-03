@@ -143,6 +143,7 @@ namespace Infrastructure.Helper
                 ClassExclusiveOrder = 2,
                 ClassExclusiveProduct = 3,
                 ClassExclusiveShipping = 4,
+                ClassExclusiveGift = 5,
             }
             public enum Holiday
             {
