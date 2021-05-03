@@ -311,6 +311,8 @@ namespace ApplicationCore.Services
         {
             try
             {
+                IGenericRepository<VoucherGroup> groupRepo = _unitOfWork.VoucherGroupRepository;
+                IGenericRepository<Promotion> promotionRepo = _unitOfWork.PromotionRepository;
                 var now = Common.GetCurrentDatetime();
                 var oldId = entity.VoucherGroupId;
 
@@ -320,7 +322,7 @@ namespace ApplicationCore.Services
                     IVoucherRepository myRepo = new VoucherRepositoryImp();
                     await myRepo.UpdateVoucherGroupWhenDeletetier(voucherGroupId: (Guid)oldId, tierId: dto.PromotionTierId);
                     await UpdateVoucher(dto);
-                    IGenericRepository<VoucherGroup> groupRepo = _unitOfWork.VoucherGroupRepository;
+
                     var voucherGroup = await groupRepo.GetFirst(filter: el => el.VoucherGroupId.Equals(dto.VoucherGroupId));
                     if (voucherGroup != null)
                     {
@@ -341,6 +343,7 @@ namespace ApplicationCore.Services
                                                                     && !el.VoucherGroup.DelFlg);
                         if (vouchers.Count() > 0)
                         {
+                            var promotion = await promotionRepo.GetFirst(filter: el => el.PromotionId.Equals(dto.PromotionId));
                             var remain = dto.MoreQuantity;
                             while (remain > 0)
                             {
@@ -348,6 +351,7 @@ namespace ApplicationCore.Services
                                                              && (el.PromotionTierId.Equals(Guid.Empty) || el.PromotionTierId == null)).FirstOrDefault();
                                 if (voucher != null)
                                 {
+                                    voucher.Promotion = promotion;
                                     voucher.PromotionId = dto.PromotionId;
                                     voucher.PromotionTierId = dto.PromotionTierId;
                                     voucher.UpdDate = now;
