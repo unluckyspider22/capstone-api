@@ -207,7 +207,7 @@ namespace PromotionEngineAPI.Controllers
                         dateRedempedStr = "0" + dateRedempedStr;
                     }
                     var minus = DateTime.ParseExact(dateRedempedStr, AppConstant.FormatGameCode, CultureInfo.InvariantCulture);
-                    var dateStr = new DateTime(minus.Year - 2000, minus.Month, minus.Day, minus.Hour, minus.Minute, 0).Add(new TimeSpan(firstDayOfTYear.Ticks));
+                    var dateStr = new DateTime(minus.Year - 2000, minus.Month, minus.Day, minus.Hour, minus.Minute, 0).Add(new TimeSpan(firstDayOfTYear.Ticks)).AddMinutes(2);
                     isValidGameCd = dateStr.AddMinutes(gameCampaign.ExpiredDuration) >= now;
                 }
                 catch (Exception)

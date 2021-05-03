@@ -197,7 +197,6 @@ namespace ApplicationCore.Chain
             {
                 code = promotion.PromotionCode + promotionTier.TierIndex,
                 GameName = postAction.GameCampaign.Name,
-                now = "0"+ temp1,
                 GameCode = gameCdStr,
                 Duration = postAction.GameCampaign.ExpiredDuration
             };
