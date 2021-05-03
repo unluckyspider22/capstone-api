@@ -277,6 +277,7 @@ namespace Infrastructure.Helper
             public const string Signature_Err_Description = "Check your [BrandCode] or [ChannelCode]";
             public const string HashData_Not_Valid = "Hash data is not valid";
             public const string Invalid_ChannelCode = "Channel không tồn tại!";
+            public const string Invalid_Channel_Distribute = "Channel không được phân phối loại voucher này!";
             public const string Empty_CustomerInfo = "Thông tin khách hàng không hợp lệ [CustomerName] [CustomerPhoneNo]!";
 
         }

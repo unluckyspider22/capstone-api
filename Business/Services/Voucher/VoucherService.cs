@@ -363,9 +363,9 @@ namespace ApplicationCore.Services
                 {
                     voucher = vouchers.FirstOrDefault();
                     var tier = voucher.VoucherGroup.PromotionTier.FirstOrDefault(f => f.PromotionTierId == tierId);
-                    await SendEmailSmtp(param, voucher, tier);
                     //Update voucher vừa lấy
                     await UpdateVoucherRedemped(voucher, param);
+                    await SendEmailSmtp(param, voucher, tier);
                 }
                 else
                 {
@@ -423,8 +423,6 @@ namespace ApplicationCore.Services
                 client.Disconnect(true);
                 client.Dispose();
             }
-
-
         }
 
         private string GenerateContent(VoucherForCustomerModel param, Voucher voucher, PromotionTier tier)
@@ -473,8 +471,14 @@ namespace ApplicationCore.Services
               else
               {*/
             //Update channel
-            var channel = voucher.Promotion.PromotionChannelMapping.FirstOrDefault(w => w.Channel.ChannelCode == param.ChannelCode).Channel;
-            voucher.Channel = channel;
+            var channelMapping = voucher.Promotion.PromotionChannelMapping.FirstOrDefault(w => w.Channel.ChannelCode == param.ChannelCode);
+            if (channelMapping != null)
+            {
+                voucher.Channel = channelMapping.Channel;
+            } else
+            {
+                throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Invalid_Channel_Distribute);
+            }
             //}
 
             //Update membership
