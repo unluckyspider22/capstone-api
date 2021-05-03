@@ -370,7 +370,7 @@ namespace ApplicationCore.Services
                 }
                 else
                 {
-                    throw new ErrorObj(code: (int)AppConstant.ErrCode.Voucher_OutOfStock, message: AppConstant.ErrMessage.Voucher_OutOfStock);
+                    throw new ErrorObj(code: (int)HttpStatusCode.BadRequest, message: AppConstant.ErrMessage.Voucher_OutOfStock);
                 }
                 return param;
             }

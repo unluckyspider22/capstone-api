@@ -45,7 +45,8 @@ namespace ApplicationCore.Services
                 "Brand,PromotionChannelMapping.Channel," +
                 "PromotionTier.Action," +
                 "PromotionTier.Gift," +
-                "PromotionTier.VoucherGroup.Voucher")).Data; ;
+                "PromotionTier.VoucherGroup.Voucher," +
+                "Voucher")).Data; ;
 
                 promotions = promotions.Where(w =>
                 w.PromotionChannelMapping.Select(vc =>
