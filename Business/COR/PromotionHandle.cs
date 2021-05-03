@@ -104,6 +104,10 @@ namespace ApplicationCore.Chain
                 {
                     throw new ErrorObj(code: (int)AppConstant.ErrCode.Exclusive_Promotion, message: AppConstant.ErrMessage.Exclusive_Promotion);
                 }
+                if (_promotions.Where(w => w.Exclusive == (int)AppConstant.EnvVar.Exclusive.ClassExclusiveGift).Count() > 1)
+                {
+                    throw new ErrorObj(code: (int)AppConstant.ErrCode.Exclusive_Promotion, message: AppConstant.ErrMessage.Exclusive_Promotion);
+                }
             }
             if (autoPromotion != null)
             {
