@@ -1,6 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Models
 {
@@ -50,7 +48,9 @@ namespace Infrastructure.Models
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
-            { }
+            {
+
+            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -527,6 +527,7 @@ namespace Infrastructure.Models
                 entity.Property(e => e.MembershipId).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.Email)
+                    .IsRequired()
                     .HasMaxLength(62)
                     .IsUnicode(false);
 
