@@ -92,7 +92,7 @@ namespace Infrastructure.Models
 
                 entity.Property(e => e.PhoneNumber)
                     .IsRequired()
-                    .HasMaxLength(11)
+                    .HasMaxLength(12)
                     .IsUnicode(false);
 
                 entity.Property(e => e.UpdDate)
