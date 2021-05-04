@@ -385,6 +385,7 @@ namespace ApplicationCore.Services
                         entity.ProductCateId = dto.ProductCateId;
                         /*entity.CateId = newCate.CateId;*/
                     }
+                    entity.DelFlg = dto.DelFlg;
                     _repository.Update(entity);
                     await _unitOfWork.SaveAsync();
 
