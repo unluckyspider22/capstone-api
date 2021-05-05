@@ -28,8 +28,14 @@ namespace PromotionEngineAPI.Controllers
             {
                 var result = await _service.GetAsync(pageIndex: param.PageIndex, pageSize: param.PageSize,
                     filter: o => o.BrandId.Equals(brandId) && !o.DelFlg,
-                      orderBy: el => el.OrderByDescending(b => b.InsDate)
+                      orderBy: el => el.OrderByDescending(b => b.InsDate),
+                      includeProperties:"GameItems"
                     );
+                result.Data = result.Data.Select(s =>
+                {
+                    s.Quantity = s.GameItems.Count();
+                    return s;
+                }).ToList();
                 return Ok(result);
             }
             catch (ErrorObj e)
